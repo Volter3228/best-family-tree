@@ -1,3 +1,3 @@
-import isMentorStatus from "./isMentorStatus";
+import isMentor from "./isMentor";
 
-export { isMentorStatus };
+export { isMentor };
