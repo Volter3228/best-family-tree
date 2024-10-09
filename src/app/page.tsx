@@ -1,33 +1,19 @@
-import { ReactNode } from "react";
-import MemberNode from "@/components/MemberNode";
+import Flow from "@/components/Flow";
 import getFamilyTree from "@/libs/getFamilyTree";
-import { isMentor } from "@/server/src/utils";
-import { Member, Mentor } from "@/types";
+import {
+  getLayoutedElements,
+  transformMembersToFlowValues,
+} from "@/libs/reactFlow";
 
 export default async function Home() {
-  const familyTree = await getFamilyTree();
-  const printedFamilyTree: ReactNode[] = [];
-  const renderTree = (members: (Member | Mentor)[]) => {
-    printedFamilyTree.push(
-      <>
-        {members.map((member) => (
-          <MemberNode key={member.id} member={member} />
-        ))}
-      </>,
-    );
+  const familyTreeMembers = await getFamilyTree();
+  const { nodes, edges } = transformMembersToFlowValues(familyTreeMembers);
 
-    members.forEach((member) => {
-      if (isMentor(member) && member.mentees && member.mentees.length) {
-        renderTree(member.mentees);
-      }
-    });
-
-    return printedFamilyTree;
-  };
+  const layoutedElements = getLayoutedElements(nodes, edges);
 
   return (
-    <div className="container mx-auto grid grid-cols-5 gap-3 pt-6">
-      {renderTree(familyTree)}
+    <div className="mx-auto h-screen w-full pt-6">
+      <Flow {...layoutedElements} />
     </div>
   );
 }
