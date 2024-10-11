@@ -1,7 +1,8 @@
 import dagre from "@dagrejs/dagre";
 
-export const DEFAULT_NODE_WIDTH = 172;
-export const DEFAULT_NODE_HEIGHT = 36;
+// Using a larger width and height values creates more space between nodes
+export const DEFAULT_NODE_WIDTH = 400;
+export const DEFAULT_NODE_HEIGHT = 200;
 export const DEFAULT_DIRECTION = "TB";
 
 const dagreGraph = new dagre.graphlib.Graph();

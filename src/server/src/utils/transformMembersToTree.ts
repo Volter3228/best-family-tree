@@ -15,7 +15,8 @@ const getTree = (membersByMentorId: MembersByMentorId, mentorId: string) => {
 };
 
 export default function transformMembersToTree(members: (Member | Mentor)[]) {
-  // Create a map of mentorId to members
+  // Using map to avoid re-filtering the initial array of members
+  // by mentorId on every recursive call
   const membersByMentorId = members.reduce<MembersByMentorId>((acc, member) => {
     const mentorId = member.mentorId;
 
