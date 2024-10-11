@@ -1,4 +1,4 @@
-import Flow from "@/components/Flow";
+import Flow from "@/components/flow/Flow";
 import getFamilyTree from "@/libs/getFamilyTree";
 import {
   getLayoutedElements,
