@@ -3,9 +3,11 @@ import dagre from "@dagrejs/dagre";
 import dagreGraph, {
   DEFAULT_NODE_HEIGHT,
   DEFAULT_NODE_WIDTH,
+  FLOW_DIRECTION,
 } from "./dagreGraph";
 import { Member, Mentor, Position } from "@/types";
 import { isMentor } from "@/server/src/utils";
+import { DagreDirection } from "@/types/reactFlow";
 
 // const DEFAULT_EDGE_TYPE = "bezier";
 const DEFAULT_POSITION = { x: 0, y: 0 };
@@ -21,7 +23,7 @@ export const transformMembersToFlowValues = (
     nodes.push({
       id: member.id,
       type: "member",
-      data: { ...member, mentees: undefined },
+      data: { member: { ...member, mentees: undefined } },
       position: DEFAULT_POSITION,
       connectable: false,
       draggable: false,
@@ -64,7 +66,15 @@ export const transformMembersToFlowValues = (
   };
 };
 
-export const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+export const getLayoutedElements = (
+  nodes: Node[],
+  edges: Edge[],
+  direction: DagreDirection = FLOW_DIRECTION.DESKTOP
+) => {
+  dagreGraph.setGraph({
+    rankdir: direction,
+  });
+
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       height: DEFAULT_NODE_HEIGHT,
@@ -82,8 +92,9 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     const nodeWithPosition = dagreGraph.node(node.id);
     const newNode: Node = {
       ...node,
-      targetPosition: Position.Top,
-      sourcePosition: Position.Bottom,
+      data: { ...node.data, direction },
+      targetPosition: direction === "TB" ? Position.Top : Position.Left,
+      sourcePosition: direction === "TB" ? Position.Bottom : Position.Right,
       // Shifting the dagre node position (anchor=center center) to the top left
       // so it matches the React Flow node anchor point (top left).
       position: {

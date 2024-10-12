@@ -12,16 +12,16 @@ import {
 } from "@/constants/reactFlowSettings";
 import "@xyflow/react/dist/style.css";
 import "./styles.css";
+import Sidebar from "./sidebar/Sidebar";
 
-interface IFlowProps {
+interface IProps {
   layoutedNodes: Node[];
   layoutedEdges: Edge[];
 }
 
-export default function Flow({ layoutedNodes, layoutedEdges }: IFlowProps) {
+export default function Flow({ layoutedNodes, layoutedEdges }: IProps) {
   const [nodes] = useNodesState(layoutedNodes);
   const [edges] = useEdgesState(layoutedEdges);
-  console.log(nodes);
 
   return (
     <ReactFlow
@@ -31,6 +31,9 @@ export default function Flow({ layoutedNodes, layoutedEdges }: IFlowProps) {
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       fitView
       maxZoom={5}
-    />
+      minZoom={0.1}
+    >
+      <Sidebar />
+    </ReactFlow>
   );
 }

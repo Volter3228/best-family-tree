@@ -17,16 +17,25 @@
 }
 
 /* Handle Styles */
-.react-flow__handle.target {
-  top: 3px;
+.react-flow__handle {
   pointer-events: none;
   opacity: 0;
 }
 
-.react-flow__handle.source {
+.react-flow__handle-top {
+  top: 3px;
+}
+
+.react-flow__handle-bottom {
   bottom: 3px;
-  pointer-events: none;
-  opacity: 0;
+}
+
+.react-flow__handle-left {
+  left: 3px;
+}
+
+.react-flow__handle-right {
+  right: 3px;
 }
 
 /* Edge styles */
@@ -56,11 +65,4 @@
 .react-flow__edge:hover .react-flow__edge-path {
   stroke-width: 8;
   filter: drop-shadow(0px 0px 3px white);
-}
-
-/* Animation keyframes */
-@keyframes dashMove {
-  to {
-    stroke-dashoffset: -30; /* Move the dashes to create animation */
-  }
 }

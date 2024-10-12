@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { ReactFlowProvider } from "@xyflow/react";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -22,7 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${nunito.className} antialiased`}>{children}</body>
+      <ReactFlowProvider>
+        <body className={`${nunito.className} antialiased`}>{children}</body>
+      </ReactFlowProvider>
     </html>
   );
 }
