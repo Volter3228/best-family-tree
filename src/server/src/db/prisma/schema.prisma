@@ -17,7 +17,7 @@ model Member {
   familyGroupId      String?
   foundedFamilyGroup FamilyGroup?
   status             Status       @default(OBSERVER)
-  joinedAt           String
+  joinedAt           DateTime?
   photo              String?
   mentor             Member?      @relation("MentorMentees", fields: [mentorId], references: [id])
   mentorId           String?
