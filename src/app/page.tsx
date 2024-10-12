@@ -12,7 +12,7 @@ export default async function Home() {
   const layoutedElements = getLayoutedElements(nodes, edges);
 
   return (
-    <div className="mx-auto h-screen w-full pt-6">
+    <div className="mx-auto h-screen w-full">
       <Flow {...layoutedElements} />
     </div>
   );
