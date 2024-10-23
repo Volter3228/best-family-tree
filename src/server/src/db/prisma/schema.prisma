@@ -13,6 +13,10 @@ model Member {
   birthday           DateTime
   email              String?      @unique
   phoneNumber        String?      @unique
+  telegramLink       String?      @unique
+  instagramLink      String?      @unique
+  facebookLink       String?      @unique
+  linkedinLink       String?      @unique
   familyGroup        FamilyGroup? @relation("FamilyGroupMembers", fields: [familyGroupId], references: [id])
   familyGroupId      String?
   foundedFamilyGroup FamilyGroup?

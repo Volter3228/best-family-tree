@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { ReactFlowProvider } from "@xyflow/react";
 import "./globals.css";
+import "./animations.css";
 
 const nunito = Nunito({
   subsets: ["cyrillic-ext"],

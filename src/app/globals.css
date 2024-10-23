@@ -9,18 +9,16 @@
     rgb(192 38 211)
   );
   --foreground: rgb(17 24 39);
+  --accent: rgb(168 85 247);
 }
-
-/* @media (prefers-color-scheme: light) {
-  :root {
-    --background: #ffffff;
-    --foreground: #171717;
-  }
-} */
 
 body {
   color: var(--foreground);
   background: var(--background-image);
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+  scrollbar-arrow-color: transparent;
   font-family: Arial, Helvetica, sans-serif;
 }
 
