@@ -1,21 +1,28 @@
 "use client";
-import { ReactFlow, useNodesState, useEdgesState } from "@xyflow/react";
+import { useEffect } from "react";
+import {
+  ReactFlow,
+  useNodesState,
+  useEdgesState,
+  useReactFlow,
+  EdgeMouseHandler,
+} from "@xyflow/react";
 import {
   DEFAULT_EDGE_OPTIONS,
   EDGE_TYPES,
   NODE_TYPES,
 } from "@/constants/reactFlowSettings";
 import type { Member as MemberType } from "@/types";
-import Sidebar from "./sidebar/Sidebar";
-import "@xyflow/react/dist/style.css";
-import "./react-flow-styles.css";
 import {
   getLayoutedElements,
   transformMembersToFlowValues,
 } from "@/libs/reactFlow";
 import Member from "@/models/Member";
 import { useMembers } from "@/hooks/useMembers";
-import { useEffect } from "react";
+import Sidebar from "./sidebar/Sidebar";
+import "@xyflow/react/dist/style.css";
+import "./react-flow-styles.css";
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/dagreGraph";
 
 interface IProps {
   members: MemberType[];
@@ -35,6 +42,7 @@ export default function Flow({ members }: IProps) {
     transformMembersToFlowValues(memberInstances);
   const { layoutedNodes, layoutedEdges } = getLayoutedElements(tNodes, tEdges);
 
+  const { setCenter } = useReactFlow();
   const [nodes, setNodes] = useNodesState(layoutedNodes);
   const [edges, setEdges] = useEdgesState(layoutedEdges);
 
@@ -53,6 +61,19 @@ export default function Flow({ members }: IProps) {
     // Re-transform the members into nodes and edges after any changes
   }, [membersTree, flatMembersList, setEdges, setNodes]);
 
+  const handleEdgeDoubleClick: EdgeMouseHandler = (event, edge) => {
+    event.preventDefault();
+    if (nodes.length > 0) {
+      const node = nodes.find((node) => node.id === edge.source)!;
+
+      const x = node.position.x + DEFAULT_NODE_WIDTH / 2;
+      const y = node.position.y + DEFAULT_NODE_HEIGHT / 2;
+      const zoom = 1.5;
+
+      setCenter(x, y, { zoom, duration: 400 });
+    }
+  };
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -63,6 +84,7 @@ export default function Flow({ members }: IProps) {
       fitView
       maxZoom={5}
       minZoom={0.1}
+      onEdgeDoubleClick={handleEdgeDoubleClick}
     >
       <Sidebar />
     </ReactFlow>
