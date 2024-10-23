@@ -61,11 +61,9 @@ export const useMembers = () => {
           mentor.addMentee(newMemberInstance); // Add mentee to the mentor
         }
       } else {
-        // If no mentor, add as a core member
         setMembersTree((prevTree) => [...(prevTree || []), newMemberInstance]);
       }
 
-      // Update the flat list by flattening the tree again
       setFlatMembersList([...flatMembersList, newMemberInstance]);
     },
     [setMembersTree, flatMembersList, setFlatMembersList]
