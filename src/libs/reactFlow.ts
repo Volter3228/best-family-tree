@@ -5,25 +5,25 @@ import dagreGraph, {
   DEFAULT_NODE_WIDTH,
   FLOW_DIRECTION,
 } from "./dagreGraph";
-import { Member, Mentor, Position } from "@/types";
-import { isMentor } from "@/server/src/utils";
+import Member from "@/models/Member";
+import { Position } from "@/types";
 import { DagreDirection } from "@/types/reactFlow";
 
-// const DEFAULT_EDGE_TYPE = "bezier";
 const DEFAULT_POSITION = { x: 0, y: 0 };
 
 export const transformMembersToFlowValues = (
-  members: (Member | Mentor)[],
+  members: Member[],
   parentRowIndex: number = 0
 ): { nodes: Node[]; edges: Edge[] } => {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
   members.forEach((member, index) => {
+    const mentorId = member.mentorId;
     nodes.push({
       id: member.id,
       type: "member",
-      data: { member: { ...member, mentees: undefined } },
+      data: { member },
       position: DEFAULT_POSITION,
       connectable: false,
       draggable: false,
@@ -35,14 +35,15 @@ export const transformMembersToFlowValues = (
       } as React.CSSProperties,
     });
 
-    const mentorId = member.mentorId;
     if (mentorId) {
       edges.push({
         id: `E_${mentorId}->${member.id}`,
+        type: "customEdge",
         source: mentorId,
         target: member.id,
         focusable: false,
         reconnectable: false,
+        selected: false,
         style: {
           "--parent-row-index": parentRowIndex,
           // edge-index -  the position index of the edge within the edges connected to the node
@@ -51,7 +52,7 @@ export const transformMembersToFlowValues = (
       });
     }
 
-    if (isMentor(member)) {
+    if (member.isMentor() && member.mentees.length) {
       const { nodes: transformedNodes, edges: transformedEdges } =
         transformMembersToFlowValues(member.mentees, parentRowIndex + 1);
 
@@ -73,6 +74,8 @@ export const getLayoutedElements = (
 ) => {
   dagreGraph.setGraph({
     rankdir: direction,
+    ranksep: 400,
+    nodesep: 50,
   });
 
   nodes.forEach((node) => {

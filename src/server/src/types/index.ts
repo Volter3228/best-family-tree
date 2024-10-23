@@ -1,13 +1,12 @@
-import { Member } from "@prisma/client";
+import { Member as PrismaMember, Status as MemberStatus } from "@prisma/client";
 
-enum MENTOR_STATUSES {
+export enum MENTOR_STATUSES {
   ALUMNI = "ALUMNI",
   FULL = "FULL",
 }
 
-type Mentor = Omit<Member, "status"> & {
-  status: MENTOR_STATUSES;
-  mentees: (Mentor | Member)[];
+type Member = PrismaMember & {
+  mentees: Member[];
 };
 
-export type { Member, Mentor };
+export { type Member, MemberStatus };

@@ -21,7 +21,7 @@ export default function SidebarIconButton({
       active:bg-purple-900 focus:outline-none duration-200 group
       "
     >
-      <Icon className="stroke-fuchsia-500 md:group-hover:stroke-purple-800 md:group-hover:stroke-2" />
+      <Icon className="stroke-fuchsia-400 md:group-hover:stroke-purple-800 md:group-hover:stroke-2" />
     </button>
   );
 }

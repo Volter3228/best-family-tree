@@ -1,39 +1,39 @@
-import { Member, Mentor } from "@/types";
-import isMentor from "./isMentor";
+import { Member as MemberType } from "@/types";
 
 type MembersByMentorId = {
-  [mentorId: string]: (Member | Mentor)[];
+  [mentorId: string]: MemberType[];
 };
 
 const getTree = (membersByMentorId: MembersByMentorId, mentorId: string) => {
-  return (membersByMentorId[mentorId] || []).map((member): Member | Mentor => ({
-    ...member,
-    ...(isMentor(member)
-      ? { mentees: getTree(membersByMentorId, member.id) }
-      : {}),
-  }));
+  return (membersByMentorId[mentorId] || []).map(
+    (member): MemberType => ({
+      ...member,
+      mentees: member.mentees.length
+        ? getTree(membersByMentorId, member.id)
+        : [],
+    })
+  );
 };
 
-export default function transformMembersToTree(members: (Member | Mentor)[]) {
-  // Using map to avoid re-filtering the initial array of members
-  // by mentorId on every recursive call
+export default function transformMembersToTree(members: MemberType[]) {
   const membersByMentorId = members.reduce<MembersByMentorId>((acc, member) => {
     const mentorId = member.mentorId;
-
     if (!mentorId) return acc;
 
-    if (!acc[mentorId]) acc[mentorId] = [];
-
+    acc[mentorId] = acc[mentorId] || [];
     acc[mentorId].push(member);
+
     return acc;
   }, {});
 
   return members
     .filter((member) => member.mentorId === null)
-    .map((member): Member | Mentor => ({
-      ...member,
-      ...(isMentor(member)
-        ? { mentees: getTree(membersByMentorId, member.id) }
-        : {}),
-    }));
+    .map(
+      (member): MemberType => ({
+        ...member,
+        mentees: member.mentees.length
+          ? getTree(membersByMentorId, member.id)
+          : [],
+      })
+    );
 }

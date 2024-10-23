@@ -1,17 +1,17 @@
-import { Member, Position } from "@/types";
-import { DagreDirection } from "@/types/reactFlow";
+import { Position } from "@/types";
+import Member from "@/models/Member";
 import { Handle } from "@xyflow/react";
 import Image from "next/image";
 
 interface IProps {
   id: string;
-  data: { member: Member; direction: DagreDirection };
+  data: { member: Member };
 }
 
 export default function MemberNode({
   data: {
-    member: { name, photo, joinedAt },
-    direction,
+    member,
+    member: { name, photo },
   },
 }: IProps) {
   return (
@@ -24,32 +24,24 @@ export default function MemberNode({
       "
     >
       <div className="relative h-16 w-16 rounded-full bg-primary">
-        <div className="absolute inset-0 scale-75">
+        <div className={`absolute inset-0 ${photo ? "" : "scale-75"}`}>
           <Image
-            src={photo || "/images/lion-white.png"}
+            src={photo || "/images/lion.svg"}
             alt={`${name} photo`}
             fill
             sizes="100%"
-            className="rounded-full"
+            className={`rounded-full ${photo ? "" : "invert"}`}
           />
         </div>
       </div>
 
       <div className="ml-4 flex flex-col">
-        <h3 className="text-lg font-semibold">{name}</h3>
-        <p className="text-sm">{joinedAt}</p>
+        <h3 className="text-base font-semibold">{name}</h3>
+        <p className="text-sm">{member.getRecruitmentSeason()}</p>
       </div>
-      {direction === "TB" ? (
-        <>
-          <Handle type="target" position={Position.Top} />
-          <Handle type="source" position={Position.Bottom} />
-        </>
-      ) : (
-        <>
-          <Handle type="target" position={Position.Left} />
-          <Handle type="source" position={Position.Right} />
-        </>
-      )}
+
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }
