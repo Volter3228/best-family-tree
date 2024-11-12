@@ -62,6 +62,7 @@ export default function Flow({ members }: IProps) {
   }, [membersTree, flatMembersList, setEdges, setNodes]);
 
   const handleEdgeDoubleClick: EdgeMouseHandler = (event, edge) => {
+    console.log(nodes);
     event.preventDefault();
     if (nodes.length > 0) {
       const node = nodes.find((node) => node.id === edge.source)!;
@@ -70,7 +71,7 @@ export default function Flow({ members }: IProps) {
       const y = node.position.y + DEFAULT_NODE_HEIGHT / 2;
       const zoom = 1.5;
 
-      setCenter(x, y, { zoom, duration: 400 });
+      setCenter(x, y, { zoom, duration: 250 });
     }
   };
 

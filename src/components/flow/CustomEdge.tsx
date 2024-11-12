@@ -1,15 +1,15 @@
-import { CSSProperties } from "react";
+import { CSSProperties, memo } from "react";
 import getBezierLength from "@/libs/getBezierLength";
 import { BaseEdge, EdgeProps, getBezierPath } from "@xyflow/react";
 
-export default function CustomEdge({
+const CustomEdge = ({
   id,
   sourceX,
   sourceY,
   targetX,
   targetY,
   style,
-}: EdgeProps) {
+}: EdgeProps) => {
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
@@ -25,4 +25,6 @@ export default function CustomEdge({
       style={{ ...style, "--edge-length": edgeLenght + 45 } as CSSProperties}
     />
   );
-}
+};
+
+export default memo(CustomEdge);
