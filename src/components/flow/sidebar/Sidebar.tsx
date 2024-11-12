@@ -24,7 +24,7 @@ export default function Sidebar() {
   };
 
   const handleFitViewClick = () => {
-    fitView({ duration: 500 });
+    fitView({ duration: 300 });
   };
 
   return (
