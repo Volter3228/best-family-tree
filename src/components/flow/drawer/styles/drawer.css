@@ -1,0 +1,5 @@
+.member-info-row .info-value > span {
+  overflow-x: overlay;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}

@@ -3,35 +3,53 @@ import { getMonth, getYear } from "date-fns";
 
 export default class Member {
   id: string;
-  name: string;
-  joinedAt: Date | null = null;
   birthday: Date;
-  mentorId: string | null;
-  mentees: Member[];
+  email: string | null;
+  facebookLink: string | null;
   familyGroupId: string | null;
-  status: string;
+  instagramLink: string | null;
+  joinedAt: Date | null = null;
+  linkedinLink: string | null;
+  mentees: Member[];
+  mentorId: string | null;
+  name: string;
+  phoneNumber: string | null;
   photo: string | null;
+  status: string;
+  telegramLink: string | null;
 
   constructor({
     id,
-    name,
-    joinedAt,
     birthday,
-    mentorId,
-    mentees,
+    email,
+    facebookLink,
     familyGroupId,
-    status,
+    instagramLink,
+    joinedAt,
+    linkedinLink,
+    mentees,
+    mentorId,
+    name,
+    phoneNumber,
     photo,
+    status,
+    telegramLink,
   }: MemberType) {
     this.id = id;
-    this.name = name;
-    this.joinedAt = joinedAt;
     this.birthday = new Date(birthday);
-    this.mentorId = mentorId;
-    this.mentees = mentees.map((mentee: MemberType) => new Member(mentee)); // Recursively create mentees
+    this.email = email;
+    this.facebookLink = facebookLink;
     this.familyGroupId = familyGroupId;
-    this.status = status;
+    this.instagramLink = instagramLink;
+    this.joinedAt = joinedAt;
+    this.linkedinLink = linkedinLink;
+    this.mentees = mentees.map((mentee: MemberType) => new Member(mentee)); // Recursively create mentees
+    this.mentorId = mentorId;
+    this.name = name;
+    this.phoneNumber = phoneNumber;
     this.photo = photo;
+    this.status = status;
+    this.telegramLink = telegramLink;
   }
 
   // Add a mentee
@@ -54,5 +72,11 @@ export default class Member {
     return (
       this.status === MemberStatus.ALUMNI || this.status === MemberStatus.FULL
     );
+  }
+
+  getMenteesNamesString(): string {
+    return this.isMentor()
+      ? this.mentees.map(({ name }) => name).join(", ")
+      : "";
   }
 }

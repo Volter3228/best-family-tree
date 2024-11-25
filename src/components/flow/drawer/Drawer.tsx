@@ -1,10 +1,14 @@
+import React from "react";
+import { createPortal } from "react-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline"; // Tailwind Heroicons
+import "./styles/drawer.css";
 
 interface IProps {
   headerTitle?: string;
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
+  className?: string;
 }
 
 const Drawer: React.FC<IProps> = ({
@@ -12,14 +16,15 @@ const Drawer: React.FC<IProps> = ({
   onClose,
   headerTitle = "Drawer Header",
   children,
+  className = "",
 }) => {
   return (
-    <div
+    /*createPortal */ <div
       className={`
-        fixed top-0 right-0 h-full w-dvw min-w-96 md:w-1/2 lg:w-1/3 xl:w-1/4 bg-white
+        fixed top-0 right-0 h-full w-dvw md:min-w-128 md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
         shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)] transform transition-transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
-        } duration-300 z-50
+        } duration-300 ${className}
       `}
     >
       <div className="flex justify-between items-center p-4 border-b bg-primary">
@@ -32,7 +37,8 @@ const Drawer: React.FC<IProps> = ({
       </div>
       <div className="p-6">{children}</div>
     </div>
+    // document.body
   );
 };
 
-export default Drawer;
+export default React.memo(Drawer);
