@@ -7,16 +7,16 @@ import {
 import { Panel, useReactFlow } from "@xyflow/react";
 import SidebarIconButton from "./SidebarIconButton";
 import Drawer from "../drawer/Drawer";
-import AddMemberForm from "../drawer/form/AddMemberForm";
+import AddMemberForm from "../drawer/form/addMember/AddMemberForm";
 
 export default function Sidebar() {
   const { fitView } = useReactFlow();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  const toggleDrawerView = () => setDrawerOpen(!isDrawerOpen);
+  const toggleDrawer = () => setDrawerOpen(!isDrawerOpen);
 
   const handleAddMemberClick = () => {
-    toggleDrawerView();
+    toggleDrawer();
   };
 
   const handleShowFamilyClick = () => {
@@ -50,8 +50,9 @@ export default function Sidebar() {
       </Panel>
       <Drawer
         headerTitle="Додати мембера"
-        onClose={toggleDrawerView}
+        onClose={toggleDrawer}
         isOpen={isDrawerOpen}
+        className="z-20"
       >
         <AddMemberForm />
       </Drawer>

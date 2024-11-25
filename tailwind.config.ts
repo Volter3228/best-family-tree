@@ -16,6 +16,9 @@ const config: Config = {
         "accent-darken": colors.purple[600],
         placeholder: colors.gray[400],
       },
+      spacing: {
+        "128": "32rem",
+      },
     },
   },
   plugins: [],

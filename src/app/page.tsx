@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <div className="mx-auto h-screen w-full">
       <MembersProvider>
-        <Flow members={familyTreeMembers} />
+        {!!familyTreeMembers && <Flow members={familyTreeMembers} />}
       </MembersProvider>
     </div>
   );

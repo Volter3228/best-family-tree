@@ -34,14 +34,14 @@ const AvatarFileInput: React.FC<IProps> = ({ initialImage, onImageSelect }) => {
           <Image
             src={selectedImage}
             alt="Avatar"
-            className="rounded-full"
+            className="rounded-full shadow-lg"
             fill
           />
         ) : (
           <div
             className="
               flex items-center justify-center w-full h-full rounded-full
-              bg-purple-50 text-accent text-center p-8 shadow-inner 
+              bg-purple-50 text-accent text-center p-8 shadow-inner
             "
           >
             <LionIcon className="fill-accent-darken" />

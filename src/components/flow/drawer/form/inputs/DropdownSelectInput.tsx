@@ -14,7 +14,7 @@ interface IProps {
   onSelect: (value: string) => void;
 }
 
-export default function DropdownInput({
+export default function DropdownSelectInput({
   label = "",
   name,
   options,

@@ -69,8 +69,12 @@ export const useMembers = () => {
     [setMembersTree, flatMembersList, setFlatMembersList]
   );
 
+  const getMemberById = (mentorId: string) =>
+    flatMembersList.find(({ id }) => id === mentorId);
+
   return {
     ...context,
+    getMemberById,
     getMentorsList: handleGetMentorsList,
     setMembers: handleSetMembers,
     addMember: handleAddMember,

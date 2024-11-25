@@ -10,6 +10,8 @@ interface IMembersContext {
   setMentorsList: Dispatch<SetStateAction<MentorsListItem[]>>;
   flatMembersList: Member[];
   setFlatMembersList: Dispatch<SetStateAction<Member[]>>;
+  selectedMember: Member | null;
+  setSelectedMember: Dispatch<SetStateAction<Member | null>>;
 }
 
 export const MembersContext = createContext<IMembersContext | undefined>(
@@ -23,6 +25,7 @@ export const MembersProvider: React.FC<{ children: React.ReactNode }> = ({
   const [membersTree, setMembersTree] = useState<Member[] | null>(null);
   const [mentorsList, setMentorsList] = useState<MentorsListItem[]>([]);
   const [flatMembersList, setFlatMembersList] = useState<Member[]>([]);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   return (
     <MembersContext.Provider
@@ -33,6 +36,8 @@ export const MembersProvider: React.FC<{ children: React.ReactNode }> = ({
         setMentorsList,
         flatMembersList,
         setFlatMembersList,
+        selectedMember,
+        setSelectedMember,
       }}
     >
       {children}

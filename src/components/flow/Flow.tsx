@@ -23,6 +23,8 @@ import Sidebar from "./sidebar/Sidebar";
 import "@xyflow/react/dist/style.css";
 import "./react-flow-styles.css";
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/dagreGraph";
+import Drawer from "./drawer/Drawer";
+import MemberInfo from "./drawer/MemberInfo";
 
 interface IProps {
   members: MemberType[];
@@ -30,7 +32,13 @@ interface IProps {
 
 export default function Flow({ members }: IProps) {
   const memberInstances = members.map((member) => new Member(member));
-  const { membersTree, setMembers, flatMembersList } = useMembers();
+  const {
+    membersTree,
+    setMembers,
+    flatMembersList,
+    selectedMember,
+    setSelectedMember,
+  } = useMembers();
 
   useEffect(() => {
     if (!membersTree) {
@@ -62,18 +70,20 @@ export default function Flow({ members }: IProps) {
   }, [membersTree, flatMembersList, setEdges, setNodes]);
 
   const handleEdgeDoubleClick: EdgeMouseHandler = (event, edge) => {
-    console.log(nodes);
     event.preventDefault();
+    console.log("tap");
     if (nodes.length > 0) {
       const node = nodes.find((node) => node.id === edge.source)!;
 
       const x = node.position.x + DEFAULT_NODE_WIDTH / 2;
       const y = node.position.y + DEFAULT_NODE_HEIGHT / 2;
-      const zoom = 1.5;
+      const zoom = 2;
 
-      setCenter(x, y, { zoom, duration: 250 });
+      setCenter(x, y, { zoom, duration: 100 });
     }
   };
+
+  const handleInfoDrawerClose = () => setSelectedMember(null);
 
   return (
     <ReactFlow
@@ -83,11 +93,20 @@ export default function Flow({ members }: IProps) {
       edgeTypes={EDGE_TYPES}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       fitView
-      maxZoom={5}
+      maxZoom={2}
       minZoom={0.1}
       onEdgeDoubleClick={handleEdgeDoubleClick}
+      id="flow"
     >
       <Sidebar />
+      <Drawer
+        headerTitle="Інфо"
+        onClose={handleInfoDrawerClose}
+        isOpen={!!selectedMember}
+        className="z-10"
+      >
+        {!!selectedMember && <MemberInfo member={selectedMember} />}
+      </Drawer>
     </ReactFlow>
   );
 }
