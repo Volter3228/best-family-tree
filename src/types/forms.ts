@@ -6,7 +6,7 @@ export type AddMemberForm = {
   birthday: Date | null;
   joinedAt: Date | null;
   mentorId: string;
-  status: MemberStatus;
+  status: MemberStatus | null;
   phoneNumber: string;
   email: string;
   photo: File | null;

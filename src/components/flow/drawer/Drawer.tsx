@@ -1,9 +1,8 @@
 import React from "react";
-import { createPortal } from "react-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline"; // Tailwind Heroicons
 import "./styles/drawer.css";
 
-interface IProps {
+interface Props {
   headerTitle?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -11,13 +10,13 @@ interface IProps {
   className?: string;
 }
 
-const Drawer: React.FC<IProps> = ({
+const Drawer = ({
   isOpen,
   onClose,
   headerTitle = "Drawer Header",
   children,
   className = "",
-}) => {
+}: Props) => {
   return (
     /*createPortal */ <div
       className={`

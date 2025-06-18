@@ -2,7 +2,7 @@ import { DocumentDuplicateIcon } from "@heroicons/react/16/solid";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-interface IProps {
+interface Props {
   title: string;
   value: string;
   icon: React.ForwardRefExoticComponent<
@@ -11,12 +11,12 @@ interface IProps {
   showCopyIcon?: boolean;
 }
 
-export default function MemberInfoRow({
+const MemberInfoRow = ({
   title,
   value,
   icon: Icon,
   showCopyIcon = false,
-}: IProps) {
+}: Props) => {
   const [copied, setCopied] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const copyIconRef = useRef<SVGSVGElement>(null);
@@ -75,4 +75,6 @@ export default function MemberInfoRow({
       </p>
     </div>
   );
-}
+};
+
+export default MemberInfoRow;

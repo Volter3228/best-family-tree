@@ -1,36 +1,37 @@
 "use client";
 import { useEffect } from "react";
 import {
-  ReactFlow,
-  useNodesState,
-  useEdgesState,
-  useReactFlow,
   EdgeMouseHandler,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
 } from "@xyflow/react";
 import {
   DEFAULT_EDGE_OPTIONS,
   EDGE_TYPES,
   NODE_TYPES,
 } from "@/constants/reactFlowSettings";
-import type { Member as MemberType } from "@/types";
+import { useMembers } from "@/hooks/useMembers";
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/dagreGraph";
 import {
   getLayoutedElements,
   transformMembersToFlowValues,
 } from "@/libs/reactFlow";
 import Member from "@/models/Member";
-import { useMembers } from "@/hooks/useMembers";
-import Sidebar from "./sidebar/Sidebar";
-import "@xyflow/react/dist/style.css";
-import "./react-flow-styles.css";
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/dagreGraph";
+import type { Member as MemberType } from "@/types";
 import Drawer from "./drawer/Drawer";
 import MemberInfo from "./drawer/MemberInfo";
+import Sidebar from "./sidebar/Sidebar";
 
-interface IProps {
+import "@xyflow/react/dist/style.css";
+import "./react-flow-styles.css";
+
+interface Props {
   members: MemberType[];
 }
 
-export default function Flow({ members }: IProps) {
+const Flow = ({ members }: Readonly<Props>) => {
   const memberInstances = members.map((member) => new Member(member));
   const {
     membersTree,
@@ -71,7 +72,6 @@ export default function Flow({ members }: IProps) {
 
   const handleEdgeDoubleClick: EdgeMouseHandler = (event, edge) => {
     event.preventDefault();
-    console.log("tap");
     if (nodes.length > 0) {
       const node = nodes.find((node) => node.id === edge.source)!;
 
@@ -96,6 +96,8 @@ export default function Flow({ members }: IProps) {
       maxZoom={2}
       minZoom={0.1}
       onEdgeDoubleClick={handleEdgeDoubleClick}
+      nodesDraggable={false}
+      nodesConnectable={false}
       id="flow"
     >
       <Sidebar />
@@ -109,4 +111,6 @@ export default function Flow({ members }: IProps) {
       </Drawer>
     </ReactFlow>
   );
-}
+};
+
+export default Flow;

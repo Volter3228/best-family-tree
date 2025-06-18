@@ -1,12 +1,12 @@
-import { Position } from "@/types";
+import { useMembers } from "@/hooks/useMembers";
 import Member from "@/models/Member";
-import { Handle } from "@xyflow/react";
+import { Position } from "@/types";
+import { Handle, NodeProps } from "@xyflow/react";
 import Image from "next/image";
 import { memo } from "react";
-import { useMembers } from "@/hooks/useMembers";
 import LionIcon from "../icons/Lion";
 
-interface IProps {
+interface Props extends NodeProps {
   id: string;
   data: { member: Member };
 }
@@ -16,7 +16,7 @@ const MemberNode = ({
     member,
     member: { name, photo },
   },
-}: IProps) => {
+}: Readonly<Props>) => {
   const { selectedMember, setSelectedMember } = useMembers();
 
   const handleNodeClick = () => setSelectedMember(member);

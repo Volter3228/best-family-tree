@@ -1,8 +1,8 @@
-interface IProps {
+interface Props {
   className?: string;
 }
 
-export default function LionIcon({ className = "" }: IProps) {
+const LionIcon = ({ className = "" }: Props) => {
   return (
     <svg
       version="1.0"
@@ -145,4 +145,6 @@ l95 64 5 -418 5 -419 165 145 c91 79 197 168 235 198 39 29 324 212 635 405
       </g>
     </svg>
   );
-}
+};
+
+export default LionIcon;

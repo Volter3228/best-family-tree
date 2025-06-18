@@ -7,16 +7,18 @@ import {
 } from "@/components/icons/social";
 import TextInput from "../inputs/TextInput";
 
-interface IProps {
+interface Props {
   form: AddMemberForm;
   onTextChange: (name: string) => (value: string) => void;
+  errors: Partial<Record<keyof AddMemberForm, string>>;
 }
 
-export default function SocialMediaFields({ form, onTextChange }: IProps) {
+const SocialMediaFields = ({ form, onTextChange, errors }: Props) => {
+  console.log(errors);
   return (
     <>
       <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 relative">
           <TextInput
             name="telegramLink"
             value={form.telegramLink}
@@ -25,8 +27,13 @@ export default function SocialMediaFields({ form, onTextChange }: IProps) {
             label="Telegram"
             icon={TelegramIcon}
           />
+          {errors.telegramLink && (
+            <p className="absolute left-0 -bottom-6 text-accent">
+              {errors.telegramLink}
+            </p>
+          )}
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 relative">
           <TextInput
             name="instagramLink"
             value={form.instagramLink}
@@ -35,10 +42,15 @@ export default function SocialMediaFields({ form, onTextChange }: IProps) {
             label="Instagram"
             icon={InstagramIcon}
           />
+          {errors.instagramLink && (
+            <p className="absolute left-0 -bottom-6 text-accent">
+              {errors.instagramLink}
+            </p>
+          )}
         </div>
       </div>
       <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 relative">
           <TextInput
             name="facebookLink"
             value={form.facebookLink}
@@ -47,8 +59,13 @@ export default function SocialMediaFields({ form, onTextChange }: IProps) {
             label="Facebook"
             icon={FacebookIcon}
           />
+          {errors.facebookLink && (
+            <p className="absolute left-0 -bottom-6 text-accent">
+              {errors.facebookLink}
+            </p>
+          )}
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 relative">
           <TextInput
             name="linkedinLink"
             value={form.linkedinLink}
@@ -57,8 +74,15 @@ export default function SocialMediaFields({ form, onTextChange }: IProps) {
             label="LinkedIn"
             icon={LinkedinIcon}
           />
+          {errors.linkedinLink && (
+            <p className="absolute left-0 -bottom-6 text-accent">
+              {errors.linkedinLink}
+            </p>
+          )}
         </div>
       </div>
     </>
   );
-}
+};
+
+export default SocialMediaFields;

@@ -1,14 +1,11 @@
 import Spinner from "@/components/utils/Spinner";
 
-interface IProps {
+interface Props {
   isSubmitting?: boolean;
   children: Readonly<React.ReactNode>;
 }
 
-export default function SubmitButton({
-  isSubmitting = false,
-  children,
-}: IProps) {
+const SubmitButton = ({ isSubmitting = false, children }: Props) => {
   return (
     <button
       className="w-full h-10 bg-accent hover:bg-accent-darken hover:disabled:bg-accent rounded-full text-slate-50 font-semibold"
@@ -19,4 +16,6 @@ export default function SubmitButton({
       {children}
     </button>
   );
-}
+};
+
+export default SubmitButton;

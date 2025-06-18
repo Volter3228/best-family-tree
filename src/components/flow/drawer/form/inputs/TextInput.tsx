@@ -1,6 +1,6 @@
 import InputLabel from "./InputLabel";
 
-interface IProps {
+interface Props {
   id?: string;
   name: string;
   value: string;
@@ -15,7 +15,7 @@ interface IProps {
       >;
 }
 
-export default function TextInput({
+const TextInput = ({
   id,
   name = "",
   placeholder = "",
@@ -24,7 +24,7 @@ export default function TextInput({
   value,
   onChange,
   icon: Icon,
-}: IProps) {
+}: Props) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
@@ -41,7 +41,7 @@ export default function TextInput({
         placeholder={placeholder}
         className={`
             block w-full pl-3 ${
-              !!Icon ? "pr-10" : "pr-3"
+              Icon ? "pr-10" : "pr-3"
             } py-2 rounded-xl placehoder:text-slate-200 shadow-inner border-accent font-light
             bg-purple-50 placeholder:text-placeholder focus:outline-none focus:ring focus:ring-accent
             caret-accent transition-all duration-200 ease-out
@@ -58,4 +58,6 @@ export default function TextInput({
       )}
     </>
   );
-}
+};
+
+export default TextInput;

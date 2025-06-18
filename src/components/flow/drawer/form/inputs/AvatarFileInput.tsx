@@ -3,18 +3,18 @@ import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import LionIcon from "@/components/icons/Lion";
 
-interface IProps {
+interface Props {
   initialImage?: string;
   onImageSelect: (file: File | null) => void;
 }
 
-const AvatarFileInput: React.FC<IProps> = ({ initialImage, onImageSelect }) => {
+const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(
-    initialImage || null
+    initialImage ?? null
   );
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);

@@ -5,15 +5,15 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { Panel, useReactFlow } from "@xyflow/react";
-import SidebarIconButton from "./SidebarIconButton";
 import Drawer from "../drawer/Drawer";
 import AddMemberForm from "../drawer/form/addMember/AddMemberForm";
+import SidebarIconButton from "./SidebarIconButton";
 
 export default function Sidebar() {
   const { fitView } = useReactFlow();
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const toggleDrawer = () => setDrawerOpen(!isDrawerOpen);
+  const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
 
   const handleAddMemberClick = () => {
     toggleDrawer();
