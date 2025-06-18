@@ -1,13 +1,13 @@
-import { type Node, type Edge } from "@xyflow/react";
+import Member from "@/models/Member";
 import dagre from "@dagrejs/dagre";
+import { type Edge, type Node } from "@xyflow/react";
+import { Position } from "@/types";
+import { DagreDirection } from "@/types/reactFlow";
 import dagreGraph, {
   DEFAULT_NODE_HEIGHT,
   DEFAULT_NODE_WIDTH,
   FLOW_DIRECTION,
 } from "./dagreGraph";
-import Member from "@/models/Member";
-import { Position } from "@/types";
-import { DagreDirection } from "@/types/reactFlow";
 
 const DEFAULT_POSITION = { x: 0, y: 0 };
 
@@ -17,7 +17,6 @@ export const transformMembersToFlowValues = (
 ): { nodes: Node[]; edges: Edge[] } => {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
-
   members.forEach((member, index) => {
     const mentorId = member.mentorId;
     nodes.push({
@@ -48,6 +47,8 @@ export const transformMembersToFlowValues = (
           "--parent-row-index": parentRowIndex,
           // edge-index -  the position index of the edge within the edges connected to the node
           "--edge-index": index,
+          "--node-edges-count": members.length ?? 0,
+          "--random-offset": Math.random() * 3.5,
         } as React.CSSProperties,
       });
     }

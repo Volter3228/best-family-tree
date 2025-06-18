@@ -1,16 +1,11 @@
-interface IProps {
+interface Props {
   label: string;
   htmlFor: string;
   required: boolean;
   onClick?: () => void;
 }
 
-export default function InputLabel({
-  label,
-  htmlFor,
-  required,
-  onClick,
-}: IProps) {
+const InputLabel = ({ label, htmlFor, required, onClick }: Props) => {
   return (
     <label
       htmlFor={htmlFor}
@@ -22,4 +17,6 @@ export default function InputLabel({
       {label}
     </label>
   );
-}
+};
+
+export default InputLabel;

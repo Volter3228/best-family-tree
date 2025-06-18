@@ -3,18 +3,18 @@ import useDropdown from "@/hooks/useDropdown";
 import { DropdownOption } from "@/types";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 
-interface IProps {
+interface Props {
   name: string;
   placeholder?: string;
   label?: string;
   required?: boolean;
-  defaultOptionText?: string;
+  // defaultOptionText?: string;
   options: DropdownOption[];
   autoComplete?: boolean;
   onSelect: (value: string) => void;
 }
 
-export default function DropdownSelectInput({
+const DropdownSelectInput = ({
   label = "",
   name,
   options,
@@ -22,7 +22,7 @@ export default function DropdownSelectInput({
   required = false,
   autoComplete = false,
   onSelect,
-}: IProps) {
+}: Props) => {
   const {
     isOpen,
     setIsOpen,
@@ -48,6 +48,14 @@ export default function DropdownSelectInput({
     handleSelect(opt);
     handleClose();
   };
+
+  const handleOptionKeyDown =
+    (opt: DropdownOption) => (e: React.KeyboardEvent<HTMLLIElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleOptionClick(opt)();
+      }
+    };
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -86,7 +94,11 @@ export default function DropdownSelectInput({
           {filteredOptions.map((opt, index) => (
             <li
               key={opt.value}
+              role="option"
+              aria-selected={opt.value === inputValue ? "true" : "false"}
+              tabIndex={index}
               onClick={handleOptionClick(opt)}
+              onKeyDown={handleOptionKeyDown(opt)}
               className={`
                 px-3 py-2 cursor-pointer ${
                   index === activeOptionIndex
@@ -109,4 +121,6 @@ export default function DropdownSelectInput({
       )}
     </div>
   );
-}
+};
+
+export default DropdownSelectInput;

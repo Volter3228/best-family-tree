@@ -16,11 +16,11 @@ import { useMembers } from "@/hooks/useMembers";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 
-interface IProps {
+interface Props {
   member: Member;
 }
 
-export default function MemberInfo({
+const MemberInfo = ({
   member,
   member: {
     name,
@@ -32,7 +32,7 @@ export default function MemberInfo({
     status,
     mentorId,
   },
-}: IProps) {
+}: Props) => {
   const { getMemberById } = useMembers();
   const mentor = mentorId ? getMemberById(mentorId) : null;
 
@@ -114,4 +114,6 @@ export default function MemberInfo({
       </div>
     </div>
   );
-}
+};
+
+export default MemberInfo;

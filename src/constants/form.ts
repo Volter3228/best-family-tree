@@ -12,7 +12,7 @@ export const ADD_MEMBER_DEFAULTS: AddMemberForm = {
   birthday: null,
   joinedAt: null,
   mentorId: "",
-  status: "OBSERVER",
+  status: null,
   phoneNumber: "",
   email: "",
   photo: null,

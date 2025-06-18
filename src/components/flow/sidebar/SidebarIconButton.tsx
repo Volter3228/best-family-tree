@@ -1,19 +1,19 @@
-interface IProps {
+interface Props {
   title: string;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   icon: React.ForwardRefExoticComponent<
     React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>
   >;
   className?: string;
-  isActive?: boolean;
+  // isActive?: boolean;
 }
 
-export default function SidebarIconButton({
+const SidebarIconButton = ({
   title,
   onClick,
   icon: Icon,
   className = "",
-}: IProps) {
+}: Props) => {
   return (
     <button
       title={title}
@@ -27,4 +27,6 @@ export default function SidebarIconButton({
       <Icon className="stroke-fuchsia-400 md:group-hover:stroke-purple-800 md:group-hover:stroke-2" />
     </button>
   );
-}
+};
+
+export default SidebarIconButton;

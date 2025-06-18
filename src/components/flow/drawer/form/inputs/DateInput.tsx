@@ -4,7 +4,7 @@ import InputLabel from "./InputLabel";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker-overrides.css";
 
-interface IProps {
+interface Props {
   id?: string;
   label: string;
   name: string;
@@ -16,7 +16,7 @@ interface IProps {
   onChange: (date: Date | null) => void;
 }
 
-export default function DateInput({
+const DateInput = ({
   id,
   label,
   name,
@@ -26,7 +26,7 @@ export default function DateInput({
   maxDate,
   minDate,
   onChange,
-}: IProps) {
+}: Props) => {
   return (
     <div className="transition-all z-50">
       <InputLabel label={label} htmlFor={name} required />
@@ -58,4 +58,6 @@ export default function DateInput({
       </div>
     </div>
   );
-}
+};
+
+export default DateInput;
