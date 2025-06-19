@@ -12,7 +12,6 @@ import {
 } from "@heroicons/react/16/solid";
 import Member from "@/models/Member";
 import { capilizeOnlyFirstLetter } from "@/utils/strings";
-import { useMembers } from "@/hooks/useMembers";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 
@@ -22,19 +21,9 @@ interface Props {
 
 const MemberInfo = ({
   member,
-  member: {
-    name,
-    photo,
-    birthday,
-    joinedAt,
-    email,
-    phoneNumber,
-    status,
-    mentorId,
-  },
+  member: { name, photo, birthday, joinedAt, email, phoneNumber, status },
 }: Props) => {
-  const { getMemberById } = useMembers();
-  const mentor = mentorId ? getMemberById(mentorId) : null;
+  const mentor = member.mentor;
 
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">

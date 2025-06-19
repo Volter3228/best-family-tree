@@ -20,11 +20,25 @@ app.use((req, res, next) => {
 app.get("/api/family-tree", async (req, res) => {
   try {
     const members = (await prisma.member.findMany({
-      include: { mentees: true },
+      include: { mentees: true, mentor: true },
     })) as MemberType[];
     const familyTree = transformMembersToTree(members);
 
     res.status(200).json(familyTree);
+  } catch {
+    res.status(500);
+  }
+});
+
+app.get("/api/member/:id", async (req, res) => {
+  try {
+    const memberId = req.params.id;
+    const member = (await prisma.member.findFirst({
+      where: { id: { equals: memberId } },
+      include: { mentees: true, mentor: true },
+    })) as MemberType;
+
+    res.status(200).json(member);
   } catch {
     res.status(500);
   }

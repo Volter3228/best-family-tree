@@ -14,7 +14,6 @@ interface Props {
 }
 
 const SocialMediaFields = ({ form, onTextChange, errors }: Props) => {
-  console.log(errors);
   return (
     <>
       <div className="flex flex-row flex-1 gap-2 w-full">
