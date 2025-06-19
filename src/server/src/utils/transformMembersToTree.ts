@@ -8,7 +8,7 @@ const getTree = (membersByMentorId: MembersByMentorId, mentorId: string) => {
   return (membersByMentorId[mentorId] || []).map(
     (member): MemberType => ({
       ...member,
-      mentees: member.mentees.length
+      mentees: member.mentees?.length
         ? getTree(membersByMentorId, member.id)
         : [],
     })
@@ -31,7 +31,7 @@ export default function transformMembersToTree(members: MemberType[]) {
     .map(
       (member): MemberType => ({
         ...member,
-        mentees: member.mentees.length
+        mentees: member.mentees?.length
           ? getTree(membersByMentorId, member.id)
           : [],
       })

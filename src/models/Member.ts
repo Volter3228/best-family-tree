@@ -11,6 +11,7 @@ export default class Member {
   joinedAt: Date | null = null;
   linkedinLink: string | null;
   mentees: Member[];
+  mentor?: Member | null;
   mentorId: string | null;
   name: string;
   phoneNumber: string | null;
@@ -28,6 +29,7 @@ export default class Member {
     joinedAt,
     linkedinLink,
     mentees,
+    mentor,
     mentorId,
     name,
     phoneNumber,
@@ -43,7 +45,9 @@ export default class Member {
     this.instagramLink = instagramLink;
     this.joinedAt = joinedAt;
     this.linkedinLink = linkedinLink;
-    this.mentees = mentees.map((mentee: MemberType) => new Member(mentee)); // Recursively create mentees
+    this.mentees =
+      mentees?.map((mentee: MemberType) => new Member(mentee)) || []; // Recursively create mentees instances
+    this.mentor = mentor ? new Member(mentor) : null;
     this.mentorId = mentorId;
     this.name = name;
     this.phoneNumber = phoneNumber;

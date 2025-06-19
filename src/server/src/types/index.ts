@@ -6,7 +6,8 @@ export enum MENTOR_STATUSES {
 }
 
 type Member = PrismaMember & {
-  mentees: Member[];
+  mentees?: Member[];
+  mentor?: Member;
 };
 
 export { type Member, MemberStatus };

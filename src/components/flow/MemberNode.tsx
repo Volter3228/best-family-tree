@@ -1,9 +1,9 @@
+import { memo } from "react";
+import { Handle, NodeProps } from "@xyflow/react";
 import { useMembers } from "@/hooks/useMembers";
 import Member from "@/models/Member";
 import { Position } from "@/types";
-import { Handle, NodeProps } from "@xyflow/react";
 import Image from "next/image";
-import { memo } from "react";
 import LionIcon from "../icons/Lion";
 
 interface Props extends NodeProps {
@@ -41,7 +41,7 @@ const MemberNode = ({
           <Image
             src={photo}
             alt="Avatar"
-            className="rounded-full"
+            className="rounded-full drop-shadow-md"
             fill
             sizes="100%"
           />
@@ -49,7 +49,7 @@ const MemberNode = ({
           <div
             className="
               flex items-center justify-center w-full h-full rounded-full
-              bg-primary text-accent text-center p-2.5 shadow-inner 
+              bg-primary text-accent text-center p-2.5 shadow-inner drop-shadow-md
             "
           >
             <LionIcon className="fill-white" />

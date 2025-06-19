@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { ReactFlowProvider } from "@xyflow/react";
 import "./globals.css";
 import "./animations.css";
+import React from "react";
 
 const nunito = Nunito({
   subsets: ["cyrillic-ext"],
@@ -21,11 +22,14 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
+  drawer: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="uk">
       <ReactFlowProvider>
-        <body className={`${nunito.className} antialiased`}>{children}</body>
+        <body className={`${nunito.className} antialiased`}>
+          <div className="relative">{children}</div>
+        </body>
       </ReactFlowProvider>
     </html>
   );

@@ -87,18 +87,18 @@ const Flow = ({ members }: Readonly<Props>) => {
 
   return (
     <ReactFlow
-      nodes={nodes}
-      nodeTypes={NODE_TYPES}
+      id="flow"
+      defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       edges={edges}
       edgeTypes={EDGE_TYPES}
-      defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
-      fitView
+      nodes={nodes}
+      nodeTypes={NODE_TYPES}
       maxZoom={2}
       minZoom={0.1}
       onEdgeDoubleClick={handleEdgeDoubleClick}
       nodesDraggable={false}
       nodesConnectable={false}
-      id="flow"
+      fitView
     >
       <Sidebar />
       <Drawer
