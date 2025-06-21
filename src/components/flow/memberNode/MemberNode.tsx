@@ -17,7 +17,7 @@ interface Props extends NodeProps {
 const MemberNode = ({
   data: {
     member,
-    member: { name, photo },
+    member: { name, avatar, photo },
   },
 }: Props) => {
   const { selectedMember, setSelectedMember } = useMembers();
@@ -53,7 +53,7 @@ const MemberNode = ({
       <div className="relative h-16 w-16 rounded-full bg-primary">
         {photo ? (
           <Image
-            src={photo}
+            src={avatar || photo}
             alt={member.name || "Member photo"}
             className="rounded-full drop-shadow-md"
             sizes="100%"

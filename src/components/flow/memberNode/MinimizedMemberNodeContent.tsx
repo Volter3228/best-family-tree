@@ -4,8 +4,6 @@ import { LionIcon } from "@/components/icons";
 import Member from "@/models/Member";
 import { Position } from "@/types";
 import { Handle, ReactFlowState, useStore } from "@xyflow/react";
-import { SCALE_ON_HOVER_VARIANTS } from "@/constants/memberNode";
-
 interface Props {
   member: Member;
   isSelected: boolean;
@@ -15,21 +13,28 @@ interface Props {
 const zoomSelector = (state: ReactFlowState) => state.transform[2];
 
 type HoverScale = 1.5 | 2 | 3 | 4;
+// Tailwind doesn't precompile these classes if object is imported
+const SCALE_ON_HOVER_VARIANTS = {
+  1.5: "hover:scale-150",
+  2: "hover:scale-[2]",
+  3: "hover:scale-[3]",
+  4: "hover:scale-[4]",
+};
+
 const getScale = (zoom: number): HoverScale => {
-  if (zoom < 0.13) return 4;
+  if (zoom < 0.15) return 4;
   if (zoom < 0.2) return 3;
-  if (zoom < 0.35) return 2;
+  if (zoom < 0.4) return 2;
   return 1.5;
 };
 
 const MinimizedMemberNodeContent = ({
-  member,
+  member: { name, avatar, photo },
   isSelected,
   onNodeClick,
 }: Props) => {
   const zoom = useStore(zoomSelector);
   let scale: HoverScale = getScale(zoom);
-  console.log({ scale });
 
   return (
     <div
@@ -39,7 +44,9 @@ const MinimizedMemberNodeContent = ({
       <div
         className={`
             absolute w-48 h-48 rounded-full hover:shadow-slate-200 hover:shadow-[0_0_70px] 
-            transition duration-200 ${SCALE_ON_HOVER_VARIANTS[scale]} 
+            transition duration-200 ${
+              SCALE_ON_HOVER_VARIANTS[scale]
+            } hover:scale-150
             ${
               isSelected
                 ? "selected shadow-slate-200 shadow-[0_0_70px] hover:shadow-[0_0_100px]"
@@ -47,10 +54,10 @@ const MinimizedMemberNodeContent = ({
             } 
         `}
       >
-        {member.photo ? (
+        {photo ? (
           <Image
-            src={member.photo}
-            alt={member.name || "Member photo"}
+            src={avatar || photo}
+            alt={name || "Member photo"}
             className="rounded-full drop-shadow-md"
             sizes="100%"
             quality={50}

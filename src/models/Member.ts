@@ -1,3 +1,4 @@
+import { getPhotoUrlAsAvatar } from "@/libs/cloudinary";
 import { MemberStatus, type Member as MemberType } from "@/types";
 import { getMonth, getYear } from "date-fns";
 
@@ -11,11 +12,12 @@ export default class Member {
   joinedAt: Date | null = null;
   linkedinLink: string | null;
   mentees: Member[];
-  mentor?: Member | null;
+  mentor: Member | null;
   mentorId: string | null;
   name: string;
   phoneNumber: string | null;
   photo: string | null;
+  avatar: string | null;
   status: string;
   telegramLink: string | null;
 
@@ -54,6 +56,7 @@ export default class Member {
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
+    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : null;
   }
 
   // Add a mentee
