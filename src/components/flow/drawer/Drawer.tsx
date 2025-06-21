@@ -20,7 +20,7 @@ const Drawer = ({
   className = "",
 }: Props) => {
   return (
-    /*createPortal */ <div
+    <div
       className={`
         fixed top-0 right-0 h-full w-dvw md:min-w-128 md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
        transform transition-transform ${
@@ -40,7 +40,6 @@ const Drawer = ({
       </div>
       <div className="p-6">{children}</div>
     </div>
-    // document.body
   );
 };
 
