@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Edge,
   EdgeMouseHandler,
@@ -33,9 +33,10 @@ interface Props {
 }
 
 const Flow = ({ members }: Props) => {
-  const { setCenter } = useReactFlow();
   const [nodes, setNodes] = useNodesState<Node>([]);
   const [edges, setEdges] = useEdgesState<Edge>([]);
+  const { setCenter } = useReactFlow();
+  const [isInfoDrawerOpen, setIsInfoDrawerOpen] = useState(false);
 
   const {
     membersTree,
@@ -65,6 +66,12 @@ const Flow = ({ members }: Props) => {
     // Re-transform the members into nodes and edges after any changes
   }, [membersTree, flatMembersList, setEdges, setNodes]);
 
+  useEffect(() => {
+    if (selectedMember) {
+      setIsInfoDrawerOpen(true);
+    }
+  }, [selectedMember]);
+
   const handleEdgeDoubleClick: EdgeMouseHandler = (event, edge) => {
     event.preventDefault();
     if (nodes.length > 0) {
@@ -78,7 +85,12 @@ const Flow = ({ members }: Props) => {
     }
   };
 
-  const handleInfoDrawerClose = () => setSelectedMember(null);
+  const handleInfoDrawerClose = () => {
+    setIsInfoDrawerOpen(false);
+    setTimeout(() => {
+      setSelectedMember(null);
+    }, 300);
+  };
 
   return (
     <ReactFlow
@@ -99,7 +111,7 @@ const Flow = ({ members }: Props) => {
       <Drawer
         headerTitle="Інфо"
         onClose={handleInfoDrawerClose}
-        isOpen={!!selectedMember}
+        isOpen={isInfoDrawerOpen}
         className="z-10"
       >
         {!!selectedMember && <MemberInfo member={selectedMember} />}
