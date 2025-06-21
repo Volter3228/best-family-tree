@@ -27,9 +27,3 @@ body {
     background-image: var(--background-image);
   }
 }
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}

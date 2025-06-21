@@ -3,6 +3,10 @@
   animation: fadeIn 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+.react-flow__panel.react-flow__attribution {
+  visibility: hidden;
+}
+
 /* Node Styles */
 @property --angle {
   syntax: "<angle>";
@@ -11,7 +15,11 @@
 }
 .react-flow__node .selected {
   position: relative;
-  z-index: 0;
+  z-index: 2 !important;
+}
+
+.react-flow__node:hover {
+  z-index: 2 !important;
 }
 
 .react-flow__node .selected::after {
@@ -36,6 +44,16 @@
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
+}
+
+.react-flow__node .minimized .selected::after {
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 6px;
 }
 
 @keyframes spin {

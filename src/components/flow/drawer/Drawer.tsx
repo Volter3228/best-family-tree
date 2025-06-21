@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline"; // Tailwind Heroicons
 import "./styles/drawer.css";
@@ -21,9 +23,11 @@ const Drawer = ({
     /*createPortal */ <div
       className={`
         fixed top-0 right-0 h-full w-dvw md:min-w-128 md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
-        shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)] transform transition-transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } duration-300 ${className}
+       transform transition-transform ${
+         isOpen
+           ? "translate-x-0 shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]"
+           : "translate-x-full"
+       } duration-300 ${className}
       `}
     >
       <div className="flex justify-between items-center p-4 border-b bg-primary">

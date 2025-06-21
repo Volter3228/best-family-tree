@@ -1,7 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import {
+  Edge,
   EdgeMouseHandler,
+  Node,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -18,7 +20,6 @@ import {
   getLayoutedElements,
   transformMembersToFlowValues,
 } from "@/libs/reactFlow";
-import Member from "@/models/Member";
 import type { Member as MemberType } from "@/types";
 import Drawer from "./drawer/Drawer";
 import MemberInfo from "./drawer/MemberInfo";
@@ -31,8 +32,11 @@ interface Props {
   members: MemberType[];
 }
 
-const Flow = ({ members }: Readonly<Props>) => {
-  const memberInstances = members.map((member) => new Member(member));
+const Flow = ({ members }: Props) => {
+  const { setCenter } = useReactFlow();
+  const [nodes, setNodes] = useNodesState<Node>([]);
+  const [edges, setEdges] = useEdgesState<Edge>([]);
+
   const {
     membersTree,
     setMembers,
@@ -42,28 +46,19 @@ const Flow = ({ members }: Readonly<Props>) => {
   } = useMembers();
 
   useEffect(() => {
-    if (!membersTree) {
+    if (!membersTree.length) {
       setMembers(members);
     }
   }, [membersTree, setMembers, members]);
 
-  const { nodes: tNodes, edges: tEdges } =
-    transformMembersToFlowValues(memberInstances);
-  const { layoutedNodes, layoutedEdges } = getLayoutedElements(tNodes, tEdges);
-
-  const { setCenter } = useReactFlow();
-  const [nodes, setNodes] = useNodesState(layoutedNodes);
-  const [edges, setEdges] = useEdgesState(layoutedEdges);
-
   useEffect(() => {
-    if (membersTree) {
+    if (membersTree.length > 0) {
       const { nodes: newNodes, edges: newEdges } =
         transformMembersToFlowValues(membersTree);
       const {
         layoutedNodes: newLayoutedNodes,
         layoutedEdges: newLayoutedEdges,
       } = getLayoutedElements(newNodes, newEdges);
-
       setNodes(newLayoutedNodes);
       setEdges(newLayoutedEdges);
     }
@@ -93,7 +88,7 @@ const Flow = ({ members }: Readonly<Props>) => {
       edgeTypes={EDGE_TYPES}
       nodes={nodes}
       nodeTypes={NODE_TYPES}
-      maxZoom={2}
+      maxZoom={3}
       minZoom={0.1}
       onEdgeDoubleClick={handleEdgeDoubleClick}
       nodesDraggable={false}

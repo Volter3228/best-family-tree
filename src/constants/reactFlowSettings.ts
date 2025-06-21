@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { DefaultEdgeOptions, EdgeTypes, NodeTypes } from "@xyflow/react";
-import MemberNode from "@/components/flow/MemberNode";
+import MemberNode from "@/components/flow/memberNode/MemberNode";
 import CustomEdge from "@/components/flow/CustomEdge";
 
 export const CONNECTION_LINE_STYLE: CSSProperties = {
