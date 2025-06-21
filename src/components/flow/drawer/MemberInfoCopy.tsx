@@ -50,7 +50,7 @@ const MemberInfoCopy = ({ valueToCopy }: Props) => {
               left: `${tooltipPosition.left}px`,
             }}
           >
-            Copied!
+            Скопійовано!
           </div>,
           document.body
         )}
