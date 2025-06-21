@@ -1,3 +1,4 @@
+import React from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { LionIcon } from "@/components/icons";
@@ -19,12 +20,17 @@ interface Props {
   member: Member;
 }
 
+const configurePhotoUrl = (url: string) => {
+  const [path, filePath] = url.split("/upload/");
+  return `${path}/upload/r_max/${filePath}`;
+};
+
 const MemberInfo = ({
   member,
   member: { name, photo, birthday, joinedAt, email, phoneNumber, status },
 }: Props) => {
   const mentor = member.mentor;
-
+  if (member.photo) configurePhotoUrl(member.photo);
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
       <div className="relative h-48 w-48">
@@ -33,8 +39,9 @@ const MemberInfo = ({
             src={photo}
             alt="Avatar"
             className="rounded-full shadow-lg"
-            fill
             sizes="100%"
+            quality={85}
+            fill
           />
         ) : (
           <div

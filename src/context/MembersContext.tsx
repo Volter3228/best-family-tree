@@ -1,11 +1,17 @@
 "use client";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useMemo,
+  useState,
+} from "react";
 import Member from "@/models/Member";
 import { MentorsListItem } from "@/types/members";
 
 interface IMembersContext {
-  membersTree: Member[] | null;
-  setMembersTree: Dispatch<SetStateAction<Member[] | null>>;
+  membersTree: Member[];
+  setMembersTree: Dispatch<SetStateAction<Member[]>>;
   mentorsList: MentorsListItem[];
   setMentorsList: Dispatch<SetStateAction<MentorsListItem[]>>;
   flatMembersList: Member[];
@@ -22,25 +28,26 @@ export const MembersContext = createContext<IMembersContext | undefined>(
 export const MembersProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [membersTree, setMembersTree] = useState<Member[] | null>(null);
+  const [membersTree, setMembersTree] = useState<Member[]>([]);
   const [mentorsList, setMentorsList] = useState<MentorsListItem[]>([]);
   const [flatMembersList, setFlatMembersList] = useState<Member[]>([]);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
+  const value = useMemo(
+    () => ({
+      membersTree,
+      setMembersTree,
+      mentorsList,
+      setMentorsList,
+      flatMembersList,
+      setFlatMembersList,
+      selectedMember,
+      setSelectedMember,
+    }),
+    [membersTree, mentorsList, flatMembersList, selectedMember]
+  );
+
   return (
-    <MembersContext.Provider
-      value={{
-        membersTree,
-        setMembersTree,
-        mentorsList,
-        setMentorsList,
-        flatMembersList,
-        setFlatMembersList,
-        selectedMember,
-        setSelectedMember,
-      }}
-    >
-      {children}
-    </MembersContext.Provider>
+    <MembersContext.Provider value={value}>{children}</MembersContext.Provider>
   );
 };

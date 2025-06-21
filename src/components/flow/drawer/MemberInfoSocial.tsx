@@ -7,11 +7,13 @@ import {
 import Member from "@/models/Member";
 import Link from "next/link";
 
-export default function MemberInfoSocial({
-  member: { telegramLink, instagramLink, facebookLink, linkedinLink },
-}: {
+interface Props {
   member: Member;
-}) {
+}
+
+const MemberInfoSocial = ({
+  member: { telegramLink, instagramLink, facebookLink, linkedinLink },
+}: Props) => {
   return (
     <div className="flex justify-center gap-4 mt-4">
       {!!telegramLink && (
@@ -60,4 +62,6 @@ export default function MemberInfoSocial({
       )}
     </div>
   );
-}
+};
+
+export default MemberInfoSocial;
