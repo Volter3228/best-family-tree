@@ -21,9 +21,9 @@ import {
   transformMembersToFlowValues,
 } from "@/libs/reactFlow";
 import type { Member as MemberType } from "@/types";
-import Drawer from "./drawer/Drawer";
-import MemberInfo from "./drawer/MemberInfo";
-import Sidebar from "./sidebar/Sidebar";
+import Drawer from "../drawer/Drawer";
+import MemberInfo from "../drawer/MemberInfo";
+import Sidebar from "../sidebar/Sidebar";
 
 import "@xyflow/react/dist/style.css";
 import "./react-flow-styles.css";

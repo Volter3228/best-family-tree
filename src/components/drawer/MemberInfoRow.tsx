@@ -6,6 +6,7 @@ interface Props {
   icon: React.ForwardRefExoticComponent<
     React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>
   >;
+  actionIcon?: React.ReactNode;
   showCopyIcon?: boolean;
 }
 
@@ -13,6 +14,7 @@ const MemberInfoRow = ({
   title,
   value,
   icon: Icon,
+  actionIcon: ActionIcon,
   showCopyIcon = false,
 }: Props) => (
   <div className="member-info-row flex gap-5 text-lg">
@@ -22,6 +24,7 @@ const MemberInfoRow = ({
     </p>
     <p className="info-value flex grow items-center overflow-x-hidden">
       <span>{value}</span>
+      {ActionIcon}
       {showCopyIcon && <MemberInfoCopy valueToCopy={value} />}
     </p>
   </div>

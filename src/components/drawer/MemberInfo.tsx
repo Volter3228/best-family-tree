@@ -10,11 +10,15 @@ import {
   UserPlusIcon,
   StarIcon,
   UserGroupIcon,
+  PhoneArrowUpRightIcon,
+  CalendarDateRangeIcon,
 } from "@heroicons/react/16/solid";
 import Member from "@/models/Member";
 import { capilizeOnlyFirstLetter } from "@/utils/strings";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
+import MemberInfoActionIcon from "./MemberInfoActionIcon";
+import { generateGoogleCalendarLink } from "@/utils/addToCalendar";
 
 interface Props {
   member: Member;
@@ -84,12 +88,19 @@ const MemberInfo = ({
               title="Номер"
               value={phoneNumber}
               icon={PhoneIcon}
+              actionIcon={
+                <MemberInfoActionIcon
+                  href={`tel: ${phoneNumber}`}
+                  icon={PhoneArrowUpRightIcon}
+                  hint="Зателефонувати"
+                />
+              }
               showCopyIcon
             />
           )}
           {!!joinedAt && (
             <MemberInfoRow
-              title="Мембер з"
+              title="Член з"
               value={format(joinedAt, "dd.LL.yyyy")}
               icon={UserPlusIcon}
             />
@@ -98,6 +109,13 @@ const MemberInfo = ({
             title="ДН"
             value={format(birthday, "dd.LL.yyyy")}
             icon={GiftIcon}
+            actionIcon={
+              <MemberInfoActionIcon
+                href={generateGoogleCalendarLink(member)}
+                icon={CalendarDateRangeIcon}
+                hint="Додати до календаря"
+              />
+            }
           />
           {member.isMentor() && (
             <MemberInfoRow
