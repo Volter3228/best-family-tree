@@ -17,6 +17,7 @@ export const transformMembersToFlowValues = (
 ): { nodes: Node[]; edges: Edge[] } => {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
+
   members.forEach((member, index) => {
     const mentorId = member.mentorId;
     nodes.push({
@@ -77,6 +78,8 @@ export const getLayoutedElements = (
     rankdir: direction,
     ranksep: 300,
     nodesep: 50,
+    marginx: 0,
+    ranker: "tight-tree",
   });
 
   nodes.forEach((node) => {

@@ -1,3 +1,3 @@
-import transformMembersToTree from "./transformMembersToTree";
+import transformMembersToTree from "./membersTree/transformMembersToTree";
 
 export { transformMembersToTree };

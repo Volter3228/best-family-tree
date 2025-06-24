@@ -20,7 +20,10 @@ app.use((req, res, next) => {
 app.get("/api/family-tree", async (req, res) => {
   try {
     const members = (await prisma.member.findMany({
-      include: { mentees: true, mentor: true },
+      include: {
+        mentees: true,
+        mentor: true,
+      },
     })) as MemberType[];
     const familyTree = transformMembersToTree(members);
 
