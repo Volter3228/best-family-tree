@@ -1,0 +1,22 @@
+model Team {
+  id          String   @id @default(cuid())
+  name        String? // "Board HUB", "BLM", "A-Board"
+  type        TeamType
+  year        Int?
+  description String?
+
+  // Relations
+  positions MemberPosition[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Event     Event[]
+
+  @@unique([name, type, year], name: "name_type_year")
+  @@map("teams")
+}
+
+enum TeamType {
+  BOARD
+  EVENT_CORE
+}

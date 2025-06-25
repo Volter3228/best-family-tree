@@ -1,0 +1,20 @@
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?
+  category    RoleCategory
+
+  // Relations
+  positions MemberPosition[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("roles")
+}
+
+enum RoleCategory {
+  BOARD // Board positions (VP4HR, President, etc.)f
+  EVENT // Logistics, HR, FR, Main Organiser
+  OTHER
+}

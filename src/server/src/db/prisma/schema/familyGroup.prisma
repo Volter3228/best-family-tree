@@ -1,11 +1,14 @@
 model FamilyGroup {
   id                 String   @id @default(cuid())
   name               String
-  description        String
+  description        String?
   familyGroupMembers Member[] @relation("FamilyGroupMembers")
   founder            Member?  @relation(fields: [founderId], references: [id])
-  founderId          String   @unique
+  founderId          String?  @unique
   photo              String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("family_groups")
 }

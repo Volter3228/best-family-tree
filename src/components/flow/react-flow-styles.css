@@ -97,8 +97,8 @@
   stroke: rgb(241, 245, 249);
   stroke-width: 4;
   cursor: default;
-  opacity: 0;
-  animation: drawLine 2.5s ease forwards;
+  /* opacity: 0; */
+  /* animation: drawLine 2.5s ease forwards; */
   animation-delay: calc(
     0.5s + (var(--edge-index) / var(--node-edges-count)) * 2s +
       var(--random-offset) * 1s
