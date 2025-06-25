@@ -1,24 +1,39 @@
 model Member {
-  id                 String       @id @default(cuid())
-  name               String
-  birthday           DateTime
-  email              String?      @unique
-  phoneNumber        String?      @unique
-  telegramLink       String?      @unique
-  instagramLink      String?      @unique
-  facebookLink       String?      @unique
-  linkedinLink       String?      @unique
-  familyGroup        FamilyGroup? @relation("FamilyGroupMembers", fields: [familyGroupId], references: [id])
-  familyGroupId      String?
+  id            String        @id @default(cuid())
+  name          String
+  joinedAt      DateTime
+  status        Status        @default(OBSERVER)
+  activityState ActivityState @default(ACTIVE)
+
+  mentorId      String?
+  familyGroupId String?
+  email         String?
+  birthday      DateTime?
+  course        Int?
+  photo         String?
+  telegramLink  String?
+  instagramLink String?
+  facebookLink  String?
+  linkedinLink  String?
+
   foundedFamilyGroup FamilyGroup?
-  status             Status       @default(OBSERVER)
-  joinedAt           DateTime?
-  photo              String?
-  mentor             Member?      @relation("MentorMentees", fields: [mentorId], references: [id])
-  mentees            Member[]     @relation("MentorMentees")
-  mentorId           String?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
+  familyGroup        FamilyGroup?     @relation("FamilyGroupMembers", fields: [familyGroupId], references: [id])
+  mentor             Member?          @relation("MentorMentees", fields: [mentorId], references: [id])
+  mentees            Member[]         @relation("MentorMentees")
+  positions          MemberPosition[]
+  phoneNumbers       PhoneNumber[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, status, joinedAt])
+  @@map("members")
+}
+
+enum ActivityState {
+  ACTIVE
+  INACTIVE
+  EXCLUDED
 }
 
 enum Status {

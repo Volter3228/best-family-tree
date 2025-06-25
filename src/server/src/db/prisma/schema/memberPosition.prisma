@@ -1,0 +1,20 @@
+model MemberPosition {
+  id       String @id @default(cuid())
+  memberId String
+  roleId   String
+
+  teamId String?
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  member Member @relation(fields: [memberId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+  team   Team?  @relation(fields: [teamId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([memberId, roleId, teamId])
+  @@map("member_positions")
+}

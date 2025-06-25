@@ -101,10 +101,11 @@ const Flow = ({ members }: Props) => {
       nodes={nodes}
       nodeTypes={NODE_TYPES}
       maxZoom={3}
-      minZoom={0.1}
+      minZoom={0.01}
       onEdgeDoubleClick={handleEdgeDoubleClick}
       nodesDraggable={false}
       nodesConnectable={false}
+      onlyRenderVisibleElements
       fitView
     >
       <Sidebar />

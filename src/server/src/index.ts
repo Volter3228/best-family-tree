@@ -3,7 +3,7 @@ import express from "express";
 import prisma from "./db/prisma/clientInstance";
 import uploadMiddleware from "./middleware/uploadMiddleware";
 import { Member as MemberType, MemberStatus } from "./types";
-import { transformMembersToTree } from "./utils";
+import { transformMembersToTree, transformMemberPhoneNumbers } from "./utils";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,12 +19,24 @@ app.use((req, res, next) => {
 
 app.get("/api/family-tree", async (req, res) => {
   try {
-    const members = (await prisma.member.findMany({
-      include: {
-        mentees: true,
-        mentor: true,
-      },
-    })) as MemberType[];
+    const members = (
+      (await prisma.member.findMany({
+        include: {
+          mentees: {
+            include: {
+              phoneNumbers: true,
+            },
+          },
+          mentor: {
+            include: {
+              phoneNumbers: true,
+            },
+          },
+          phoneNumbers: true,
+        },
+      })) || []
+    ).map(transformMemberPhoneNumbers) as MemberType[];
+
     const familyTree = transformMembersToTree(members);
 
     res.status(200).json(familyTree);
@@ -79,7 +91,7 @@ app.post(
       joinedAt,
       mentorId,
       status,
-      phoneNumber,
+      phoneNumbers,
       email,
       telegramLink,
       instagramLink,
@@ -95,7 +107,6 @@ app.post(
           name: `${firstName} ${lastName}`,
           birthday: new Date(birthday),
           email,
-          phoneNumber,
           status,
           joinedAt, // Ensure this is passed in the correct format
           photo: photoUrl,
@@ -106,10 +117,21 @@ app.post(
           linkedinLink: linkedinLink || null,
         },
         include: {
-          mentees: true, // Optional: to include mentees in the result
+          mentees: true,
+          mentor: true,
+          phoneNumbers: true,
         },
       });
-      res.status(201).json(newMember);
+
+      for (const phoneNumber of phoneNumbers) {
+        await prisma.phoneNumber.create({
+          data: {
+            phoneNumber,
+            ownerId: newMember.id,
+          },
+        });
+      }
+      res.status(201).json(transformMemberPhoneNumbers(newMember));
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to create member" });

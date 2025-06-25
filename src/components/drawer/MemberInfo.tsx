@@ -33,7 +33,7 @@ const MemberInfo = ({
     birthday,
     joinedAt,
     email,
-    phoneNumber,
+    phoneNumbers,
     status,
     mentor,
   },
@@ -83,14 +83,14 @@ const MemberInfo = ({
               showCopyIcon
             />
           )}
-          {!!phoneNumber && (
+          {!!phoneNumbers.length && (
             <MemberInfoRow
               title="Номер"
-              value={phoneNumber}
+              value={phoneNumbers[0]}
               icon={PhoneIcon}
               actionIcon={
                 <MemberInfoActionIcon
-                  href={`tel: ${phoneNumber}`}
+                  href={`tel: ${phoneNumbers[0]}`}
                   icon={PhoneArrowUpRightIcon}
                   hint="Зателефонувати"
                 />
@@ -105,18 +105,20 @@ const MemberInfo = ({
               icon={UserPlusIcon}
             />
           )}
-          <MemberInfoRow
-            title="ДН"
-            value={format(birthday, "dd.LL.yyyy")}
-            icon={GiftIcon}
-            actionIcon={
-              <MemberInfoActionIcon
-                href={generateGoogleCalendarLink(member)}
-                icon={CalendarDateRangeIcon}
-                hint="Додати до календаря"
-              />
-            }
-          />
+          {!!birthday && (
+            <MemberInfoRow
+              title="ДН"
+              value={format(birthday, "dd.LL.yyyy")}
+              icon={GiftIcon}
+              actionIcon={
+                <MemberInfoActionIcon
+                  href={generateGoogleCalendarLink(member)}
+                  icon={CalendarDateRangeIcon}
+                  hint="Додати до календаря"
+                />
+              }
+            />
+          )}
           {member.isMentor() && (
             <MemberInfoRow
               title="Діти"

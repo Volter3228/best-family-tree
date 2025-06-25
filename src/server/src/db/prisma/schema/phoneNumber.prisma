@@ -1,0 +1,6 @@
+model PhoneNumber {
+  id          String @id @default(cuid())
+  ownerId     String
+  phoneNumber String @unique
+  owner       Member @relation(fields: [ownerId], references: [id])
+}

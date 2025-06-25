@@ -15,7 +15,6 @@
     "prisma:migrate-dev": "cd src/db/prisma && npx prisma migrate dev"
   },
   "prisma": {
-    "seed": "node --loader ts-node/esm ./prisma/seed.ts",
     "schema": "src/db/prisma/schema"
   },
   "author": "",
@@ -24,6 +23,7 @@
     "@prisma/client": "^6.10.1",
     "cloudinary": "^1.21.0",
     "express": "^5.1.0",
+    "mongodb": "^6.17.0",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0"
   },

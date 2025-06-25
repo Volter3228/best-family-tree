@@ -4,7 +4,7 @@ import { getMonth, getYear } from "date-fns";
 
 export default class Member {
   id: string;
-  birthday: Date;
+  birthday: Date | null;
   email: string | null;
   facebookLink: string | null;
   familyGroupId: string | null;
@@ -15,7 +15,7 @@ export default class Member {
   mentor: Member | null;
   mentorId: string | null;
   name: string;
-  phoneNumber: string | null;
+  phoneNumbers: string[];
   photo: string | null;
   avatar: string | null;
   status: string;
@@ -34,13 +34,13 @@ export default class Member {
     mentor,
     mentorId,
     name,
-    phoneNumber,
+    phoneNumbers,
     photo,
     status,
     telegramLink,
   }: MemberType) {
     this.id = id;
-    this.birthday = new Date(birthday);
+    this.birthday = birthday ? new Date(birthday) : null;
     this.email = email;
     this.facebookLink = facebookLink;
     this.familyGroupId = familyGroupId;
@@ -52,7 +52,7 @@ export default class Member {
     this.mentor = mentor ? new Member(mentor) : null;
     this.mentorId = mentorId;
     this.name = name;
-    this.phoneNumber = phoneNumber;
+    this.phoneNumbers = phoneNumbers;
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
