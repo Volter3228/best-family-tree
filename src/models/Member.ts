@@ -9,7 +9,7 @@ export default class Member {
   facebookLink: string | null;
   familyGroupId: string | null;
   instagramLink: string | null;
-  joinedAt: Date | null = null;
+  joinedAt: Date;
   linkedinLink: string | null;
   mentees: Member[];
   mentor: Member | null;

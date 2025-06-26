@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Edge,
   EdgeMouseHandler,
@@ -15,7 +15,7 @@ import {
   NODE_TYPES,
 } from "@/constants/reactFlowSettings";
 import { useMembers } from "@/hooks/useMembers";
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/dagreGraph";
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/graph";
 import {
   getLayoutedElements,
   transformMembersToFlowValues,
@@ -56,12 +56,16 @@ const Flow = ({ members }: Props) => {
     if (membersTree.length > 0) {
       const { nodes: newNodes, edges: newEdges } =
         transformMembersToFlowValues(membersTree);
-      const {
-        layoutedNodes: newLayoutedNodes,
-        layoutedEdges: newLayoutedEdges,
-      } = getLayoutedElements(newNodes, newEdges);
-      setNodes(newLayoutedNodes);
-      setEdges(newLayoutedEdges);
+
+      getLayoutedElements(newNodes, newEdges).then((res) => {
+        const {
+          layoutedNodes: newLayoutedNodes,
+          layoutedEdges: newLayoutedEdges,
+        } = res;
+
+        setNodes(newLayoutedNodes);
+        setEdges(newLayoutedEdges);
+      });
     }
     // Re-transform the members into nodes and edges after any changes
   }, [membersTree, flatMembersList, setEdges, setNodes]);
@@ -79,7 +83,7 @@ const Flow = ({ members }: Props) => {
 
       const x = node.position.x + DEFAULT_NODE_WIDTH / 2;
       const y = node.position.y + DEFAULT_NODE_HEIGHT / 2;
-      const zoom = 2;
+      const zoom = 1.5;
 
       setCenter(x, y, { zoom, duration: 100 });
     }
@@ -101,7 +105,7 @@ const Flow = ({ members }: Props) => {
       nodes={nodes}
       nodeTypes={NODE_TYPES}
       maxZoom={3}
-      minZoom={0.01}
+      minZoom={0.025}
       onEdgeDoubleClick={handleEdgeDoubleClick}
       nodesDraggable={false}
       nodesConnectable={false}

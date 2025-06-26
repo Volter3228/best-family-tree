@@ -18,6 +18,7 @@ const CustomEdge = ({
   });
   const edgeLenght = getBezierLength(sourceX, sourceY, targetX, targetY);
 
+  return null;
   return (
     <BaseEdge
       id={id}

@@ -6,8 +6,8 @@ export enum Position {
   Bottom = "bottom",
 }
 
-export type DagreDirection = "TB" | "LR";
-export type FlowDirection = {
-  DESKTOP: DagreDirection;
-  MOBILE: DagreDirection;
+export type Direction = "TB" | "LR";
+export type FlowViewportDirection = {
+  DESKTOP: Direction;
+  MOBILE: Direction;
 };

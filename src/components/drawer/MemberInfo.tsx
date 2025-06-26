@@ -98,13 +98,11 @@ const MemberInfo = ({
               showCopyIcon
             />
           )}
-          {!!joinedAt && (
-            <MemberInfoRow
-              title="Член з"
-              value={format(joinedAt, "dd.LL.yyyy")}
-              icon={UserPlusIcon}
-            />
-          )}
+          <MemberInfoRow
+            title="Член з"
+            value={format(joinedAt, "dd.LL.yyyy")}
+            icon={UserPlusIcon}
+          />
           {!!birthday && (
             <MemberInfoRow
               title="ДН"

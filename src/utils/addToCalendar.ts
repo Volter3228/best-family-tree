@@ -18,6 +18,7 @@ const getClosestBirthday = (birthday: Date): Date => {
 };
 
 export const generateGoogleCalendarLink = (member: Member): string => {
+  if (!member.birthday) return "";
   const closestBirthdayDate = getClosestBirthday(member.birthday);
   const startDate = format(closestBirthdayDate, "yyyyMMdd");
 
