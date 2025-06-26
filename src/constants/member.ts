@@ -6,3 +6,5 @@ export const MEMBER_STATUSES: MemberStatus[] = [
   "FULL",
   "ALUMNI",
 ];
+
+export const FOUNDER_JOIN_YEAR = 2002;

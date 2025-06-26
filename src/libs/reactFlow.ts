@@ -1,15 +1,29 @@
+import {
+  ElkExtendedEdge,
+  ElkNode,
+  LayoutOptions as ElkLayoutOptions,
+} from "elkjs/lib/elk.bundled.js";
 import Member from "@/models/Member";
-import dagre from "@dagrejs/dagre";
 import { type Edge, type Node } from "@xyflow/react";
 import { Position } from "@/types";
-import { DagreDirection } from "@/types/reactFlow";
-import dagreGraph, {
+import elk, {
   DEFAULT_NODE_HEIGHT,
   DEFAULT_NODE_WIDTH,
-  FLOW_DIRECTION,
-} from "./dagreGraph";
+  DEFAULT_POSITION,
+  FLOW_VIEWPORT_DIRECTION,
+} from "./graph";
+import { Direction } from "@/types/reactFlow";
 
-const DEFAULT_POSITION = { x: 0, y: 0 };
+const getLayoutOptions = (): ElkLayoutOptions => {
+  return {
+    "elk.algorithm": "mrtree",
+    "elk.direction": "DOWN",
+    "elk.separateConnectedComponents": "true",
+    // Spacing
+    "elk.spacing.nodeNode": "100",
+    "elk.spacing.componentComponent": "2000",
+  };
+};
 
 export const transformMembersToFlowValues = (
   members: Member[],
@@ -23,10 +37,8 @@ export const transformMembersToFlowValues = (
     nodes.push({
       id: member.id,
       type: "member",
-      data: { member },
+      data: { member } as { member: Member },
       position: DEFAULT_POSITION,
-      connectable: false,
-      draggable: false,
       // mentor-index - the index of the row where the parent node is located
       // node-index - the position index of the node within the parent's children
       style: {
@@ -38,7 +50,7 @@ export const transformMembersToFlowValues = (
     if (mentorId) {
       edges.push({
         id: `E_${mentorId}->${member.id}`,
-        type: "customEdge",
+        type: "simpleBezier",
         source: mentorId,
         target: member.id,
         focusable: false,
@@ -54,7 +66,7 @@ export const transformMembersToFlowValues = (
       });
     }
 
-    if (member.isMentor() && member.mentees.length) {
+    if (member.mentees.length > 0) {
       const { nodes: transformedNodes, edges: transformedEdges } =
         transformMembersToFlowValues(member.mentees, parentRowIndex + 1);
 
@@ -69,49 +81,60 @@ export const transformMembersToFlowValues = (
   };
 };
 
-export const getLayoutedElements = (
+const getElkGraph = (nodes: Node[], edges: Edge[]): ElkNode => {
+  const elkNodes: ElkNode[] = nodes.map((node) => ({
+    ...node,
+    width: DEFAULT_NODE_WIDTH,
+    height: DEFAULT_NODE_HEIGHT + 300, // Additional space between node layers
+  }));
+
+  const elkEdges: ElkExtendedEdge[] = edges.map((edge) => ({
+    ...edge,
+    sources: [edge.source],
+    targets: [edge.target],
+  }));
+
+  return {
+    id: "root",
+    children: elkNodes,
+    edges: elkEdges,
+  };
+};
+
+export const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
-  direction: DagreDirection = FLOW_DIRECTION.DESKTOP
+  direction: Direction = FLOW_VIEWPORT_DIRECTION.DESKTOP
 ) => {
-  dagreGraph.setGraph({
-    rankdir: direction,
-    ranksep: 300,
-    nodesep: 50,
-    marginx: 0,
-    ranker: "tight-tree",
+  // Convert to ELK format
+  const elkGraph = getElkGraph(nodes, edges);
+
+  // TODO: Get layout options based on direction for mobile view
+  const layoutOptions = getLayoutOptions();
+
+  // Perform layout
+  const layoutedGraph = await elk.layout(elkGraph, {
+    layoutOptions,
   });
 
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, {
-      height: DEFAULT_NODE_HEIGHT,
-      width: DEFAULT_NODE_WIDTH,
-    });
-  });
+  const [targetPosition, sourcePosition] =
+    direction === FLOW_VIEWPORT_DIRECTION.DESKTOP
+      ? [Position.Top, Position.Bottom]
+      : [Position.Left, Position.Right];
 
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    const newNode: Node = {
+  const layoutedNodes = nodes.map((node, index) => {
+    const elkNode = layoutedGraph.children?.[index];
+    return {
       ...node,
-      data: { ...node.data, direction },
-      targetPosition: direction === "TB" ? Position.Top : Position.Left,
-      sourcePosition: direction === "TB" ? Position.Bottom : Position.Right,
-      // Shifting the dagre node position (anchor=center center) to the top left
-      // so it matches the React Flow node anchor point (top left).
+      targetPosition,
+      sourcePosition,
       position: {
-        x: nodeWithPosition.x - DEFAULT_NODE_WIDTH / 2,
-        y: nodeWithPosition.y - DEFAULT_NODE_HEIGHT / 2,
+        x: elkNode?.x ?? 0,
+        y: elkNode?.y ?? 0,
       },
     };
-
-    return newNode;
   });
 
+  // Convert back to React Flow format
   return { layoutedNodes, layoutedEdges: edges };
 };

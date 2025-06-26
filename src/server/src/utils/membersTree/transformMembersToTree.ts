@@ -34,11 +34,18 @@ const buildTree = (membersByMentorId: MembersByMentorId, mentorId: string) => {
 
 const transformMembersToTree = (members: MemberType[]) => {
   try {
+    const mentorIdsNotInMembers = new Set<string>();
     // Create a dictionary where key is mentorId and value is an array of related mentees
     const membersByMentorId = members.reduce<MembersByMentorId>(
       (acc, member) => {
         const mentorId = member.mentorId;
-        if (!mentorId) return acc;
+        if (!mentorId || mentorIdsNotInMembers.has(mentorId)) return acc;
+
+        const isMentorInMembers = members.some(({ id }) => id === mentorId);
+        if (!isMentorInMembers) {
+          mentorIdsNotInMembers.add(mentorId);
+          return acc;
+        }
 
         acc[mentorId] = acc[mentorId] || [];
         acc[mentorId].push(member);
@@ -50,7 +57,10 @@ const transformMembersToTree = (members: MemberType[]) => {
 
     // Root members are founders of the organisation
     const rootMembers = members
-      .filter((member) => member.mentorId === null)
+      .filter(
+        (member) =>
+          member.mentorId === null || mentorIdsNotInMembers.has(member.mentorId)
+      )
       .map(
         (member): MemberType => ({
           ...member,

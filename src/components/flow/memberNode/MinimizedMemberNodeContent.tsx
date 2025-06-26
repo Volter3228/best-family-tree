@@ -12,10 +12,10 @@ interface Props {
 
 const zoomSelector = (state: ReactFlowState) => state.transform[2];
 
-type HoverScale = 1.5 | 2 | 3 | 4;
+type HoverScale = 1.2 | 2 | 3 | 4;
 // Tailwind doesn't precompile these classes if object is imported
 const SCALE_ON_HOVER_VARIANTS = {
-  1.5: "hover:scale-150",
+  1.2: "hover:scale-120",
   2: "hover:scale-[2]",
   3: "hover:scale-[3]",
   4: "hover:scale-[4]",
@@ -25,7 +25,7 @@ const getScale = (zoom: number): HoverScale => {
   if (zoom < 0.15) return 4;
   if (zoom < 0.2) return 3;
   if (zoom < 0.4) return 2;
-  return 1.5;
+  return 1.2;
 };
 
 const MinimizedMemberNodeContent = ({
@@ -38,7 +38,7 @@ const MinimizedMemberNodeContent = ({
 
   return (
     <div
-      className={`minimized relative min-w-72 h-24 flex justify-center transition duration-150`}
+      className={`minimized relative min-w-60 h-44 flex justify-center transition duration-150`}
       onClick={onNodeClick}
     >
       <div

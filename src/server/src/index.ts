@@ -21,6 +21,20 @@ app.get("/api/family-tree", async (req, res) => {
   try {
     const members = (
       (await prisma.member.findMany({
+        where: {
+          AND: [
+            // { activityState: ActivityState.ACTIVE },
+            {
+              NOT: {
+                AND: [
+                  { status: MemberStatus.ALUMNI },
+                  { mentees: { none: {} } },
+                  { mentorId: null },
+                ],
+              },
+            },
+          ],
+        },
         include: {
           mentees: {
             include: {
