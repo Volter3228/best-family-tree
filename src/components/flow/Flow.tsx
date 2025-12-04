@@ -33,10 +33,10 @@ interface Props {
 }
 
 const Flow = ({ members }: Props) => {
-  const [nodes, setNodes] = useNodesState<Node>([]);
-  const [edges, setEdges] = useEdgesState<Edge>([]);
-  const { setCenter } = useReactFlow();
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isInfoDrawerOpen, setIsInfoDrawerOpen] = useState(false);
+  const { setCenter } = useReactFlow();
 
   const {
     membersTree,
@@ -107,6 +107,8 @@ const Flow = ({ members }: Props) => {
       maxZoom={3}
       minZoom={0.025}
       onEdgeDoubleClick={handleEdgeDoubleClick}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       nodesDraggable={false}
       nodesConnectable={false}
       onlyRenderVisibleElements

@@ -12,7 +12,7 @@ import elk, {
   DEFAULT_POSITION,
   FLOW_VIEWPORT_DIRECTION,
 } from "./graph";
-import { Direction } from "@/types/reactFlow";
+import { Direction, MemberNode } from "@/types/reactFlow";
 
 const getLayoutOptions = (): ElkLayoutOptions => {
   return {
@@ -28,8 +28,8 @@ const getLayoutOptions = (): ElkLayoutOptions => {
 export const transformMembersToFlowValues = (
   members: Member[],
   parentRowIndex: number = 0
-): { nodes: Node[]; edges: Edge[] } => {
-  const nodes: Node[] = [];
+): { nodes: MemberNode[]; edges: Edge[] } => {
+  const nodes: MemberNode[] = [];
   const edges: Edge[] = [];
 
   members.forEach((member, index) => {
@@ -37,7 +37,7 @@ export const transformMembersToFlowValues = (
     nodes.push({
       id: member.id,
       type: "member",
-      data: { member } as { member: Member },
+      data: { member },
       position: DEFAULT_POSITION,
       // mentor-index - the index of the row where the parent node is located
       // node-index - the position index of the node within the parent's children

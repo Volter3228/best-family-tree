@@ -112,6 +112,11 @@ const useDropdown = (
     if (!isOpen) setActiveOptionIndex(0);
   }, [isOpen]);
 
+  // Reset active index after filtering options
+  useEffect(() => {
+    setActiveOptionIndex(0);
+  }, [filteredOptions.length]);
+
   return {
     isOpen,
     isClosing,

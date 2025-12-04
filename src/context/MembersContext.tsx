@@ -20,14 +20,16 @@ interface IMembersContext {
   setSelectedMember: Dispatch<SetStateAction<Member | null>>;
 }
 
+interface Props {
+  children: React.ReactNode;
+}
+
 export const MembersContext = createContext<IMembersContext | undefined>(
   undefined
 );
 
 // Members Provider component
-export const MembersProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MembersProvider = ({ children }: Props) => {
   const [membersTree, setMembersTree] = useState<Member[]>([]);
   const [mentorsList, setMentorsList] = useState<MentorsListItem[]>([]);
   const [flatMembersList, setFlatMembersList] = useState<Member[]>([]);

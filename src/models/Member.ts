@@ -82,7 +82,7 @@ export default class Member {
   }
 
   getMenteesNamesString(): string {
-    return this.isMentor()
+    return this.mentees.length
       ? this.mentees.map(({ name }) => name).join(", ")
       : "";
   }

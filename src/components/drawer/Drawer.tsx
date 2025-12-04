@@ -38,7 +38,7 @@ const Drawer = ({
           <XMarkIcon className="h-6 w-6 stroke-slate-50 hover:stroke-2" />
         </button>
       </div>
-      <div className="p-6">{children}</div>
+      <div className="drawer-content p-6 overflow-y-auto">{children}</div>
     </div>
   );
 };

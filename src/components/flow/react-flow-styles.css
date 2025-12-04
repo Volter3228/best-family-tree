@@ -8,11 +8,6 @@
 }
 
 /* Node Styles */
-@property --angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
 .react-flow__node .selected {
   position: relative;
   z-index: 2 !important;
@@ -56,15 +51,6 @@
   padding: 6px;
 }
 
-@keyframes spin {
-  from {
-    --angle: 0deg;
-  }
-  to {
-    --angle: 360deg;
-  }
-}
-
 /* Handle Styles */
 .react-flow__handle {
   pointer-events: none;
@@ -104,6 +90,10 @@
       var(--random-offset) * 1s
   );
   transition: all 0.5s ease;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: rgb(241, 245, 249);
 }
 
 /* Draw connection line keyframes */

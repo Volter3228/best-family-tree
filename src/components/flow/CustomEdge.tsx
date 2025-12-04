@@ -16,15 +16,10 @@ const CustomEdge = ({
     targetX,
     targetY,
   });
-  const edgeLenght = getBezierLength(sourceX, sourceY, targetX, targetY);
+  // const edgeLenght = getBezierLength(sourceX, sourceY, targetX, targetY);
 
-  return null;
   return (
-    <BaseEdge
-      id={id}
-      path={edgePath}
-      style={{ ...style, "--edge-length": edgeLenght + 45 } as CSSProperties}
-    />
+    <BaseEdge id={id} path={edgePath} style={{ ...style } as CSSProperties} />
   );
 };
 
