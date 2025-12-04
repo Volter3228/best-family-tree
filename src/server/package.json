@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "preserve": "npm run build",
     "serve": "concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
+    "migrate:mongodb": "npx tsx ./src/db/migrateMembersFromMongodb.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma:studio": "cd src/db/prisma && npx prisma studio",
     "prisma:generate": "cd src/db/prisma && npx prisma generate",
@@ -22,6 +23,7 @@
   "dependencies": {
     "@prisma/client": "^6.10.1",
     "cloudinary": "^1.21.0",
+    "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "mongodb": "^6.17.0",
     "multer": "^2.0.1",
@@ -35,6 +37,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.10.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
     "typescript": "^5.8.3"
   }
 }

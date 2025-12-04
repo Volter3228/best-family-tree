@@ -2,7 +2,13 @@ const http = async (
   endpoint: string,
   init?: RequestInit
 ): Promise<Response> => {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
+  // Use internal Docker URL for server-side, public URL for client-side
+  const isServer = typeof window === "undefined";
+  const baseUrl = isServer
+    ? process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL
+    : process.env.NEXT_PUBLIC_API_URL;
+
+  const url = `${baseUrl}${endpoint}`;
 
   try {
     const response = await fetch(url, {

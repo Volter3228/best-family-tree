@@ -27,6 +27,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+src/server/.env
+!.env.example
+!src/server/.env.example
 
 # vercel
 .vercel
@@ -37,3 +41,6 @@ next-env.d.ts
 
 #vscode
 /.vscode
+
+# Docker
+docker-compose.override.yml
