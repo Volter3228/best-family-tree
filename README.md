@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BEST Family Tree
 
-## Getting Started
+A mentorship tree visualization app for the BEST (Board of European Students of Technology) volunteering organization. Displays mentor-mentee relationships in an interactive tree view.
 
-First, run the development server:
+## Tech Stack
+
+- **Frontend**: Next.js, React, TailwindCSS, React Flow
+- **Backend**: Express.js, TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Infrastructure**: Docker Compose
+
+## Prerequisites
+
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+- Node.js 20+ (for local IDE support)
+
+## Getting Started with Docker
+
+### 1. Clone and configure environment
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Copy environment files
+cp .env.example .env
+cp src/server/.env.example src/server/.env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Edit `src/server/.env` and add your credentials:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/best_family_tree
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+MONGODB_URI=your_mongodb_uri  # Only needed for data migration
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Start the application
 
-## Learn More
+```bash
+docker compose up --build
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Run database migrations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+docker compose exec backend npm run prisma:migrate-dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Access the app
 
-## Deploy on Vercel
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001/api
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## IDE Setup (VSCode / Cursor)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To enable TypeScript IntelliSense and remove import errors in your IDE, install dependencies locally:
+
+```bash
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd src/server
+npm install
+
+# Generate Prisma client for type definitions
+npx prisma generate --schema=src/db/prisma/schema
+```
+
+> Note: Docker uses its own isolated `node_modules` at runtime. Local installation is only for IDE type checking.
+
+## Available Commands
+
+### Docker Commands
+
+```bash
+# Start all services
+docker compose up
+
+# Start in detached mode
+docker compose up -d
+
+# Rebuild containers
+docker compose build --no-cache
+
+# Stop services
+docker compose down
+
+# Reset database (removes all data)
+docker compose down -v
+```
+
+### Backend Commands (run inside container)
+
+```bash
+# Run Prisma migrations
+docker compose exec backend npm run prisma:migrate-dev
+
+# Open Prisma Studio (database GUI)
+docker compose exec backend npm run prisma:studio
+
+# Migrate data from MongoDB
+docker compose exec backend npm run migrate:mongodb
+```
+
+## Project Structure
+
+```
+├── src/
+│   ├── app/              # Next.js app router pages
+│   ├── components/       # React components
+│   ├── api/              # Frontend API calls
+│   ├── libs/             # Utility libraries
+│   ├── types/            # TypeScript types
+│   └── server/           # Express.js backend
+│       ├── src/
+│       │   ├── db/       # Prisma schema & migrations
+│       │   ├── utils/    # Backend utilities
+│       │   └── index.ts  # Server entry point
+│       └── package.json
+├── docker-compose.yml
+├── Dockerfile.dev        # Frontend Docker config
+└── package.json
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    docker-compose.yml                        │
+├─────────────────┬─────────────────┬─────────────────────────┤
+│   frontend      │    backend      │      postgres           │
+│   (Next.js)     │   (Express)     │   (PostgreSQL 16)       │
+│   Port: 3000    │   Port: 3001    │   Port: 5432            │
+│   Hot-reload    │   Hot-reload    │   Persistent volume     │
+└─────────────────┴─────────────────┴─────────────────────────┘
+```
