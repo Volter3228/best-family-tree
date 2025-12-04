@@ -7,7 +7,7 @@ import {
 import { Panel, useReactFlow } from "@xyflow/react";
 import Drawer from "../drawer/Drawer";
 import AddMemberForm from "../drawer/form/addMember/AddMemberForm";
-import SidebarIconButton from "./SidebarIconButton";
+import ToolbarIconButton from "../ToolbarIconButton";
 
 export default function Sidebar() {
   const { fitView } = useReactFlow();
@@ -31,17 +31,18 @@ export default function Sidebar() {
     <>
       <Panel position="top-left">
         <div className="flex flex-col bg-violet-900 shadow-2xl rounded-xl p-2 gap-y-2">
-          <SidebarIconButton
+          <ToolbarIconButton
             title="Add Member"
             onClick={handleAddMemberClick}
             icon={PlusIcon}
+            isActive={isDrawerOpen}
           />
-          <SidebarIconButton
+          <ToolbarIconButton
             title="Show Family"
             onClick={handleShowFamilyClick}
             icon={UsersIcon}
           />
-          <SidebarIconButton
+          <ToolbarIconButton
             title="Fit View"
             onClick={handleFitViewClick}
             icon={ViewfinderCircleIcon}

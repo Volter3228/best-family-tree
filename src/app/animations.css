@@ -1,5 +1,5 @@
 .animate-fade-in {
-  /* animation: fadeIn 0.4s ease-out forwards; */
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 @keyframes fadeIn {
@@ -11,8 +11,21 @@
   }
 }
 
+.animate-fade-out {
+  animation: fadeOut 0.4s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .animate-fade-slide-up {
-  /* animation: fadeSlideUp 0.2s ease-out forwards; */
+  animation: fadeSlideUp 0.2s ease-out forwards;
 }
 
 @keyframes fadeSlideUp {
@@ -30,7 +43,7 @@
 }
 
 .animate-fade-slide-down {
-  /* animation: fadeSlideDown 0.2s ease-out forwards; */
+  animation: fadeSlideDown 0.2s ease-out forwards;
 }
 
 @keyframes fadeSlideDown {
@@ -44,5 +57,23 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.animate-erase-line {
+  animation: eraseLine 1.5s ease backwards;
+}
+
+@keyframes eraseLine {
+  0% {
+    stroke-dasharray: var(--edge-length), 0;
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dasharray: 0, var(--edge-length);
+    opacity: 0;
   }
 }

@@ -117,7 +117,7 @@ const MemberInfo = ({
               }
             />
           )}
-          {member.isMentor() && (
+          {!!member.mentees.length && (
             <MemberInfoRow
               title="Діти"
               value={`${member.getMenteesNamesString()} (${
