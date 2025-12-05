@@ -22,7 +22,7 @@ const Drawer = ({
   return (
     <div
       className={`
-        fixed top-0 right-0 h-full w-dvw md:min-w-128 md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
+        fixed top-0 right-0 h-full w-dvw md:min-w-lg md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
        transform transition-transform ${
          isOpen
            ? "translate-x-0 shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]"

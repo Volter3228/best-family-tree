@@ -78,7 +78,7 @@ const DropdownSelectInput = ({
         autoComplete="off"
         className={`
           block w-full px-3 py-2 rounded-xl placehoder:text-slate-200 shadow-inner border-accent
-          bg-purple-50 placeholder:text-placeholder font-light focus:outline-none focus:ring focus:ring-accent
+          bg-purple-50 placeholder:text-placeholder font-light focus:outline-hidden focus:ring-3 focus:ring-accent
           caret-accent transition-all duration-200 ease-out
           ${!autoComplete ? "cursor-pointer select-none caret-transparent" : ""}
         `}

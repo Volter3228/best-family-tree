@@ -45,7 +45,7 @@ const DateInput = ({
         autoComplete="off"
         className="
           w-full pl-3 pr-9 py-2 rounded-xl shadow-inner bg-purple-50 caret-accent
-        placeholder:text-placeholder focus:outline-none focus:ring focus:ring-accent
+        placeholder:text-placeholder focus:outline-hidden focus:ring-3 focus:ring-accent
           transition-all duration-200 ease-out font-light
         "
         calendarClassName="border-purple-700 bg-purple-50 text-foreground shadow-md rounded-lg"

@@ -56,7 +56,7 @@ export default class Member {
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
-    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : null;
+    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : '';
   }
 
   // Add a mentee

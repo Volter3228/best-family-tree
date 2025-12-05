@@ -1,25 +1,51 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --background-image: linear-gradient(
-    to top right,
-    rgb(67 56 202),
-    rgb(192 38 211)
-  );
-  --foreground: rgb(17 24 39);
-  --accent: rgb(168 85 247);
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-darken: #9333ea;
+  --color-placeholder: #9ca3af;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background-image);
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) transparent;
-  scrollbar-arrow-color: transparent;
-  font-family: Arial, Helvetica, sans-serif;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@layer utilities {
+  :root {
+    --background-image: linear-gradient(
+      to top right,
+      rgb(67 56 202),
+      rgb(192 38 211)
+    );
+    --foreground: rgb(17 24 39);
+    --accent: rgb(168 85 247);
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background-image);
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+    scrollbar-arrow-color: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }
 
 @layer base {
