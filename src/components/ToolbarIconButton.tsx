@@ -28,7 +28,7 @@ const ToolbarIconButton = ({
           isActive ? "bg-fuchsia-500 rounded-xl" : "bg-violet-700 rounded-3xl"
         } h-10 w-10 p-2 cursor-pointer transition-all ease-in-out 
         md:hover:rounded-xl md:hover:bg-fuchsia-500 md:active:bg-fuchsia-300 md:duration-300
-      active:bg-purple-900 focus:outline-none duration-200 group ${className}
+      active:bg-purple-900 focus:outline-hidden duration-200 group ${className}
       `}
     >
       {isLoading ? (

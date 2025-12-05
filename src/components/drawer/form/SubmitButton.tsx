@@ -10,7 +10,7 @@ const SubmitButton = ({ isSubmitting = false, children }: Props) => {
     <button
       className={`
         w-full h-10 bg-accent hover:bg-accent-darken hover:disabled:bg-accent rounded-full 
-        text-slate-50 font-semibold focus:outline-none focus:ring focus:ring-accent
+        text-slate-50 font-semibold focus:outline-hidden focus:ring-3 focus:ring-accent
       `}
       type="submit"
       disabled={isSubmitting}

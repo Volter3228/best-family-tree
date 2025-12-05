@@ -66,7 +66,7 @@ const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
           onClick={handleRemoveImage}
           className="
             absolute top-0 right-0 mt-1 mr-1 bg-accent text-white
-            text-sm rounded-full p-1 hover:bg-accent-darken focus:outline-none
+            text-sm rounded-full p-1 hover:bg-accent-darken focus:outline-hidden
             w-6 h-6 shadow-md
           "
           aria-label="Remove Avatar"

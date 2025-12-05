@@ -61,7 +61,6 @@ services:
       - ./public:/app/public
       - ./package.json:/app/package.json
       - ./next.config.mjs:/app/next.config.mjs
-      - ./tailwind.config.ts:/app/tailwind.config.ts
       - ./postcss.config.mjs:/app/postcss.config.mjs
       - ./tsconfig.json:/app/tsconfig.json
       - /app/node_modules
