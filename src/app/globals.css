@@ -1,11 +1,11 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
-  --color-accent-darken: #9333ea;
-  --color-placeholder: #9ca3af;
+  --color-accent-darken: hsl(262, 83%, 56%);
+  --color-placeholder: hsl(220, 13%, 65%);
 }
 
 /*
@@ -33,6 +33,11 @@
       rgb(67 56 202),
       rgb(192 38 211)
     );
+    --avatar-background: linear-gradient(
+      to top,
+      rgb(192 38 211),
+      rgb(67 56 202)
+    );
     --foreground: rgb(17 24 39);
     --accent: rgb(168 85 247);
   }
@@ -51,5 +56,9 @@
 @layer base {
   .bg-primary {
     background-image: var(--background-image);
+  }
+
+  .bg-avatar-gradient {
+    background-image: var(--avatar-background);
   }
 }

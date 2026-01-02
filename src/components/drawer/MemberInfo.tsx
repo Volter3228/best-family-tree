@@ -54,7 +54,7 @@ const MemberInfo = ({
           <div
             className="
               flex items-center justify-center w-full h-full rounded-full
-              bg-primary text-accent text-center p-8 shadow-inner
+              bg-avatar-gradient text-accent text-center p-8 shadow-inner
             "
           >
             <LionIcon className="fill-white" />
