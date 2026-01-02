@@ -34,7 +34,10 @@ const Drawer = ({
         <h2 className="text-xl font-bold text-slate-50 pointer-events-none">
           {headerTitle}
         </h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={onClose}
+          className="text-gray-500 hover:text-gray-700 cursor-pointer"
+        >
           <XMarkIcon className="h-6 w-6 stroke-slate-50 hover:stroke-2" />
         </button>
       </div>

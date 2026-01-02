@@ -56,7 +56,7 @@ export default class Member {
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
-    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : '';
+    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : "";
   }
 
   // Add a mentee
@@ -64,9 +64,9 @@ export default class Member {
     this.mentees.push(mentee); // Add mentee if this is the mentor
   }
 
-  getRecruitmentSeason(): string | null {
+  getRecruitmentSeason(): string {
     let season = "Весна";
-    if (!this.joinedAt) return null;
+    if (!this.joinedAt) return "";
     const month = getMonth(this.joinedAt);
     if (month >= 7 && month <= 12) {
       season = "Осінь";

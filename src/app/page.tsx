@@ -1,4 +1,5 @@
-import Flow from "@/components/flow/Flow";
+import PixiTree from "@/components/pixi-tree/PixiTree";
+// import Flow from "@/components/flow/Flow";
 import { MembersProvider } from "@/context/MembersContext";
 import getFamilyTree from "@/api/getFamilyTree";
 
@@ -8,7 +9,8 @@ export default async function Home() {
   return (
     <div className="mx-auto h-screen w-full">
       <MembersProvider>
-        {!!familyTreeMembers && <Flow members={familyTreeMembers} />}
+        {/* {!!familyTreeMembers && <Flow members={familyTreeMembers} />} */}
+        {!!familyTreeMembers && <PixiTree members={familyTreeMembers} />}
       </MembersProvider>
     </div>
   );
