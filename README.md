@@ -118,7 +118,7 @@ docker compose exec backend npm run migrate:mongodb
 │       │   ├── utils/    # Backend utilities
 │       │   └── index.ts  # Server entry point
 │       └── package.json
-├── docker-compose.yml
+├── compose.yml
 ├── Dockerfile.dev        # Frontend Docker config
 └── package.json
 ```
@@ -127,7 +127,7 @@ docker compose exec backend npm run migrate:mongodb
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    docker-compose.yml                        │
+│                    compose.yml                        │
 ├─────────────────┬─────────────────┬─────────────────────────┤
 │   frontend      │    backend      │      postgres           │
 │   (Next.js)     │   (Express)     │   (PostgreSQL 16)       │

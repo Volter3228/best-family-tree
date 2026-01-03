@@ -1,6 +1,6 @@
-import sortMembersBalanced from "./sortMembersBalanced";
+import sortMembersBalanced from "./sortMembersBalanced.js";
 import { Member as MemberType } from "@/types";
-import { MembersByMentorId, TreeCache } from "./types";
+import { MembersByMentorId, TreeCache } from "./types.js";
 
 // Memoization cache for subtree calculations
 const subtreeCache: { size: TreeCache; depth: TreeCache } = {

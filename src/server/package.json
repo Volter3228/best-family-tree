@@ -1,27 +1,24 @@
 {
+  "type": "module",
   "name": "best-family-tree-server",
   "version": "0.1.0",
   "description": "Backend for BEST Family Tree",
-  "main": "index.mts",
-  "scripts": {
-    "build": "tsc --build",
-    "prestart": "npm run build",
-    "start": "node dist/index.js",
-    "preserve": "npm run build",
-    "serve": "concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
-    "migrate:mongodb": "npx tsx ./src/db/migrateMembersFromMongodb.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prisma:studio": "cd src/db/prisma && npx prisma studio",
-    "prisma:generate": "cd src/db/prisma && npx prisma generate",
-    "prisma:migrate-dev": "cd src/db/prisma && npx prisma migrate dev"
-  },
-  "prisma": {
-    "schema": "src/db/prisma/schema"
-  },
+  "main": "index.ts",
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "build": "tsc --build",
+    "start": "node dist/src/index.js",
+    "serve": "tsc --build && concurrently \"tsc --watch --preserveWatchOutput\" \"nodemon --exec \\\"node\\\" dist/src/index.js\"",
+    "migrate:mongodb": "npx tsx ./src/db/migrateMembersFromMongodb.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prisma:studio": "npx prisma studio",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate-dev": "npx prisma migrate dev"
+  },
   "dependencies": {
-    "@prisma/client": "^6.10.1",
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "cloudinary": "^1.21.0",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
@@ -30,12 +27,13 @@
     "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
+    "@prisma/config": "^7.2.0",
     "@types/express": "^5.0.3",
     "@types/multer": "^1.4.13",
     "@types/node": "^24.0.3",
     "concurrently": "^9.2.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.10.1",
+    "prisma": "^7.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
     "typescript": "^5.8.3"

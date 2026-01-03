@@ -1,4 +1,7 @@
-import { Member as PrismaMember, Status as MemberStatus } from "@prisma/client";
+import {
+  Member as PrismaMember,
+  Status as MemberStatus,
+} from "../db/prisma/generated/client.js";
 
 export enum MENTOR_STATUSES {
   ALUMNI = "ALUMNI",

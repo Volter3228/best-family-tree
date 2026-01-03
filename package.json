@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start ",
     "lint": "next lint"
@@ -26,7 +27,6 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@prisma/client": "^6.10.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/lodash": "^4.17.19",
     "@types/node": "^20",
@@ -35,7 +35,6 @@
     "eslint": "^9.29.0",
     "eslint-config-next": "^16.0.7",
     "postcss": "^8",
-    "prisma": "^6.10.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.8.3"
   }

@@ -1,9 +1,12 @@
 import "dotenv/config";
 import express from "express";
-import prisma from "./db/prisma/clientInstance";
-import uploadMiddleware from "./middleware/uploadMiddleware";
-import { Member as MemberType, MemberStatus } from "./types";
-import { transformMembersToTree, transformMemberPhoneNumbers } from "./utils";
+import prisma from "./db/prisma/clientInstance.js";
+import uploadMiddleware from "./middleware/uploadMiddleware.js";
+import { Member as MemberType, MemberStatus } from "./types/index.js";
+import {
+  transformMembersToTree,
+  transformMemberPhoneNumbers,
+} from "./utils/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;

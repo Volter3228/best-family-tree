@@ -1,4 +1,4 @@
-import transformMembersToTree from "./membersTree/transformMembersToTree";
-import transformMemberPhoneNumbers from "./transformMemberPhoneNumbers";
+import transformMembersToTree from "./membersTree/transformMembersToTree.js";
+import transformMemberPhoneNumbers from "./transformMemberPhoneNumbers.js";
 
 export { transformMembersToTree, transformMemberPhoneNumbers };

@@ -1,5 +1,5 @@
 import { Member as MemberType } from "@/types";
-import type { TreeCache, MemberMetrics } from "./types";
+import type { TreeCache, MemberMetrics } from "./types.js";
 
 // Function to calculate the total number of descendants (subtree size)
 // Answers the following question: "Including this member, how many total descendants are in its entire branch?"

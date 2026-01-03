@@ -1,7 +1,7 @@
 import path from "path";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../db/cloudinaryConfig";
+import cloudinary from "../db/cloudinaryConfig.js";
 
 export default function uploadMiddleware(folderName: string) {
   const storage = new CloudinaryStorage({

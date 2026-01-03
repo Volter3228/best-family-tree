@@ -1,21 +1,15 @@
-FROM node:20-alpine
+FROM node:22.15.1-alpine
 
 WORKDIR /app
 
 # Install dependencies first (better layer caching)
-COPY package*.json ./
-RUN npm install
-
-# Copy Prisma schema from server and generate client (needed for shared types)
-COPY src/server/src/db/prisma/schema ./prisma/schema
-RUN npx prisma generate --schema=./prisma/schema
-
-# Copy source files (these will be overwritten by volume mounts in dev)
 COPY . .
+RUN rm -rf package-lock.json
+RUN npm install
 
 # Expose Next.js dev server port
 EXPOSE 3000
 
-# Start Next.js in development mode
-CMD ["npm", "run", "dev"]
+# Start Next.js in development mode with webpack for polling
+CMD ["npm", "run", "dev:webpack"]
 

@@ -1,4 +1,4 @@
-import { PhoneNumber } from "@prisma/client";
+import { PhoneNumber } from "../db/prisma/generated/client.js";
 
 type Input = {
   phoneNumbers: PhoneNumber[];
