@@ -39,8 +39,8 @@ src/server/.env
 *.tsbuildinfo
 next-env.d.ts
 
-#vscode
+# Vscode
 /.vscode
 
 # Docker
-docker-compose.override.yml
+compose.override.yml

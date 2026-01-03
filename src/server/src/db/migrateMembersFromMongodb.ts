@@ -1,6 +1,5 @@
 import { MongoClient, ObjectId } from "mongodb";
 import {
-  PrismaClient,
   RoleCategory,
   TeamType,
   Status,
@@ -9,7 +8,8 @@ import {
   FamilyGroup,
   Role,
   Team,
-} from "@prisma/client";
+} from "./prisma/generated/client.js";
+import prisma from "./prisma/clientInstance.js";
 
 interface MongoMember {
   _id: ObjectId;
@@ -66,8 +66,6 @@ const ACTIVITY_MAP: Record<string, ActivityState> = {
   Inactive: ActivityState.INACTIVE,
   Active: ActivityState.ACTIVE,
 };
-
-const prisma = new PrismaClient();
 
 if (!process.env.MONGODB_URI) {
   console.error("Error: MONGODB_URI environment variable is not set");

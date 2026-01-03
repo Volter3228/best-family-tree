@@ -1,7 +1,7 @@
-import { centerSingleSubtree, calculateMemberMetrics } from "./calculations";
+import { centerSingleSubtree, calculateMemberMetrics } from "./calculations.js";
 
 import { type Member as MemberType } from "@/types";
-import { type MemberMetrics, type TreeCache } from "./types";
+import { type MemberMetrics, type TreeCache } from "./types.js";
 
 // Distribute subtrees evenly across available positions
 const distributeSubtrees = (
