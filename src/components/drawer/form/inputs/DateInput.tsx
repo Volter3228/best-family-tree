@@ -42,6 +42,7 @@ const DateInput = ({
         maxDate={maxDate}
         minDate={minDate}
         required={required}
+        shouldCloseOnSelect={false}
         autoComplete="off"
         className="
           w-full pl-3 pr-9 py-2 rounded-xl shadow-inner bg-purple-50 caret-accent

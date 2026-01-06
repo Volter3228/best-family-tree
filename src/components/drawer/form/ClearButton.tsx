@@ -9,7 +9,7 @@ const ClearButton = ({ isSubmitting = false, onClick, children }: Props) => {
     <button
       className={`
         w-full h-10 bg-purple-50 hover:bg-purple-200 hover:disabled:bg-accent rounded-full 
-        text-accent font-semibold focus:outline-hidden focus:ring-3 focus:ring-accent
+        text-accent font-semibold focus:outline-hidden focus:ring-3 focus:ring-accent cursor-pointer
       `}
       onClick={onClick}
       disabled={isSubmitting}
