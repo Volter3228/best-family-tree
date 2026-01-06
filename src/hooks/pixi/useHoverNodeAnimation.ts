@@ -6,6 +6,7 @@ import { getIsMinimized } from "@/libs/pixi";
 import {
   NODE_HOVER_SCALE,
   NODE_HOVER_ANIMATION_DURATION,
+  MINIMIZED_NODE_HOVERED_SCALE_MAP,
 } from "@/constants/pixi";
 import { DropShadowFilter } from "pixi-filters";
 
@@ -14,12 +15,11 @@ const calculateTargetScale = (isHovered: boolean, appScale: number) => {
 
   const isMinimized = getIsMinimized(appScale);
   if (isMinimized) {
-    if (appScale < 0.05) return 5;
-    if (appScale < 0.1) return 3.5;
-    if (appScale < 0.15) return 2.5;
-    if (appScale < 0.2) return 2;
-    if (appScale < 0.4) return 1.5;
+    for (const [scale, targetScale] of MINIMIZED_NODE_HOVERED_SCALE_MAP) {
+      if (appScale < scale) return targetScale;
+    }
   }
+
   return NODE_HOVER_SCALE;
 };
 
