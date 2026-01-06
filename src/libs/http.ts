@@ -1,4 +1,4 @@
-const http = async (
+export const http = async (
   endpoint: string,
   init?: RequestInit
 ): Promise<Response> => {

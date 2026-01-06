@@ -1,6 +1,6 @@
+import { http } from "@/libs";
 import { ENDPOINTS } from "@/constants/endpoints";
 import { Member as MemberType } from "@/types";
-import http from "../libs/http";
 
 export default async function addMember(formData: FormData) {
   try {

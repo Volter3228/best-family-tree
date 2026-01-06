@@ -1,6 +1,6 @@
 const NUMBER_OF_SEGMENTS = 5;
 
-const getBezierLength = (
+export const getBezierLength = (
   x1: number,
   y1: number,
   x2: number,
@@ -24,5 +24,3 @@ const getBezierLength = (
 
   return length;
 };
-
-export default getBezierLength;

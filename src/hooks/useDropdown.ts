@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { DropdownOption } from "@/types";
 
-const useDropdown = (
+export const useDropdown = (
   options: DropdownOption[],
   onSelect: (optValue: string) => void,
   autoComplete: boolean
@@ -131,5 +131,3 @@ const useDropdown = (
     handleClose,
   };
 };
-
-export default useDropdown;

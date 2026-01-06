@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useMembers } from "@/hooks/useMembers";
+import { useMembers } from "@/hooks";
 import type { AddMemberForm } from "@/types";
 import { ADD_MEMBER_DEFAULTS } from "@/constants/form";
 import apiAddMember from "@/api/addMember";

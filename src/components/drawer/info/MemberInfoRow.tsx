@@ -18,7 +18,7 @@ const MemberInfoRow = ({
   showCopyIcon = false,
 }: Props) => (
   <div className="member-info-row flex gap-5 text-lg">
-    <p className="flex text-accent-darken min-w-32 max-w-32 font-semibold">
+    <p className="flex text-accent min-w-32 max-w-32 font-semibold">
       <Icon className="inline-block mr-1 h-6 mt-0.5" />
       {title}
     </p>

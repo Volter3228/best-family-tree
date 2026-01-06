@@ -1,0 +1,2 @@
+export const NODE_HOVER_SCALE = 1.2;
+export const NODE_HOVER_ANIMATION_DURATION = 0.3;

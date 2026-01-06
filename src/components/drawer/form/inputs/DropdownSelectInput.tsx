@@ -1,5 +1,5 @@
 import InputLabel from "./InputLabel";
-import useDropdown from "@/hooks/useDropdown";
+import { useDropdown } from "@/hooks";
 import { DropdownOption } from "@/types";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 

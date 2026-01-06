@@ -1,4 +1,4 @@
-import { useMembers } from "@/hooks/useMembers";
+import { useMembers } from "@/hooks";
 import { capilizeOnlyFirstLetter } from "@/utils/strings";
 import {
   MAX_DATE_BIRTHDAY,

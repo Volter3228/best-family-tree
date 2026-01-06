@@ -30,16 +30,16 @@
   :root {
     --background-image: linear-gradient(
       to top right,
-      rgb(67 56 202),
-      rgb(192 38 211)
+      hsl(249, 59%, 51%),
+      hsl(302, 86%, 45%)
     );
     --avatar-background: linear-gradient(
       to top,
-      rgb(192 38 211),
-      rgb(67 56 202)
+      hsl(302, 86%, 45%),
+      hsl(249, 59%, 51%)
     );
-    --foreground: rgb(17 24 39);
-    --accent: rgb(168 85 247);
+    --foreground: hsl(220, 39%, 11%);
+    --accent: hsl(267, 100%, 61%);
   }
 
   body {
