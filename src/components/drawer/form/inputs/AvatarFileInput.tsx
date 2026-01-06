@@ -55,7 +55,7 @@ const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
         />
         <div
           className="
-            absolute inset-0 rounded-full group-hover:bg-accent-darken group-hover:bg-opacity-30
+            absolute inset-0 rounded-full group-hover:bg-accent-darken/30
             transition-colors duration-200 ease-in-out
           "
         />
