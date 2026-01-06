@@ -14,7 +14,7 @@ import {
   EDGE_TYPES,
   NODE_TYPES,
 } from "@/constants/reactFlowSettings";
-import { useMembers } from "@/hooks/useMembers";
+import { useMembers } from "@/hooks";
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/graph";
 import {
   getLayoutedElements,
@@ -22,7 +22,7 @@ import {
 } from "@/libs/reactFlow";
 import type { Member as MemberType } from "@/types";
 import Drawer from "../drawer/Drawer";
-import MemberInfo from "../drawer/MemberInfo";
+import MemberInfo from "../drawer/info/MemberInfo";
 import Sidebar from "../sidebar/Sidebar";
 
 import "@xyflow/react/dist/style.css";
@@ -67,7 +67,6 @@ const Flow = ({ members }: Props) => {
         setEdges(newLayoutedEdges);
       });
     }
-    // Re-transform the members into nodes and edges after any changes
   }, [membersTree, flatMembersList, setEdges, setNodes]);
 
   useEffect(() => {

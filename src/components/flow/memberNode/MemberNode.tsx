@@ -1,7 +1,7 @@
 import { memo } from "react";
 import Image from "next/image";
 import { Handle, NodeProps, ReactFlowState, useStore } from "@xyflow/react";
-import { useMembers } from "@/hooks/useMembers";
+import { useMembers } from "@/hooks";
 import { Position } from "@/types";
 import Member from "@/models/Member";
 import MinimizedMemberNodeContent from "./MinimizedMemberNodeContent";

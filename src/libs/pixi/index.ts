@@ -1,3 +1,2 @@
-import getAvatarTexture from "./getAvatarTexture";
-
-export { getAvatarTexture };
+export * from "./getAvatarImage";
+export * from "./scale";

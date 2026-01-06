@@ -30,7 +30,7 @@ export default function Sidebar() {
   return (
     <>
       <Panel position="top-left" className="z-40!">
-        <div className="flex flex-col bg-violet-900 shadow-2xl rounded-xl p-2 gap-y-2">
+        <div className="flex flex-col bg-accent-darken shadow-2xl rounded-xl p-2 gap-y-2">
           <ToolbarIconButton
             title="Add Member"
             onClick={handleAddMemberClick}

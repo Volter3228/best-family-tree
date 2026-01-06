@@ -1,87 +1,75 @@
-"use client";
-
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useMemo } from "react";
+import { Container } from "pixi.js";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { HOVER_SCALE } from "@/components/pixi-tree/pixiNode/constants";
+import { getIsMinimized } from "@/libs/pixi";
+import {
+  NODE_HOVER_SCALE,
+  NODE_HOVER_ANIMATION_DURATION,
+} from "@/constants/pixi";
 import { DropShadowFilter } from "pixi-filters";
 
-// Register the hook for better performance/safety
-gsap.registerPlugin(useGSAP);
+const calculateTargetScale = (isHovered: boolean, appScale: number) => {
+  if (!isHovered) return 1;
 
-const ANIMATION_DURATION = 0.3;
+  const isMinimized = getIsMinimized(appScale);
+  if (isMinimized) {
+    if (appScale < 0.05) return 5;
+    if (appScale < 0.1) return 3.5;
+    if (appScale < 0.15) return 2.5;
+    if (appScale < 0.2) return 2;
+    if (appScale < 0.4) return 1.5;
+  }
+  return NODE_HOVER_SCALE;
+};
 
 interface Props {
+  container: Container | null;
   isHovered: boolean;
-  isMinimized: boolean;
   isSelected: boolean;
-  zoom: number;
+  appScale: number;
 }
 
-const getTargetScaleHandler =
-  (isHovered: boolean, isMinimized: boolean, zoom: number) => () => {
-    if (!isHovered) return 1;
-    if (isMinimized) {
-      if (zoom < 0.05) return 5;
-      if (zoom < 0.1) return 3.5;
-      if (zoom < 0.15) return 2.5;
-      if (zoom < 0.2) return 2;
-      if (zoom < 0.4) return 1.5;
-    }
-    return HOVER_SCALE;
-  };
-
-const useHoverNodeAnimation = ({
+export const useHoverNodeAnimation = ({
+  container,
   isHovered,
-  isMinimized,
   isSelected,
-  zoom,
+  appScale,
 }: Props) => {
-  const [scale, setScale] = useState(1);
-  const scaleRef = useRef({ value: 1 });
-
-  const shadowFilter = useMemo(
-    () =>
-      new DropShadowFilter({
-        color: 0xffffff,
-        blur: 0,
-        alpha: 0,
-        resolution: window.devicePixelRatio || 1,
-        quality: 7,
-      }),
-    []
-  );
-
-  const getTargetScale = useCallback(
-    getTargetScaleHandler(isHovered, isMinimized, zoom),
-    [isHovered, isMinimized, zoom]
-  );
+  const shadowFilter = useMemo(() => {
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+    return new DropShadowFilter({
+      color: 0xffffff,
+      alpha: 0,
+      offset: { x: 0, y: 0 },
+      resolution: Math.max(dpr, 2),
+      quality: 5,
+      shadowOnly: false,
+    });
+  }, []);
 
   useGSAP(() => {
-    const targetScale = getTargetScale();
-    gsap.killTweensOf(scaleRef.current);
+    if (!container) return;
 
-    gsap.to(scaleRef.current, {
-      value: targetScale,
-      duration: ANIMATION_DURATION,
+    const targetScale = calculateTargetScale(isHovered, appScale);
+
+    gsap.to(container.scale, {
+      x: targetScale,
+      y: targetScale,
+      duration: NODE_HOVER_ANIMATION_DURATION,
       ease: "power2.out",
-      onUpdate: () => {
-        console.log("here");
-        setScale(scaleRef.current.value);
-      },
+      overwrite: "auto",
     });
 
     const shouldShowShadow = isHovered || isSelected;
-
     gsap.to(shadowFilter, {
-      blur: shouldShowShadow ? 12 : 0,
-      alpha: shouldShowShadow ? 0.7 : 0,
-      duration: 0.3,
-      ease: "power2.out",
+      blur: shouldShowShadow ? 8 : 0,
+      alpha: shouldShowShadow ? 0.6 : 0,
+      duration: NODE_HOVER_ANIMATION_DURATION / 2,
+      ease: "power1.out",
+      overwrite: "auto",
     });
-  }, [isHovered, isMinimized, zoom, isSelected]);
+  }, [isHovered, appScale, isSelected]);
 
-  return { scale, shadowFilter };
+  return { shadowFilter };
 };
-
-export default useHoverNodeAnimation;
