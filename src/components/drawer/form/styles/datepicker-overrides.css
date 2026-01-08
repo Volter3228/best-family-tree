@@ -9,7 +9,7 @@
 }
 
 .react-datepicker {
-  @apply border-purple-700! rounded-2xl!;
+  @apply border-accent-darken! rounded-2xl!;
 }
 
 .react-datepicker__tab-loop {
@@ -19,11 +19,11 @@
 }
 
 .react-datepicker__header {
-  @apply bg-accent! text-slate-50! rounded-t-xl!;
+  @apply bg-accent! text-slate-50! rounded-t-xl! border-0!;
 }
 
 .react-datepicker__month-container {
-  @apply border-purple-700!;
+  @apply border-accent-darken!;
 }
 
 .react-datepicker__current-month {
@@ -35,19 +35,20 @@
 }
 
 .react-datepicker__navigation:hover .react-datepicker__navigation-icon {
-  @apply before:border-accent-darken!;
+  @apply before:border-accent-darken-hover!;
 }
 
 .react-datepicker__navigation-icon {
-  @apply before:border-purple-800!;
+  @apply before:border-accent-darken!;
 }
 
 .react-datepicker__year-read-view--down-arrow {
-  @apply border-purple-800! hover:border-purple-950!;
+  @apply border-accent-darken! hover:border-accent-darken-hover!;
 }
 
+/* Triangle ^ appears as separate block */
 .react-datepicker__triangle {
-  @apply stroke-purple-500! fill-purple-500! text-purple-500! z-50;
+  @apply stroke-accent-darken! fill-accent! text-accent! z-50;
 }
 
 .react-datepicker__year-dropdown {

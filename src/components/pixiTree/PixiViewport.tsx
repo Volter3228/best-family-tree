@@ -4,6 +4,7 @@ import { ReactNode, useRef, useEffect, useImperativeHandle } from "react";
 import { useApplication } from "@pixi/react";
 import { Viewport as BaseViewport } from "pixi-viewport";
 import { debounce } from "lodash";
+import { getIsMinimized } from "@/libs/pixi";
 
 interface Props {
   ref: React.Ref<BaseViewport>;
@@ -22,6 +23,7 @@ const PixiViewport = ({
 }: Props) => {
   const { app } = useApplication();
   const viewportRef = useRef<BaseViewport>(null);
+  const wasMinimizedRef = useRef(false);
 
   useImperativeHandle(ref, () => viewportRef.current!);
 
@@ -41,6 +43,8 @@ const PixiViewport = ({
     viewport.resize(width, height);
     viewport.cursor = "grab";
 
+    wasMinimizedRef.current = getIsMinimized(viewport.scale.x);
+
     const handleDragStart = () => (viewport.cursor = "grabbing");
     const handleDragEnd = () => (viewport.cursor = "grab");
 
@@ -48,8 +52,18 @@ const PixiViewport = ({
       onScaleChange(viewport.scale.x);
     }, 100);
 
+    const handleWheel = () => {
+      const currentScale = viewport.scale.x;
+      const isMinimized = getIsMinimized(currentScale);
+      if (isMinimized !== wasMinimizedRef.current) {
+        onScaleChange(currentScale);
+        wasMinimizedRef.current = isMinimized;
+      }
+    }
+
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
+    viewport.on("wheel", handleWheel);
     viewport.on("zoomed", handleZoomed);
 
     return () => {
