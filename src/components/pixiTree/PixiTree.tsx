@@ -12,7 +12,7 @@ import {
   transformMembersToFlowValues,
   getLayoutedElements,
 } from "@/libs";
-import { FIXED_EDGE_WIDTH_SCALE } from "@/constants/pixi";
+import { MINIMIZED_VIEW_SCALE } from "@/constants/pixi";
 import Member from "@/models/Member";
 import PixiViewport from "./PixiViewport";
 import PixiNode from "./pixiNode/PixiNode";
@@ -114,7 +114,7 @@ const PixiTree = ({ members }: Props) => {
           <PixiEdgesLayer
             edges={edges}
             nodePositions={nodePositions}
-            pixelLine={scale < FIXED_EDGE_WIDTH_SCALE}
+            pixelLine={scale < MINIMIZED_VIEW_SCALE}
           />
           {nodes.map((node) => (
             <PixiNode

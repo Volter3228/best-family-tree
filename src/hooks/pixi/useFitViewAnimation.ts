@@ -1,12 +1,8 @@
-import { useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Viewport } from "pixi-viewport";
 import gsap from "gsap";
 import { Node } from "@xyflow/react";
-import {
-  NODE_WIDTH,
-  NODE_HEIGHT,
-  FIXED_EDGE_WIDTH_SCALE,
-} from "@/constants/pixi";
+import { MINIMIZED_VIEW_SCALE, NODE_HEIGHT, NODE_WIDTH } from "@/constants/pixi";
 
 interface Props {
   nodes: Node[];
@@ -18,7 +14,7 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
-  const fitView = useCallback(
+  return useCallback(
     (
       duration = 1,
       { width = window.innerWidth, height = window.innerHeight } = {}
@@ -70,7 +66,7 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
         onUpdate: () => {
           if (
             !lodTriggeredRef.current &&
-            viewport.scale.x < FIXED_EDGE_WIDTH_SCALE
+            viewport.scale.x < MINIMIZED_VIEW_SCALE
           ) {
             setScale(viewport.scale.x);
             lodTriggeredRef.current = true;
@@ -108,6 +104,4 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
     },
     [nodes, viewport, setScale]
   );
-
-  return fitView;
 };
