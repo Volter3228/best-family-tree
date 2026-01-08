@@ -39,8 +39,10 @@ src/server/.env
 *.tsbuildinfo
 next-env.d.ts
 
-# Vscode
+# Editors
 /.vscode
+/.idea
 
 # Docker
 compose.override.yml
+Dockerfile.*override
