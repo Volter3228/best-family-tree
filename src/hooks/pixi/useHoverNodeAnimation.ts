@@ -10,7 +10,7 @@ import {
 } from "@/constants/pixi";
 import { DropShadowFilter } from "pixi-filters";
 
-const calculateTargetScale = (isHovered: boolean, appScale: number) => {
+const calculateTargetScale = (appScale: number, isHovered: boolean) => {
   if (!isHovered) return 1;
 
   const isMinimized = getIsMinimized(appScale);
@@ -25,16 +25,16 @@ const calculateTargetScale = (isHovered: boolean, appScale: number) => {
 
 interface Props {
   container: Container | null;
+  appScale: number;
   isHovered: boolean;
   isSelected: boolean;
-  appScale: number;
 }
 
 export const useHoverNodeAnimation = ({
   container,
+  appScale,
   isHovered,
   isSelected,
-  appScale,
 }: Props) => {
   const shadowFilter = useMemo(() => {
     const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
@@ -51,7 +51,7 @@ export const useHoverNodeAnimation = ({
   useGSAP(() => {
     if (!container) return;
 
-    const targetScale = calculateTargetScale(isHovered, appScale);
+    const targetScale = calculateTargetScale(appScale, isHovered);
 
     gsap.to(container.scale, {
       x: targetScale,

@@ -2,10 +2,8 @@ import { useMemo, useState, useEffect, useCallback, memo, useRef } from "react";
 import {
   Texture,
   FederatedPointerEvent,
-  Graphics,
   GraphicsContext,
   Container,
-  Rectangle,
 } from "pixi.js";
 import Member from "@/models/Member";
 import { getAvatarImage, getIsMinimized } from "@/libs/pixi";
@@ -13,16 +11,10 @@ import { useHoverNodeAnimation } from "@/hooks";
 import {
   NODE_WIDTH,
   NODE_HEIGHT,
-  AVATAR_SIZE,
-  MAXIMIZED_BACKGROUND_COLOR,
-  ACCENT_COLOR,
-  AVATAR_FILL_GRADIENT,
-  TEXT_STYLE,
-  SUB_TEXT_STYLE,
-  MINIMIZED_RADIUS,
-  TEXT_RESOLUTION,
+  MINIMIZED_NODE_RADIUS,
 } from "@/constants/pixi";
 import PixiNodeMinimized from "./PixiNodeMinimized";
+import PixiNodeMaximized from "./PixiNodeMaximized";
 
 interface Props {
   member: Member;
@@ -61,41 +53,6 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
     };
   }, [member.avatar, member.photo]);
 
-  const drawNode = useCallback(
-    (g: Graphics) => {
-      g.clear();
-      g.beginPath();
-      g.roundRect(0, 0, NODE_WIDTH, NODE_HEIGHT, 24);
-      g.fillStyle = MAXIMIZED_BACKGROUND_COLOR;
-      g.fill();
-      g.setStrokeStyle({ color: ACCENT_COLOR, width: 2 });
-      g.stroke();
-
-      if (isSelected) {
-        g.setStrokeStyle({ color: ACCENT_COLOR, width: 4 });
-        g.stroke();
-      }
-    },
-    [isSelected]
-  );
-
-  const drawAvatarMask = useCallback((g: Graphics) => {
-    g.clear();
-    g.circle(0, 0, AVATAR_SIZE / 2);
-    g.fill(AVATAR_FILL_GRADIENT);
-  }, []);
-
-  const drawSvgAvatar = useCallback(
-    (g: Graphics) => {
-      if (!(avatarImage instanceof GraphicsContext)) return;
-      g.context = avatarImage;
-
-      g.scale.set(0.003, -0.003);
-      g.position.set(-28, 32);
-    },
-    [avatarImage]
-  );
-
   const handleClick = useCallback(
     (e: FederatedPointerEvent) => {
       e.stopPropagation();
@@ -116,17 +73,12 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
   const contentCenterX = NODE_WIDTH / 2;
   const contentCenterY = NODE_HEIGHT / 2;
 
-  const hitArea = useMemo(() => {
-    return new Rectangle(0, 0, NODE_WIDTH, NODE_HEIGHT);
-  }, []);
-
   return (
     <pixiContainer
       ref={containerRef}
       x={x + contentCenterX}
       y={y + contentCenterY}
       pivot={{ x: contentCenterX, y: contentCenterY }}
-      hitArea={hitArea}
       zIndex={isHovered ? 1000 : 0}
       eventMode="static"
       cursor="pointer"
@@ -138,44 +90,19 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
     >
       <PixiNodeMinimized
         visible={isMinimized}
-        x={25 + MINIMIZED_RADIUS}
-        y={MINIMIZED_RADIUS}
+        x={25 + MINIMIZED_NODE_RADIUS}
+        y={MINIMIZED_NODE_RADIUS}
         isSelected={isSelected}
         avatarImage={avatarImage}
+        memberName={member.name}
+        isHovered={isHovered}
       />
-      <pixiContainer visible={!isMinimized}>
-        <pixiGraphics draw={drawNode} />
-        <pixiContainer x={contentCenterX} y={contentCenterY - AVATAR_SIZE / 3}>
-          <pixiGraphics draw={drawAvatarMask} />
-          {avatarImage &&
-            (avatarImage instanceof Texture ? (
-              <pixiSprite
-                texture={avatarImage}
-                anchor={0.5}
-                width={AVATAR_SIZE}
-                height={AVATAR_SIZE}
-                roundPixels={true}
-              />
-            ) : (
-              <pixiGraphics draw={drawSvgAvatar} />
-            ))}
-        </pixiContainer>
-        <pixiContainer x={contentCenterX} y={120}>
-          <pixiText
-            text={member.name}
-            anchor={0.5}
-            style={TEXT_STYLE}
-            resolution={window.devicePixelRatio * TEXT_RESOLUTION}
-          />
-          <pixiText
-            text={member.getRecruitmentSeason()}
-            anchor={0.5}
-            y={20}
-            style={SUB_TEXT_STYLE}
-            resolution={window.devicePixelRatio * TEXT_RESOLUTION}
-          />
-        </pixiContainer>
-      </pixiContainer>
+      <PixiNodeMaximized
+        visible={!isMinimized}
+        member={member}
+        avatarImage={avatarImage}
+        isSelected={isSelected}
+      />
     </pixiContainer>
   );
 };

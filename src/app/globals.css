@@ -45,6 +45,7 @@
     scrollbar-color: var(--accent) transparent;
     scrollbar-arrow-color: transparent;
     font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
   }
 
   .bg-primary {

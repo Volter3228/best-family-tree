@@ -1,9 +1,9 @@
 import { TextStyle } from "pixi.js";
+import { PRIMARY_GRADIENT } from "@/constants/pixi/colors";
 
-export const TEXT_RESOLUTION = 2.5;
 const FONT_FAMILY = ["Nunito", "Arial", "Helvetica", "sans-serif"];
 
-export const TEXT_STYLE = new TextStyle({
+export const NODE_TITLE_STYLE = new TextStyle({
   fontFamily: FONT_FAMILY,
   fontSize: 16,
   fontWeight: "600",
@@ -13,10 +13,19 @@ export const TEXT_STYLE = new TextStyle({
   wordWrapWidth: 200,
 });
 
-export const SUB_TEXT_STYLE = new TextStyle({
+export const NODE_SUBTITLE_STYLE = new TextStyle({
   fontFamily: FONT_FAMILY,
   fontSize: 14,
   fontWeight: "300",
   fill: "#666",
   align: "center",
 });
+
+export const MINIMIZED_TOOLTIP_TEXT_STYLE = new TextStyle({
+  fontFamily: FONT_FAMILY,
+  fontSize: 14,
+  fill: PRIMARY_GRADIENT,
+  fontWeight: "bold",
+});
+
+export const TEXT_RESOLUTION = 2.5;

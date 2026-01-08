@@ -1,17 +1,15 @@
 import { useCallback, memo } from "react";
 import {
-  Container,
-  FederatedPointerEvent,
-  Filter,
   Graphics,
   GraphicsContext,
   Texture,
 } from "pixi.js";
+import PixiNodeMinimizedTooltip from "@/components/pixiTree/pixiNode/PixiNodeMinimizedTooltip";
 import {
-  ACCENT_COLOR,
   AVATAR_FILL_GRADIENT,
-  MINIMIZED_RADIUS,
-  MINIMIZED_SIZE,
+  MINIMIZED_NODE_RADIUS,
+  MINIMIZED_NODE_SIZE,
+  SLATE_LIGHT_COLOR
 } from "@/constants/pixi";
 
 interface Props {
@@ -20,6 +18,8 @@ interface Props {
   y: number;
   isSelected: boolean;
   avatarImage: Texture | GraphicsContext | null;
+  memberName: string;
+  isHovered: boolean;
 }
 
 const PixiNodeMinimized = ({
@@ -28,18 +28,21 @@ const PixiNodeMinimized = ({
   y,
   isSelected,
   avatarImage,
+  memberName,
+  isHovered,
 }: Props) => {
+  const radius = MINIMIZED_NODE_RADIUS;
+
   const drawMinimizedNode = useCallback(
     (g: Graphics) => {
       g.clear();
 
-      const r = MINIMIZED_RADIUS;
       g.beginPath();
-      g.circle(r, r, r);
+      g.circle(radius, radius, radius);
       g.fill(AVATAR_FILL_GRADIENT);
 
       if (isSelected) {
-        g.stroke({ color: ACCENT_COLOR, width: 5 });
+        g.stroke({ color: SLATE_LIGHT_COLOR, width: 5, alpha: 0.7 });
       }
     },
     [isSelected]
@@ -51,7 +54,7 @@ const PixiNodeMinimized = ({
       g.context = avatarImage;
 
       g.scale.set(0.0075, -0.0075);
-      g.position.set(MINIMIZED_RADIUS - 70, MINIMIZED_RADIUS + 80);
+      g.position.set(radius - 70, radius + 80);
     },
     [avatarImage]
   );
@@ -61,7 +64,7 @@ const PixiNodeMinimized = ({
       visible={visible}
       x={x}
       y={y}
-      pivot={{ x: MINIMIZED_RADIUS, y: MINIMIZED_RADIUS }}
+      pivot={{ x: radius, y: radius }}
     >
       <pixiGraphics draw={drawMinimizedNode} />
       {avatarImage &&
@@ -69,15 +72,16 @@ const PixiNodeMinimized = ({
           <pixiSprite
             texture={avatarImage}
             anchor={0.5}
-            x={MINIMIZED_RADIUS}
-            y={MINIMIZED_RADIUS}
-            width={MINIMIZED_SIZE}
-            height={MINIMIZED_SIZE}
+            x={radius}
+            y={radius}
+            width={MINIMIZED_NODE_SIZE}
+            height={MINIMIZED_NODE_SIZE}
             roundPixels
           />
         ) : (
           <pixiGraphics draw={drawSvgAvatar} />
         ))}
+      <PixiNodeMinimizedTooltip text={memberName} visible={isHovered} />
     </pixiContainer>
   );
 };

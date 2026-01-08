@@ -1,13 +1,13 @@
 "use client";
 
-import { ReactNode, useRef, useEffect, useImperativeHandle } from "react";
+import { ReactNode, useRef, useEffect, useImperativeHandle, type Ref } from "react";
 import { useApplication } from "@pixi/react";
 import { Viewport as BaseViewport } from "pixi-viewport";
 import { debounce } from "lodash";
 import { getIsMinimized } from "@/libs/pixi";
 
 interface Props {
-  ref: React.Ref<BaseViewport>;
+  ref: Ref<BaseViewport>;
   children: ReactNode;
   width: number;
   height: number;
