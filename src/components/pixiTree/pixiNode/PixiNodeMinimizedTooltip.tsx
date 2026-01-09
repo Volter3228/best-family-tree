@@ -1,7 +1,12 @@
 import { useCallback, useRef } from "react";
-import { CanvasTextMetrics, Container, Graphics } from "pixi.js";
+import { CanvasTextMetrics, Container, Graphics, TextStyle } from "pixi.js";
 import { useTick } from "@pixi/react";
-import { MINIMIZED_NODE_RADIUS, MINIMIZED_NODE_TOOLTIP_OFFSET, MINIMIZED_TOOLTIP_TEXT_STYLE } from "@/constants/pixi";
+import {
+  MINIMIZED_NODE_RADIUS,
+  MINIMIZED_NODE_TOOLTIP_OFFSET,
+  MINIMIZED_TOOLTIP_TEXT_STYLE,
+  PRIMARY_GRADIENT,
+} from "@/constants/pixi";
 
 interface Props {
   text: string;
@@ -16,7 +21,10 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
     (g: Graphics) => {
       g.clear();
 
-      const metrics = CanvasTextMetrics.measureText(text, MINIMIZED_TOOLTIP_TEXT_STYLE);
+      const metrics = CanvasTextMetrics.measureText(
+        text,
+        MINIMIZED_TOOLTIP_TEXT_STYLE
+      );
       const w = metrics.width + 16;
       const h = metrics.height + 10;
 
@@ -31,7 +39,8 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
     if (!tooltip) return;
 
     const target = visible ? 1 : 0;
-    animationProgress.current += (target - animationProgress.current) * 0.15 * delta.speed;
+    animationProgress.current +=
+      (target - animationProgress.current) * 0.15 * delta.speed;
 
     if (target === 0 && animationProgress.current < 0.01) {
       tooltip.visible = false;
@@ -51,19 +60,21 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
     }
   });
 
-  return <pixiContainer
-    ref={tooltipRef}
-    x={MINIMIZED_NODE_RADIUS}
-    y={MINIMIZED_NODE_RADIUS}
-  >
-    <pixiGraphics draw={drawTooltipBackground} />
-    <pixiText
-      text={text}
-      anchor={{ x: 0.5, y: 1 }}
-      y={-5}
-      style={MINIMIZED_TOOLTIP_TEXT_STYLE}
-    />
-  </pixiContainer>
+  return (
+    <pixiContainer
+      ref={tooltipRef}
+      x={MINIMIZED_NODE_RADIUS}
+      y={MINIMIZED_NODE_RADIUS}
+    >
+      <pixiGraphics draw={drawTooltipBackground} />
+      <pixiText
+        text={text}
+        anchor={{ x: 0.5, y: 1 }}
+        y={-5}
+        style={MINIMIZED_TOOLTIP_TEXT_STYLE}
+      />
+    </pixiContainer>
+  );
 };
 
 export default PixiNodeMinimizedTooltip;
