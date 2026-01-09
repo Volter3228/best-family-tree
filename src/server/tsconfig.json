@@ -16,6 +16,11 @@
     "strictNullChecks": true,
     "skipLibCheck": true
   },
+  "watchOptions": {
+    "watchFile": "dynamicPriorityPolling",
+    "watchDirectory": "dynamicPriorityPolling",
+    "fallbackPolling": "dynamicpriority"
+  },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
