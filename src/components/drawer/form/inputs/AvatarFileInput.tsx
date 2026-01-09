@@ -1,19 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import LionIcon from "@/components/icons/Lion";
 
 interface Props {
-  initialImage?: string;
   onImageSelect: (file: File | null) => void;
 }
 
-const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(
-    initialImage ?? null
-  );
+const AvatarFileInput = ({ onImageSelect }: Props) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e);
     if (e.target.files?.[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
@@ -25,6 +24,10 @@ const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
   const handleRemoveImage = () => {
     setSelectedImage(null);
     onImageSelect(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -48,6 +51,7 @@ const AvatarFileInput = ({ initialImage, onImageSelect }: Props) => {
           </div>
         )}
         <input
+          ref={fileInputRef}
           type="file"
           accept="image/*"
           className="hidden"
