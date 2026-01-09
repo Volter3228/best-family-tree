@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
-import { ReactFlowProvider } from "@xyflow/react";
+// import { ReactFlowProvider } from "@xyflow/react";
 import "./globals.css";
 import "./animations.css";
 
@@ -24,11 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk">
-      <ReactFlowProvider>
-        <body className={`${nunito.className} antialiased`}>
-          <div className="relative">{children}</div>
-        </body>
-      </ReactFlowProvider>
+      <body
+        className={`${nunito.className} antialiased`}
+        suppressHydrationWarning
+      >
+        <div className="relative">{children}</div>
+      </body>
     </html>
   );
 }

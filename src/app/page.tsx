@@ -1,5 +1,5 @@
-import PixiTree from "@/components/pixiTree/PixiTree";
 // import Flow from "@/components/flow/Flow";
+import PixiTree from "@/components/pixiTree/PixiTreeLoader";
 import { MembersProvider } from "@/context/MembersContext";
 import getFamilyTree from "@/api/getFamilyTree";
 

@@ -23,15 +23,14 @@ export const PRIMARY_GRADIENT = new FillGradient({
   type: "linear",
   start: {
     x: 0,
-    y: 1,
+    y: 0,
   },
   end: {
     x: 1,
-    y: 0,
+    y: 1,
   },
   colorStops: [
     { offset: 0, color: PRIMARY_GRADIENT_START },
     { offset: 1, color: PRIMARY_GRADIENT_END },
   ],
 });
-

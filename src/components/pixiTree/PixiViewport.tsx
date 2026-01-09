@@ -1,13 +1,19 @@
 "use client";
 
-import { ReactNode, useRef, useEffect, useImperativeHandle, type Ref } from "react";
+import {
+  ReactNode,
+  useRef,
+  useEffect,
+  useImperativeHandle,
+  type Ref,
+} from "react";
 import { useApplication } from "@pixi/react";
-import { Viewport as BaseViewport } from "pixi-viewport";
+import { Viewport } from "pixi-viewport";
 import { debounce } from "lodash";
 import { getIsMinimized } from "@/libs/pixi";
 
 interface Props {
-  ref: Ref<BaseViewport>;
+  ref: Ref<Viewport>;
   children: ReactNode;
   width: number;
   height: number;
@@ -22,7 +28,7 @@ const PixiViewport = ({
   onScaleChange,
 }: Props) => {
   const { app } = useApplication();
-  const viewportRef = useRef<BaseViewport>(null);
+  const viewportRef = useRef<Viewport>(null);
   const wasMinimizedRef = useRef(false);
 
   useImperativeHandle(ref, () => viewportRef.current!);
@@ -59,7 +65,7 @@ const PixiViewport = ({
         onScaleChange(currentScale);
         wasMinimizedRef.current = isMinimized;
       }
-    }
+    };
 
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
@@ -72,7 +78,11 @@ const PixiViewport = ({
       viewport.off("zoomed", handleZoomed);
       handleZoomed.cancel();
     };
-  }, [app, width, height, onScaleChange]);
+  }, [app, app?.ticker, width, height, onScaleChange]);
+
+  if (!app || !app.renderer || !app.ticker) {
+    return null;
+  }
 
   return (
     <pixiViewport
