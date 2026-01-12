@@ -4,10 +4,14 @@ import { Member as MemberType } from "@/types";
 
 export default async function addMember(formData: FormData) {
   try {
-    const res = await http(ENDPOINTS.addMember, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await http(
+      ENDPOINTS.addMember,
+      {
+        method: "POST",
+        body: formData,
+      },
+      true
+    );
 
     if (!res.ok) {
       throw new Error(`HTTP Error! Status: ${res.status}`);

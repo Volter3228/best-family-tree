@@ -92,7 +92,6 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
         visible={isMinimized}
         x={25 + MINIMIZED_NODE_RADIUS}
         y={MINIMIZED_NODE_RADIUS}
-        isSelected={isSelected}
         avatarImage={avatarImage}
         memberName={member.name}
         isHovered={isHovered}

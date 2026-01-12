@@ -41,17 +41,18 @@ export default function AddMemberForm() {
       if (value instanceof Date) {
         formData.append(key, value.toISOString()); // Handle Date objects
       } else if (value !== undefined && value !== null) {
-        if (typeof value === "object") {
+        // TODO: Make phone numbers an array with possibility to expand
+        if (key === "phoneNumber") {
+          formData.append("phoneNumbers", JSON.stringify([value]));
+        } else if (key === "photo") {
+          formData.append(key, value);
+        } else if (typeof value === "object") {
           formData.append(key, JSON.stringify(value)); // Serialize objects
         } else {
           formData.append(key, value.toString()); // Convert other values to strings
         }
       }
     });
-
-    if (form.photo) {
-      formData.append("photo", form.photo);
-    }
 
     const newMember = await apiAddMember(formData);
     if (newMember) {

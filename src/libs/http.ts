@@ -1,8 +1,8 @@
 export const http = async (
   endpoint: string,
-  init?: RequestInit
+  init?: RequestInit,
+  isFormData?: boolean
 ): Promise<Response> => {
-  // Use internal Docker URL for server-side, public URL for client-side
   const isServer = typeof window === "undefined";
   const baseUrl = isServer
     ? process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL
@@ -11,13 +11,19 @@ export const http = async (
   const url = `${baseUrl}${endpoint}`;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        ...init?.headers,
-      },
-      ...init,
-    });
+    let response;
+
+    if (isFormData) {
+      response = await fetch(url, { ...init });
+    } else {
+      response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          ...init?.headers,
+        },
+        ...init,
+      });
+    }
 
     return response;
   } catch (error) {
