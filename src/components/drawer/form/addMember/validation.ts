@@ -8,21 +8,13 @@ import { AddMemberForm, MentorsListItem } from "@/types";
 
 const REQUIRED_MESSAGE = "Обов'язкове поле.";
 const INVALID_LINK_MESSAGE = "Некоректне посилання.";
-const TELEGRAM_LINK_REGEX = /^(https?:\/\/(www\.)?t\.me\/)?(\w{5,})$/;
+const TELEGRAM_LINK_REGEX = /^((https?:\/\/)?(www\.)?t\.me\/)?(\w{5,})$/;
 const INSTAGRAM_LINK_REGEX =
   /^(https?:\/\/(www\.)?instagram\.com\/|instagram\.com\/)?([a-zA-Z0-9._]{1,30})$/;
 const FACEBOOK_LINK_REGEX =
   /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.com)(\/.*)?$/;
 const LINKEDIN_LINK_REGEX =
   /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9][a-zA-Z0-9_-]{1,98}[a-zA-Z0-9]$/;
-
-const validateLink = (link: string, regex: RegExp) => {
-  const match = regex.exec(link);
-
-  if (!match) {
-    return INVALID_LINK_MESSAGE;
-  }
-};
 
 type Links = {
   telegramLink: string;
@@ -31,20 +23,24 @@ type Links = {
   linkedinLink: string;
 };
 
-const validateLinks = (links: Links) => {
-  const { telegramLink, facebookLink, instagramLink, linkedinLink } = links;
+const validateLinks = ({
+  telegramLink,
+  facebookLink,
+  instagramLink,
+  linkedinLink,
+}: Links) => {
   const errors: Partial<Links> = {};
-  if (telegramLink) {
-    errors.telegramLink = validateLink(telegramLink, TELEGRAM_LINK_REGEX);
+  if (!telegramLink || !TELEGRAM_LINK_REGEX.exec(telegramLink)) {
+    errors.telegramLink = INVALID_LINK_MESSAGE;
   }
-  if (instagramLink) {
-    errors.instagramLink = validateLink(instagramLink, INSTAGRAM_LINK_REGEX);
+  if (!instagramLink || !INSTAGRAM_LINK_REGEX.exec(instagramLink)) {
+    errors.instagramLink = INVALID_LINK_MESSAGE;
   }
-  if (facebookLink) {
-    errors.facebookLink = validateLink(facebookLink, FACEBOOK_LINK_REGEX);
+  if (!facebookLink || !FACEBOOK_LINK_REGEX.exec(facebookLink)) {
+    errors.facebookLink = INVALID_LINK_MESSAGE;
   }
-  if (linkedinLink) {
-    errors.linkedinLink = validateLink(linkedinLink, LINKEDIN_LINK_REGEX);
+  if (!linkedinLink || !LINKEDIN_LINK_REGEX.exec(linkedinLink)) {
+    errors.linkedinLink = INVALID_LINK_MESSAGE;
   }
 
   return errors;

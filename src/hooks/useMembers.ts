@@ -42,9 +42,7 @@ export const useMembers = () => {
 
   const handleGetMentorsList = useCallback(async () => {
     const mentorsList = await getMentorsList();
-    if (setMentorsList) {
-      setMentorsList(mentorsList);
-    }
+    setMentorsList(mentorsList);
   }, [setMentorsList]);
 
   // Add a new member

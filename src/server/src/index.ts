@@ -76,22 +76,25 @@ app.get("/api/member/:id", async (req, res) => {
   }
 });
 
-app.get("/api/mentors-list", async (req, res) => {
+app.get("/api/mentors-list", async (_req, res) => {
   try {
-    const mentors = await prisma.member.findMany({
+    const mentorsData = await prisma.member.findMany({
       where: {
         status: {
           in: [MemberStatus.ALUMNI, MemberStatus.FULL],
         },
       },
-      include: {
-        mentees: true, // Optional: to include mentees in the result
+      select: {
+        id: true,
+        name: true,
       },
     });
 
-    const mentorsData = mentors.map(({ id, name }) => ({ id, name }));
+    const mentors = mentorsData.sort((a, b) =>
+      a.name.localeCompare(b.name, "uk-UA")
+    );
 
-    res.status(200).json(mentorsData);
+    res.status(200).json(mentors);
   } catch {
     res.status(500);
   }
@@ -108,7 +111,6 @@ app.post(
       joinedAt,
       mentorId,
       status,
-      phoneNumbers,
       email,
       telegramLink,
       instagramLink,
@@ -118,8 +120,9 @@ app.post(
 
     try {
       const photoUrl = req.file?.path || null;
+      const phoneNumbers = JSON.parse(req.body.phoneNumbers);
 
-      const newMember = await prisma.member.create({
+      const { id: newMemberId } = await prisma.member.create({
         data: {
           name: `${firstName} ${lastName}`,
           birthday: new Date(birthday),
@@ -144,11 +147,17 @@ app.post(
         await prisma.phoneNumber.create({
           data: {
             phoneNumber,
-            ownerId: newMember.id,
+            ownerId: newMemberId,
           },
         });
       }
-      res.status(201).json(transformMemberPhoneNumbers(newMember));
+
+      const newMember = await prisma.member.findFirst({
+        where: { id: { equals: newMemberId } },
+        include: { mentees: true, mentor: true, phoneNumbers: true },
+      });
+
+      res.status(201).json(newMember);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to create member" });

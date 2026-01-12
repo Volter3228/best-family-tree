@@ -1,22 +1,17 @@
-import { useCallback, memo } from "react";
-import {
-  Graphics,
-  GraphicsContext,
-  Texture,
-} from "pixi.js";
+import { useCallback, memo, useRef } from "react";
+import { Graphics, GraphicsContext, Texture } from "pixi.js";
 import PixiNodeMinimizedTooltip from "@/components/pixiTree/pixiNode/PixiNodeMinimizedTooltip";
 import {
   AVATAR_FILL_GRADIENT,
+  MINIMIZED_AVATAR_SCALE,
   MINIMIZED_NODE_RADIUS,
   MINIMIZED_NODE_SIZE,
-  SLATE_LIGHT_COLOR
 } from "@/constants/pixi";
 
 interface Props {
   visible: boolean;
   x: number;
   y: number;
-  isSelected: boolean;
   avatarImage: Texture | GraphicsContext | null;
   memberName: string;
   isHovered: boolean;
@@ -26,27 +21,19 @@ const PixiNodeMinimized = ({
   visible,
   x,
   y,
-  isSelected,
   avatarImage,
   memberName,
   isHovered,
 }: Props) => {
+  const nodeMaskRef = useRef<Graphics>(null);
   const radius = MINIMIZED_NODE_RADIUS;
 
-  const drawMinimizedNode = useCallback(
-    (g: Graphics) => {
-      g.clear();
-
-      g.beginPath();
-      g.circle(radius, radius, radius);
-      g.fill(AVATAR_FILL_GRADIENT);
-
-      if (isSelected) {
-        g.stroke({ color: SLATE_LIGHT_COLOR, width: 5, alpha: 0.7 });
-      }
-    },
-    [isSelected]
-  );
+  const drawMinimizedNode = useCallback((g: Graphics) => {
+    g.clear();
+    g.beginPath();
+    g.circle(radius, radius, radius);
+    g.fill(AVATAR_FILL_GRADIENT);
+  }, []);
 
   const drawSvgAvatar = useCallback(
     (g: Graphics) => {
@@ -66,21 +53,25 @@ const PixiNodeMinimized = ({
       y={y}
       pivot={{ x: radius, y: radius }}
     >
-      <pixiGraphics draw={drawMinimizedNode} />
-      {avatarImage &&
-        (avatarImage instanceof Texture ? (
-          <pixiSprite
-            texture={avatarImage}
-            anchor={0.5}
-            x={radius}
-            y={radius}
-            width={MINIMIZED_NODE_SIZE}
-            height={MINIMIZED_NODE_SIZE}
-            roundPixels
-          />
-        ) : (
-          <pixiGraphics draw={drawSvgAvatar} />
-        ))}
+      <pixiContainer
+        mask={avatarImage instanceof Texture ? nodeMaskRef.current : null}
+      >
+        <pixiGraphics ref={nodeMaskRef} draw={drawMinimizedNode} />
+        {avatarImage &&
+          (avatarImage instanceof Texture ? (
+            <pixiSprite
+              texture={avatarImage}
+              anchor={0.5}
+              x={radius}
+              y={radius}
+              width={MINIMIZED_NODE_SIZE}
+              height={MINIMIZED_NODE_SIZE}
+              scale={MINIMIZED_AVATAR_SCALE}
+            />
+          ) : (
+            <pixiGraphics draw={drawSvgAvatar} />
+          ))}
+      </pixiContainer>
       <PixiNodeMinimizedTooltip text={memberName} visible={isHovered} />
     </pixiContainer>
   );
