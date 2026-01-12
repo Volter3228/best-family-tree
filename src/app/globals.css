@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-darken: var(--accent-darken);
   --color-accent-darken-hover: var(--accent-darken-hover);
   --color-placeholder: hsl(220, 13%, 65%);
+
+  --background-image-primary: var(--primary-gradient);
+  --background-image-avatar-gradient: var(--avatar-gradient);
 }
 
 @layer base {
   :root {
-    --background-image: linear-gradient(
-            to top right,
-            hsl(249, 59%, 51%),
-            hsl(302, 86%, 45%)
+    --primary-gradient: linear-gradient(
+      to top right,
+      hsl(249, 59%, 51%),
+      hsl(302, 86%, 45%)
     );
-    --avatar-background: linear-gradient(
-            to top,
-            hsl(302, 86%, 45%),
-            hsl(249, 59%, 51%)
+    --avatar-gradient: linear-gradient(
+      to top,
+      hsl(302, 86%, 45%),
+      hsl(249, 59%, 51%)
     );
     --foreground: hsl(220, 39%, 11%);
     --accent: hsl(267, 100%, 60%);
@@ -39,7 +41,7 @@
 
   body {
     color: var(--foreground);
-    background: var(--background-image);
+    background: var(--primary-gradient);
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: var(--accent) transparent;
@@ -48,11 +50,7 @@
     overflow: hidden;
   }
 
-  .bg-primary {
-    background-image: var(--background-image);
-  }
-
-  .bg-avatar-gradient {
-    background-image: var(--avatar-background);
+  button {
+    cursor: pointer;
   }
 }
