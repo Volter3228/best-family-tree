@@ -2,7 +2,11 @@ import { useCallback, useRef } from "react";
 import { Viewport } from "pixi-viewport";
 import gsap from "gsap";
 import { Node } from "@xyflow/react";
-import { MINIMIZED_VIEW_SCALE, NODE_HEIGHT, NODE_WIDTH } from "@/constants/pixi";
+import {
+  MINIMIZED_VIEW_SCALE,
+  NODE_HEIGHT,
+  NODE_WIDTH,
+} from "@/constants/pixi";
 
 interface Props {
   nodes: Node[];
@@ -19,6 +23,7 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
       duration = 1,
       { width = window.innerWidth, height = window.innerHeight } = {}
     ) => {
+      console.log(viewport, nodes.length, width, height);
       if (!viewport || nodes.length === 0 || width === 0 || height === 0)
         return;
 

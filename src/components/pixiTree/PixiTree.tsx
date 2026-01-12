@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import { Application, useApplication } from "@pixi/react";
+import { Application } from "@pixi/react";
 import { CullerPlugin } from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import { useMembers, useFitViewAnimation } from "@/hooks";
@@ -31,9 +31,9 @@ const PixiTree = ({ members }: Props) => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [scale, setScale] = useState(1);
   const [isInfoDrawerOpen, setIsInfoDrawerOpen] = useState(false);
+  const [viewport, setViewport] = useState<Viewport | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const viewportRef = useRef<Viewport>(null);
 
   const { membersTree, setMembers, selectedMember, setSelectedMember } =
     useMembers();
@@ -60,14 +60,14 @@ const PixiTree = ({ members }: Props) => {
 
   const fitView = useFitViewAnimation({
     nodes,
-    viewport: viewportRef.current,
+    viewport,
     setScale,
   });
 
   // Handle auto-fit-view on initial load
   useEffect(() => {
     if (nodes.length > 0) {
-      const timer = setTimeout(() => fitView(2), 100);
+      const timer = setTimeout(() => fitView(2), 200);
       return () => clearTimeout(timer);
     }
   }, [nodes, fitView]);
@@ -107,7 +107,7 @@ const PixiTree = ({ members }: Props) => {
         extensions={[CullerPlugin]}
       >
         <PixiViewport
-          ref={viewportRef}
+          ref={setViewport}
           width={window.innerWidth}
           height={window.innerHeight}
           onScaleChange={setScale}
