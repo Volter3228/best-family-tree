@@ -25,7 +25,7 @@ const PixiViewport = ({
   height,
   onScaleChange,
 }: Props) => {
-  const { app } = useApplication();
+  const { app, isInitialised } = useApplication();
   const viewportRef = useRef<Viewport>(null);
   const wasMinimizedRef = useRef(false);
 
@@ -76,9 +76,9 @@ const PixiViewport = ({
       viewport.off("zoomed", handleZoomed);
       handleZoomed.cancel();
     };
-  }, [app, app?.ticker, width, height, onScaleChange]);
+  }, [app, width, height, onScaleChange, isInitialised]);
 
-  if (!app || !app.renderer || !app.ticker) {
+  if (!isInitialised) {
     return null;
   }
 
