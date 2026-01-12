@@ -1,16 +1,14 @@
-// Frontend-compatible types (mirrors Prisma schema without dependency)
-
 export enum MemberStatus {
-  OBSERVER = "observer",
-  BABY = "baby",
-  FULL = "full",
-  ALUMNI = "alumni",
+  Observer = "OBSERVER",
+  Baby = "BABY",
+  Full = "FULL",
+  Alumni = "ALUMNI",
 }
 
 export enum ActivityState {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  EXCLUDED = "excluded",
+  Active = "ACTIVE",
+  Inactive = "INACTIVE",
+  Excluded = "EXCLUDED",
 }
 
 export type Member = {
@@ -34,5 +32,5 @@ export type Member = {
   // Relations (populated by API)
   mentor?: Member;
   mentees?: Member[];
-  phoneNumbers?: string[];
+  phoneNumbers: string[];
 };

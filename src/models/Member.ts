@@ -77,7 +77,7 @@ export default class Member {
 
   isMentor(): boolean {
     return (
-      this.status === MemberStatus.ALUMNI || this.status === MemberStatus.FULL
+      this.status === MemberStatus.Alumni || this.status === MemberStatus.Full
     );
   }
 
