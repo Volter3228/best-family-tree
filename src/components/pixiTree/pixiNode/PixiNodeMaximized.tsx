@@ -2,15 +2,14 @@ import { useCallback, useRef } from "react";
 import { CanvasTextMetrics, Graphics, GraphicsContext, Texture } from "pixi.js";
 import Member from "@/models/Member";
 import {
-  ACCENT_COLOR,
   AVATAR_FILL_GRADIENT,
   AVATAR_SIZE,
   NODE_HEIGHT,
   NODE_SUBTITLE_STYLE,
   NODE_TITLE_STYLE,
-  NODE_WIDTH,
+  NODE_WIDTH, PRIMARY_GRADIENT,
   SLATE_LIGHT_COLOR,
-  TEXT_RESOLUTION,
+  TEXT_RESOLUTION
 } from "@/constants/pixi";
 
 interface Props {
@@ -59,11 +58,18 @@ const PixiNodeMaximized = ({
       g.clear();
       g.beginPath();
       g.roundRect(0, 0, NODE_WIDTH, NODE_HEIGHT, 24);
-      g.fill(SLATE_LIGHT_COLOR);
-      g.stroke({ color: ACCENT_COLOR, width: 2 });
+      g.fill({
+        color: SLATE_LIGHT_COLOR,
+      });
 
       if (isSelected) {
-        g.stroke({ color: ACCENT_COLOR, width: 4 });
+        g.stroke({ fill: PRIMARY_GRADIENT, width: 2 });
+      } else {
+        g.stroke({
+          color: SLATE_LIGHT_COLOR,
+          width: 3,
+          alpha: 0.25
+        });
       }
     },
     [isSelected]
