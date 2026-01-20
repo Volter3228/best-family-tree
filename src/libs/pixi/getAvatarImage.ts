@@ -1,6 +1,6 @@
 import { Assets, GraphicsContext, Texture } from "pixi.js";
 
-const LION_ICON_PATH = "/images/lion-white.svg";
+const LION_ICON_PATH = "/images/lion-light.svg";
 
 const loadLionSvg = async (): Promise<Texture | GraphicsContext | void> => {
   try {

@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   title: "BEST Family Tree",
   description: "Vouchik's Pet Project",
   icons: {
-    icon: "/images/favicon.ico",
+    icon: [
+      { media: "(prefers-color-scheme: light)", url: "/images/lion.svg" },
+      { media: "(prefers-color-scheme: dark)", url: "/images/lion-light.svg" },
+    ],
   },
 };
 
