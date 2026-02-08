@@ -1,5 +1,9 @@
 import { getPhotoUrlAsAvatar } from "@/libs/cloudinary";
-import { MemberStatus, type Member as MemberType } from "@/types";
+import {
+  MemberStatus,
+  type Member as MemberType,
+  ActivityState,
+} from "@/types";
 import { getMonth, getYear } from "date-fns";
 
 export default class Member {
@@ -18,8 +22,12 @@ export default class Member {
   phoneNumbers: string[];
   photo: string | null;
   avatar: string | null;
-  status: string;
+  status: MemberStatus;
   telegramLink: string | null;
+  activityState: ActivityState;
+  course: number | null;
+  createdAt: Date;
+  updatedAt: Date;
 
   constructor({
     id,
@@ -38,6 +46,10 @@ export default class Member {
     photo,
     status,
     telegramLink,
+    activityState,
+    course,
+    createdAt,
+    updatedAt,
   }: MemberType) {
     this.id = id;
     this.birthday = birthday ? new Date(birthday) : null;
@@ -57,6 +69,10 @@ export default class Member {
     this.status = status;
     this.telegramLink = telegramLink;
     this.avatar = photo ? getPhotoUrlAsAvatar(photo) : "";
+    this.activityState = activityState;
+    this.course = course;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   // Add a mentee
@@ -85,5 +101,20 @@ export default class Member {
     return this.mentees.length
       ? this.mentees.map(({ name }) => name).join(", ")
       : "";
+  }
+
+  getDescendantIds(): Set<string> {
+    const descendantIds = new Set<string>();
+    const collectDescendants = (mentees: Member[]) => {
+      for (const mentee of mentees) {
+        descendantIds.add(mentee.id);
+        if (mentee.mentees.length) {
+          collectDescendants(mentee.mentees);
+        }
+      }
+    };
+
+    collectDescendants(this.mentees);
+    return descendantIds;
   }
 }

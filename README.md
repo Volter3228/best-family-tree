@@ -81,7 +81,7 @@ docker compose up
 docker compose up -d
 
 # Rebuild containers
-docker compose build --no-cache
+docker compose build
 
 # Stop services
 docker compose down

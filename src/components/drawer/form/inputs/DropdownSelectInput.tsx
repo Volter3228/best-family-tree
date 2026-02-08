@@ -8,10 +8,10 @@ interface Props {
   placeholder?: string;
   label?: string;
   required?: boolean;
-  // defaultOptionText?: string;
   options: DropdownOption[];
   autoComplete?: boolean;
   onSelect: (value: string) => void;
+  initialValue?: string;
 }
 
 const DropdownSelectInput = ({
@@ -22,6 +22,7 @@ const DropdownSelectInput = ({
   required = false,
   autoComplete = false,
   onSelect,
+  initialValue,
 }: Props) => {
   const {
     isOpen,
@@ -35,7 +36,7 @@ const DropdownSelectInput = ({
     handleSelect,
     handleKeyDown,
     handleClose,
-  } = useDropdown(options, onSelect, autoComplete);
+  } = useDropdown(options, onSelect, initialValue, autoComplete);
 
   const handleInputFocus = () => setIsOpen(true);
 

@@ -14,21 +14,26 @@
 
 @layer base {
   :root {
-    --primary-gradient: linear-gradient(
-      to top right,
-      hsl(249, 59%, 51%),
-      hsl(302, 86%, 45%)
-    );
-    --avatar-gradient: linear-gradient(
-      to top,
-      hsl(302, 86%, 45%),
-      hsl(249, 59%, 51%)
-    );
+    /* Colors */
     --foreground: hsl(220, 39%, 11%);
     --accent: hsl(267, 100%, 60%);
     --accent-hover: hsl(267, 100%, 55%);
     --accent-darken: hsl(267, 100%, 45%);
     --accent-darken-hover: hsl(267, 100%, 40%);
+
+    /* Gradients */
+    --primary-gradient-start: hsl(249, 59%, 51%);
+    --primary-gradient-end: hsl(302, 86%, 45%);
+    --primary-gradient: linear-gradient(
+      to top right,
+      var(--primary-gradient-start),
+      var(--primary-gradient-end)
+    );
+    --avatar-gradient: linear-gradient(
+      to top,
+      var(--primary-gradient-end),
+      var(--primary-gradient-start)
+    );
   }
 
   *,

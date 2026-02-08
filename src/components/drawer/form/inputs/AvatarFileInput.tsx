@@ -1,18 +1,24 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { XMarkIcon } from "@heroicons/react/16/solid";
 import LionIcon from "@/components/icons/Lion";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 
 interface Props {
   onImageSelect: (file: File | null) => void;
+  initialImage: string | null;
 }
 
-const AvatarFileInput = ({ onImageSelect }: Props) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+const AvatarFileInput = ({ onImageSelect, initialImage = null }: Props) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(
+    initialImage,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    setSelectedImage(initialImage);
+  }, [initialImage]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e);
     if (e.target.files?.[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);

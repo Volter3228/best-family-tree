@@ -5,7 +5,7 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import Drawer from "../drawer/Drawer";
-import AddMemberForm from "../drawer/form/addMember/AddMemberForm";
+import AddMemberForm from "../drawer/form/AddMemberForm";
 import ToolbarIconButton from "../ToolbarIconButton";
 
 interface PixiSidebarProps {
@@ -52,7 +52,7 @@ export default function PixiSidebar({ onFitView }: PixiSidebarProps) {
         </div>
       </div>
       <Drawer
-        headerTitle="Додати мембера"
+        headerTitle="Додати"
         onClose={toggleDrawer}
         isOpen={isDrawerOpen}
         className="z-20"

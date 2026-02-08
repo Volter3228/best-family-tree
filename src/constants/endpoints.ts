@@ -4,4 +4,5 @@ export const ENDPOINTS = {
   getMemberById: (id: string) => `/member/${id}`,
 
   addMember: "/add-member",
+  editMember: (id: string) => `/members/${id}`,
 };

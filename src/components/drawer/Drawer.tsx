@@ -1,22 +1,33 @@
 "use client";
 
 import React from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline"; // Tailwind Heroicons
+import {
+  XCircleIcon,
+  PencilSquareIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/solid"; // Tailwind Heroicons
+import { DrawerMode } from "@/types";
 import "./styles/drawer.css";
 
 interface Props {
   headerTitle?: string;
   isOpen: boolean;
   onClose: () => void;
-  children?: React.ReactNode;
+  onEditClick?: () => void;
+  onBackClick?: () => void;
+  mode?: DrawerMode;
   className?: string;
+  children?: React.ReactNode;
 }
 
 const Drawer = ({
   isOpen,
   onClose,
+  onEditClick,
+  onBackClick,
   headerTitle = "Drawer Header",
   children,
+  mode,
   className = "",
 }: Props) => {
   return (
@@ -31,15 +42,36 @@ const Drawer = ({
       `}
     >
       <div className="flex justify-between items-center p-4 border-b bg-primary">
-        <h2 className="text-xl font-bold text-slate-50 pointer-events-none">
-          {headerTitle}
+        <h2 className="text-xl font-bold text-slate-50 flex items-center">
+          {mode === "edit" && (
+            <button
+              onClick={onBackClick}
+              className="text-slate-50 hover:text-purple-300 transition-colors duration-200 ease-out"
+              title="Назад"
+            >
+              <ArrowLeftIcon className="h-6 w-6" />
+            </button>
+          )}
+          <span className="ml-2 pointer-events-none">{headerTitle}</span>
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 cursor-pointer"
-        >
-          <XMarkIcon className="h-6 w-6 stroke-slate-50 hover:stroke-2" />
-        </button>
+        <div className="flex gap-2">
+          {mode === "info" && (
+            <button
+              onClick={onEditClick}
+              className="text-slate-50 hover:text-purple-300 transition-colors duration-200 ease-out"
+              title="Редагувати"
+            >
+              <PencilSquareIcon className="h-6 w-6" />
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="text-slate-50 hover:text-purple-300 transition-colors duration-200 ease-out"
+            title="Закрити"
+          >
+            <XCircleIcon className="h-6 w-6" />
+          </button>
+        </div>
       </div>
       <div className="drawer-content p-6 overflow-y-auto">{children}</div>
     </div>

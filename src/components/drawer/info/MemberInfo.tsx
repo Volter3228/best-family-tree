@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { LionIcon } from "@/components/icons";
@@ -13,12 +12,11 @@ import {
   PhoneArrowUpRightIcon,
   CalendarDateRangeIcon,
 } from "@heroicons/react/16/solid";
+import { capilizeOnlyFirstLetter, generateGoogleCalendarLink } from "@/utils";
 import Member from "@/models/Member";
-import { capilizeOnlyFirstLetter } from "@/utils/strings";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 import MemberInfoActionIcon from "./MemberInfoActionIcon";
-import { generateGoogleCalendarLink } from "@/utils/addToCalendar";
 
 interface Props {
   member: Member;
@@ -113,6 +111,8 @@ const MemberInfo = ({
                   href={generateGoogleCalendarLink(member)}
                   icon={CalendarDateRangeIcon}
                   hint="Додати до календаря"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 />
               }
             />

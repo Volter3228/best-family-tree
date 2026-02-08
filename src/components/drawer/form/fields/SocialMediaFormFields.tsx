@@ -1,4 +1,4 @@
-import { AddMemberForm } from "@/types";
+import { MemberFormData } from "@/types";
 import {
   TelegramIcon,
   InstagramIcon,
@@ -8,12 +8,12 @@ import {
 import TextInput from "../inputs/TextInput";
 
 interface Props {
-  form: AddMemberForm;
+  form: MemberFormData;
   onTextChange: (name: string) => (value: string) => void;
-  errors: Partial<Record<keyof AddMemberForm, string>>;
+  errors: Partial<Record<keyof MemberFormData, string>>;
 }
 
-const SocialMediaFields = ({ form, onTextChange, errors }: Props) => {
+const SocialMediaFormFields = ({ form, onTextChange, errors }: Props) => {
   return (
     <>
       <div className="flex flex-row flex-1 gap-2 w-full">
@@ -84,4 +84,4 @@ const SocialMediaFields = ({ form, onTextChange, errors }: Props) => {
   );
 };
 
-export default SocialMediaFields;
+export default SocialMediaFormFields;

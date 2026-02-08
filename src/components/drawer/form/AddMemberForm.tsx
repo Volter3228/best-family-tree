@@ -1,23 +1,25 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useMembers } from "@/hooks";
-import type { AddMemberForm } from "@/types";
-import { ADD_MEMBER_DEFAULTS } from "@/constants/form";
+import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
 import apiAddMember from "@/api/addMember";
-import SubmitButton from "../SubmitButton";
-import Fields from "./Fields";
-import ClearButton from "../ClearButton";
-import validateForm from "./validation";
+import type { MemberFormData, Member as MemberType } from "@/types";
+import { SubmitButton, ClearButton } from "./buttons";
+import { MemberFormFields } from "./fields";
+import validateMemberForm from "./validations/memberFormValidation";
 
-export default function AddMemberForm() {
-  const [form, setForm] = useState<AddMemberForm>({
-    ...ADD_MEMBER_DEFAULTS,
-  });
+interface Props {
+  onSuccess?: (member: MemberType) => void;
+}
+
+export default function AddMemberForm({ onSuccess }: Props) {
+  const [form, setForm] = useState<MemberFormData>({ ...MEMBER_FORM_DEFAULTS });
   const [errors, setErrors] = useState<
-    Partial<Record<keyof AddMemberForm, string>>
+    Partial<Record<keyof MemberFormData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { addMember, mentorsList, getMentorsList } = useMembers();
+
   useEffect(() => {
     if (!mentorsList.length) {
       getMentorsList();
@@ -28,9 +30,9 @@ export default function AddMemberForm() {
     event.preventDefault();
 
     setErrors({});
-    const validationErrors = validateForm(form, mentorsList); // Validate the form
+    const validationErrors = validateMemberForm(form, mentorsList);
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors); // Show errors if validation fails
+      setErrors(validationErrors);
       return;
     }
 
@@ -39,7 +41,7 @@ export default function AddMemberForm() {
 
     Object.entries(form).forEach(([key, value]) => {
       if (value instanceof Date) {
-        formData.append(key, value.toISOString()); // Handle Date objects
+        formData.append(key, value.toISOString());
       } else if (value !== undefined && value !== null) {
         // TODO: Make phone numbers an array with possibility to expand
         if (key === "phoneNumber") {
@@ -47,24 +49,31 @@ export default function AddMemberForm() {
         } else if (key === "photo") {
           formData.append(key, value);
         } else if (typeof value === "object") {
-          formData.append(key, JSON.stringify(value)); // Serialize objects
+          formData.append(key, JSON.stringify(value));
         } else {
-          formData.append(key, value.toString()); // Convert other values to strings
+          formData.append(key, String(value));
         }
       }
     });
 
-    const newMember = await apiAddMember(formData);
-    if (newMember) {
-      addMember(newMember);
+    try {
+      const newMember = await apiAddMember(formData);
+      if (newMember) {
+        addMember(newMember);
+        onSuccess?.(newMember);
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
     }
 
     setIsSubmitting(false);
   };
 
   const handleClearForm = () => {
-    setForm({ ...ADD_MEMBER_DEFAULTS });
+    setForm({ ...MEMBER_FORM_DEFAULTS });
   };
+
+  const submitLabel = isSubmitting ? "Додаємо..." : "Додати";
 
   return (
     <form
@@ -72,12 +81,12 @@ export default function AddMemberForm() {
       onSubmit={handleSubmit}
       noValidate
     >
-      <Fields form={form} setForm={setForm} errors={errors} />
+      <MemberFormFields form={form} setForm={setForm} errors={errors} />
       <div className="flex flex-row w-4/5 mt-10 justify-center gap-3">
-        <ClearButton isSubmitting={isSubmitting} onClick={handleClearForm} />
-        <SubmitButton isSubmitting={isSubmitting}>
-          {isSubmitting ? "Додаємо..." : "Додати"}
-        </SubmitButton>
+        <ClearButton isSubmitting={isSubmitting} onClick={handleClearForm}>
+          Очистити
+        </ClearButton>
+        <SubmitButton isSubmitting={isSubmitting}>{submitLabel}</SubmitButton>
       </div>
     </form>
   );
