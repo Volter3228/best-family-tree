@@ -29,8 +29,7 @@ export type Member = {
   linkedinLink: string | null;
   createdAt: Date;
   updatedAt: Date;
-  // Relations (populated by API)
-  mentor?: Member;
+  mentor?: Member | null;
   mentees?: Member[];
   phoneNumbers: string[];
 };

@@ -15,8 +15,7 @@ const ClearButton = ({ isSubmitting = false, onClick, children }: Props) => {
       onClick={onClick}
       disabled={isSubmitting}
     >
-      Очистити
-      {children}
+      {children || "Очистити"}
     </button>
   );
 };

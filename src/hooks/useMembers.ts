@@ -15,6 +15,7 @@ export const useMembers = () => {
     setMembersTree,
     flatMembersList,
     setFlatMembersList,
+    setSelectedMember,
   } = context;
 
   // Helper to flatten the tree structure
@@ -34,7 +35,7 @@ export const useMembers = () => {
 
   const handleSetMembers = (members: MemberType[]) => {
     const memberInstances: Member[] = members.map(
-      (member) => new Member(member)
+      (member) => new Member(member),
     );
     setMembersTree(memberInstances);
     setFlatMembersList(flattenTree(memberInstances));
@@ -45,26 +46,94 @@ export const useMembers = () => {
     setMentorsList(mentorsList);
   }, [setMentorsList]);
 
-  // Add a new member
   const handleAddMember = useCallback(
-    async (newMember: MemberType) => {
+    (newMember: MemberType) => {
       const newMemberInstance = new Member(newMember);
-      if (newMember?.mentorId) {
-        // Find mentor in flatMembersList
-        const mentor = flatMembersList.find(
-          (member) => member.id === newMemberInstance.mentorId
-        );
 
-        if (mentor) {
-          mentor.addMentee(newMemberInstance); // Add mentee to the mentor
+      setFlatMembersList((prevFlatList) => [
+        ...prevFlatList,
+        newMemberInstance,
+      ]);
+
+      setMembersTree((prevTree) => {
+        if (!newMember.mentorId) {
+          return [...(prevTree || []), newMemberInstance];
         }
-      } else {
-        setMembersTree((prevTree) => [...(prevTree || []), newMemberInstance]);
-      }
 
-      setFlatMembersList([...flatMembersList, newMemberInstance]);
+        const addToTree = (members: Member[]): Member[] => {
+          let hasChanged = false;
+          const newMembers = members.map((member) => {
+            if (member.id === newMember.mentorId) {
+              hasChanged = true;
+              return new Member({
+                ...member,
+                mentees: [...member.mentees, newMemberInstance],
+              });
+            }
+            if (member.mentees.length) {
+              const updatedMentees = addToTree(member.mentees);
+              if (updatedMentees !== member.mentees) {
+                hasChanged = true;
+                return new Member({
+                  ...member,
+                  mentees: updatedMentees,
+                });
+              }
+            }
+            return member;
+          });
+          return hasChanged ? newMembers : members;
+        };
+
+        return addToTree(prevTree || []);
+      });
     },
-    [setMembersTree, flatMembersList, setFlatMembersList]
+    [setMembersTree, setFlatMembersList],
+  );
+
+  const handleUpdateMember = useCallback(
+    (updatedMemberData: MemberType) => {
+      const updatedMemberInstance = new Member(updatedMemberData);
+
+      const updatedFlatList = flatMembersList.map((member) =>
+        member.id === updatedMemberInstance.id ? updatedMemberInstance : member,
+      );
+      setFlatMembersList(updatedFlatList);
+
+      setMembersTree((prevTree) => {
+        const updateInTree = (members: Member[]): Member[] => {
+          let hasChanged = false;
+          const newMembers = members.map((member) => {
+            if (member.id === updatedMemberInstance.id) {
+              hasChanged = true;
+              // Preserve mentees from the old member
+              updatedMemberInstance.mentees = member.mentees;
+              return updatedMemberInstance;
+            }
+            if (member.mentees.length) {
+              const updatedMentees = updateInTree(member.mentees);
+              if (updatedMentees !== member.mentees) {
+                hasChanged = true;
+                const updatedMember = new Member({
+                  ...member,
+                  mentees: [],
+                } as unknown as MemberType);
+                updatedMember.mentees = updatedMentees;
+                return updatedMember;
+              }
+            }
+            return member;
+          });
+          return hasChanged ? newMembers : members;
+        };
+        return updateInTree(prevTree || []);
+      });
+
+      setSelectedMember((prev) =>
+        prev?.id === updatedMemberInstance.id ? updatedMemberInstance : prev,
+      );
+    },
+    [flatMembersList, setFlatMembersList, setMembersTree, setSelectedMember],
   );
 
   const getMemberById = (mentorId: string) =>
@@ -76,5 +145,6 @@ export const useMembers = () => {
     getMentorsList: handleGetMentorsList,
     setMembers: handleSetMembers,
     addMember: handleAddMember,
+    updateMember: handleUpdateMember,
   };
 };

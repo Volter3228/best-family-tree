@@ -21,9 +21,8 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
   return useCallback(
     (
       duration = 1,
-      { width = window.innerWidth, height = window.innerHeight } = {}
+      { width = window.innerWidth, height = window.innerHeight } = {},
     ) => {
-      console.log(viewport, nodes.length, width, height);
       if (!viewport || nodes.length === 0 || width === 0 || height === 0)
         return;
 
@@ -91,7 +90,7 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
           duration: duration,
           ease: "power3.inOut",
         },
-        0
+        0,
       );
 
       timeline.to(
@@ -102,11 +101,11 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
           duration: duration,
           ease: "power3.inOut",
         },
-        0
+        0,
       );
 
       timelineRef.current = timeline;
     },
-    [nodes, viewport, setScale]
+    [nodes, viewport, setScale],
   );
 };

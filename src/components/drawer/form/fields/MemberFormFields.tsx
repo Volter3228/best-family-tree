@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMembers } from "@/hooks";
 import { capilizeOnlyFirstLetter } from "@/utils/strings";
 import {
@@ -7,28 +8,44 @@ import {
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/16/solid";
-import { AddMemberForm, DropdownOption } from "@/types";
+import { MemberFormData, MemberFormMode, DropdownOption } from "@/types";
 import {
   AvatarFileInput,
   TextInput,
   DateInput,
   DropdownSelectInput,
 } from "../inputs";
-import SocialMediaFields from "./SocialMediaFields";
+import SocialMediaFields from "./SocialMediaFormFields";
 
 interface Props {
-  form: AddMemberForm;
-  setForm: React.Dispatch<React.SetStateAction<AddMemberForm>>;
-  errors: Partial<Record<keyof AddMemberForm, string>>;
+  form: MemberFormData;
+  setForm: React.Dispatch<React.SetStateAction<MemberFormData>>;
+  errors: Partial<Record<keyof MemberFormData, string>>;
+  mode?: MemberFormMode;
+  initialAvatar?: string | null;
 }
 
-const Fields = ({ form, setForm, errors }: Props) => {
-  const { mentorsList } = useMembers();
+const MemberFormFields = ({
+  form,
+  setForm,
+  errors,
+  mode = "add",
+  initialAvatar = null,
+}: Props) => {
+  const { mentorsList, selectedMember } = useMembers();
 
-  const mentorOptions: DropdownOption[] = mentorsList.map(({ id, name }) => ({
-    text: name,
-    value: id,
-  }));
+  const mentorOptions: DropdownOption[] = useMemo(() => {
+    const excludedIds = selectedMember
+      ? new Set([selectedMember.id, ...selectedMember.getDescendantIds()])
+      : new Set<string>();
+
+    return mentorsList
+      .filter(({ id }) => !excludedIds.has(id))
+      .map(({ id, name }) => ({
+        text: name,
+        value: id,
+      }));
+  }, [mentorsList, selectedMember]);
 
   const statusOptions: DropdownOption[] = MEMBER_STATUSES.map((status) => ({
     value: status,
@@ -46,15 +63,16 @@ const Fields = ({ form, setForm, errors }: Props) => {
   };
 
   const handleFileChange = (name: string) => (file: File | null) => {
-    if (file) {
-      setForm({ ...form, [name]: file });
-    }
+    setForm({ ...form, [name]: file });
   };
 
   return (
     <div className="flex flex-col gap-6 items-center h-5/6 overflow-y-visible">
       <div className="flex flex-row flex-1 w-full justify-center mb-2">
-        <AvatarFileInput onImageSelect={handleFileChange("photo")} />
+        <AvatarFileInput
+          onImageSelect={handleFileChange("photo")}
+          initialImage={mode === "edit" ? initialAvatar : null}
+        />
       </div>
       <div className="flex flex-row flex-1 gap-2 w-full">
         <div className="flex flex-col flex-1 relative">
@@ -131,6 +149,7 @@ const Fields = ({ form, setForm, errors }: Props) => {
             options={statusOptions}
             onSelect={handleTextChange("status")}
             placeholder="Excluded"
+            initialValue={form.status || undefined}
             required
           />
           {errors.status && (
@@ -148,6 +167,7 @@ const Fields = ({ form, setForm, errors }: Props) => {
             placeholder="Ментор Менторовенко"
             autoComplete
             required
+            initialValue={form.mentorId || undefined}
           />
           {errors.mentorId && (
             <p className="absolute left-0 -bottom-6 text-accent">
@@ -193,10 +213,10 @@ const Fields = ({ form, setForm, errors }: Props) => {
       <SocialMediaFields
         form={form}
         onTextChange={handleTextChange}
-        errors={{ ...errors }}
+        errors={errors}
       />
     </div>
   );
 };
 
-export default Fields;
+export default MemberFormFields;

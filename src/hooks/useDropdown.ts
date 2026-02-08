@@ -4,17 +4,28 @@ import { DropdownOption } from "@/types";
 export const useDropdown = (
   options: DropdownOption[],
   onSelect: (optValue: string) => void,
-  autoComplete: boolean
+  initialValue: string = "",
+  autoComplete: boolean = false,
 ) => {
+  const getInitialText = () => {
+    if (!initialValue) return "";
+    const option = options.find((opt) => opt.value === initialValue);
+    return option?.text || "";
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [activeOptionIndex, setActiveOptionIndex] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setInputValue(getInitialText());
+  }, [initialValue, options]);
+
   const filteredOptions = autoComplete
     ? options.filter((opt) =>
-        opt.text.toLowerCase().includes(inputValue.toLowerCase())
+        opt.text.toLowerCase().includes(inputValue.toLowerCase()),
       )
     : options;
 
@@ -32,7 +43,7 @@ export const useDropdown = (
         setInputValue(text);
       }
     },
-    [onSelect, filteredOptions, inputValue]
+    [onSelect, filteredOptions, inputValue],
   );
 
   const handleClose = useCallback(() => {
@@ -54,7 +65,7 @@ export const useDropdown = (
         handleClose();
       }
     },
-    [handleClose, handleSelect]
+    [handleClose, handleSelect],
   );
 
   const handleKeyDown = useCallback(
@@ -71,7 +82,7 @@ export const useDropdown = (
           break;
         case "ArrowUp":
           setActiveOptionIndex((prev) =>
-            prev === 0 ? filteredOptions.length - 1 : prev - 1
+            prev === 0 ? filteredOptions.length - 1 : prev - 1,
           );
           break;
         case "Enter":
@@ -92,7 +103,7 @@ export const useDropdown = (
           break;
       }
     },
-    [activeOptionIndex, isOpen, filteredOptions, handleSelect, handleClose]
+    [activeOptionIndex, isOpen, filteredOptions, handleSelect, handleClose],
   );
 
   useEffect(() => {

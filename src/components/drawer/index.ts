@@ -1,6 +1,7 @@
 import Drawer from "./Drawer";
 import MemberInfo from "./info/MemberInfo";
-import AddMemberForm from "./form/addMember/AddMemberForm";
+import AddMemberForm from "./form/AddMemberForm";
+import EditMemberForm from "./form/EditMemberForm";
 
-export { MemberInfo, AddMemberForm };
+export { MemberInfo, AddMemberForm, EditMemberForm };
 export default Drawer;

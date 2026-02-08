@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Panel, useReactFlow } from "@xyflow/react";
 import Drawer from "../drawer/Drawer";
-import AddMemberForm from "../drawer/form/addMember/AddMemberForm";
+import AddMemberForm from "../drawer/form/AddMemberForm";
 import ToolbarIconButton from "../ToolbarIconButton";
 
 export default function Sidebar() {
