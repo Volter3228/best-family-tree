@@ -6,13 +6,15 @@ import {
   Container,
 } from "pixi.js";
 import Member from "@/models/Member";
-import { getAvatarImage, getIsMinimized } from "@/libs/pixi";
-import { useHoverNodeAnimation } from "@/hooks";
 import {
   NODE_WIDTH,
   NODE_HEIGHT,
   MINIMIZED_NODE_RADIUS,
+  AVATAR_SIZE,
 } from "@/constants/pixi";
+import { getAvatarImage, getIsMinimized } from "@/libs/pixi";
+import { useHoverNodeAnimation } from "@/hooks";
+import MemberBirthdayAnimation from "@/components/animations/memberBirthday/MemberBirthdayAnimation";
 import PixiNodeMinimized from "./PixiNodeMinimized";
 import PixiNodeMaximized from "./PixiNodeMaximized";
 
@@ -58,7 +60,7 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
       e.stopPropagation();
       onClick(member);
     },
-    [member, onClick]
+    [member, onClick],
   );
 
   const filters = useMemo(() => {
@@ -73,36 +75,52 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
   const contentCenterX = NODE_WIDTH / 2;
   const contentCenterY = NODE_HEIGHT / 2;
 
+  const isBirthday = member.isBirthdayToday();
+
   return (
-    <pixiContainer
-      ref={containerRef}
-      x={x + contentCenterX}
-      y={y + contentCenterY}
-      pivot={{ x: contentCenterX, y: contentCenterY }}
-      zIndex={isHovered ? 1000 : 0}
-      eventMode="static"
-      cursor="pointer"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      onClick={handleClick}
-      filters={filters}
-      cullable
-    >
-      <PixiNodeMinimized
-        visible={isMinimized}
-        x={25 + MINIMIZED_NODE_RADIUS}
-        y={MINIMIZED_NODE_RADIUS}
-        avatarImage={avatarImage}
-        memberName={member.name}
-        isHovered={isHovered}
-      />
-      <PixiNodeMaximized
-        visible={!isMinimized}
-        member={member}
-        avatarImage={avatarImage}
-        isSelected={isSelected}
-      />
-    </pixiContainer>
+    <>
+      <pixiContainer
+        ref={containerRef}
+        x={x + contentCenterX}
+        y={y + contentCenterY}
+        pivot={{ x: contentCenterX, y: contentCenterY }}
+        zIndex={isHovered ? 1000 : 0}
+        eventMode="static"
+        cursor="pointer"
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onClick={handleClick}
+        filters={filters}
+        cullable
+      >
+        <PixiNodeMinimized
+          visible={isMinimized}
+          x={25 + MINIMIZED_NODE_RADIUS}
+          y={MINIMIZED_NODE_RADIUS}
+          avatarImage={avatarImage}
+          memberName={member.name}
+          isHovered={isHovered}
+        />
+        <PixiNodeMaximized
+          visible={!isMinimized}
+          member={member}
+          avatarImage={avatarImage}
+          isSelected={isSelected}
+        />
+      </pixiContainer>
+      {isBirthday && (
+        <pixiContainer
+          x={x + contentCenterX}
+          y={y + contentCenterY - AVATAR_SIZE / 3}
+          visible={!isMinimized}
+          zIndex={1001}
+          eventMode="none"
+          cullable
+        >
+          <MemberBirthdayAnimation />
+        </pixiContainer>
+      )}
+    </>
   );
 };
 

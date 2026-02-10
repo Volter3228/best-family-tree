@@ -7,9 +7,10 @@ import {
   NODE_HEIGHT,
   NODE_SUBTITLE_STYLE,
   NODE_TITLE_STYLE,
-  NODE_WIDTH, PRIMARY_GRADIENT,
+  NODE_WIDTH,
+  PRIMARY_GRADIENT,
   SLATE_LIGHT_COLOR,
-  TEXT_RESOLUTION
+  TEXT_RESOLUTION,
 } from "@/constants/pixi";
 
 interface Props {
@@ -31,7 +32,7 @@ const PixiNodeMaximized = ({
 
   const titleMetrics = CanvasTextMetrics.measureText(
     member.name,
-    NODE_TITLE_STYLE
+    NODE_TITLE_STYLE,
   );
   const subtitleY = titleMetrics.height / 2 + 12;
   const avatarY = titleMetrics.height > 24 ? -8 : 0;
@@ -50,7 +51,7 @@ const PixiNodeMaximized = ({
       g.scale.set(0.003, -0.003);
       g.position.set(-28, avatarY + 32);
     },
-    [avatarImage]
+    [avatarImage],
   );
 
   const drawMaximizedNode = useCallback(
@@ -68,12 +69,14 @@ const PixiNodeMaximized = ({
         g.stroke({
           color: SLATE_LIGHT_COLOR,
           width: 3,
-          alpha: 0.25
+          alpha: 0.25,
         });
       }
     },
-    [isSelected]
+    [isSelected],
   );
+
+  const isBirthday = member.isBirthdayToday();
 
   return (
     <pixiContainer visible={visible}>
