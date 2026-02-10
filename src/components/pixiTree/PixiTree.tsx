@@ -14,12 +14,11 @@ import {
 } from "@/libs";
 import { MINIMIZED_VIEW_SCALE } from "@/constants/pixi";
 import Member from "@/models/Member";
+import Drawer, { MemberDrawerContent } from "../drawer";
 import PixiViewport from "./PixiViewport";
 import PixiNode from "./pixiNode/PixiNode";
 import PixiEdgesLayer from "./PixiEdgesLayer";
-import Drawer from "../drawer";
 import PixiSidebar from "./PixiSidebar";
-import MemberDrawerContent from "../drawer/MemberDrawerContent";
 
 registerPlugins();
 

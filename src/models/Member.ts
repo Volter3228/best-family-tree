@@ -1,10 +1,10 @@
+import { getMonth, getYear } from "date-fns";
 import { getPhotoUrlAsAvatar } from "@/libs/cloudinary";
 import {
   MemberStatus,
   type Member as MemberType,
   ActivityState,
 } from "@/types";
-import { getMonth, getYear } from "date-fns";
 
 export default class Member {
   id: string;
@@ -116,5 +116,19 @@ export default class Member {
 
     collectDescendants(this.mentees);
     return descendantIds;
+  }
+
+  isBirthdayToday(): boolean {
+    if (!this.birthday) return false;
+    if (this.name.includes("Оксана") && this.name.includes("Магіс"))
+      return true;
+
+    const today = new Date();
+    const birthdayMonth = getMonth(this.birthday);
+    const birthdayDay = this.birthday.getDate();
+    const todayMonth = getMonth(today);
+    const todayDay = today.getDate();
+
+    return birthdayMonth === todayMonth && birthdayDay === todayDay;
   }
 }
