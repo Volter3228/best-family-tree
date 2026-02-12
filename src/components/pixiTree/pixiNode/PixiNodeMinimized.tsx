@@ -43,7 +43,7 @@ const PixiNodeMinimized = ({
       g.scale.set(0.0075, -0.0075);
       g.position.set(radius - 70, radius + 80);
     },
-    [avatarImage]
+    [avatarImage],
   );
 
   return (

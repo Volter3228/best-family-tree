@@ -10,28 +10,31 @@ import { DrawerMode } from "@/types";
 import "./styles/drawer.css";
 
 interface Props {
+  id?: string;
+  mode?: DrawerMode;
   headerTitle?: string;
   isOpen: boolean;
   onClose: () => void;
   onEditClick?: () => void;
   onBackClick?: () => void;
-  mode?: DrawerMode;
   className?: string;
   children?: React.ReactNode;
 }
 
 const Drawer = ({
+  id,
+  mode,
   isOpen,
+  headerTitle = "Drawer Header",
   onClose,
   onEditClick,
   onBackClick,
-  headerTitle = "Drawer Header",
-  children,
-  mode,
   className = "",
+  children,
 }: Props) => {
   return (
     <div
+      id={id}
       className={`
         fixed top-0 right-0 h-full w-dvw md:min-w-lg md:w-2/3 lg:w-1/3 xl:w-1/4 bg-white
        transform transition-transform ${

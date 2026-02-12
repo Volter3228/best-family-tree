@@ -1,10 +1,9 @@
-"use client";
-
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import type Member from "@/models/Member";
 import { MemberInfo, EditMemberForm } from ".";
 import { DrawerMode } from "@/types/forms";
+import { useViewportAnimation, useMembers } from "@/hooks";
 
 interface Props {
   member: Member;
@@ -15,6 +14,18 @@ interface Props {
 const MemberDrawerContent = ({ member, drawerMode, onEditExit }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevViewRef = useRef<"info" | "edit">(drawerMode);
+
+  const { flatMembersList, setSelectedMember } = useMembers();
+  const { focusNode } = useViewportAnimation();
+
+  const handleMemberNameClick = (memberId: string) => {
+    // Find the member in the flat list
+    const targetMember = flatMembersList.find((m) => m.id === memberId);
+    if (targetMember) {
+      setSelectedMember(targetMember);
+      focusNode(memberId);
+    }
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -46,7 +57,7 @@ const MemberDrawerContent = ({ member, drawerMode, onEditExit }: Props) => {
   return (
     <div ref={containerRef}>
       {drawerMode === "info" ? (
-        <MemberInfo member={member} />
+        <MemberInfo member={member} onMemberNameClick={handleMemberNameClick} />
       ) : (
         <EditMemberForm member={member} onExit={onEditExit} />
       )}
