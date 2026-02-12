@@ -20,6 +20,7 @@ import MemberInfoActionIcon from "./MemberInfoActionIcon";
 
 interface Props {
   member: Member;
+  onMemberNameClick?: (memberId: string) => void;
 }
 
 const MemberInfo = ({
@@ -35,6 +36,7 @@ const MemberInfo = ({
     status,
     mentor,
   },
+  onMemberNameClick,
 }: Props) => {
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
@@ -60,7 +62,12 @@ const MemberInfo = ({
         )}
       </div>
       <div className="text-center mb-3">
-        <h5 className="text-2xl">{name}</h5>
+        <h5
+          className="text-2xl cursor-pointer hover:text-accent transition-colors duration-200"
+          onClick={() => onMemberNameClick?.(member.id)}
+        >
+          {name}
+        </h5>
         <h6 className="text-lg font-light">{member.getRecruitmentSeason()}</h6>
       </div>
       <div className="flex flex-row w-full justify-center">
@@ -71,7 +78,18 @@ const MemberInfo = ({
             icon={AcademicCapIcon}
           />
           {!!mentor && (
-            <MemberInfoRow title="Ментор" value={mentor.name} icon={StarIcon} />
+            <MemberInfoRow
+              title="Ментор"
+              value={
+                <span
+                  className="cursor-pointer hover:text-accent transition-colors duration-200"
+                  onClick={() => onMemberNameClick?.(mentor.id)}
+                >
+                  {mentor.name}
+                </span>
+              }
+              icon={StarIcon}
+            />
           )}
           {!!email && (
             <MemberInfoRow
@@ -120,7 +138,23 @@ const MemberInfo = ({
           {!!member.mentees.length && (
             <MemberInfoRow
               title="Діти"
-              value={`${member.getMenteesNamesString()} (${
+              value={
+                <span>
+                  {member.mentees.map((mentee, index) => (
+                    <span key={mentee.id}>
+                      {index > 0 && ", "}
+                      <span
+                        className="cursor-pointer hover:text-accent transition-colors duration-200"
+                        onClick={() => onMemberNameClick?.(mentee.id)}
+                      >
+                        {mentee.name}
+                      </span>
+                    </span>
+                  ))}
+                  {` (${member.mentees.length})`}
+                </span>
+              }
+              copyValue={`${member.getMenteesNamesString()} (${
                 member.mentees.length
               })`}
               icon={UserGroupIcon}

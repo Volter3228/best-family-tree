@@ -23,7 +23,7 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
 
       const metrics = CanvasTextMetrics.measureText(
         text,
-        MINIMIZED_TOOLTIP_TEXT_STYLE
+        MINIMIZED_TOOLTIP_TEXT_STYLE,
       );
       const w = metrics.width + 16;
       const h = metrics.height + 10;
@@ -31,7 +31,7 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
       g.roundRect(-w / 2, -h, w, h, 6);
       g.fill({ color: "#fff", alpha: 0.8 });
     },
-    [text]
+    [text],
   );
 
   useTick((delta) => {
@@ -65,6 +65,7 @@ const PixiNodeMinimizedTooltip = ({ text, visible }: Props) => {
       ref={tooltipRef}
       x={MINIMIZED_NODE_RADIUS}
       y={MINIMIZED_NODE_RADIUS}
+      eventMode="none"
     >
       <pixiGraphics draw={drawTooltipBackground} />
       <pixiText
