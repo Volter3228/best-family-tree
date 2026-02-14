@@ -135,3 +135,17 @@ docker compose exec backend npm run migrate:mongodb
 │   Hot-reload    │   Hot-reload    │   Persistent volume     │
 └─────────────────┴─────────────────┴─────────────────────────┘
 ```
+
+## Docs
+
+Tailwind - https://tailwindcss.com/docs/styling-with-utility-classes
+PixiJS - https://pixijs.download/release/docs/index.html
+PixiJS Guides - https://pixijs.com/8.x/guides/getting-started/intro
+NextJS - https://nextjs.org/docs
+React - https://react.dev/reference/react
+GSAP - https://gsap.com/docs/v3/
+Prisma - https://www.prisma.io/docs
+NodeJS - https://nodejs.org/docs/latest/api/
+ExpressJS - https://expressjs.com/en/guide/routing.html
+Typescript - https://www.typescriptlang.org/docs/
+Elkjs (nodes layouting) - https://github.com/kieler/elkjs
