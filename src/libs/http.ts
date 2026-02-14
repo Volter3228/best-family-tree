@@ -1,7 +1,7 @@
 export const http = async (
   endpoint: string,
   init?: RequestInit,
-  isFormData?: boolean
+  isFormData?: boolean,
 ): Promise<Response> => {
   const isServer = typeof window === "undefined";
   const baseUrl = isServer
@@ -17,11 +17,11 @@ export const http = async (
       response = await fetch(url, { ...init });
     } else {
       response = await fetch(url, {
+        ...init,
         headers: {
           "Content-Type": "application/json",
           ...init?.headers,
         },
-        ...init,
       });
     }
 

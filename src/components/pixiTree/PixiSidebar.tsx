@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   PlusIcon,
   ViewfinderCircleIcon,
@@ -8,25 +8,17 @@ import Drawer from "../drawer/Drawer";
 import AddMemberForm from "../drawer/form/AddMemberForm";
 import ToolbarIconButton from "../ToolbarIconButton";
 
-interface PixiSidebarProps {
+interface Props {
   onFitView: () => void;
 }
 
-export default function PixiSidebar({ onFitView }: PixiSidebarProps) {
+const PixiSidebar = ({ onFitView }: Props) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
 
-  const handleAddMemberClick = () => {
-    toggleDrawer();
-  };
-
   const handleShowFamilyClick = () => {
     console.log("show family");
-  };
-
-  const handleFitViewClick = () => {
-    onFitView();
   };
 
   return (
@@ -35,7 +27,7 @@ export default function PixiSidebar({ onFitView }: PixiSidebarProps) {
         <div className="flex flex-col bg-violet-900 shadow-2xl rounded-xl p-2 gap-y-2">
           <ToolbarIconButton
             title="Add Member"
-            onClick={handleAddMemberClick}
+            onClick={toggleDrawer}
             icon={PlusIcon}
             isActive={isDrawerOpen}
           />
@@ -46,7 +38,7 @@ export default function PixiSidebar({ onFitView }: PixiSidebarProps) {
           />
           <ToolbarIconButton
             title="Fit View"
-            onClick={handleFitViewClick}
+            onClick={onFitView}
             icon={ViewfinderCircleIcon}
           />
         </div>
@@ -61,4 +53,6 @@ export default function PixiSidebar({ onFitView }: PixiSidebarProps) {
       </Drawer>
     </>
   );
-}
+};
+
+export default memo(PixiSidebar);

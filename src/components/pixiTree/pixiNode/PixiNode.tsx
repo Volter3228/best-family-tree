@@ -1,9 +1,10 @@
-import { useMemo, useState, useEffect, useCallback, memo, useRef } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   Texture,
   FederatedPointerEvent,
   GraphicsContext,
   Container,
+  Filter,
 } from "pixi.js";
 import Member from "@/models/Member";
 import {
@@ -12,7 +13,7 @@ import {
   MINIMIZED_NODE_RADIUS,
   AVATAR_SIZE,
 } from "@/constants/pixi";
-import { getAvatarImage, getIsMinimized } from "@/libs/pixi";
+import { getAvatarImage } from "@/libs/pixi";
 import { useHoverNodeAnimation } from "@/hooks";
 import MemberBirthdayAnimation from "@/components/animations/memberBirthday/MemberBirthdayAnimation";
 import PixiNodeMinimized from "./PixiNodeMinimized";
@@ -21,13 +22,26 @@ import PixiNodeMaximized from "./PixiNodeMaximized";
 interface Props {
   member: Member;
   isSelected: boolean;
+  isMinimized: boolean;
   x: number;
   y: number;
   appScale: number;
   onClick: (member: Member) => void;
 }
 
-const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
+const EMPTY_FILTERS: Filter[] = [];
+const CONTENT_CENTER_X = NODE_WIDTH / 2;
+const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
+
+const PixiNode = ({
+  x,
+  y,
+  member,
+  isSelected,
+  isMinimized,
+  appScale,
+  onClick,
+}: Props) => {
   const [avatarImage, setAvatarImage] = useState<
     Texture | GraphicsContext | null
   >(null);
@@ -63,27 +77,23 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
     [member, onClick],
   );
 
+  const handlePointerEnter = useCallback(() => setIsHovered(true), []);
+  const handlePointerLeave = useCallback(() => setIsHovered(false), []);
+
   const filters = useMemo(() => {
-    if (!isHovered && !isSelected) return [];
+    if (!isHovered && !isSelected) return EMPTY_FILTERS;
     return [shadowFilter];
   }, [isHovered, isSelected, shadowFilter]);
 
-  const handlePointerEnter = () => setIsHovered(true);
-  const handlePointerLeave = () => setIsHovered(false);
-
-  const isMinimized = getIsMinimized(appScale);
-  const contentCenterX = NODE_WIDTH / 2;
-  const contentCenterY = NODE_HEIGHT / 2;
-
-  const isBirthday = member.isBirthdayToday();
+  const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
 
   return (
     <>
       <pixiContainer
         ref={containerRef}
-        x={x + contentCenterX}
-        y={y + contentCenterY}
-        pivot={{ x: contentCenterX, y: contentCenterY }}
+        x={x + CONTENT_CENTER_X}
+        y={y + CONTENT_CENTER_Y}
+        pivot={{ x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y }}
         zIndex={isHovered ? 1000 : 0}
         eventMode="static"
         cursor="pointer"
@@ -93,25 +103,27 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
         filters={filters}
         cullable
       >
-        <PixiNodeMinimized
-          visible={isMinimized}
-          x={25 + MINIMIZED_NODE_RADIUS}
-          y={MINIMIZED_NODE_RADIUS}
-          avatarImage={avatarImage}
-          memberName={member.name}
-          isHovered={isHovered}
-        />
-        <PixiNodeMaximized
-          visible={!isMinimized}
-          member={member}
-          avatarImage={avatarImage}
-          isSelected={isSelected}
-        />
+        <pixiContainer visible={isMinimized}>
+          <PixiNodeMinimized
+            x={25 + MINIMIZED_NODE_RADIUS}
+            y={MINIMIZED_NODE_RADIUS}
+            avatarImage={avatarImage}
+            memberName={member.name}
+            isHovered={isHovered}
+          />
+        </pixiContainer>
+        <pixiContainer visible={!isMinimized}>
+          <PixiNodeMaximized
+            member={member}
+            avatarImage={avatarImage}
+            isSelected={isSelected}
+          />
+        </pixiContainer>
       </pixiContainer>
       {isBirthday && (
         <pixiContainer
-          x={x + contentCenterX}
-          y={y + contentCenterY - AVATAR_SIZE / 3}
+          x={x + CONTENT_CENTER_X}
+          y={y + CONTENT_CENTER_Y - AVATAR_SIZE / 3}
           visible={!isMinimized}
           zIndex={1001}
           eventMode="none"
@@ -124,4 +136,4 @@ const PixiNode = ({ x, y, member, isSelected, appScale, onClick }: Props) => {
   );
 };
 
-export default memo(PixiNode);
+export default PixiNode;

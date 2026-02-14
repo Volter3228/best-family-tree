@@ -68,7 +68,9 @@ const MemberInfo = ({
         >
           {name}
         </h5>
-        <h6 className="text-lg font-light">{member.getRecruitmentSeason()}</h6>
+        <h6 className="text-lg font-light">
+          {member.getRecruitmentSeason(true)}
+        </h6>
       </div>
       <div className="flex flex-row w-full justify-center">
         <div className="flex flex-col gap-4 max-w-full">

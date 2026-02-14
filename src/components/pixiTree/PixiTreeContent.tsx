@@ -1,60 +1,64 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { Application } from "@pixi/react";
 import { CullerPlugin } from "pixi.js";
-import { PixiTreeContext } from "@/context/PixiTreeContext";
-import { useMembers, useViewportAnimation } from "@/hooks";
+import { useTree, useMembers, useDrawer, useViewportAnimation } from "@/hooks";
 import {
   transformMembersToFlowValues,
   getLayoutedElements,
   getIsMinimized,
 } from "@/libs";
 import Member from "@/models/Member";
-import type { Member as MemberType, DrawerMode } from "@/types";
-import Drawer, { MemberDrawerContent } from "../drawer";
+import type { Member as MemberType } from "@/types";
 import PixiViewport from "./PixiViewport";
-import PixiNode from "./pixiNode/PixiNode";
 import PixiEdgesLayer from "./PixiEdgesLayer";
 import PixiSidebar from "./PixiSidebar";
+import PixiNodesWrapper from "./PixiNodesWrapper";
+import Drawer, { MemberDrawerContent } from "../drawer";
 
 interface Props {
   members: MemberType[];
 }
 
 const PixiTreeContent = ({ members }: Props) => {
-  const context = useContext(PixiTreeContext);
-
-  if (!context) {
-    throw new Error("PixiTreeContent must be used within a PixiTreeProvider");
-  }
-
-  const { nodes, setNodes, edges, setEdges, scale, setScale, setViewport } =
-    context;
-
-  // Local state for UI only
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<DrawerMode>("info");
-  const containerRef = useRef<HTMLDivElement>(null);
+  const {
+    nodes,
+    setNodes,
+    edges,
+    setEdges,
+    scale,
+    setScale,
+    setViewport,
+    nodePositions,
+  } = useTree();
 
   const { membersTree, setMembers, selectedMember, setSelectedMember } =
     useMembers();
 
+  const {
+    isDrawerOpen,
+    drawerMode,
+    onClose: handleDrawerClose,
+    onEditClick: handleDrawerEditClick,
+    onBackToInfoClick: handleDrawerBackToInfo,
+  } = useDrawer(selectedMember, setSelectedMember);
+
   const { fitView } = useViewportAnimation();
+
+  const handleFitView = useCallback(() => {
+    fitView();
+  }, [fitView]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasInitialFitView = useRef(false);
 
   // Sync members
   useEffect(() => {
     if (!membersTree.length) {
       setMembers(members);
     }
-  }, [membersTree, setMembers, members]);
+  }, [membersTree, members]);
 
   // Layout
   useEffect(() => {
@@ -71,39 +75,16 @@ const PixiTreeContent = ({ members }: Props) => {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (nodes.length > 0) {
-      timer = setTimeout(() => fitView(2), 200);
+    if (nodes.length > 0 && !hasInitialFitView.current) {
+      timer = setTimeout(() => {
+        fitView(2);
+        hasInitialFitView.current = true;
+      }, 200);
     }
     return () => clearTimeout(timer);
   }, [nodes, fitView]);
 
-  useEffect(() => {
-    if (selectedMember) {
-      setIsDrawerOpen(true);
-      setDrawerMode("info");
-    }
-  }, [selectedMember]);
-
-  const handleDrawerClose = useCallback(() => {
-    setIsDrawerOpen(false);
-    setTimeout(() => {
-      setDrawerMode("info");
-      setSelectedMember(null);
-    }, 300);
-  }, []);
-
-  const handleDrawerEditClick = () => setDrawerMode("edit");
-  const handleDrawerEditExit = () => setDrawerMode("info");
-
   const handleNodeClick = (member: Member) => setSelectedMember(member);
-
-  const nodePositions = useMemo(() => {
-    const map = new Map<string, { x: number; y: number }>();
-    nodes.forEach((n) => {
-      map.set(n.id, { x: n.position.x, y: n.position.y });
-    });
-    return map;
-  }, [nodes]);
 
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden">
@@ -126,20 +107,15 @@ const PixiTreeContent = ({ members }: Props) => {
             nodePositions={nodePositions}
             pixelLine={getIsMinimized(scale)}
           />
-          {nodes.map((node) => (
-            <PixiNode
-              key={node.id}
-              x={node.position.x}
-              y={node.position.y}
-              appScale={scale}
-              member={node.data.member as Member}
-              isSelected={selectedMember?.id === node.id}
-              onClick={handleNodeClick}
-            />
-          ))}
+          <PixiNodesWrapper
+            nodes={nodes}
+            scale={scale}
+            selectedMember={selectedMember}
+            onNodeClick={handleNodeClick}
+          />
         </PixiViewport>
       </Application>
-      <PixiSidebar onFitView={fitView} />
+      <PixiSidebar onFitView={handleFitView} />
       <Drawer
         id="member-drawer"
         headerTitle={drawerMode === "info" ? "Інфо" : "Редагувати"}
@@ -147,14 +123,14 @@ const PixiTreeContent = ({ members }: Props) => {
         isOpen={isDrawerOpen}
         onClose={handleDrawerClose}
         onEditClick={handleDrawerEditClick}
-        onBackClick={handleDrawerEditExit}
+        onBackClick={handleDrawerBackToInfo}
         className="z-10"
       >
         {!!selectedMember && (
           <MemberDrawerContent
             member={selectedMember}
             drawerMode={drawerMode}
-            onEditExit={handleDrawerEditExit}
+            onEditExit={handleDrawerBackToInfo}
           />
         )}
       </Drawer>

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 import { CanvasTextMetrics, Graphics, GraphicsContext, Texture } from "pixi.js";
 import Member from "@/models/Member";
 import {
@@ -14,34 +14,37 @@ import {
 } from "@/constants/pixi";
 
 interface Props {
-  visible: boolean;
   member: Member;
   avatarImage: Texture | GraphicsContext | null;
   isSelected: boolean;
 }
 
-const PixiNodeMaximized = ({
-  visible,
-  member,
-  avatarImage,
-  isSelected,
-}: Props) => {
+const PixiNodeMaximized = ({ member, avatarImage, isSelected }: Props) => {
   const avatarMaskRef = useRef<Graphics>(null);
   const contentCenterX = NODE_WIDTH / 2;
   const contentCenterY = NODE_HEIGHT / 2;
 
-  const titleMetrics = CanvasTextMetrics.measureText(
-    member.name,
-    NODE_TITLE_STYLE,
+  const titleMetrics = useMemo(
+    () => CanvasTextMetrics.measureText(member.name, NODE_TITLE_STYLE),
+    [member.name],
   );
+
+  const textResolution = useMemo(
+    () => window.devicePixelRatio * TEXT_RESOLUTION,
+    [],
+  );
+
   const subtitleY = titleMetrics.height / 2 + 12;
   const avatarY = titleMetrics.height > 24 ? -8 : 0;
 
-  const drawAvatarBackground = useCallback((g: Graphics) => {
-    g.clear();
-    g.circle(0, avatarY, AVATAR_SIZE / 2);
-    g.fill(AVATAR_FILL_GRADIENT);
-  }, []);
+  const drawAvatarBackground = useCallback(
+    (g: Graphics) => {
+      g.clear();
+      g.circle(0, avatarY, AVATAR_SIZE / 2);
+      g.fill(AVATAR_FILL_GRADIENT);
+    },
+    [avatarY],
+  );
 
   const drawSvgAvatar = useCallback(
     (g: Graphics) => {
@@ -76,10 +79,8 @@ const PixiNodeMaximized = ({
     [isSelected],
   );
 
-  const isBirthday = member.isBirthdayToday();
-
   return (
-    <pixiContainer visible={visible}>
+    <pixiContainer>
       <pixiGraphics draw={drawMaximizedNode} />
       <pixiContainer
         x={contentCenterX}
@@ -104,18 +105,18 @@ const PixiNodeMaximized = ({
           text={member.name}
           anchor={0.5}
           style={NODE_TITLE_STYLE}
-          resolution={window.devicePixelRatio * TEXT_RESOLUTION}
+          resolution={textResolution}
         />
         <pixiText
           text={member.getRecruitmentSeason()}
           anchor={0.5}
           y={subtitleY}
           style={NODE_SUBTITLE_STYLE}
-          resolution={window.devicePixelRatio * TEXT_RESOLUTION}
+          resolution={textResolution}
         />
       </pixiContainer>
     </pixiContainer>
   );
 };
 
-export default PixiNodeMaximized;
+export default memo(PixiNodeMaximized);

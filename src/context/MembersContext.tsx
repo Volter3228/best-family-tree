@@ -1,4 +1,5 @@
 "use client";
+
 import {
   createContext,
   Dispatch,
@@ -7,6 +8,7 @@ import {
   useState,
 } from "react";
 import Member from "@/models/Member";
+import { flattenTree } from "@/utils";
 import { MentorsListItem } from "@/types/members";
 
 interface IMembersContext {
@@ -15,7 +17,7 @@ interface IMembersContext {
   mentorsList: MentorsListItem[];
   setMentorsList: Dispatch<SetStateAction<MentorsListItem[]>>;
   flatMembersList: Member[];
-  setFlatMembersList: Dispatch<SetStateAction<Member[]>>;
+  membersMap: Map<string, Member>;
   selectedMember: Member | null;
   setSelectedMember: Dispatch<SetStateAction<Member | null>>;
 }
@@ -25,15 +27,23 @@ interface Props {
 }
 
 export const MembersContext = createContext<IMembersContext | undefined>(
-  undefined
+  undefined,
 );
 
-// Members Provider component
 export const MembersProvider = ({ children }: Props) => {
   const [membersTree, setMembersTree] = useState<Member[]>([]);
   const [mentorsList, setMentorsList] = useState<MentorsListItem[]>([]);
-  const [flatMembersList, setFlatMembersList] = useState<Member[]>([]);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  const flatMembersList = useMemo(
+    () => flattenTree(membersTree),
+    [membersTree],
+  );
+
+  const membersMap = useMemo(
+    () => new Map(flatMembersList.map((m) => [m.id, m])),
+    [flatMembersList],
+  );
 
   const value = useMemo(
     () => ({
@@ -42,11 +52,11 @@ export const MembersProvider = ({ children }: Props) => {
       mentorsList,
       setMentorsList,
       flatMembersList,
-      setFlatMembersList,
+      membersMap,
       selectedMember,
       setSelectedMember,
     }),
-    [membersTree, mentorsList, flatMembersList, selectedMember]
+    [membersTree, mentorsList, flatMembersList, membersMap, selectedMember],
   );
 
   return (

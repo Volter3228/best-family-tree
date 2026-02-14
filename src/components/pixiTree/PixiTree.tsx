@@ -1,21 +1,29 @@
 "use client";
 
-import { PixiTreeProvider } from "@/context/PixiTreeContext";
-import PixiTreeContent from "./PixiTreeContent";
-import type { Member as MemberType } from "@/types";
+import { useEffect } from "react";
+import { TreeProvider } from "@/context/pixi/TreeContext";
 import { registerPlugins } from "@/libs";
+import type { Member as MemberType } from "@/types";
+import PixiTreeContent from "./PixiTreeContent";
 
-registerPlugins();
+let didRegisterPixiPlugins = false;
 
 interface Props {
   members: MemberType[];
 }
 
 const PixiTree = ({ members }: Props) => {
+  useEffect(() => {
+    if (!didRegisterPixiPlugins) {
+      didRegisterPixiPlugins = true;
+      registerPlugins();
+    }
+  }, []);
+
   return (
-    <PixiTreeProvider>
+    <TreeProvider>
       <PixiTreeContent members={members} />
-    </PixiTreeProvider>
+    </TreeProvider>
   );
 };
 

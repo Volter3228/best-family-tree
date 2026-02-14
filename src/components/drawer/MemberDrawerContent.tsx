@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import gsap from "gsap";
 import type Member from "@/models/Member";
 import { MemberInfo, EditMemberForm } from ".";
@@ -15,18 +15,22 @@ const MemberDrawerContent = ({ member, drawerMode, onEditExit }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevViewRef = useRef<"info" | "edit">(drawerMode);
 
-  const { flatMembersList, setSelectedMember } = useMembers();
+  const { setSelectedMember, getMemberById } = useMembers();
   const { focusNode } = useViewportAnimation();
 
-  const handleMemberNameClick = (memberId: string) => {
-    // Find the member in the flat list
-    const targetMember = flatMembersList.find((m) => m.id === memberId);
-    if (targetMember) {
-      setSelectedMember(targetMember);
-      focusNode(memberId);
-    }
-  };
+  const handleMemberNameClick = useCallback(
+    (memberId: string) => {
+      // Find the member in the flat list
+      const targetMember = getMemberById(memberId);
+      if (targetMember) {
+        setSelectedMember(targetMember);
+        focusNode(memberId);
+      }
+    },
+    [getMemberById, setSelectedMember, focusNode],
+  );
 
+  // Animate drawer mode change
   useEffect(() => {
     if (!containerRef.current) return;
 

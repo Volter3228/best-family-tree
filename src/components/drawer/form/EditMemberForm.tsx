@@ -1,11 +1,12 @@
 import { FormEvent, useEffect, useState, useMemo } from "react";
 import { useMembers } from "@/hooks";
-import type { MemberFormData, Member as MemberType } from "@/types";
 import apiEditMember from "@/api/editMember";
 import Member from "@/models/Member";
+import type { MemberFormData } from "@/types";
+import { MemberFormFields } from "./fields";
 import { SubmitButton, ClearButton } from "./buttons";
-import Fields from "./fields/MemberFormFields";
 import validateMemberForm from "./validations/memberFormValidation";
+import { buildMemberFormData } from "./buildMemberFormData";
 
 interface Props {
   member: Member;
@@ -66,22 +67,7 @@ const EditMemberForm = ({ member, onExit }: Props) => {
     }
 
     setIsSubmitting(true);
-    const formData = new FormData();
-
-    Object.entries(form).forEach(([key, value]) => {
-      if (key === "photo") return;
-      if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else if (value !== undefined && value !== null) {
-        if (key === "phoneNumber") {
-          formData.append("phoneNumbers", JSON.stringify([value]));
-        } else if (typeof value === "object") {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
-        }
-      }
-    });
+    const formData = buildMemberFormData(form, new Set(["photo"]));
 
     if (!form.photo) {
       formData.append("photo", "");
@@ -97,9 +83,9 @@ const EditMemberForm = ({ member, onExit }: Props) => {
       }
     } catch (error) {
       console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   const submitLabel = isSubmitting ? "Зберігаємо..." : "Зберегти";
@@ -110,7 +96,7 @@ const EditMemberForm = ({ member, onExit }: Props) => {
       onSubmit={handleSubmit}
       noValidate
     >
-      <Fields
+      <MemberFormFields
         form={form}
         setForm={setForm}
         errors={errors}

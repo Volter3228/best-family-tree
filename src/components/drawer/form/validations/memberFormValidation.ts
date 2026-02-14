@@ -8,13 +8,13 @@ import { MemberFormData, MentorsListItem } from "@/types";
 
 const REQUIRED_MESSAGE = "Обов'язкове поле.";
 const INVALID_LINK_MESSAGE = "Некоректне посилання.";
-const TELEGRAM_LINK_REGEX = /^((https?:\/\/)?(www\.)?t\.me\/)?(\w{5,})\/?$/;
+const TELEGRAM_LINK_REGEX = /^((https?:\/\/)?(www\.)?t\.me\/\S+|@?\w{5,})$/;
 const INSTAGRAM_LINK_REGEX =
-  /^(https?:\/\/(www\.)?instagram\.com\/|instagram\.com\/)?([a-zA-Z0-9._]{1,30})\/?$/;
+  /^((https?:\/\/)?(www\.)?instagram\.com\/\S+|@?[a-zA-Z0-9._]{1,30})$/;
 const FACEBOOK_LINK_REGEX =
-  /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.com)(\/.*)?$/;
+  /^((https?:\/\/)?(www\.)?(facebook\.com|fb\.com)(\/\S*)?|@?[\w.]{1,50})$/;
 const LINKEDIN_LINK_REGEX =
-  /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9][a-zA-Z0-9_-]{1,98}[a-zA-Z0-9]\/?$/;
+  /^((https?:\/\/)?(www\.)?linkedin\.com\/in\/\S+|@?[a-zA-Z0-9][a-zA-Z0-9_-]{1,98}[a-zA-Z0-9])$/;
 
 type Links = {
   telegramLink: string;
@@ -89,7 +89,7 @@ const validateMemberForm = (
   if (!status) {
     errors.status = REQUIRED_MESSAGE;
   } else if (!MEMBER_STATUSES.includes(status)) {
-    errors.mentorId = "Некоректний ментор.";
+    errors.status = "Некоректний статус.";
   }
 
   if (!mentorId) {
@@ -107,7 +107,7 @@ const validateMemberForm = (
   if (!phoneNumber) {
     errors.phoneNumber = REQUIRED_MESSAGE;
   } else if (!/^(\+380|380|0)\d{9}$/.test(phoneNumber)) {
-    errors.email = "Некоректний номер.";
+    errors.phoneNumber = "Некоректний номер.";
   }
 
   errors = {

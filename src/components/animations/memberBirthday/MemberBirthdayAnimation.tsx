@@ -1,20 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Container, Sprite, Texture } from "pixi.js";
-import { NODE_WIDTH } from "@/constants/pixi";
 import gsap from "gsap";
+import { createEmojiTexture, generateRandomPosition } from "./utils";
 import { BIRTHDAY_EMOJIS, EMOJI_COUNT } from "./constants";
-import {
-  createEmojiTexture,
-  generateRandomPosition,
-  MIN_DISTANCE_FROM_CENTER,
-} from "./utils";
 
 const MemberBirthdayAnimation = () => {
   const containerRef = useRef<Container>(null);
-  const spritesRef = useRef<Sprite[]>([]);
-  const timelinesRef = useRef<gsap.core.Timeline[]>([]);
-  // We only need to cache Textures now, not Text objects
-  const textureCacheRef = useRef<Texture[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -137,10 +128,6 @@ const MemberBirthdayAnimation = () => {
 
       timelines.push(timeline);
     }
-
-    spritesRef.current = sprites;
-    timelinesRef.current = timelines;
-    textureCacheRef.current = textureCache;
 
     return () => {
       timelines.forEach((timeline) => timeline.kill());

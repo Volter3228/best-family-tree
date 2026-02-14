@@ -1,9 +1,9 @@
+import { http } from "@/libs/http";
 import Member from "@/models/Member";
 import { ENDPOINTS } from "@/constants/endpoints";
 import { Member as MemberType } from "@/types";
-import { http } from "@/libs";
 
-const getMemberById = async (id: string): Promise<Member | null> => {
+const fetchMemberById = async (id: string): Promise<Member | null> => {
   try {
     const res = await http(ENDPOINTS.getMemberById(id), {
       cache: "force-cache",
@@ -26,4 +26,4 @@ const getMemberById = async (id: string): Promise<Member | null> => {
   }
 };
 
-export default getMemberById;
+export default fetchMemberById;
