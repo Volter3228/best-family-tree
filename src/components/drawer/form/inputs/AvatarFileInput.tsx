@@ -5,10 +5,15 @@ import { XMarkIcon } from "@heroicons/react/16/solid";
 
 interface Props {
   onImageSelect: (file: File | null) => void;
+  image: string | File | null;
   initialImage: string | null;
 }
 
-const AvatarFileInput = ({ onImageSelect, initialImage = null }: Props) => {
+const AvatarFileInput = ({
+  onImageSelect,
+  image,
+  initialImage = null,
+}: Props) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImage,
   );
@@ -17,6 +22,15 @@ const AvatarFileInput = ({ onImageSelect, initialImage = null }: Props) => {
   useEffect(() => {
     setSelectedImage(initialImage);
   }, [initialImage]);
+
+  useEffect(() => {
+    if (!image && selectedImage) {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setSelectedImage(null);
+    }
+  }, [image]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
