@@ -3,8 +3,9 @@ import { useMembers } from "@/hooks";
 import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
 import apiAddMember from "@/api/addMember";
 import type { MemberFormData, Member as MemberType } from "@/types";
-import { SubmitButton, ClearButton } from "./buttons";
 import { MemberFormFields } from "./fields";
+import { SubmitButton, ClearButton } from "./buttons";
+import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
 
 interface Props {
@@ -37,24 +38,7 @@ export default function AddMemberForm({ onSuccess }: Props) {
     }
 
     setIsSubmitting(true);
-    const formData = new FormData();
-
-    Object.entries(form).forEach(([key, value]) => {
-      if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else if (value !== undefined && value !== null) {
-        // TODO: Make phone numbers an array with possibility to expand
-        if (key === "phoneNumber") {
-          formData.append("phoneNumbers", JSON.stringify([value]));
-        } else if (key === "photo") {
-          formData.append(key, value);
-        } else if (typeof value === "object") {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
-        }
-      }
-    });
+    const formData = buildMemberFormData(form);
 
     try {
       const newMember = await apiAddMember(formData);
@@ -64,9 +48,9 @@ export default function AddMemberForm({ onSuccess }: Props) {
       }
     } catch (error) {
       console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   const handleClearForm = () => {

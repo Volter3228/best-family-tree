@@ -1,16 +1,26 @@
-import { PhoneNumber } from "../db/prisma/generated/client.js";
+import {
+  Member as PrismaMember,
+  PhoneNumber,
+} from "../db/prisma/generated/client.js";
 
-type Input = {
+export type MemberWithPhoneNumberRecords = PrismaMember & {
   phoneNumbers: PhoneNumber[];
-  mentees?: any[];
-  mentor?: any;
+  mentees?: MemberWithPhoneNumberRecords[];
+  mentor?: MemberWithPhoneNumberRecords | null;
 };
 
-const transformMemberPhoneNumbers = (member: Input): any => ({
+export type MemberWithPhoneNumberStrings = PrismaMember & {
+  phoneNumbers: string[];
+  mentees: MemberWithPhoneNumberStrings[];
+  mentor?: MemberWithPhoneNumberStrings;
+};
+
+const transformMemberPhoneNumbers = (
+  member: MemberWithPhoneNumberRecords,
+): MemberWithPhoneNumberStrings => ({
   ...member,
-  // Transform to array of phone number strings
-  phoneNumbers: member.phoneNumbers.map(({ phoneNumber }) => phoneNumber) || [],
-  mentees: member.mentees?.map(transformMemberPhoneNumbers) || undefined,
+  phoneNumbers: member.phoneNumbers.map(({ phoneNumber }) => phoneNumber),
+  mentees: (member.mentees ?? []).map(transformMemberPhoneNumbers),
   mentor: member.mentor
     ? transformMemberPhoneNumbers(member.mentor)
     : undefined,

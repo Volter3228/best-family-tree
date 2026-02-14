@@ -60,15 +60,18 @@ export default class Member {
     this.joinedAt = joinedAt;
     this.linkedinLink = linkedinLink;
     this.mentees =
-      mentees?.map((mentee: MemberType) => new Member(mentee)) || []; // Recursively create mentees instances
-    this.mentor = mentor ? new Member(mentor) : null;
+      mentees?.map((mentee: MemberType) =>
+        mentee instanceof Member ? mentee : new Member(mentee),
+      ) || [];
+    this.mentor =
+      mentor instanceof Member ? mentor : mentor ? new Member(mentor) : null;
     this.mentorId = mentorId;
     this.name = name;
     this.phoneNumbers = phoneNumbers;
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
-    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : "";
+    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : null;
     this.activityState = activityState;
     this.course = course;
     this.createdAt = createdAt;
@@ -80,15 +83,19 @@ export default class Member {
     this.mentees.push(mentee); // Add mentee if this is the mentor
   }
 
-  getRecruitmentSeason(): string {
-    let season = "Весна";
+  getRecruitmentSeason(withEmoji = false): string {
     if (!this.joinedAt) return "";
     const month = getMonth(this.joinedAt);
-    if (month >= 7 && month <= 12) {
-      season = "Осінь";
+    const year = getYear(this.joinedAt);
+
+    let season = `Весна ${year}`;
+    let emoji = "🌷";
+    if (month > 6 && month < 12) {
+      season = `Осінь ${year}`;
+      emoji = "🍁";
     }
 
-    return `${season} ${getYear(this.joinedAt)}`;
+    return withEmoji ? `${emoji}${season}${emoji}` : season;
   }
 
   isMentor(): boolean {
@@ -116,6 +123,14 @@ export default class Member {
 
     collectDescendants(this.mentees);
     return descendantIds;
+  }
+
+  clone(overrides: Partial<MemberType> = {}): Member {
+    const cloned = new Member({
+      ...this,
+      ...overrides,
+    } as MemberType);
+    return cloned;
   }
 
   isBirthdayToday(): boolean {

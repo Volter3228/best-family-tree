@@ -7,8 +7,8 @@ import {
 } from "react";
 import { useApplication } from "@pixi/react";
 import { Viewport } from "pixi-viewport";
-import { debounce } from "lodash";
 import { getIsMinimized } from "@/libs/pixi";
+import debounce from "lodash/debounce";
 
 interface Props {
   ref: Ref<Viewport>;
@@ -31,22 +31,26 @@ const PixiViewport = ({
 
   useImperativeHandle(ref, () => viewportRef.current!);
 
+  // One-time plugins setup
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || viewport.plugins.get("drag")) return;
+
+    viewport
+      .drag({ mouseButtons: "left" })
+      .pinch()
+      .wheel({ smooth: 8, percent: 0.03, interrupt: true })
+      .decelerate({ friction: 0.95, bounce: 0.7 })
+      .clampZoom({ minScale: 0.025, maxScale: 3 });
+
+    viewport.cursor = "grab";
+  }, [isInitialised]);
+
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    if (!viewport.plugins.get("drag")) {
-      viewport
-        .drag({ mouseButtons: "left" })
-        .pinch()
-        .wheel({ smooth: 8, percent: 0.03, interrupt: true })
-        .decelerate({ friction: 0.95, bounce: 0.7 })
-        .clampZoom({ minScale: 0.025, maxScale: 3 });
-    }
-
     viewport.resize(width, height);
-    viewport.cursor = "grab";
-
     wasMinimizedRef.current = getIsMinimized(viewport.scale.x);
 
     const handleDragStart = () => (viewport.cursor = "grabbing");
@@ -73,10 +77,11 @@ const PixiViewport = ({
     return () => {
       viewport.off("drag-start", handleDragStart);
       viewport.off("drag-end", handleDragEnd);
+      viewport.off("wheel", handleWheel);
       viewport.off("zoomed", handleZoomed);
       handleZoomed.cancel();
     };
-  }, [app, width, height, onScaleChange, isInitialised]);
+  }, [width, height, onScaleChange, isInitialised]);
 
   if (!isInitialised) {
     return null;

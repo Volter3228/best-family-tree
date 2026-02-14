@@ -1,8 +1,8 @@
+import { http } from "@/libs/http";
 import { ENDPOINTS } from "@/constants/endpoints";
-import http from "../libs/http";
 import type { MentorsListItem } from "@/types/members";
 
-export default async function getMentorsList() {
+const fetchMentorsList = async () => {
   const res = await http(ENDPOINTS.getMentorsList);
 
   if (!res.ok) {
@@ -12,4 +12,6 @@ export default async function getMentorsList() {
   const data: MentorsListItem[] = await res.json();
 
   return data;
-}
+};
+
+export default fetchMentorsList;

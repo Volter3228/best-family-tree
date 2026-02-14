@@ -1,16 +1,19 @@
 // import Flow from "@/components/flow/Flow";
-import PixiTree from "@/components/pixiTree/PixiTreeLoader";
+import PixiTreeDynamic from "@/components/pixiTree/PixiTreeDynamic";
 import { MembersProvider } from "@/context/MembersContext";
-import getFamilyTree from "@/api/getFamilyTree";
+import fetchFamilyTree from "@/api/fetchFamilyTree";
 
 export default async function Home() {
-  const familyTreeMembers = await getFamilyTree();
+  const familyTreeMembers = await fetchFamilyTree().catch((error) => {
+    console.error("Failed to load family tree:", error);
+    return undefined;
+  });
 
   return (
-    <div className="mx-auto h-screen w-full">
+    <div className="h-screen w-screen">
       <MembersProvider>
         {/* {!!familyTreeMembers && <Flow members={familyTreeMembers} />} */}
-        {!!familyTreeMembers && <PixiTree members={familyTreeMembers} />}
+        {!!familyTreeMembers && <PixiTreeDynamic members={familyTreeMembers} />}
       </MembersProvider>
     </div>
   );

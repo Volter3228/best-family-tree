@@ -1,16 +1,9 @@
-import { useContext } from "react";
-import { PixiTreeContext } from "@/context/PixiTreeContext";
+import { useTree } from "./useTree";
 import { useFitViewAnimation } from "./useFitViewAnimation";
 import { useFocusNodeAnimation } from "./useFocusNodeAnimation";
 
 export const useViewportAnimation = () => {
-  const context = useContext(PixiTreeContext);
-
-  if (!context) {
-    throw new Error(
-      "useViewportAnimation must be used within a PixiTreeProvider",
-    );
-  }
+  const context = useTree();
 
   const fitView = useFitViewAnimation(context);
   const focusNode = useFocusNodeAnimation(context);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { DropdownOption } from "@/types";
 
 export const useDropdown = (
@@ -23,11 +23,15 @@ export const useDropdown = (
     setInputValue(getInitialText());
   }, [initialValue, options]);
 
-  const filteredOptions = autoComplete
-    ? options.filter((opt) =>
-        opt.text.toLowerCase().includes(inputValue.toLowerCase()),
-      )
-    : options;
+  const filteredOptions = useMemo(
+    () =>
+      autoComplete
+        ? options.filter((opt) =>
+            opt.text.toLowerCase().includes(inputValue.toLowerCase()),
+          )
+        : options,
+    [autoComplete, options, inputValue],
+  );
 
   const handleSelect = useCallback(
     (opt?: DropdownOption) => {

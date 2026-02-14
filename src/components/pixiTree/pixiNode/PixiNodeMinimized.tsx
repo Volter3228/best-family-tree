@@ -9,7 +9,6 @@ import {
 } from "@/constants/pixi";
 
 interface Props {
-  visible: boolean;
   x: number;
   y: number;
   avatarImage: Texture | GraphicsContext | null;
@@ -18,7 +17,6 @@ interface Props {
 }
 
 const PixiNodeMinimized = ({
-  visible,
   x,
   y,
   avatarImage,
@@ -47,12 +45,7 @@ const PixiNodeMinimized = ({
   );
 
   return (
-    <pixiContainer
-      visible={visible}
-      x={x}
-      y={y}
-      pivot={{ x: radius, y: radius }}
-    >
+    <pixiContainer x={x} y={y} pivot={{ x: radius, y: radius }}>
       <pixiContainer
         mask={avatarImage instanceof Texture ? nodeMaskRef.current : null}
       >
