@@ -13,6 +13,7 @@ const ClearButton = ({ isSubmitting = false, onClick, children }: Props) => {
         transition-colors duration-300 ease-in-out
       `}
       onClick={onClick}
+      type="button"
       disabled={isSubmitting}
     >
       {children || "Очистити"}

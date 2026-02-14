@@ -27,6 +27,11 @@ export default function AddMemberForm({ onSuccess }: Props) {
     }
   }, [mentorsList, getMentorsList]);
 
+  const handleResetForm = () => {
+    setForm({ ...MEMBER_FORM_DEFAULTS });
+    setErrors({});
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -44,6 +49,7 @@ export default function AddMemberForm({ onSuccess }: Props) {
       const newMember = await apiAddMember(formData);
       if (newMember) {
         addMember(newMember);
+        handleResetForm();
         onSuccess?.(newMember);
       }
     } catch (error) {
@@ -51,10 +57,6 @@ export default function AddMemberForm({ onSuccess }: Props) {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleClearForm = () => {
-    setForm({ ...MEMBER_FORM_DEFAULTS });
   };
 
   const submitLabel = isSubmitting ? "Додаємо..." : "Додати";
@@ -67,7 +69,7 @@ export default function AddMemberForm({ onSuccess }: Props) {
     >
       <MemberFormFields form={form} setForm={setForm} errors={errors} />
       <div className="flex flex-row w-4/5 mt-10 justify-center gap-3">
-        <ClearButton isSubmitting={isSubmitting} onClick={handleClearForm}>
+        <ClearButton isSubmitting={isSubmitting} onClick={handleResetForm}>
           Очистити
         </ClearButton>
         <SubmitButton isSubmitting={isSubmitting}>{submitLabel}</SubmitButton>

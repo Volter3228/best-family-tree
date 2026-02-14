@@ -47,10 +47,14 @@ const MemberFormFields = ({
       }));
   }, [mentorsList, selectedMember]);
 
-  const statusOptions: DropdownOption[] = MEMBER_STATUSES.map((status) => ({
-    value: status,
-    text: capilizeOnlyFirstLetter(status),
-  }));
+  const statusOptions: DropdownOption[] = useMemo(
+    () =>
+      MEMBER_STATUSES.map((status) => ({
+        value: status,
+        text: capilizeOnlyFirstLetter(status),
+      })),
+    [],
+  );
 
   const handleTextChange = (name: string) => (value: string) => {
     setForm({ ...form, [name]: value });
@@ -71,6 +75,7 @@ const MemberFormFields = ({
       <div className="flex flex-row flex-1 w-full justify-center mb-2">
         <AvatarFileInput
           onImageSelect={handleFileChange("photo")}
+          image={form.photo}
           initialImage={mode === "edit" ? initialAvatar : null}
         />
       </div>

@@ -16,6 +16,7 @@ const PixiSidebar = ({ onFitView }: Props) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
+  const closeDrawer = () => setIsDrawerOpen(false);
 
   const handleShowFamilyClick = () => {
     console.log("show family");
@@ -45,11 +46,11 @@ const PixiSidebar = ({ onFitView }: Props) => {
       </div>
       <Drawer
         headerTitle="Додати"
-        onClose={toggleDrawer}
+        onClose={closeDrawer}
         isOpen={isDrawerOpen}
         className="z-20"
       >
-        <AddMemberForm />
+        <AddMemberForm onSuccess={closeDrawer} />
       </Drawer>
     </>
   );
