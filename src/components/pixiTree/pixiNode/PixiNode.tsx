@@ -80,6 +80,19 @@ const PixiNode = ({
   const handlePointerEnter = useCallback(() => setIsHovered(true), []);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
 
+  useEffect(() => {
+    if (!isHovered) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!(e.target instanceof HTMLCanvasElement)) {
+        setIsHovered(false);
+      }
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, [isHovered]);
+
   const filters = useMemo(() => {
     if (!isHovered && !isSelected) return EMPTY_FILTERS;
     return [shadowFilter];
