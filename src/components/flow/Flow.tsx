@@ -15,11 +15,11 @@ import {
   NODE_TYPES,
 } from "@/constants/reactFlowSettings";
 import { useMembers } from "@/hooks";
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/graph";
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/libs/elk";
 import {
   getLayoutedElements,
   transformMembersToFlowValues,
-} from "@/libs/reactFlow";
+} from "@/libs/graph";
 import type { Member as MemberType } from "@/types";
 import Drawer from "../drawer/Drawer";
 import MemberInfo from "../drawer/info/MemberInfo";
