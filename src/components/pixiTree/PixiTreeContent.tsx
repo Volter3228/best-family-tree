@@ -50,7 +50,6 @@ const PixiTreeContent = ({ members }: Props) => {
     fitView();
   }, [fitView]);
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const hasInitialFitView = useRef(false);
 
   // Sync members
@@ -87,7 +86,7 @@ const PixiTreeContent = ({ members }: Props) => {
   const handleNodeClick = (member: Member) => setSelectedMember(member);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden">
       <Application
         resizeTo={window}
         backgroundAlpha={0}

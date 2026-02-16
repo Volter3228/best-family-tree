@@ -1,7 +1,8 @@
 import InputLabel from "./InputLabel";
+import { twMerge } from "tailwind-merge";
 import { useDropdown } from "@/hooks";
-import { DropdownOption } from "@/types";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { DropdownOption } from "@/types";
 
 interface Props {
   name: string;
@@ -77,20 +78,21 @@ const DropdownSelectInput = ({
         onFocus={handleInputFocus}
         onKeyDown={handleKeyDown}
         autoComplete="off"
-        className={`
-          block w-full px-3 py-2 rounded-xl shadow-inner border-accent
-          bg-purple-50 placeholder:text-placeholder font-light focus:outline-hidden focus:ring-2 focus:ring-accent
-          caret-accent transition-all duration-200 ease-out
-          ${!autoComplete ? "cursor-pointer select-none caret-transparent" : ""}
-        `}
+        className={twMerge(
+          "block w-full px-3 py-2 rounded-xl shadow-inner border-accent",
+          "bg-purple-50 placeholder:text-placeholder font-light",
+          "focus:outline-hidden focus:ring-2 focus:ring-accent",
+          "caret-accent transition-all duration-200 ease-out",
+          !autoComplete ? "cursor-pointer select-none caret-transparent" : "",
+        )}
       />
       {isOpen && !!filteredOptions.length && (
         <ul
-          className={`
-            absolute z-10 mt-2 max-h-60 w-full overflow-y-auto
-            rounded-xl bg-white shadow-lg transition-all transform scale-95
-            scroll-smooth animate-fade-slide-${isClosing ? "up" : "down"}
-          `}
+          className={twMerge(
+            "absolute z-10 mt-2 max-h-60 w-full overflow-y-auto",
+            "rounded-xl bg-white shadow-lg transition-all transform scale-95",
+            `scroll-smooth animate-fade-slide-${isClosing ? "up" : "down"}`,
+          )}
         >
           {filteredOptions.map((opt, index) => (
             <li
@@ -100,13 +102,12 @@ const DropdownSelectInput = ({
               tabIndex={index}
               onClick={handleOptionClick(opt)}
               onKeyDown={handleOptionKeyDown(opt)}
-              className={`
-                px-3 py-2 cursor-pointer ${
-                  index === activeOptionIndex
-                    ? "bg-accent text-white"
-                    : "hover:bg-accent hover:text-white"
-                }
-              `}
+              className={twMerge(
+                "px-3 py-2 cursor-pointer",
+                index === activeOptionIndex
+                  ? "bg-accent text-white"
+                  : "hover:bg-accent hover:text-white",
+              )}
             >
               {opt.text}
             </li>

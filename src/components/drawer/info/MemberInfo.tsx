@@ -47,7 +47,8 @@ const MemberInfo = ({
             alt="Avatar"
             className="rounded-full shadow-lg"
             sizes="100%"
-            quality={85}
+            quality={80}
+            priority
             fill
           />
         ) : (
