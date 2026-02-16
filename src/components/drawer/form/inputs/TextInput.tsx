@@ -1,4 +1,5 @@
 import InputLabel from "./InputLabel";
+import { twMerge } from "tailwind-merge";
 
 interface Props {
   id?: string;
@@ -39,13 +40,13 @@ const TextInput = ({
         value={value}
         type="text"
         placeholder={placeholder}
-        className={`
-            block w-full pl-3 ${
-              Icon ? "pr-10" : "pr-3"
-            } py-2 rounded-xl placehoder:text-slate-200 shadow-inner border-accent font-light
-            bg-purple-50 placeholder:text-placeholder focus:outline-hidden focus:ring-2 focus:ring-accent
-            caret-accent transition-all duration-200 ease-out
-          `}
+        className={twMerge(
+          "block w-full pl-3",
+          Icon ? "pr-10" : "pr-3",
+          "py-2 rounded-xl placehoder:text-slate-200 shadow-inner border-accent font-light",
+          "bg-purple-50 placeholder:text-placeholder focus:outline-hidden focus:ring-2 focus:ring-accent",
+          "caret-accent transition-all duration-200 ease-out",
+        )}
         autoComplete="off"
         required={required}
       />

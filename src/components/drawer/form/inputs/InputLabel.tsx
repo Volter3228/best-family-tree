@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 interface Props {
   label: string;
   htmlFor: string;
@@ -10,9 +12,10 @@ const InputLabel = ({ label, htmlFor, required, onClick }: Props) => {
     <label
       htmlFor={htmlFor}
       onClick={onClick}
-      className={`block mb-1 ${
-        required ? "after:content-['*'] after:ml-0.5 after:text-accent" : ""
-      }`}
+      className={twMerge(
+        "block mb-1",
+        required && "after:content-['*'] after:ml-0.5 after:text-accent",
+      )}
     >
       {label}
     </label>
