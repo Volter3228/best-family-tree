@@ -4,7 +4,7 @@ import {
   LinkedinIcon,
   TelegramIcon,
 } from "@/components/icons";
-import Member from "@/models/Member";
+import { Member } from "@/models";
 import Link from "next/link";
 
 interface Props {

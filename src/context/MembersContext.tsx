@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import Member from "@/models/Member";
+import { Member } from "@/models";
 import { flattenTree } from "@/utils";
 import { MentorsListItem } from "@/types/members";
 

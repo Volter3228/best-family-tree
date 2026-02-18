@@ -1,5 +1,5 @@
-import Member from "@/models/Member";
 import { format, getYear, isBefore, addYears, startOfDay } from "date-fns";
+import { Member } from "@/models";
 
 const getClosestBirthday = (birthday: Date): Date => {
   const currentYear = getYear(new Date());
@@ -8,7 +8,7 @@ const getClosestBirthday = (birthday: Date): Date => {
   const birthdayThisYear = new Date(
     currentYear,
     birthday.getMonth(),
-    birthday.getDate()
+    birthday.getDate(),
   );
 
   // if birthday already passed this year, use next year

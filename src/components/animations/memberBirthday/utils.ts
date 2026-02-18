@@ -1,5 +1,5 @@
 import { Texture } from "pixi.js";
-import { NODE_WIDTH, AVATAR_SIZE } from "@/constants/pixi";
+import { NODE_WIDTH, AVATAR_SIZE } from "@/constants/canvas";
 
 export const MIN_DISTANCE_FROM_CENTER = AVATAR_SIZE / 2 + 10;
 

@@ -12,8 +12,13 @@ import {
   PhoneArrowUpRightIcon,
   CalendarDateRangeIcon,
 } from "@heroicons/react/16/solid";
-import { capilizeOnlyFirstLetter, generateGoogleCalendarLink } from "@/utils";
-import Member from "@/models/Member";
+import {
+  capitalizeOnlyFirstLetter,
+  generateGoogleCalendarLink,
+  formatMemberRecruitmentSeason,
+  getMemberAvatar,
+} from "@/utils";
+import { Member } from "@/models";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 import MemberInfoActionIcon from "./MemberInfoActionIcon";
@@ -27,7 +32,6 @@ const MemberInfo = ({
   member,
   member: {
     name,
-    avatar,
     photo,
     birthday,
     joinedAt,
@@ -38,6 +42,8 @@ const MemberInfo = ({
   },
   onMemberNameClick,
 }: Props) => {
+  const avatar = getMemberAvatar(member);
+
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
       <div className="relative h-48 w-48">
@@ -70,14 +76,14 @@ const MemberInfo = ({
           {name}
         </h5>
         <h6 className="text-lg font-light">
-          {member.getRecruitmentSeason(true)}
+          {formatMemberRecruitmentSeason(member, true)}
         </h6>
       </div>
       <div className="flex flex-row w-full justify-center">
         <div className="flex flex-col gap-4 max-w-full">
           <MemberInfoRow
             title="Статус"
-            value={capilizeOnlyFirstLetter(status)}
+            value={capitalizeOnlyFirstLetter(status)}
             icon={AcademicCapIcon}
           />
           {!!mentor && (

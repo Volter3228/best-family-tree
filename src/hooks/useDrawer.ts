@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import Member from "@/models/Member";
+import { Member } from "@/models";
 import type { DrawerMode } from "@/types";
 
 export const useDrawer = (
