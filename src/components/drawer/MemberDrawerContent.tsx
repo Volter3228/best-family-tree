@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
 import gsap from "gsap";
-import type Member from "@/models/Member";
-import { MemberInfo, EditMemberForm } from ".";
-import { DrawerMode } from "@/types/forms";
+import { useCallback, useEffect, useRef } from "react";
 import { useViewportAnimation, useMembers } from "@/hooks";
+import { Member } from "@/models";
+import { DrawerMode } from "@/types/forms";
+import { EditMemberForm } from "./form";
+import MemberInfo from "./info";
 
 interface Props {
   member: Member;

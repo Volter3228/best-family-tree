@@ -1,6 +1,5 @@
-// import Flow from "@/components/flow/Flow";
-import PixiTreeDynamic from "@/components/pixiTree/PixiTreeDynamic";
 import { MembersProvider } from "@/context/MembersContext";
+import MembersTreeDynamic from "@/components/membersTree/MembersTreeDynamic";
 import fetchFamilyTree from "@/api/fetchFamilyTree";
 
 export default async function Home() {
@@ -12,8 +11,9 @@ export default async function Home() {
   return (
     <div className="h-screen w-screen">
       <MembersProvider>
-        {/* {!!familyTreeMembers && <Flow members={familyTreeMembers} />} */}
-        {!!familyTreeMembers && <PixiTreeDynamic members={familyTreeMembers} />}
+        {!!familyTreeMembers && (
+          <MembersTreeDynamic members={familyTreeMembers} />
+        )}
       </MembersProvider>
     </div>
   );

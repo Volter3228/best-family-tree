@@ -1,12 +1,13 @@
 import { FormEvent, useEffect, useState, useMemo } from "react";
 import { useMembers } from "@/hooks";
 import apiEditMember from "@/api/editMember";
-import Member from "@/models/Member";
+import { getMemberAvatar } from "@/utils";
+import { Member } from "@/models";
 import type { MemberFormData } from "@/types";
 import { MemberFormFields } from "./fields";
 import { SubmitButton, ClearButton } from "./buttons";
-import validateMemberForm from "./validations/memberFormValidation";
 import { buildMemberFormData } from "./buildMemberFormData";
+import validateMemberForm from "./validations/memberFormValidation";
 
 interface Props {
   member: Member;
@@ -101,7 +102,7 @@ const EditMemberForm = ({ member, onExit }: Props) => {
         setForm={setForm}
         errors={errors}
         mode="edit"
-        initialAvatar={member.avatar}
+        initialAvatar={getMemberAvatar(member)}
       />
       <div className="flex flex-row w-4/5 mt-10 justify-center gap-3">
         <ClearButton isSubmitting={isSubmitting} onClick={onExit}>

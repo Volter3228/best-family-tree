@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import { useMembers } from "@/hooks";
-import { capilizeOnlyFirstLetter } from "@/utils/strings";
+import { capitalizeOnlyFirstLetter } from "@/utils";
 import {
   MAX_DATE_BIRTHDAY,
   MIN_DATE_BIRTHDAY,
   MIN_DATE_JOIN,
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/16/solid";
 import { MemberFormData, MemberFormMode, DropdownOption } from "@/types";
+import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/16/solid";
 import {
   AvatarFileInput,
   TextInput,
@@ -51,7 +51,7 @@ const MemberFormFields = ({
     () =>
       MEMBER_STATUSES.map((status) => ({
         value: status,
-        text: capilizeOnlyFirstLetter(status),
+        text: capitalizeOnlyFirstLetter(status),
       })),
     [],
   );

@@ -1,8 +1,8 @@
+import { useCallback, useContext } from "react";
 import { MembersContext } from "@/context/MembersContext";
 import fetchMentorsList from "@/api/fetchMentorsList";
-import { useCallback, useContext } from "react";
 import type { Member as MemberType } from "@/types";
-import Member from "@/models/Member";
+import { Member } from "@/models";
 
 export const useMembers = () => {
   const context = useContext(MembersContext);

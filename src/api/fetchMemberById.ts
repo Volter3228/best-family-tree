@@ -1,6 +1,6 @@
 import { http } from "@/libs/http";
-import Member from "@/models/Member";
 import { ENDPOINTS } from "@/constants/endpoints";
+import { Member } from "@/models";
 import { Member as MemberType } from "@/types";
 
 const fetchMemberById = async (id: string): Promise<Member | null> => {

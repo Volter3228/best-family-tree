@@ -1,5 +1,5 @@
 import ELK from "elkjs/lib/elk.bundled.js";
-import { FlowViewportDirection } from "@/types/reactFlow";
+import { FlowViewportDirection } from "@/types/tree";
 
 // Using a larger width and height values creates more space between nodes
 export const DEFAULT_NODE_WIDTH = 220;

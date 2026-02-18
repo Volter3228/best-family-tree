@@ -1,9 +1,10 @@
 import { getMonth, getYear } from "date-fns";
-import { getPhotoUrlAsAvatar } from "@/libs/cloudinary";
 import {
   MemberStatus,
   type Member as MemberType,
   ActivityState,
+  RecruitmentSeason,
+  RecruitmentTerm,
 } from "@/types";
 
 export default class Member {
@@ -21,7 +22,6 @@ export default class Member {
   name: string;
   phoneNumbers: string[];
   photo: string | null;
-  avatar: string | null;
   status: MemberStatus;
   telegramLink: string | null;
   activityState: ActivityState;
@@ -71,7 +71,6 @@ export default class Member {
     this.photo = photo;
     this.status = status;
     this.telegramLink = telegramLink;
-    this.avatar = photo ? getPhotoUrlAsAvatar(photo) : null;
     this.activityState = activityState;
     this.course = course;
     this.createdAt = createdAt;
@@ -83,19 +82,20 @@ export default class Member {
     this.mentees.push(mentee); // Add mentee if this is the mentor
   }
 
-  getRecruitmentSeason(withEmoji = false): string {
-    if (!this.joinedAt) return "";
+  getRecruitmentTerm(): RecruitmentTerm | null {
+    if (!this.joinedAt) return null;
     const month = getMonth(this.joinedAt);
     const year = getYear(this.joinedAt);
 
-    let season = `Весна ${year}`;
-    let emoji = "🌷";
+    let season: RecruitmentSeason = "spring";
     if (month > 6 && month < 12) {
-      season = `Осінь ${year}`;
-      emoji = "🍁";
+      season = "autumn";
     }
 
-    return withEmoji ? `${emoji}${season}${emoji}` : season;
+    return {
+      season,
+      year,
+    };
   }
 
   isMentor(): boolean {
