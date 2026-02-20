@@ -36,8 +36,13 @@ const MembersTreeContent = ({ members }: Props) => {
     nodePositions,
   } = useMembersTree();
 
-  const { membersTree, setMembers, selectedMember, setSelectedMember } =
-    useMembers();
+  const {
+    membersTree,
+    setMembers,
+    selectedMember,
+    setSelectedMember,
+    getMemberById,
+  } = useMembers();
 
   const {
     isDrawerOpen,
@@ -47,11 +52,21 @@ const MembersTreeContent = ({ members }: Props) => {
     onBackToInfoClick: handleDrawerBackToInfo,
   } = useDrawer(selectedMember, setSelectedMember);
 
-  const { fitView } = useViewportAnimation();
+  const { fitView, focusNode } = useViewportAnimation();
 
   const handleFitView = useCallback(() => {
     fitView();
   }, [fitView]);
+
+  const handleSearch = useCallback(
+    (memberId: string) => {
+      const member = getMemberById(memberId);
+      if (!member) return;
+      setSelectedMember(member);
+      focusNode(memberId);
+    },
+    [getMemberById, setSelectedMember, focusNode],
+  );
 
   const hasInitialFitView = useRef(false);
 
@@ -117,7 +132,7 @@ const MembersTreeContent = ({ members }: Props) => {
           />
         </Viewport>
       </Application>
-      <Sidebar onFitView={handleFitView} />
+      <Sidebar onFitView={handleFitView} onSearch={handleSearch} />
       <Drawer
         id="member-drawer"
         headerTitle={drawerMode === "info" ? "Інфо" : "Редагувати"}
