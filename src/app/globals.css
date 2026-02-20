@@ -10,6 +10,9 @@
 
   --background-image-primary: var(--primary-gradient);
   --background-image-avatar-gradient: var(--avatar-gradient);
+
+  --animate-search-slide-in: search-slide-in 0.25s ease-out forwards;
+  --animate-search-slide-out: search-slide-out 0.2s ease-in forwards;
 }
 
 @layer base {

@@ -53,7 +53,7 @@ const MemberInfo = ({
             alt="Avatar"
             className="rounded-full shadow-lg"
             sizes="100%"
-            quality={80}
+            quality={75}
             priority
             fill
           />
