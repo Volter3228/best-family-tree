@@ -1,8 +1,9 @@
 import { useCallback, useContext } from "react";
+import { fetchMentorsList } from "@/api";
+import { getUpdatedMentorsList } from "@/utils/membersTree";
 import { MembersContext } from "@/context/MembersContext";
-import fetchMentorsList from "@/api/fetchMentorsList";
-import type { Member as MemberType } from "@/types";
 import { Member } from "@/models";
+import { MemberStatus, type Member as MemberType } from "@/types";
 
 export const useMembers = () => {
   const context = useContext(MembersContext);
@@ -37,6 +38,8 @@ export const useMembers = () => {
     (newMember: MemberType) => {
       const newMemberInstance = new Member(newMember);
 
+      setMentorsList(getUpdatedMentorsList(mentorsList, newMember));
+
       setMembersTree((prevTree) => {
         if (!newMember.mentorId) {
           return [...(prevTree || []), newMemberInstance];
@@ -68,7 +71,7 @@ export const useMembers = () => {
         return addToTree(prevTree || []);
       });
     },
-    [setMembersTree],
+    [setMembersTree, setMentorsList],
   );
 
   const updateMember = useCallback(
@@ -179,12 +182,16 @@ export const useMembers = () => {
         return tree;
       });
 
+      setMentorsList(
+        getUpdatedMentorsList(mentorsList, updatedMemberData, "update"),
+      );
+
       setSelectedMember((prev) => {
         if (prev?.id !== updatedMemberData.id) return prev;
         return prev.clone(updatedMemberData);
       });
     },
-    [setMembersTree, setSelectedMember],
+    [setMembersTree, setSelectedMember, setMentorsList],
   );
 
   const getMemberById = useCallback(
