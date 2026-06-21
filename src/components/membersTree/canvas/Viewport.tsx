@@ -50,11 +50,11 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
     const handleDragStart = () => (viewport.cursor = "grabbing");
     const handleDragEnd = () => (viewport.cursor = "grab");
 
-    const handleZoomed = debounce(() => {
-      onScaleChange(viewport.scale.x);
-    }, 100);
-
     const handleWheel = () => {
+      // Cancel drag deceleration when user scrolls to prevent freezes
+      const decelerate = viewport.plugins.get("decelerate");
+      decelerate?.reset();
+
       const currentScale = viewport.scale.x;
       const isMinimized = getIsMinimized(currentScale);
       if (isMinimized !== wasMinimizedRef.current) {
@@ -62,6 +62,10 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
         wasMinimizedRef.current = isMinimized;
       }
     };
+
+    const handleZoomed = debounce(() => {
+      onScaleChange(viewport.scale.x);
+    }, 100);
 
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
