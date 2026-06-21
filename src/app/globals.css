@@ -11,8 +11,11 @@
   --background-image-primary: var(--primary-gradient);
   --background-image-avatar-gradient: var(--avatar-gradient);
 
-  --animate-search-slide-in: search-slide-in 0.25s ease-out forwards;
-  --animate-search-slide-out: search-slide-out 0.2s ease-in forwards;
+  /* Animations */
+  --animate-sidebar-slide-in: sidebar-slide-in 0.25s ease-out forwards;
+  --animate-sidebar-slide-out: sidebar-slide-out 0.2s ease-in forwards;
+  --animate-fade-slide-down: fade-slide-down 0.2s ease-out forwards;
+  --animate-fade-slide-up: fade-slide-up 0.2s ease-out forwards;
 }
 
 @layer base {

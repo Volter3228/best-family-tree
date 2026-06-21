@@ -86,20 +86,21 @@ const DropdownSelectInput = ({
           !autoComplete ? "cursor-pointer select-none caret-transparent" : "",
         )}
       />
-      {isOpen && !!filteredOptions.length && (
+      {(isOpen || isClosing) && !!filteredOptions.length && (
         <ul
           className={twMerge(
             "absolute z-10 mt-2 max-h-60 w-full overflow-y-auto",
-            "rounded-xl bg-white shadow-lg transition-all transform scale-95",
-            `scroll-smooth animate-fade-slide-${isClosing ? "up" : "down"}`,
+            "rounded-xl bg-white shadow-lg transition-all transform scale-95 scroll-smooth",
+            isClosing ? "animate-fade-slide-up" : "animate-fade-slide-down",
           )}
+          tabIndex={-1}
         >
           {filteredOptions.map((opt, index) => (
             <li
               key={opt.value}
               role="option"
               aria-selected={opt.value === inputValue ? "true" : "false"}
-              tabIndex={index}
+              tabIndex={-1}
               onClick={handleOptionClick(opt)}
               onKeyDown={handleOptionKeyDown(opt)}
               className={twMerge(

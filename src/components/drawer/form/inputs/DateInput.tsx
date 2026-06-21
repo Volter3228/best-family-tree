@@ -1,7 +1,6 @@
 import DatePicker from "react-datepicker";
 import { CalendarDaysIcon } from "@heroicons/react/16/solid";
 import InputLabel from "./InputLabel";
-import "../styles/datepicker-overrides.css";
 
 interface Props {
   id?: string;
