@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from "react";
+import { useState, memo } from "react";
 import Drawer, { AddMemberForm } from "@/components/drawer";
 import {
   PlusIcon,
@@ -6,7 +6,9 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { useFilters, usePanelToggle } from "@/hooks";
 import { SearchBar } from "./memberSearch";
+import { FiltersPanel } from "./filters";
 import SidebarIconButton from "./SidebarIconButton";
 
 interface Props {
@@ -14,34 +16,18 @@ interface Props {
   onSearch: (memberId: string) => void;
 }
 
-const SEARCH_CLOSE_DURATION = 200;
-
 const Sidebar = ({ onFitView, onSearch }: Props) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSearchClosing, setIsSearchClosing] = useState(false);
+  const search = usePanelToggle();
+  const filters = usePanelToggle();
+
+  const { isFilterActive: hasActiveFilters } = useFilters();
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
   const closeDrawer = () => setIsDrawerOpen(false);
-  const closeSearch = useCallback(() => {
-    setIsSearchClosing(true);
-    setTimeout(() => {
-      setIsSearchOpen(false);
-      setIsSearchClosing(false);
-    }, SEARCH_CLOSE_DURATION);
-  }, []);
 
-  const handleShowFiltersClick = () => {
-    console.log("show filterse");
-  };
-
-  const handleShowSearchClick = useCallback(() => {
-    if (isSearchOpen && !isSearchClosing) {
-      closeSearch();
-    } else if (!isSearchClosing) {
-      setIsSearchOpen(true);
-    }
-  }, [isSearchOpen, isSearchClosing, closeSearch]);
+  const handleShowSearchClick = () => search.toggle(filters.close);
+  const handleShowFiltersClick = () => filters.toggle(search.close);
 
   return (
     <>
@@ -51,13 +37,19 @@ const Sidebar = ({ onFitView, onSearch }: Props) => {
             title="Search"
             onClick={handleShowSearchClick}
             icon={MagnifyingGlassIcon}
-            isActive={isSearchOpen}
+            isActive={search.isOpen}
           />
-          <SidebarIconButton
-            title="Filters"
-            onClick={handleShowFiltersClick}
-            icon={FunnelIcon}
-          />
+          <div className="relative">
+            <SidebarIconButton
+              title="Filters"
+              onClick={handleShowFiltersClick}
+              icon={FunnelIcon}
+              isActive={filters.isOpen}
+            />
+            {hasActiveFilters && !filters.isOpen && (
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-fuchsia-400 border border-violet-900" />
+            )}
+          </div>
           <SidebarIconButton
             title="Fit View"
             onClick={onFitView}
@@ -72,11 +64,12 @@ const Sidebar = ({ onFitView, onSearch }: Props) => {
         </div>
       </div>
       <SearchBar
-        isOpen={isSearchOpen}
-        isClosing={isSearchClosing}
-        onClose={closeSearch}
+        isOpen={search.isOpen}
+        isClosing={search.isClosing}
+        onClose={search.close}
         onSearch={onSearch}
       />
+      <FiltersPanel isOpen={filters.isOpen} isClosing={filters.isClosing} />
       <Drawer
         headerTitle="Додати"
         onClose={closeDrawer}

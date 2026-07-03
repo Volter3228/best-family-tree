@@ -33,6 +33,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <div className="relative">{children}</div>
+        <div id="datepicker-portal" />
       </body>
     </html>
   );

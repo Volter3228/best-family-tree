@@ -10,7 +10,7 @@
     "build": "tsc --build",
     "start": "node dist/src/index.js",
     "serve": "tsc --build && concurrently \"tsc --watch --preserveWatchOutput\" \"nodemon -L --watch dist --delay 1 --exec \\\"node\\\" dist/src/index.js\"",
-    "migrate:mongodb": "npx tsx ./src/db/migrateMembersFromMongodb.ts",
+    "migrate:mongodb": "npx prisma generate && npx prisma migrate deploy && npx tsx ./src/db/migrateMembersFromMongodb.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma:studio": "npx prisma studio --browser none",
     "prisma:generate": "npx prisma generate",

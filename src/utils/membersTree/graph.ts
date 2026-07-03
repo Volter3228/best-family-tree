@@ -14,7 +14,7 @@ const getLayoutOptions = (): ElkLayoutOptions => {
     "elk.direction": "DOWN",
     "elk.separateConnectedComponents": "true",
     // Spacing
-    "elk.spacing.nodeNode": "100",
+    "elk.spacing.nodeNode": "80",
     "elk.spacing.componentComponent": "2000",
   };
 };

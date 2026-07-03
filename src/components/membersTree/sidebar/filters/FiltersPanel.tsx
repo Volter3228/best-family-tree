@@ -1,0 +1,153 @@
+import { useCallback, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import type { FilterState, FilterSectionKey } from "@/types/filters";
+import { useFilters } from "@/hooks/useFilters";
+import {
+  MEMBER_STATUSES,
+  ACTIVITY_STATES,
+  JOIN_SEASONS,
+  AVATAR_VALUES,
+  SEASON_OPTIONS,
+  STATUS_OPTIONS,
+  ACTIVITY_OPTIONS,
+  AVATAR_OPTIONS,
+} from "@/constants/filters";
+import FiltersHeader from "./FiltersHeader";
+import {
+  CheckboxGroupFilterSection,
+  JoinYearFilterSection,
+  BirthdayFilterSection,
+  LineageFilterSection,
+  ConnectionsFilterSection,
+} from "./sections";
+
+interface Props {
+  isOpen: boolean;
+  isClosing: boolean;
+}
+
+const FiltersPanel = ({ isOpen, isClosing }: Props) => {
+  const {
+    draftFilters,
+    setDraftFilters,
+    applyFilters,
+    resetFilters,
+    filteredCount,
+    isFilterActive: active,
+    isDraftActive,
+  } = useFilters();
+
+  const [sections, setSections] = useState<Record<FilterSectionKey, boolean>>({
+    joinYear: false,
+    joinSeason: false,
+    status: false,
+    activity: false,
+    birthday: false,
+    avatar: false,
+    lineage: false,
+    connections: false,
+  });
+
+  const toggleSection = (key: FilterSectionKey) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleToggleSection = useCallback(
+    (key: FilterSectionKey) => () => toggleSection(key),
+    [toggleSection],
+  );
+
+  const handleChange = (patch: Partial<FilterState>) => {
+    setDraftFilters((prev) => ({ ...prev, ...patch }));
+  };
+
+  const handleFilterChange =
+    (filter: keyof FilterState) => (next: string[] | string) =>
+      handleChange({ [filter]: next });
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className={twMerge(
+        "fixed top-4 left-4 right-4 z-40 max-h-[80vh]",
+        "md:top-4 md:left-20 md:right-auto md:w-80",
+        isClosing ? "animate-sidebar-slide-out" : "animate-sidebar-slide-in",
+      )}
+    >
+      <div className="bg-violet-900 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <FiltersHeader
+          count={filteredCount}
+          isActive={active}
+          isDraftActive={isDraftActive}
+          onApply={applyFilters}
+          onReset={resetFilters}
+        />
+        <div className="overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin scrollbar-thumb-violet-700">
+          <JoinYearFilterSection
+            filters={draftFilters}
+            isOpen={sections.joinYear}
+            onChange={handleChange}
+            onToggle={handleToggleSection("joinYear")}
+          />
+          <CheckboxGroupFilterSection
+            title="Сезон вступу"
+            options={SEASON_OPTIONS}
+            allValues={JOIN_SEASONS}
+            selected={draftFilters.joinSeasons}
+            isOpen={sections.joinSeason}
+            onChangeSelected={handleFilterChange("joinSeasons")}
+            onToggle={handleToggleSection("joinSeason")}
+          />
+          <CheckboxGroupFilterSection
+            title="Статус"
+            options={STATUS_OPTIONS}
+            allValues={MEMBER_STATUSES}
+            selected={draftFilters.statuses}
+            isOpen={sections.status}
+            onChangeSelected={handleFilterChange("statuses")}
+            onToggle={handleToggleSection("status")}
+          />
+          <CheckboxGroupFilterSection
+            title="Стан активності"
+            options={ACTIVITY_OPTIONS}
+            allValues={ACTIVITY_STATES}
+            selected={draftFilters.activityStates}
+            isOpen={sections.activity}
+            onChangeSelected={handleFilterChange("activityStates")}
+            onToggle={handleToggleSection("activity")}
+          />
+          <BirthdayFilterSection
+            filters={draftFilters}
+            isOpen={sections.birthday}
+            onChange={handleChange}
+            onToggle={handleToggleSection("birthday")}
+          />
+          <CheckboxGroupFilterSection
+            title="Аватар"
+            options={AVATAR_OPTIONS}
+            allValues={AVATAR_VALUES}
+            selected={draftFilters.avatars}
+            isOpen={sections.avatar}
+            onChangeSelected={handleFilterChange("avatars")}
+            onToggle={handleToggleSection("avatar")}
+          />
+          <LineageFilterSection
+            filters={draftFilters}
+            isOpen={sections.lineage}
+            onChange={handleChange}
+            onToggle={handleToggleSection("lineage")}
+          />
+          <ConnectionsFilterSection
+            filters={draftFilters}
+            isOpen={sections.connections}
+            onChange={handleChange}
+            onToggle={handleToggleSection("connections")}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FiltersPanel;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback } from "react";
 import { Application } from "@pixi/react";
 import { CullerPlugin } from "pixi.js";
 import {
@@ -8,12 +8,11 @@ import {
   useMembers,
   useDrawer,
   useViewportAnimation,
+  useFilters,
+  useSyncMembers,
+  useTreeLayout,
 } from "@/hooks";
-import {
-  transformMembersToFlowValues,
-  getLayoutedElements,
-  getIsMinimized,
-} from "@/utils";
+import { getIsMinimized } from "@/utils";
 import { Member } from "@/models";
 import type { Member as MemberType } from "@/types";
 import { Viewport, NodesLayer, EdgesLayer } from "./canvas";
@@ -25,24 +24,10 @@ interface Props {
 }
 
 const MembersTreeContent = ({ members }: Props) => {
-  const {
-    nodes,
-    setNodes,
-    edges,
-    setEdges,
-    scale,
-    setScale,
-    setViewport,
-    nodePositions,
-  } = useMembersTree();
+  const { nodes, edges, scale, setScale, setViewport, nodePositions } =
+    useMembersTree();
 
-  const {
-    membersTree,
-    setMembers,
-    selectedMember,
-    setSelectedMember,
-    getMemberById,
-  } = useMembers();
+  const { selectedMember, setSelectedMember, getMemberById } = useMembers();
 
   const {
     isDrawerOpen,
@@ -52,54 +37,25 @@ const MembersTreeContent = ({ members }: Props) => {
     onBackToInfoClick: handleDrawerBackToInfo,
   } = useDrawer(selectedMember, setSelectedMember);
 
-  const { fitView, focusNode } = useViewportAnimation();
+  const { filteredMemberIds, appliedFilters } = useFilters();
+  const { focusNode, fitView } = useViewportAnimation();
+  const showTree = appliedFilters.showTree;
 
-  const handleFitView = useCallback(() => {
-    fitView();
-  }, [fitView]);
+  useSyncMembers(members);
+  useTreeLayout();
+
+  const handleFitView = useCallback(() => fitView(), [fitView]);
 
   const handleSearch = useCallback(
     (memberId: string) => {
       const member = getMemberById(memberId);
       if (!member) return;
+      if (filteredMemberIds && !filteredMemberIds.has(memberId)) return;
       setSelectedMember(member);
       focusNode(memberId);
     },
-    [getMemberById, setSelectedMember, focusNode],
+    [getMemberById, setSelectedMember, focusNode, filteredMemberIds],
   );
-
-  const hasInitialFitView = useRef(false);
-
-  // Sync members
-  useEffect(() => {
-    if (!membersTree.length) {
-      setMembers(members);
-    }
-  }, [membersTree, members]);
-
-  // Layout
-  useEffect(() => {
-    if (membersTree.length > 0) {
-      const { nodes: newNodes, edges: newEdges } =
-        transformMembersToFlowValues(membersTree);
-
-      getLayoutedElements(newNodes, newEdges).then((res) => {
-        setNodes(res.layoutedNodes);
-        setEdges(res.layoutedEdges);
-      });
-    }
-  }, [membersTree]);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (nodes.length > 0 && !hasInitialFitView.current) {
-      timer = setTimeout(() => {
-        fitView(2);
-        hasInitialFitView.current = true;
-      }, 200);
-    }
-    return () => clearTimeout(timer);
-  }, [nodes, fitView]);
 
   const handleNodeClick = (member: Member) => setSelectedMember(member);
 
@@ -119,11 +75,13 @@ const MembersTreeContent = ({ members }: Props) => {
           height={window.innerHeight}
           onScaleChange={setScale}
         >
-          <EdgesLayer
-            edges={edges}
-            nodePositions={nodePositions}
-            pixelLine={getIsMinimized(scale)}
-          />
+          {showTree && (
+            <EdgesLayer
+              edges={edges}
+              nodePositions={nodePositions}
+              pixelLine={getIsMinimized(scale)}
+            />
+          )}
           <NodesLayer
             nodes={nodes}
             scale={scale}

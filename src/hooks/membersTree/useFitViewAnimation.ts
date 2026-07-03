@@ -21,7 +21,10 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
   return useCallback(
     (
       duration = 1,
-      { width = window.innerWidth, height = window.innerHeight } = {},
+      {
+        width = window.innerWidth,
+        height = window.innerHeight,
+      }: { width?: number; height?: number } = {},
     ) => {
       if (!viewport || nodes.length === 0 || width === 0 || height === 0)
         return;

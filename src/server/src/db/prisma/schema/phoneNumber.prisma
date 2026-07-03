@@ -3,4 +3,6 @@ model PhoneNumber {
   ownerId     String
   phoneNumber String @unique
   owner       Member @relation(fields: [ownerId], references: [id])
+
+  @@map("phone_numbers")
 }

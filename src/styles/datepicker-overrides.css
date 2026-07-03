@@ -1,5 +1,10 @@
 @reference "../app/globals.css";
 
+#datepicker-portal {
+  position: relative;
+  z-index: 9999;
+}
+
 .react-datepicker-wrapper {
   @apply block;
 }
@@ -14,7 +19,7 @@
 
 .react-datepicker__tab-loop {
   opacity: 0;
-  transform: scale(0.5);
+  transform: scale(0.8);
   animation: zoomIn 0.2s ease-out forwards;
   position: absolute;
 }
