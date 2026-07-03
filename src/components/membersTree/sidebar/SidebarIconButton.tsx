@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-import Spinner from "@/components/ui/Spinner";
 
 interface Props {
   title: string;
@@ -9,7 +8,6 @@ interface Props {
   >;
   className?: string;
   isActive?: boolean;
-  isLoading?: boolean;
 }
 
 const SidebarIconButton = ({
@@ -18,35 +16,25 @@ const SidebarIconButton = ({
   icon: Icon,
   className = "",
   isActive = false,
-  isLoading = false,
 }: Props) => {
   return (
     <button
       title={title}
       onClick={onClick}
       className={twMerge(
-        "h-10 w-10 p-2 transition-all ease-in-out active:bg-purple-900 focus:outline-hidden duration-200 group",
+        "h-10 w-10 p-2 transition-all ease-in-out focus:outline-hidden duration-200 group",
         isActive
           ? "bg-fuchsia-500 rounded-xl"
           : "bg-violet-700 rounded-3xl md:hover:rounded-xl md:hover:bg-fuchsia-500 md:active:bg-fuchsia-300 md:duration-300",
         className,
       )}
     >
-      {isLoading ? (
-        <Spinner
-          className={twMerge(
-            "text-fuchsia-400 md:group-hover:text-purple-800",
-            isActive && "text-purple-800",
-          )}
-        />
-      ) : (
-        <Icon
-          className={twMerge(
-            "stroke-fuchsia-400 md:group-hover:stroke-purple-800 md:group-hover:stroke-2",
-            isActive && "stroke-purple-800",
-          )}
-        />
-      )}
+      <Icon
+        className={twMerge(
+          "stroke-fuchsia-500 md:group-hover:stroke-purple-800 md:group-hover:stroke-2",
+          isActive && "stroke-violet-700",
+        )}
+      />
     </button>
   );
 };

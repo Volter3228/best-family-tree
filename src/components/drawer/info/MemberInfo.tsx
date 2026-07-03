@@ -26,6 +26,7 @@ import MemberInfoActionIcon from "./MemberInfoActionIcon";
 interface Props {
   member: Member;
   onMemberNameClick?: (memberId: string) => void;
+  filteredMemberIds?: Set<string> | null;
 }
 
 const MemberInfo = ({
@@ -41,7 +42,10 @@ const MemberInfo = ({
     mentor,
   },
   onMemberNameClick,
+  filteredMemberIds,
 }: Props) => {
+  const isVisible = (id: string) =>
+    !filteredMemberIds || filteredMemberIds.has(id);
   const avatar = getMemberAvatar(member);
 
   return (
@@ -90,12 +94,16 @@ const MemberInfo = ({
             <MemberInfoRow
               title="Ментор"
               value={
-                <span
-                  className="cursor-pointer hover:text-accent transition-colors duration-200"
-                  onClick={() => onMemberNameClick?.(mentor.id)}
-                >
-                  {mentor.name}
-                </span>
+                isVisible(mentor.id) ? (
+                  <span
+                    className="cursor-pointer hover:text-accent transition-colors duration-200"
+                    onClick={() => onMemberNameClick?.(mentor.id)}
+                  >
+                    {mentor.name}
+                  </span>
+                ) : (
+                  <span>{mentor.name}</span>
+                )
               }
               icon={StarIcon}
             />
@@ -152,12 +160,16 @@ const MemberInfo = ({
                   {member.mentees.map((mentee, index) => (
                     <span key={mentee.id}>
                       {index > 0 && ", "}
-                      <span
-                        className="cursor-pointer hover:text-accent transition-colors duration-200"
-                        onClick={() => onMemberNameClick?.(mentee.id)}
-                      >
-                        {mentee.name}
-                      </span>
+                      {isVisible(mentee.id) ? (
+                        <span
+                          className="cursor-pointer hover:text-accent transition-colors duration-200"
+                          onClick={() => onMemberNameClick?.(mentee.id)}
+                        >
+                          {mentee.name}
+                        </span>
+                      ) : (
+                        <span>{mentee.name}</span>
+                      )}
                     </span>
                   ))}
                   {` (${member.mentees.length})`}

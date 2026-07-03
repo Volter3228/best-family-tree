@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { useCallback, useEffect, useRef } from "react";
-import { useViewportAnimation, useMembers } from "@/hooks";
+import { useViewportAnimation, useMembers, useFilters } from "@/hooks";
 import { Member } from "@/models";
 import { DrawerMode } from "@/types/forms";
 import { EditMemberForm } from "./form";
@@ -18,17 +18,18 @@ const MemberDrawerContent = ({ member, drawerMode, onEditExit }: Props) => {
 
   const { setSelectedMember, getMemberById } = useMembers();
   const { focusNode } = useViewportAnimation();
+  const { filteredMemberIds } = useFilters();
 
   const handleMemberNameClick = useCallback(
     (memberId: string) => {
-      // Find the member in the flat list
+      if (filteredMemberIds && !filteredMemberIds.has(memberId)) return;
       const targetMember = getMemberById(memberId);
       if (targetMember) {
         setSelectedMember(targetMember);
         focusNode(memberId);
       }
     },
-    [getMemberById, setSelectedMember, focusNode],
+    [getMemberById, setSelectedMember, focusNode, filteredMemberIds],
   );
 
   // Animate drawer mode change
@@ -62,7 +63,11 @@ const MemberDrawerContent = ({ member, drawerMode, onEditExit }: Props) => {
   return (
     <div ref={containerRef}>
       {drawerMode === "info" ? (
-        <MemberInfo member={member} onMemberNameClick={handleMemberNameClick} />
+        <MemberInfo
+          member={member}
+          onMemberNameClick={handleMemberNameClick}
+          filteredMemberIds={filteredMemberIds}
+        />
       ) : (
         <EditMemberForm member={member} onExit={onEditExit} />
       )}

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { twMerge } from "tailwind-merge";
-import { useMembers, useMembersSearch } from "@/hooks";
+import { useMembers, useMembersSearch, useFilters } from "@/hooks";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import SearchSuggestionItem from "./SearchSuggestionItem";
 
@@ -13,8 +13,18 @@ interface Props {
 
 const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
   const { flatMembersList } = useMembers();
+  const { filteredMemberIds } = useFilters();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Members that are currently displayed in the tree
+  const searchableMembers = useMemo(
+    () =>
+      filteredMemberIds
+        ? flatMembersList.filter((m) => filteredMemberIds.has(m.id))
+        : flatMembersList,
+    [flatMembersList, filteredMemberIds],
+  );
 
   const handleSelect = (memberId: string) => {
     onSearch(memberId);
@@ -29,7 +39,7 @@ const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
     handleSelect: selectMember,
     handleKeyDown: onKeyDown,
   } = useMembersSearch({
-    members: flatMembersList,
+    members: searchableMembers,
     onSelect: handleSelect,
   });
 
@@ -60,8 +70,8 @@ const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
         ref={containerRef}
         className={twMerge(
           "fixed top-4 left-4 right-4 z-40",
-          "md:top-6 md:left-20 md:right-auto md:w-80",
-          isClosing ? "animate-search-slide-out" : "animate-search-slide-in",
+          "md:top-4 md:left-20 md:right-auto md:w-80",
+          isClosing ? "animate-sidebar-slide-out" : "animate-sidebar-slide-in",
         )}
       >
         <div className="bg-violet-900 rounded-xl shadow-2xl">
@@ -90,21 +100,26 @@ const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
               </button>
             )}
           </div>
-          {filteredMembers.length > 0 && (
-            <ul className="overflow-y-auto overflow-hidden rounded-b-xl">
-              {filteredMembers.map((member, index) => (
-                <SearchSuggestionItem
-                  key={member.id}
-                  member={member}
-                  isActive={index === activeIndex}
-                  onClick={() => selectMember(member)}
-                />
-              ))}
-            </ul>
-          )}
+          <ul
+            className={twMerge(
+              "overflow-y-auto overflow-hidden rounded-b-xl transition-all duration-200 ease-in-out",
+              filteredMembers.length > 0
+                ? "opacity-100 translate-y-0 scale-y-100"
+                : "opacity-0 translate-y-1 scale-y-95 pointer-events-none",
+            )}
+          >
+            {filteredMembers.map((member, index) => (
+              <SearchSuggestionItem
+                key={member.id}
+                member={member}
+                isActive={index === activeIndex}
+                onClick={() => selectMember(member)}
+              />
+            ))}
+          </ul>
           {query.trim() && filteredMembers.length === 0 && (
             <div className="border-t border-violet-800 px-3 py-3 text-center text-sm text-fuchsia-400/60">
-              Нічого не знайдено
+              Нима таких...
             </div>
           )}
         </div>

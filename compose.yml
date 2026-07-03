@@ -25,6 +25,7 @@ services:
     container_name: best-family-tree-backend
     ports:
       - "3001:3001"
+      - "51212:51212"
     environment:
       - NODE_ENV=development
       - PORT=3001
