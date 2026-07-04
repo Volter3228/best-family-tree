@@ -8,7 +8,6 @@ import {
   GiftIcon,
   UserPlusIcon,
   StarIcon,
-  UserGroupIcon,
   PhoneArrowUpRightIcon,
   CalendarDateRangeIcon,
 } from "@heroicons/react/16/solid";
@@ -22,6 +21,7 @@ import { Member } from "@/models";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 import MemberInfoActionIcon from "./MemberInfoActionIcon";
+import MentorMenteesDropdown from "./MentorMenteesDropdown";
 
 interface Props {
   member: Member;
@@ -152,33 +152,11 @@ const MemberInfo = ({
               }
             />
           )}
-          {!!member.mentees.length && (
-            <MemberInfoRow
-              title="Діти"
-              value={
-                <span>
-                  {member.mentees.map((mentee, index) => (
-                    <span key={mentee.id}>
-                      {index > 0 && ", "}
-                      {isVisible(mentee.id) ? (
-                        <span
-                          className="cursor-pointer hover:text-accent transition-colors duration-200"
-                          onClick={() => onMemberNameClick?.(mentee.id)}
-                        >
-                          {mentee.name}
-                        </span>
-                      ) : (
-                        <span>{mentee.name}</span>
-                      )}
-                    </span>
-                  ))}
-                  {` (${member.mentees.length})`}
-                </span>
-              }
-              copyValue={`${member.getMenteesNamesString()} (${
-                member.mentees.length
-              })`}
-              icon={UserGroupIcon}
+          {member.mentees?.length > 0 && (
+            <MentorMenteesDropdown
+              mentees={member.mentees}
+              onMemberNameClick={onMemberNameClick}
+              isVisible={isVisible}
             />
           )}
           <MemberInfoSocial member={member} />
