@@ -3,7 +3,3 @@
   scrollbar-width: none;
   scrollbar-color: transparent transparent;
 }
-
-.drawer-content {
-  max-height: calc(100vh - 3.75rem);
-}
