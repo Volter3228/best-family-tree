@@ -1,11 +1,11 @@
 import { useCallback, memo } from "react";
 import { Graphics } from "pixi.js";
-import { TreeEdge } from "@/types";
 import { NODE_WIDTH, NODE_HEIGHT, FIXED_EDGE_WIDTH } from "@/constants/canvas";
+import type { NodePositions, TreeEdge } from "@/types";
 
 interface Props {
   edges: TreeEdge[];
-  nodePositions: Map<string, { x: number; y: number }>;
+  nodePositions: NodePositions;
   pixelLine: boolean;
 }
 

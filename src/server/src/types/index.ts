@@ -15,3 +15,5 @@ type Member = PrismaMember & {
 };
 
 export { type Member, MemberStatus };
+export * from "./member.js";
+export * from "./tree.js";

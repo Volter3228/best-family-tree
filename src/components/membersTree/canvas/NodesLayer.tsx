@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { getIsMinimized } from "@/utils";
 import { Member } from "@/models";
-import { type MemberNode } from "@/types";
+import type { MemberNode } from "@/types";
 import PixiNode from "./memberNode/MemberNode";
 
 interface Props {

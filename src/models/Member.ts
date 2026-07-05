@@ -1,10 +1,10 @@
 import { getMonth, getYear } from "date-fns";
 import {
-  MemberStatus,
   type Member as MemberType,
+  type RecruitmentSeason,
+  type RecruitmentTerm,
   ActivityState,
-  RecruitmentSeason,
-  RecruitmentTerm,
+  MemberStatus,
 } from "@/types";
 
 export default class Member {

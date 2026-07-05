@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { MembersTreeProvider } from "@/context/membersTree/MembersTreeProvider";
 import { FiltersProvider } from "@/context/FiltersContext";
 import { registerPixiPlugins } from "@/libs";
-import { type Member as MemberType } from "@/types";
+import type { Member as MemberType } from "@/types";
 import MembersTreeContent from "./MembersTreeContent";
 
 let didRegisterPixiPlugins = false;

@@ -1,13 +1,11 @@
 import { centerSingleSubtree, calculateMemberMetrics } from "./calculations.js";
-
-import { type Member as MemberType } from "@/types";
-import { type MemberMetrics, type TreeCache } from "./types.js";
+import type { Member as MemberType, MemberMetrics, TreeCache } from "@/types";
 
 // Distribute subtrees evenly across available positions
 const distributeSubtrees = (
   withChildren: MemberMetrics[],
   withoutChildren: MemberMetrics[],
-  totalLength: number
+  totalLength: number,
 ): MemberType[] => {
   const arrangement: (MemberType | null)[] = new Array(totalLength).fill(null);
 
@@ -46,14 +44,14 @@ const distributeSubtrees = (
 // The goal is to minimize empty space between nodes and create visually balanced, centered graph.
 const sortMembersBalanced = (
   mentees: MemberType[],
-  cache: { size: TreeCache; depth: TreeCache }
+  cache: { size: TreeCache; depth: TreeCache },
 ): MemberType[] => {
   if (!mentees?.length || mentees.length <= 1) {
     return mentees || [];
   }
 
   const metrics = mentees.map((member) =>
-    calculateMemberMetrics(member, cache)
+    calculateMemberMetrics(member, cache),
   );
 
   // Separate members with and without children

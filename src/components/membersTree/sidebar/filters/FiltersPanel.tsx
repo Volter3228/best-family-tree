@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import type { FilterState, FilterSectionKey } from "@/types/filters";
+import type { FilterState, FilterSectionKey } from "@/types";
 import { useFilters } from "@/hooks/useFilters";
 import {
   MEMBER_STATUSES,

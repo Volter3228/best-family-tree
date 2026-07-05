@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { DropdownOption } from "@/types";
+import type { DropdownOption } from "@/types";
 
 export const useDropdown = (
   options: DropdownOption[],

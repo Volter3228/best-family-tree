@@ -1,7 +1,7 @@
 import { http } from "@/libs/http";
 import { ENDPOINTS } from "@/constants/endpoints";
 import { Member } from "@/models";
-import { Member as MemberType } from "@/types";
+import type { Member as MemberType } from "@/types";
 
 const fetchMemberById = async (id: string): Promise<Member | null> => {
   try {

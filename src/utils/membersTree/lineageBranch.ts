@@ -1,10 +1,11 @@
 import { Member } from "@/models";
+import type { MembersMap } from "@/types";
 
 /**
  * Collect direct ancestors (mentors) up the chain
  */
 const collectAllAncestorIds = (
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
   startId: string,
 ): Set<string> => {
   const ids = new Set<string>();
@@ -32,7 +33,7 @@ const collectAllDescendantIds = (
 };
 
 const collectSiblingIds = (
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
   memberId: string,
 ): Set<string> => {
   const ids = new Set<string>();
@@ -51,7 +52,7 @@ const collectSiblingIds = (
 };
 
 export const computeLineageBranchIds = (
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
   memberId: string,
 ): Set<string> => {
   const member = membersMap.get(memberId);

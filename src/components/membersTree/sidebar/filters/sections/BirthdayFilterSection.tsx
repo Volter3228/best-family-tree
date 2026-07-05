@@ -1,7 +1,7 @@
 import DatePicker from "react-datepicker";
 import { toDate, fromDate } from "@/utils";
 import { DATE_PICKER_CLASSES } from "@/constants/filters";
-import type { FilterState } from "@/types/filters";
+import type { FilterState } from "@/types";
 import FilterSection from "./FilterSection";
 import FilterCheckbox from "./FilterCheckbox";
 import ClearButton from "./ClearButton";

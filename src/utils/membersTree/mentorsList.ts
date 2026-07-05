@@ -1,5 +1,5 @@
 import { MENTOR_STATUSES } from "@/constants/member";
-import { MemberStatus } from "@/types";
+import type { MemberStatus } from "@/types";
 
 export const getUpdatedMentorsList = (
   mentorsList: { id: string; name: string }[],

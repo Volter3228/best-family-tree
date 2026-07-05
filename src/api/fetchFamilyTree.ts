@@ -1,6 +1,6 @@
 import { http } from "@/libs/http";
 import { ENDPOINTS } from "@/constants/endpoints";
-import { Member as MemberType } from "@/types";
+import type { Member as MemberType } from "@/types";
 
 export default async function fetchFamilyTree() {
   const res = await http(ENDPOINTS.getFamilyTree, {

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Viewport } from "pixi-viewport";
-import { MemberNode, TreeEdge } from "@/types";
+import type { MemberNode, TreeEdge } from "@/types";
 import { MembersTreeDataContext } from "./MembersTreeDataContext";
 import { ViewportContext } from "./ViewportContext";
 

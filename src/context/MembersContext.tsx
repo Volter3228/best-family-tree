@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Member } from "@/models";
 import { flattenTree } from "@/utils";
-import { MentorsListItem } from "@/types/members";
+import type { MentorsListItem, MembersMap } from "@/types/members";
 
 interface IMembersContext {
   membersTree: Member[];
@@ -17,7 +17,7 @@ interface IMembersContext {
   mentorsList: MentorsListItem[];
   setMentorsList: Dispatch<SetStateAction<MentorsListItem[]>>;
   flatMembersList: Member[];
-  membersMap: Map<string, Member>;
+  membersMap: MembersMap;
   selectedMember: Member | null;
   setSelectedMember: Dispatch<SetStateAction<Member | null>>;
 }
