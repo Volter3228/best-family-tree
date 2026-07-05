@@ -1,5 +1,5 @@
 import { endOfYear, subYears } from "date-fns";
-import { type MemberFormData } from "@/types";
+import type { MemberFormData } from "@/types";
 
 /* Date Input */
 export const MAX_DATE_BIRTHDAY = endOfYear(subYears(new Date(), 16));

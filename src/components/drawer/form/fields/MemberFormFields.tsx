@@ -7,8 +7,8 @@ import {
   MIN_DATE_JOIN,
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
-import { MemberFormData, MemberFormMode, DropdownOption } from "@/types";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/16/solid";
+import type { MemberFormData, MemberFormMode, DropdownOption } from "@/types";
 import {
   AvatarFileInput,
   TextInput,

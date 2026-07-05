@@ -1,5 +1,4 @@
-import { MemberStatus, ActivityState } from "./server";
-import { RecruitmentSeason } from "./members";
+import { RecruitmentSeason, MemberStatus, ActivityState } from "./members";
 
 export type AvatarFilterValue = "with" | "without";
 

@@ -31,3 +31,5 @@ export interface TreeEdge {
 }
 
 export type MemberNode = TreeNode & { data: { member: Member } };
+
+export type NodePositions = Map<string, { x: number; y: number }>;

@@ -1,6 +1,9 @@
 import sortMembersBalanced from "./sortMembersBalanced.js";
-import { Member as MemberType } from "@/types";
-import { MembersByMentorId, TreeCache } from "./types.js";
+import type {
+  Member as MemberType,
+  MembersByMentorId,
+  TreeCache,
+} from "@/types";
 
 // Recursively build the tree
 const buildTree = (

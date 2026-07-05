@@ -2,7 +2,7 @@ import gsap from "gsap";
 import { useCallback, useEffect, useRef } from "react";
 import { useViewportAnimation, useMembers, useFilters } from "@/hooks";
 import { Member } from "@/models";
-import { DrawerMode } from "@/types/forms";
+import type { DrawerMode } from "@/types";
 import { EditMemberForm } from "./form";
 import MemberInfo from "./info";
 

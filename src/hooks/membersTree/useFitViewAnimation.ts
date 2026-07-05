@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react";
 import { Viewport } from "pixi-viewport";
-import { MemberNode } from "@/types";
 import {
   MINIMIZED_VIEW_SCALE,
   NODE_HEIGHT,
   NODE_WIDTH,
 } from "@/constants/canvas";
+import type { MemberNode } from "@/types";
 import gsap from "gsap";
 
 interface Props {

@@ -1,9 +1,9 @@
 import {
-  FilterState,
-  AvatarFilterValue,
+  type FilterState,
+  type AvatarFilterValue,
+  type RecruitmentSeason,
   MemberStatus,
   ActivityState,
-  RecruitmentSeason,
 } from "@/types";
 
 export const MEMBER_STATUSES: MemberStatus[] = [

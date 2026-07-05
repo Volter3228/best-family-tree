@@ -7,7 +7,7 @@ import {
   ArrowLeftIcon,
 } from "@heroicons/react/24/solid"; // Tailwind Heroicons
 import { twMerge } from "tailwind-merge";
-import { DrawerMode } from "@/types";
+import type { DrawerMode } from "@/types";
 import "./styles/drawer.css";
 
 interface Props {

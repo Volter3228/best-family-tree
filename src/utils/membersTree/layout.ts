@@ -1,6 +1,6 @@
 import { Member } from "@/models";
-import { TreeEdge, MemberNode } from "@/types";
 import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
+import type { TreeEdge, MemberNode, MembersMap } from "@/types";
 
 /**
  * Reconnect edges to the nearest visible ancestor when nodes are filtered out.
@@ -9,7 +9,7 @@ import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
  */
 export const reconnectEdgesToVisibleAncestors = (
   visibleNodes: MemberNode[],
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
 ): TreeEdge[] => {
   const nodeIdSet = new Set(visibleNodes.map((n) => n.id));
   const reconnectedEdges: TreeEdge[] = [];
@@ -61,7 +61,7 @@ export const computeGridLayout = (
 export const reorderEdgesForLineageCentering = (
   edges: TreeEdge[],
   lineageMemberId: string,
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
 ): TreeEdge[] => {
   const lm = membersMap.get(lineageMemberId);
   if (!lm?.mentorId) return edges;
@@ -90,7 +90,7 @@ export const reorderEdgesForLineageCentering = (
 export const alignLineageLayout = (
   layoutedNodes: MemberNode[],
   lineageMemberId: string,
-  membersMap: Map<string, Member>,
+  membersMap: MembersMap,
 ): MemberNode[] => {
   const focus = layoutedNodes.find((n) => n.id === lineageMemberId);
   if (!focus) return layoutedNodes;

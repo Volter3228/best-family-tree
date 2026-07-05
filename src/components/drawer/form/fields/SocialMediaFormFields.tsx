@@ -1,10 +1,10 @@
-import { MemberFormData } from "@/types";
 import {
   TelegramIcon,
   InstagramIcon,
   FacebookIcon,
   LinkedinIcon,
 } from "@/components/icons/social";
+import type { MemberFormData } from "@/types";
 import TextInput from "../inputs/TextInput";
 
 interface Props {

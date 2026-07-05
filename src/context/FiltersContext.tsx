@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useFilterSearchParams } from "@/hooks";
 import { EMPTY_FILTER_STATE } from "@/constants/filters";
-import type { FilterState } from "@/types/filters";
+import type { FilterState } from "@/types";
 
 interface IFiltersContext {
   /** Draft filters edited in the panel (not yet applied) */

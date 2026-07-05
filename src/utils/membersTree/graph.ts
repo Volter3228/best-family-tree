@@ -5,7 +5,12 @@ import {
 } from "elkjs/lib/elk.bundled.js";
 import elk, { DEFAULT_POSITION, FLOW_VIEWPORT_DIRECTION } from "../../libs/elk";
 import { Member } from "@/models";
-import { TreeEdge, Position, Direction, MemberNode } from "@/types";
+import {
+  type TreeEdge,
+  type Direction,
+  type MemberNode,
+  Position,
+} from "@/types";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 
 const getLayoutOptions = (): ElkLayoutOptions => {

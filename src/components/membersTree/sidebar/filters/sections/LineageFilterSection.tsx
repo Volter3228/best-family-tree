@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { FilterState } from "@/types/filters";
+import type { FilterState } from "@/types";
 import FilterSection from "./FilterSection";
 import LineageMemberSearch from "./LineageMemberSearch";
 

@@ -3,7 +3,7 @@ import { fetchMentorsList } from "@/api";
 import { getUpdatedMentorsList } from "@/utils/membersTree";
 import { MembersContext } from "@/context/MembersContext";
 import { Member } from "@/models";
-import { type Member as MemberType } from "@/types";
+import type { Member as MemberType } from "@/types";
 
 export const useMembers = () => {
   const context = useContext(MembersContext);

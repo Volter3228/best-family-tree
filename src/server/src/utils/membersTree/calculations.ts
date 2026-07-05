@@ -1,5 +1,4 @@
-import { Member as MemberType } from "@/types";
-import type { TreeCache, MemberMetrics } from "./types.js";
+import { Member as MemberType, TreeCache, MemberMetrics } from "@/types";
 
 // Function to calculate the total number of descendants (subtree size)
 // Answers the following question: "Including this member, how many total descendants are in its entire branch?"
@@ -12,7 +11,7 @@ const calculateSubtreeSize = (member: MemberType, cache: TreeCache): number => {
     ? 1 +
       member.mentees.reduce(
         (sum, mentee) => sum + calculateSubtreeSize(mentee, cache),
-        0
+        0,
       ) // Sum of all mentees subtrees
     : 1; // Return 1 for member themself
 
@@ -24,7 +23,7 @@ const calculateSubtreeSize = (member: MemberType, cache: TreeCache): number => {
 // Answers the following question: "What is the longest path of descendants from this member down to the bottom of the tree?"
 const calculateSubtreeDepth = (
   member: MemberType,
-  cache: TreeCache
+  cache: TreeCache,
 ): number => {
   if (cache.has(member.id)) {
     return cache.get(member.id)!; // cache subtree depth value
@@ -33,7 +32,7 @@ const calculateSubtreeDepth = (
   const depth = member.mentees.length
     ? 1 +
       Math.max(
-        ...member.mentees.map((member) => calculateSubtreeDepth(member, cache))
+        ...member.mentees.map((member) => calculateSubtreeDepth(member, cache)),
       ) // The longest path down to the bottom of the tree from current member
     : 1; // Return 1 for member level themself
 
@@ -45,7 +44,7 @@ const calculateSubtreeDepth = (
 // Calculate weight, primary value for sorting
 export const calculateMemberMetrics = (
   member: MemberType,
-  cache: { size: TreeCache; depth: TreeCache }
+  cache: { size: TreeCache; depth: TreeCache },
 ): MemberMetrics => {
   const size = calculateSubtreeSize(member, cache.size);
   const depth = calculateSubtreeDepth(member, cache.depth);
@@ -64,7 +63,7 @@ export const calculateMemberMetrics = (
 export const centerSingleSubtree = (
   largeSubtree: MemberMetrics,
   smallItems: MemberMetrics[],
-  totalLength: number
+  totalLength: number,
 ): MemberType[] => {
   const arrangement: (MemberType | null)[] = new Array(totalLength).fill(null);
   const centerIndex = Math.floor(totalLength / 2);

@@ -17,7 +17,7 @@ import {
  * after layout changes.
  */
 export const useTreeLayout = () => {
-  const { nodes, setNodes, edges, setEdges } = useMembersTree();
+  const { nodes, setNodes, setEdges } = useMembersTree();
   const { membersTree, membersMap } = useMembers();
   const { filteredMemberIds, filterVersion, appliedFilters } = useFilters();
   const { fitView } = useViewportAnimation();

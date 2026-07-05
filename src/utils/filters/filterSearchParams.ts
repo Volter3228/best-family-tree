@@ -4,8 +4,13 @@ import {
   JOIN_SEASONS,
   AVATAR_VALUES,
 } from "@/constants/filters";
-import type { FilterState, AvatarFilterValue } from "@/types/filters";
-import type { MemberStatus, ActivityState, RecruitmentSeason } from "@/types";
+import {
+  type AvatarFilterValue,
+  type FilterState,
+  type RecruitmentSeason,
+  MemberStatus,
+  ActivityState,
+} from "@/types";
 
 const parseNumberOrNull = (val: string | null): number | null => {
   if (!val) return null;
