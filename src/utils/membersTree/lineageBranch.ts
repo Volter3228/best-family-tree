@@ -2,6 +2,26 @@ import { Member } from "@/models";
 import type { MembersMap } from "@/types";
 
 /**
+ * Build ordered ancestor chain [root, ..., memberId] by walking mentorId up.
+ */
+export const buildAncestorChain = (
+  memberId: string,
+  membersMap: MembersMap,
+): string[] => {
+  const chain: string[] = [];
+  let currentId: string | null = memberId;
+
+  while (currentId) {
+    chain.push(currentId);
+    const member = membersMap.get(currentId);
+    currentId = member?.mentorId ?? null;
+  }
+
+  chain.reverse();
+  return chain;
+};
+
+/**
  * Collect direct ancestors (mentors) up the chain
  */
 const collectAllAncestorIds = (

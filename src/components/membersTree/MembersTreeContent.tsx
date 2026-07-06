@@ -15,7 +15,7 @@ import {
 import { getIsMinimized } from "@/utils";
 import { Member } from "@/models";
 import type { Member as MemberType } from "@/types";
-import { Viewport, NodesLayer, EdgesLayer } from "./canvas";
+import { Viewport, NodesLayer, EdgesLayer, LineageEdge } from "./canvas";
 import Drawer, { MemberDrawerContent } from "../drawer";
 import Sidebar from "./sidebar";
 
@@ -27,7 +27,8 @@ const MembersTreeContent = ({ members }: Props) => {
   const { nodes, edges, scale, setScale, setViewport, nodePositions } =
     useMembersTree();
 
-  const { selectedMember, setSelectedMember, getMemberById } = useMembers();
+  const { selectedMember, setSelectedMember, getMemberById, membersMap } =
+    useMembers();
 
   const {
     isDrawerOpen,
@@ -78,6 +79,14 @@ const MembersTreeContent = ({ members }: Props) => {
           {showTree && (
             <EdgesLayer
               edges={edges}
+              nodePositions={nodePositions}
+              pixelLine={getIsMinimized(scale)}
+            />
+          )}
+          {showTree && (
+            <LineageEdge
+              selectedMember={selectedMember}
+              membersMap={membersMap}
               nodePositions={nodePositions}
               pixelLine={getIsMinimized(scale)}
             />

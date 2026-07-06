@@ -13,10 +13,12 @@ export type FlowViewportDirection = {
   MOBILE: Direction;
 };
 
+export type Point = { x: number; y: number };
+
 export interface TreeNode {
   id: string;
   type?: string;
-  position: { x: number; y: number };
+  position: Point;
   data: Record<string, unknown>;
   style?: React.CSSProperties;
   targetPosition?: Position;
@@ -30,6 +32,19 @@ export interface TreeEdge {
   style?: React.CSSProperties;
 }
 
+export interface SegmentData {
+  points: Point[];
+  arcLengths: number[];
+  totalLen: number;
+}
+
+export interface PathData {
+  chain: string[];
+  segments: SegmentData[];
+  offsets: number[];
+  totalLen: number;
+}
+
 export type MemberNode = TreeNode & { data: { member: Member } };
 
-export type NodePositions = Map<string, { x: number; y: number }>;
+export type NodePositions = Map<string, Point>;

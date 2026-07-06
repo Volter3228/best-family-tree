@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Viewport } from "pixi-viewport";
-import type { MemberNode, TreeEdge } from "@/types";
+import type { MemberNode, TreeEdge, Point } from "@/types";
 import { MembersTreeDataContext } from "./MembersTreeDataContext";
 import { ViewportContext } from "./ViewportContext";
 
@@ -20,7 +20,7 @@ export const MembersTreeProvider = ({ children }: Props) => {
   const [viewport, setViewport] = useState<Viewport | null>(null);
 
   const nodePositions = useMemo(() => {
-    const map = new Map<string, { x: number; y: number }>();
+    const map = new Map<string, Point>();
     nodes.forEach((n) => {
       map.set(n.id, { x: n.position.x, y: n.position.y });
     });
