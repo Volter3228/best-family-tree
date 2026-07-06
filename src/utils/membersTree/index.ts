@@ -6,3 +6,4 @@ export * from "./mentorsList";
 export * from "./lineageBranch";
 export * from "./layout";
 export * from "./dashedBezier";
+export * from "./lineageEdgePath";

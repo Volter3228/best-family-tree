@@ -1,6 +1,5 @@
-import { Member } from "@/models";
 import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
-import type { TreeEdge, MemberNode, MembersMap } from "@/types";
+import type { TreeEdge, MemberNode, MembersMap, Point } from "@/types";
 
 /**
  * Reconnect edges to the nearest visible ancestor when nodes are filtered out.
@@ -96,7 +95,7 @@ export const alignLineageLayout = (
   if (!focus) return layoutedNodes;
 
   const targetX = focus.position.x;
-  const posMap = new Map<string, { x: number; y: number }>();
+  const posMap = new Map<string, Point>();
   for (const n of layoutedNodes) {
     posMap.set(n.id, { ...n.position });
   }
