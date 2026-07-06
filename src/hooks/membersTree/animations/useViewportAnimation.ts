@@ -1,4 +1,4 @@
-import { useMembersTree } from "./useMembersTree";
+import { useMembersTree } from "../useMembersTree";
 import { useFitViewAnimation } from "./useFitViewAnimation";
 import { useFocusNodeAnimation } from "./useFocusNodeAnimation";
 
