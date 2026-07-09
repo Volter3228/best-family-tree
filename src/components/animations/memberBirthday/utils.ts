@@ -1,7 +1,5 @@
 import { Texture } from "pixi.js";
-import { NODE_WIDTH, AVATAR_SIZE } from "@/constants/canvas";
-
-export const MIN_DISTANCE_FROM_CENTER = AVATAR_SIZE / 2 + 10;
+import { NODE_WIDTH, NODE_AVATAR_RADIUS } from "@/constants/canvas";
 
 export const createEmojiTexture = (emoji: string): Texture => {
   const canvas = document.createElement("canvas");
@@ -23,10 +21,10 @@ export const createEmojiTexture = (emoji: string): Texture => {
 };
 
 export const generateRandomPosition = (fixedSide?: number) => {
-  const minY = -40;
-  const maxY = 40;
+  const minY = -60;
+  const maxY = 60;
   // Total width of the particle generation area
-  const totalWidth = NODE_WIDTH + 40;
+  const totalWidth = NODE_WIDTH + 100;
   const halfWidth = totalWidth / 2;
 
   // 1. Pick a random Y within the strip
@@ -35,7 +33,7 @@ export const generateRandomPosition = (fixedSide?: number) => {
   // 2. Calculate the "forbidden" width at this Y
   // We need |x| >= x_min such that x^2 + y^2 >= R^2
   // So x_min = sqrt(R^2 - y^2) if |y| < R, else 0
-  const minDistSq = MIN_DISTANCE_FROM_CENTER * MIN_DISTANCE_FROM_CENTER;
+  const minDistSq = NODE_AVATAR_RADIUS * NODE_AVATAR_RADIUS;
   const ySq = y * y;
 
   // If y is outside the circle vertical range, the whole width is valid (xMin = 0)

@@ -8,7 +8,7 @@ const RECRUITMENT_SEASON_LABEL: Record<RecruitmentSeason, string> = {
 };
 
 const RECRUITMENT_SEASON_EMOJI: Record<RecruitmentSeason, string> = {
-  spring: "🌷",
+  spring: "🌸",
   autumn: "🍁",
 };
 

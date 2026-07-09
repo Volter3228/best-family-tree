@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import { Viewport } from "pixi-viewport";
 import gsap from "gsap";
 import type { MemberNode } from "@/types";
-import { getIsMinimized } from "@/utils";
+import { isZoomedOut } from "@/utils";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 
 interface Props {
@@ -32,7 +32,7 @@ export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
       const nodeCenterY = node.position.y + NODE_HEIGHT / 2;
 
       // Get current viewport state
-      const isMinimizedOnStart = getIsMinimized(viewport.scale.x);
+      const wasZoomedOut = isZoomedOut(viewport.scale.x);
 
       // Determine view center offset (accounting for drawer)
       const drawerElement = document.getElementById("member-drawer");
@@ -59,8 +59,8 @@ export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
           // Only update if we cross the threshold and haven't triggered yet
           if (
             !lodTriggeredRef.current &&
-            isMinimizedOnStart &&
-            !getIsMinimized(viewport.scale.x)
+            wasZoomedOut &&
+            !isZoomedOut(viewport.scale.x)
           ) {
             setScale(viewport.scale.x);
             lodTriggeredRef.current = true;

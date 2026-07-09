@@ -30,8 +30,13 @@ export const useMembers = () => {
   );
 
   const getMentorsList = useCallback(async () => {
-    const list = await fetchMentorsList();
-    setMentorsList(list);
+    try {
+      const list = await fetchMentorsList();
+      setMentorsList(list);
+    } catch (error) {
+      console.error("Failed to fetch mentors list:", error);
+      setMentorsList([]);
+    }
   }, [setMentorsList]);
 
   const addMember = useCallback(

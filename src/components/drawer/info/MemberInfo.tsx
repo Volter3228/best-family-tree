@@ -74,7 +74,7 @@ const MemberInfo = ({
       </div>
       <div className="text-center mb-3">
         <h5
-          className="text-2xl cursor-pointer hover:text-accent transition-colors duration-200"
+          className="text-2xl text- cursor-pointer hover:text-accent transition-colors duration-200"
           onClick={() => onMemberNameClick?.(member.id)}
         >
           {name}

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback, useRef } from "react";
+import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   Texture,
   FederatedPointerEvent,
@@ -6,26 +6,28 @@ import {
   Container,
   Filter,
 } from "pixi.js";
+import gsap from "gsap";
 import { getMemberAvatar, getAvatarImage } from "@/utils";
-import { useHoverNodeAnimation } from "@/hooks";
-import { Member } from "@/models";
 import {
-  NODE_WIDTH,
-  NODE_HEIGHT,
-  MINIMIZED_NODE_RADIUS,
-  AVATAR_SIZE,
-} from "@/constants/canvas";
+  useHoverNodeAnimation,
+  useCardAnimation,
+  CARD_PIVOT_X,
+  CARD_PIVOT_Y,
+} from "@/hooks";
+import { Member } from "@/models";
+import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
 import MemberBirthdayAnimation from "@/components/animations/memberBirthday";
-import MemberNodeMinimized from "./MemberNodeMinimized";
-import MemberNodeMaximized from "./MemberNodeMaximized";
+import MemberNodeAvatar from "./MemberNodeAvatar";
+import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
+import MemberNodeCard from "./MemberNodeCard";
 
 interface Props {
   member: Member;
   isSelected: boolean;
-  isMinimized: boolean;
+  isZoomedOut: boolean;
+  showBirthday: boolean;
   x: number;
   y: number;
-  appScale: number;
   onClick: (member: Member) => void;
 }
 
@@ -38,8 +40,8 @@ const MemberNode = ({
   y,
   member,
   isSelected,
-  isMinimized,
-  appScale,
+  isZoomedOut,
+  showBirthday,
   onClick,
 }: Props) => {
   const [avatarImage, setAvatarImage] = useState<
@@ -47,13 +49,13 @@ const MemberNode = ({
   >(null);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<Container>(null);
+  const cardRef = useRef<Container>(null);
   const avatarUrl = useMemo(() => getMemberAvatar(member), [member.photo]);
 
   const { shadowFilter } = useHoverNodeAnimation({
     container: containerRef.current,
     isHovered,
     isSelected,
-    appScale,
   });
 
   useEffect(() => {
@@ -99,7 +101,19 @@ const MemberNode = ({
     return [shadowFilter];
   }, [isHovered, isSelected, shadowFilter]);
 
+  useCardAnimation({ cardRef, isZoomedOut, memberId: member.id });
+
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
+  const birthdayRef = useRef<Container>(null);
+
+  useEffect(() => {
+    if (!birthdayRef.current || !isBirthday) return;
+    gsap.to(birthdayRef.current, {
+      alpha: showBirthday ? 1 : 0,
+      duration: 0.6,
+      ease: "power2.inOut",
+    });
+  }, [showBirthday, isBirthday]);
 
   return (
     <>
@@ -117,28 +131,28 @@ const MemberNode = ({
         filters={filters}
         cullable
       >
-        <pixiContainer visible={isMinimized}>
-          <MemberNodeMinimized
-            x={25 + MINIMIZED_NODE_RADIUS}
-            y={MINIMIZED_NODE_RADIUS}
-            avatarImage={avatarImage}
-            memberName={member.name}
-            isHovered={isHovered}
-          />
+        {/* Card slides from behind the avatar on zoom in */}
+        <pixiContainer
+          ref={cardRef}
+          pivot={{ x: CARD_PIVOT_X, y: CARD_PIVOT_Y }}
+          x={CARD_PIVOT_X}
+        >
+          <MemberNodeCard member={member} isSelected={isSelected} />
         </pixiContainer>
-        <pixiContainer visible={!isMinimized}>
-          <MemberNodeMaximized
-            member={member}
-            avatarImage={avatarImage}
-            isSelected={isSelected}
-          />
-        </pixiContainer>
+
+        <MemberNodeAvatar avatarImage={avatarImage} />
+
+        <MemberNodeMinimizedTooltip
+          text={member.name}
+          visible={isZoomedOut && isHovered}
+        />
       </pixiContainer>
       {isBirthday && (
         <pixiContainer
+          ref={birthdayRef}
           x={x + CONTENT_CENTER_X}
-          y={y + CONTENT_CENTER_Y - AVATAR_SIZE / 3}
-          visible={!isMinimized}
+          y={y + CONTENT_CENTER_Y}
+          alpha={0}
           zIndex={1001}
           eventMode="none"
           cullable
@@ -150,4 +164,4 @@ const MemberNode = ({
   );
 };
 
-export default MemberNode;
+export default memo(MemberNode);

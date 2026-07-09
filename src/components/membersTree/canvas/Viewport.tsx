@@ -5,10 +5,14 @@ import {
   useImperativeHandle,
   type Ref,
 } from "react";
-import { useApplication } from "@pixi/react";
 import { Viewport as PixiViewport } from "pixi-viewport";
-import { getIsMinimized } from "@/utils";
-import debounce from "lodash/debounce";
+import { useApplication } from "@pixi/react";
+import { isZoomedOut } from "@/utils";
+import {
+  BIRTHDAY_ANIMATION_MIN_SCALE,
+  MAX_VIEWPORT_ZOOM,
+  MIN_VIEWPORT_ZOOM,
+} from "@/constants/canvas";
 
 interface Props {
   ref: Ref<PixiViewport>;
@@ -21,7 +25,8 @@ interface Props {
 const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
   const { app, isInitialised } = useApplication();
   const viewportRef = useRef<PixiViewport>(null);
-  const wasMinimizedRef = useRef(false);
+  const wasZoomedOutRef = useRef(false);
+  const wasBirthdayVisibleRef = useRef(true);
 
   useImperativeHandle(ref, () => viewportRef.current!);
 
@@ -35,7 +40,7 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
       .pinch()
       .wheel({ smooth: 8, percent: 0.03, interrupt: true })
       .decelerate({ friction: 0.95, bounce: 0.7 })
-      .clampZoom({ minScale: 0.025, maxScale: 3 });
+      .clampZoom({ minScale: MIN_VIEWPORT_ZOOM, maxScale: MAX_VIEWPORT_ZOOM });
 
     viewport.cursor = "grab";
   }, [isInitialised]);
@@ -45,27 +50,32 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
     if (!viewport) return;
 
     viewport.resize(width, height);
-    wasMinimizedRef.current = getIsMinimized(viewport.scale.x);
+    wasZoomedOutRef.current = isZoomedOut(viewport.scale.x);
+    wasBirthdayVisibleRef.current =
+      viewport.scale.x >= BIRTHDAY_ANIMATION_MIN_SCALE;
 
     const handleDragStart = () => (viewport.cursor = "grabbing");
     const handleDragEnd = () => (viewport.cursor = "grab");
 
     const handleWheel = () => {
-      // Cancel drag deceleration when user scrolls to prevent freezes
       const decelerate = viewport.plugins.get("decelerate");
       decelerate?.reset();
-
-      const currentScale = viewport.scale.x;
-      const isMinimized = getIsMinimized(currentScale);
-      if (isMinimized !== wasMinimizedRef.current) {
-        onScaleChange(currentScale);
-        wasMinimizedRef.current = isMinimized;
-      }
     };
 
-    const handleZoomed = debounce(() => {
-      onScaleChange(viewport.scale.x);
-    }, 100);
+    const handleZoomed = () => {
+      const currentScale = viewport.scale.x;
+      const zoomedOut = isZoomedOut(currentScale);
+      const birthdayVisible = currentScale >= BIRTHDAY_ANIMATION_MIN_SCALE;
+
+      if (
+        zoomedOut !== wasZoomedOutRef.current ||
+        birthdayVisible !== wasBirthdayVisibleRef.current
+      ) {
+        onScaleChange(currentScale);
+        wasZoomedOutRef.current = zoomedOut;
+        wasBirthdayVisibleRef.current = birthdayVisible;
+      }
+    };
 
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
@@ -77,7 +87,6 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
       viewport.off("drag-end", handleDragEnd);
       viewport.off("wheel", handleWheel);
       viewport.off("zoomed", handleZoomed);
-      handleZoomed.cancel();
     };
   }, [width, height, onScaleChange, isInitialised]);
 

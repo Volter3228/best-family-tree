@@ -2,20 +2,19 @@ import { useMemo } from "react";
 import { Container } from "pixi.js";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { getIsMinimized } from "@/utils";
+import { isZoomedOut } from "@/utils";
 import {
   NODE_HOVER_SCALE,
   NODE_HOVER_ANIMATION_DURATION,
-  MINIMIZED_NODE_HOVERED_SCALE_MAP,
+  ZOOMED_OUT_HOVER_SCALE_MAP,
 } from "@/constants/canvas";
 import { DropShadowFilter } from "pixi-filters";
 
 const calculateTargetScale = (appScale: number, isHovered: boolean) => {
   if (!isHovered) return 1;
 
-  const isMinimized = getIsMinimized(appScale);
-  if (isMinimized) {
-    for (const [scale, targetScale] of MINIMIZED_NODE_HOVERED_SCALE_MAP) {
+  if (isZoomedOut(appScale)) {
+    for (const [scale, targetScale] of ZOOMED_OUT_HOVER_SCALE_MAP) {
       if (appScale < scale) return targetScale;
     }
   }
@@ -25,14 +24,12 @@ const calculateTargetScale = (appScale: number, isHovered: boolean) => {
 
 interface Props {
   container: Container | null;
-  appScale: number;
   isHovered: boolean;
   isSelected: boolean;
 }
 
 export const useHoverNodeAnimation = ({
   container,
-  appScale,
   isHovered,
   isSelected,
 }: Props) => {
@@ -51,6 +48,7 @@ export const useHoverNodeAnimation = ({
   useGSAP(() => {
     if (!container) return;
 
+    const appScale = Math.abs(container.parent?.worldTransform?.a || 1);
     const targetScale = calculateTargetScale(appScale, isHovered);
 
     gsap.to(container.scale, {
@@ -69,7 +67,7 @@ export const useHoverNodeAnimation = ({
       ease: "power1.out",
       overwrite: "auto",
     });
-  }, [isHovered, appScale, isSelected]);
+  }, [isHovered, isSelected]);
 
   return { shadowFilter };
 };
