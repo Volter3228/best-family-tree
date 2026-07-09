@@ -1,10 +1,6 @@
 import { useCallback, useRef } from "react";
 import { Viewport } from "pixi-viewport";
-import {
-  MINIMIZED_VIEW_SCALE,
-  NODE_HEIGHT,
-  NODE_WIDTH,
-} from "@/constants/canvas";
+import { CARD_VIEW_SCALE, NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 import type { MemberNode } from "@/types";
 import gsap from "gsap";
 
@@ -71,10 +67,7 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
 
       const timeline = gsap.timeline({
         onUpdate: () => {
-          if (
-            !lodTriggeredRef.current &&
-            viewport.scale.x < MINIMIZED_VIEW_SCALE
-          ) {
+          if (!lodTriggeredRef.current && viewport.scale.x < CARD_VIEW_SCALE) {
             setScale(viewport.scale.x);
             lodTriggeredRef.current = true;
           }

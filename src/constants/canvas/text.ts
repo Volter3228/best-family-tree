@@ -21,11 +21,11 @@ export const NODE_SUBTITLE_STYLE: TextStyleOptions = {
   align: "center",
 };
 
-export const MINIMIZED_TOOLTIP_TEXT_STYLE: TextStyleOptions = {
+export const NODE_TOOLTIP_TEXT_STYLE: TextStyleOptions = {
   fontFamily: FONT_FAMILY,
   fontSize: 14,
   fill: PRIMARY_GRADIENT,
-  fontWeight: "bold",
+  fontWeight: "600",
 };
 
 export const TEXT_RESOLUTION = 2.5;

@@ -12,7 +12,8 @@ import {
   useSyncMembers,
   useTreeLayout,
 } from "@/hooks";
-import { getIsMinimized } from "@/utils";
+import { isZoomedOut as getIsZoomedOut } from "@/utils";
+import { BIRTHDAY_ANIMATION_MIN_SCALE } from "@/constants/canvas";
 import { Member } from "@/models";
 import type { Member as MemberType } from "@/types";
 import { Viewport, NodesLayer, EdgesLayer, LineageEdge } from "./canvas";
@@ -80,7 +81,7 @@ const MembersTreeContent = ({ members }: Props) => {
             <EdgesLayer
               edges={edges}
               nodePositions={nodePositions}
-              pixelLine={getIsMinimized(scale)}
+              pixelLine={getIsZoomedOut(scale)}
             />
           )}
           {showTree && (
@@ -88,12 +89,13 @@ const MembersTreeContent = ({ members }: Props) => {
               selectedMember={selectedMember}
               membersMap={membersMap}
               nodePositions={nodePositions}
-              pixelLine={getIsMinimized(scale)}
+              pixelLine={getIsZoomedOut(scale)}
             />
           )}
           <NodesLayer
             nodes={nodes}
-            scale={scale}
+            isZoomedOut={getIsZoomedOut(scale)}
+            showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
             selectedMember={selectedMember}
             onNodeClick={handleNodeClick}
           />

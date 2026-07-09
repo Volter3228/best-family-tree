@@ -2,12 +2,13 @@ import { useCallback, useRef } from "react";
 import { CanvasTextMetrics, Container, Graphics, TextStyle } from "pixi.js";
 import { useTick } from "@pixi/react";
 import {
-  MINIMIZED_NODE_RADIUS,
-  MINIMIZED_NODE_TOOLTIP_OFFSET,
-  MINIMIZED_TOOLTIP_TEXT_STYLE,
+  NODE_WIDTH,
+  NODE_AVATAR_RADIUS,
+  NODE_TOOLTIP_OFFSET,
+  NODE_TOOLTIP_TEXT_STYLE,
 } from "@/constants/canvas";
 
-const textStyle = new TextStyle(MINIMIZED_TOOLTIP_TEXT_STYLE);
+const textStyle = new TextStyle(NODE_TOOLTIP_TEXT_STYLE);
 
 interface Props {
   text: string;
@@ -54,15 +55,15 @@ const MemberNodeMinimizedTooltip = ({ text, visible }: Props) => {
     if (parentScale > 0.0001) {
       const inverseScale = 1 / parentScale;
       tooltip.scale.set(inverseScale);
-      tooltip.y = -(MINIMIZED_NODE_TOOLTIP_OFFSET * inverseScale);
+      tooltip.y = -(NODE_TOOLTIP_OFFSET * inverseScale);
     }
   });
 
   return (
     <pixiContainer
       ref={tooltipRef}
-      x={MINIMIZED_NODE_RADIUS}
-      y={MINIMIZED_NODE_RADIUS}
+      x={NODE_WIDTH / 2}
+      y={NODE_AVATAR_RADIUS}
       eventMode="none"
     >
       <pixiGraphics draw={drawTooltipBackground} />

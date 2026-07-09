@@ -57,6 +57,7 @@ services:
       - .env
     volumes:
       - ./src:/app/src
+      - ./public:/app/public
       - /app/src/server
       - /app/node_modules
       - /app/.next
