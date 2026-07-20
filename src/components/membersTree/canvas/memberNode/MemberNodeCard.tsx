@@ -2,13 +2,10 @@ import { memo, useCallback, useMemo } from "react";
 import { CanvasTextMetrics, Graphics, TextStyle } from "pixi.js";
 import { Member } from "@/models";
 import { formatMemberRecruitmentSeason } from "@/utils";
+import { useCanvasTheme } from "@/hooks";
 import {
   NODE_AVATAR_SIZE,
-  NODE_SUBTITLE_STYLE,
-  NODE_TITLE_STYLE,
   NODE_WIDTH,
-  PRIMARY_GRADIENT,
-  SLATE_LIGHT_COLOR,
   NODE_CARD_TOP,
   NODE_CARD_HEIGHT,
   NODE_CARD_RADIUS,
@@ -17,19 +14,42 @@ import {
 interface Props {
   member: Member;
   isSelected: boolean;
+  placeholderColorIndex: number;
 }
-
-const titleStyle = new TextStyle(NODE_TITLE_STYLE);
-const subtitleStyle = new TextStyle(NODE_SUBTITLE_STYLE);
 
 const TEXT_Y = NODE_AVATAR_SIZE + 17;
 
-const MemberNodeCard = ({ member, isSelected }: Props) => {
+const MemberNodeCard = ({
+  member,
+  isSelected,
+  placeholderColorIndex,
+}: Props) => {
   const centerX = NODE_WIDTH / 2;
+  const {
+    primaryGradientToTopRight,
+    surfaceAccentColors,
+    textStyles,
+    cardStroke,
+    cardStrokeAlpha,
+  } = useCanvasTheme();
+
+  const titleStyle = useMemo(
+    () => new TextStyle(textStyles.title),
+    [textStyles],
+  );
+  const subtitleStyle = useMemo(
+    () => new TextStyle(textStyles.subtitle),
+    [textStyles],
+  );
 
   const titleMetrics = useMemo(
     () => CanvasTextMetrics.measureText(member.name, titleStyle),
-    [member.name],
+    [member.name, titleStyle],
+  );
+
+  const seasonText = useMemo(
+    () => formatMemberRecruitmentSeason(member),
+    [member],
   );
 
   const subtitleY = titleMetrics.height / 2 + 12;
@@ -45,19 +65,28 @@ const MemberNodeCard = ({ member, isSelected }: Props) => {
         NODE_CARD_HEIGHT,
         NODE_CARD_RADIUS,
       );
-      g.fill({ color: SLATE_LIGHT_COLOR });
+      g.fill({
+        color: surfaceAccentColors[placeholderColorIndex],
+      });
 
       if (isSelected) {
-        g.stroke({ fill: PRIMARY_GRADIENT, width: 2 });
+        g.stroke({ fill: primaryGradientToTopRight, width: 3 });
       } else {
         g.stroke({
-          color: SLATE_LIGHT_COLOR,
+          color: cardStroke,
           width: 3,
-          alpha: 0.25,
+          alpha: cardStrokeAlpha,
         });
       }
     },
-    [isSelected],
+    [
+      isSelected,
+      placeholderColorIndex,
+      surfaceAccentColors,
+      primaryGradientToTopRight,
+      cardStroke,
+      cardStrokeAlpha,
+    ],
   );
 
   return (
@@ -66,7 +95,7 @@ const MemberNodeCard = ({ member, isSelected }: Props) => {
       <pixiContainer x={centerX} y={TEXT_Y}>
         <pixiBitmapText text={member.name} style={titleStyle} anchor={0.5} />
         <pixiBitmapText
-          text={formatMemberRecruitmentSeason(member)}
+          text={seasonText}
           anchor={0.5}
           y={subtitleY}
           style={subtitleStyle}

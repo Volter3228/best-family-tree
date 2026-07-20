@@ -45,6 +45,8 @@ export interface PathData {
   totalLen: number;
 }
 
-export type MemberNode = TreeNode & { data: { member: Member } };
+export type MemberNode = TreeNode & {
+  data: { member: Member; placeholderColorIndex: number };
+};
 
 export type NodePositions = Map<string, Point>;

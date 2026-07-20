@@ -37,3 +37,11 @@ export const formatMemberRecruitmentSeason = (
   member: Member,
   withEmoji = false,
 ): string => formatRecruitmentTerm(member.getRecruitmentTerm(), withEmoji);
+
+export const getInitials = (name: string): string => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "";
+  const first = parts[0][0] ?? "";
+  const last = parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "";
+  return (first + last).toUpperCase();
+};

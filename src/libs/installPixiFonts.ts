@@ -9,7 +9,7 @@ const CHARS = [
 ];
 
 const installPixiFonts = () => {
-  const resolution = Math.max(window.devicePixelRatio, 6);
+  const resolution = Math.min(Math.max(window.devicePixelRatio, 1), 2);
 
   BitmapFont.install({
     name: "Nunito-600",

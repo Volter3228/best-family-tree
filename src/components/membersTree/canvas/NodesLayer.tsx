@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Member } from "@/models";
 import type { MemberNode } from "@/types";
-import PixiNode from "./memberNode/MemberNode";
+import PixiMemberNode from "./memberNode/MemberNode";
 
 interface Props {
   nodes: MemberNode[];
@@ -21,13 +21,14 @@ const NodesLayer = ({
   return (
     <pixiContainer>
       {nodes.map((node) => (
-        <PixiNode
+        <PixiMemberNode
           key={node.id}
           x={node.position.x}
           y={node.position.y}
           isZoomedOut={isZoomedOut}
           showBirthday={showBirthday}
           member={node.data.member}
+          placeholderColorIndex={node.data.placeholderColorIndex}
           isSelected={selectedMember?.id === node.id}
           onClick={onNodeClick}
         />

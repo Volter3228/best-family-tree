@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { ThemeProvider } from "@/context/ThemeContext";
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import { themeInitScript } from "@/utils/themeInitScript";
 import "./globals.css";
-import "./animations.css";
+import "../styles/background.css";
+import "../styles/animations.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker-overrides.css";
 
@@ -27,13 +31,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uk">
+    <html lang="uk" suppressHydrationWarning>
       <body
         className={`${nunito.className} antialiased`}
         suppressHydrationWarning
       >
-        <div className="relative">{children}</div>
-        <div id="datepicker-portal" />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <AuroraBackground />
+        <ThemeProvider>
+          <div className="relative z-1">{children}</div>
+          <div id="datepicker-portal" />
+        </ThemeProvider>
       </body>
     </html>
   );

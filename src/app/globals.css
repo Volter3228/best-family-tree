@@ -1,45 +1,50 @@
 @import "tailwindcss";
 
 @theme {
+  /* Semantic colors — all driven by CSS custom properties set via ThemeContext */
   --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-darken: var(--accent-darken);
-  --color-accent-darken-hover: var(--accent-darken-hover);
-  --color-placeholder: hsl(220, 13%, 65%);
+  --color-placeholder: var(--placeholder);
+  --color-surface: var(--surface);
 
-  --background-image-primary: var(--primary-gradient);
-  --background-image-avatar-gradient: var(--avatar-gradient);
+  /* Accent color triplet (for toolbar buttons, etc.) */
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-green: var(--accent-green);
+  --color-accent-orange: var(--accent-orange);
+  --color-surface-blue: var(--surface-blue);
+  --color-surface-green: var(--surface-green);
+  --color-surface-orange: var(--surface-orange);
 
   /* Animations */
   --animate-sidebar-slide-in: sidebar-slide-in 0.25s ease-out forwards;
   --animate-sidebar-slide-out: sidebar-slide-out 0.2s ease-in forwards;
   --animate-fade-slide-down: fade-slide-down 0.2s ease-out forwards;
   --animate-fade-slide-up: fade-slide-up 0.2s ease-out forwards;
+  --animate-dock-rise: dock-rise 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)
+    forwards;
 }
 
 @layer base {
   :root {
-    /* Colors */
-    --foreground: hsl(220, 39%, 11%);
-    --accent: hsl(267, 100%, 60%);
-    --accent-hover: hsl(267, 100%, 55%);
-    --accent-darken: hsl(267, 100%, 45%);
-    --accent-darken-hover: hsl(267, 100%, 40%);
+    /* Light theme defaults (overridden by ThemeContext on mount) */
+    --foreground: hsl(220 39% 11%);
+    --placeholder: hsl(220 13% 65%);
+    --surface: hsl(0 0% 98%);
+
+    /* Background */
+    --background-base: hsl(210 20% 89%);
+
+    /* Accent color triplet */
+    --accent-blue: hsl(203 100% 43%);
+    --accent-green: hsl(87 74% 47%);
+    --accent-orange: hsl(33 100% 47%);
+    --surface-blue: hsl(203 100% 97.5%);
+    --surface-green: hsl(87 74% 96.5%);
+    --surface-orange: hsl(37 99% 97.5%);
 
     /* Gradients */
-    --primary-gradient-start: hsl(249, 59%, 51%);
-    --primary-gradient-end: hsl(302, 86%, 45%);
-    --primary-gradient: linear-gradient(
-      to top right,
-      var(--primary-gradient-start),
-      var(--primary-gradient-end)
-    );
-    --avatar-gradient: linear-gradient(
-      to top,
-      var(--primary-gradient-end),
-      var(--primary-gradient-start)
-    );
+    --primary-gradient-start: hsl(203 100% 43%);
+    --primary-gradient-middle: hsl(87 74% 47%);
+    --primary-gradient-end: hsl(33 100% 47%);
   }
 
   *,
@@ -48,16 +53,16 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
+    font-family: Nunito, Arial, Helvetica, sans-serif;
   }
 
   body {
     color: var(--foreground);
-    background: var(--primary-gradient);
+    background-color: var(--background-base);
     scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: var(--accent) transparent;
+    scrollbar-color: var(--foreground) transparent;
     scrollbar-arrow-color: transparent;
-    font-family: Nunito, Arial, Helvetica, sans-serif;
     overflow: hidden;
   }
 

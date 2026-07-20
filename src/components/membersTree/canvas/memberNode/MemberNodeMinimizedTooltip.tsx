@@ -1,23 +1,32 @@
-import { useCallback, useRef } from "react";
+import { memo, useCallback, useRef, useMemo } from "react";
 import { CanvasTextMetrics, Container, Graphics, TextStyle } from "pixi.js";
 import { useTick } from "@pixi/react";
+import { useCanvasTheme } from "@/hooks";
 import {
   NODE_WIDTH,
   NODE_AVATAR_RADIUS,
   NODE_TOOLTIP_OFFSET,
-  NODE_TOOLTIP_TEXT_STYLE,
 } from "@/constants/canvas";
-
-const textStyle = new TextStyle(NODE_TOOLTIP_TEXT_STYLE);
 
 interface Props {
   text: string;
   visible: boolean;
+  placeholderColorIndex: number;
 }
 
-const MemberNodeMinimizedTooltip = ({ text, visible }: Props) => {
+const MemberNodeMinimizedTooltip = ({
+  text,
+  visible,
+  placeholderColorIndex,
+}: Props) => {
+  const { accentColors, textStyles } = useCanvasTheme();
   const tooltipRef = useRef<Container>(null);
   const animationProgress = useRef(0);
+
+  const textStyle = useMemo(
+    () => new TextStyle(textStyles.tooltip),
+    [textStyles],
+  );
 
   const drawTooltipBackground = useCallback(
     (g: Graphics) => {
@@ -28,9 +37,12 @@ const MemberNodeMinimizedTooltip = ({ text, visible }: Props) => {
       const h = metrics.height + 10;
 
       g.roundRect(-w / 2, -h, w, h, 6);
-      g.fill({ color: "#fff", alpha: 0.8 });
+      g.fill({
+        color: accentColors[placeholderColorIndex],
+        alpha: 0.9,
+      });
     },
-    [text],
+    [text, textStyle, placeholderColorIndex, accentColors],
   );
 
   useTick((delta) => {
@@ -67,7 +79,7 @@ const MemberNodeMinimizedTooltip = ({ text, visible }: Props) => {
       eventMode="none"
     >
       <pixiGraphics draw={drawTooltipBackground} />
-      <pixiText
+      <pixiBitmapText
         text={text}
         anchor={{ x: 0.5, y: 1 }}
         y={-5}
@@ -77,4 +89,4 @@ const MemberNodeMinimizedTooltip = ({ text, visible }: Props) => {
   );
 };
 
-export default MemberNodeMinimizedTooltip;
+export default memo(MemberNodeMinimizedTooltip);

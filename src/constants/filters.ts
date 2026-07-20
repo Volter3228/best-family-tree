@@ -65,4 +65,4 @@ export const AVATAR_OPTIONS: { value: AvatarFilterValue; label: string }[] = [
 
 // Styles
 export const DATE_PICKER_CLASSES =
-  "w-full rounded-lg bg-violet-800 pl-2 pr-7 py-1.5 text-sm text-white placeholder:text-fuchsia-400/50 focus:outline-none focus:ring-1 focus:ring-fuchsia-500";
+  "w-full rounded-lg bg-surface-green/40 pl-2 pr-7 py-1.5 text-sm text-foreground placeholder:text-placeholder focus:outline-none focus:ring-1 focus:ring-accent-green";

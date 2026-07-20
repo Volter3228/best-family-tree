@@ -4,11 +4,11 @@ import { Graphics } from "pixi.js";
 import gsap from "gsap";
 import { Member } from "@/models";
 import { buildPath, findCommonLen, animDuration, drawDashes } from "@/utils";
-import { FIXED_EDGE_WIDTH, PRIMARY_GRADIENT } from "@/constants/canvas";
+import { useCanvasTheme } from "@/hooks";
+import { FIXED_EDGE_WIDTH } from "@/constants/canvas";
 import {
   DASH_LEN,
   GAP_LEN,
-  PATTERN_LEN,
   SPEED,
   EMPTY_PATH,
   RETRACT_BASE,
@@ -30,6 +30,7 @@ const LineageEdge = ({
   pixelLine,
 }: Props) => {
   const { app } = useApplication();
+  const { accentColors } = useCanvasTheme();
   const graphicsRef = useRef<Graphics>(null);
   const offsetRef = useRef(0);
   const animRef = useRef({ visibleLen: 0 });
@@ -149,10 +150,6 @@ const LineageEdge = ({
       }
 
       offsetRef.current -= (app.ticker.deltaMS / 1000) * SPEED;
-      // Wrap every frame so offset stays in [-PATTERN_LEN, 0]
-      if (offsetRef.current <= -PATTERN_LEN) {
-        offsetRef.current %= PATTERN_LEN;
-      }
 
       // Skip redraw when dash offset delta is sub-pixel and no transition is active
       const offsetDelta = Math.abs(offsetRef.current - lastOffsetRef.current);
@@ -163,15 +160,6 @@ const LineageEdge = ({
       lastOffsetRef.current = offsetRef.current;
 
       g.clear();
-      g.setStrokeStyle({
-        pixelLine,
-        width: FIXED_EDGE_WIDTH + 2,
-        fill: PRIMARY_GRADIENT,
-        alpha: 0.85,
-        cap: "round",
-        join: "round",
-      });
-      g.beginPath();
 
       let remainingLen = visibleLen;
       for (let i = 0; i < segments.length; i++) {
@@ -184,11 +172,16 @@ const LineageEdge = ({
           GAP_LEN,
           offsetRef.current + offsets[i],
           segMaxDist,
+          accentColors,
+          {
+            width: FIXED_EDGE_WIDTH + 2,
+            cap: "round",
+            join: "round",
+            pixelLine,
+          },
         );
         remainingLen -= segments[i].totalLen;
       }
-
-      g.stroke();
     };
 
     onTick();
@@ -197,7 +190,7 @@ const LineageEdge = ({
       alive = false;
       app.ticker.remove(onTick);
     };
-  }, [app, pixelLine]);
+  }, [app, pixelLine, accentColors]);
 
   const initDraw = (g: Graphics) => {
     graphicsRef.current = g;

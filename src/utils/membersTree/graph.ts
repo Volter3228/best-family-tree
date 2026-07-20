@@ -12,6 +12,9 @@ import {
   Position,
 } from "@/types";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
+import { hashString } from "../strings";
+
+const PRIMARY_COLOR_COUNT = 3;
 
 const getLayoutOptions = (): ElkLayoutOptions => {
   return {
@@ -31,12 +34,16 @@ export const transformMembersToFlowValues = (
   const nodes: MemberNode[] = [];
   const edges: TreeEdge[] = [];
 
-  members.forEach((member) => {
+  const groupSeed = members[0]?.mentorId ?? "root";
+  const startColorIdx = hashString(groupSeed) % PRIMARY_COLOR_COUNT;
+
+  members.forEach((member, index) => {
+    const placeholderColorIndex = (startColorIdx + index) % PRIMARY_COLOR_COUNT;
     const mentorId = member.mentorId;
     nodes.push({
       id: member.id,
       type: "member",
-      data: { member },
+      data: { member, placeholderColorIndex },
       position: DEFAULT_POSITION,
       style: {} as React.CSSProperties,
     });

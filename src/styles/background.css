@@ -1,0 +1,274 @@
+/* ── Aurora Background ────────────────────────────────────── */
+/* Each bloom is a separate div so we can animate them individually.
+   Conic drift layers stay as ::before / ::after on the container.
+*/
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--background-base);
+}
+
+/* ── Bloom base ── */
+
+.aurora-bloom {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.55;
+  transform: scale(0.94);
+  animation-delay: var(--bloom-delay, 0s);
+}
+
+/* ── 6 blooms, colors distributed so no single hue dominates ── */
+/* Blue:   top-center + bottom-right                          */
+/* Green:  top-right   + bottom-left                          */
+/* Orange: center-left + mid-right                            */
+
+.aurora-bloom-1 {
+  --bloom-delay: 0s;
+  width: 35vmax;
+  height: 35vmax;
+  top: -8%;
+  left: 28%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-blue) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+.aurora-bloom-2 {
+  --bloom-delay: 4.67s;
+  width: 30vmax;
+  height: 30vmax;
+  top: 5%;
+  right: 8%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-green) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+.aurora-bloom-3 {
+  --bloom-delay: 9.33s;
+  width: 32vmax;
+  height: 32vmax;
+  top: 35%;
+  left: -5%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-orange) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+.aurora-bloom-4 {
+  --bloom-delay: 14s;
+  width: 28vmax;
+  height: 28vmax;
+  bottom: 5%;
+  left: 12%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-green) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+.aurora-bloom-5 {
+  --bloom-delay: 18.67s;
+  width: 33vmax;
+  height: 33vmax;
+  bottom: -5%;
+  right: 15%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-blue) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+.aurora-bloom-6 {
+  --bloom-delay: 23.33s;
+  width: 27vmax;
+  height: 27vmax;
+  top: 30%;
+  right: -3%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aurora-bloom-orange) 0%,
+    transparent 70%
+  );
+  animation: aurora-breathe 28s ease-in-out infinite alternate both;
+}
+
+/* ── Conic drift layers ── */
+
+.aurora-bg::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    var(--aurora-conic-blue),
+    var(--aurora-conic-green),
+    var(--aurora-conic-orange),
+    var(--aurora-conic-blue)
+  );
+  filter: blur(var(--aurora-blur, 80px)) saturate(var(--aurora-saturate, 1.4));
+  opacity: var(--aurora-conic-opacity, 0.35);
+  animation: aurora-drift 40s ease-in-out infinite;
+  contain: paint;
+  backface-visibility: hidden;
+}
+
+.aurora-bg::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 180deg at 40% 60%,
+    var(--aurora-conic-green),
+    var(--aurora-conic-orange),
+    var(--aurora-conic-blue),
+    var(--aurora-conic-green)
+  );
+  filter: blur(var(--aurora-blur, 80px)) saturate(var(--aurora-saturate, 1.4));
+  opacity: var(--aurora-conic-2-opacity, 0.2);
+  animation: aurora-drift-reverse 52s ease-in-out infinite;
+  contain: paint;
+  backface-visibility: hidden;
+}
+
+/* ── Keyframes ── */
+
+/* Breathing: opacity + scale pulse, staggered per bloom via delay */
+@keyframes aurora-breathe {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+/* Multi-step drift for more chaotic, interesting movement */
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(-3%, -2%, 0) rotate(0deg) scale(1.15);
+  }
+  25% {
+    transform: translate3d(3%, -1%, 0) rotate(90deg) scale(1.2);
+  }
+  50% {
+    transform: translate3d(4%, 3%, 0) rotate(180deg) scale(1.1);
+  }
+  75% {
+    transform: translate3d(-2%, 4%, 0) rotate(270deg) scale(1.18);
+  }
+  100% {
+    transform: translate3d(-3%, -2%, 0) rotate(360deg) scale(1.15);
+  }
+}
+
+@keyframes aurora-drift-reverse {
+  0% {
+    transform: translate3d(3%, 2%, 0) rotate(360deg) scale(1.15);
+  }
+  25% {
+    transform: translate3d(-3%, 1%, 0) rotate(270deg) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-4%, -2%, 0) rotate(180deg) scale(1.2);
+  }
+  75% {
+    transform: translate3d(2%, -3%, 0) rotate(90deg) scale(1.12);
+  }
+  100% {
+    transform: translate3d(3%, 2%, 0) rotate(0deg) scale(1.15);
+  }
+}
+
+/* ── Dark theme ── */
+
+[data-theme="dark"] {
+  --aurora-bloom-blue: hsl(203 100% 43% / 0.28);
+  --aurora-bloom-green: hsl(87 75% 38% / 0.25);
+  --aurora-bloom-orange: hsl(33 100% 47% / 0.25);
+
+  --aurora-conic-blue: hsl(203 100% 46%);
+  --aurora-conic-green: hsl(87 75% 41%);
+  --aurora-conic-orange: hsl(33 100% 50%);
+
+  --aurora-conic-opacity: 0.35;
+  --aurora-conic-2-opacity: 0.2;
+  --aurora-blur: 100px;
+  --aurora-saturate: 1.3;
+}
+
+/* ── Light theme (slightly brighter than before) ── */
+
+[data-theme="light"] {
+  --aurora-bloom-blue: hsl(203 100% 50% / 0.24);
+  --aurora-bloom-green: hsl(87 75% 45% / 0.22);
+  --aurora-bloom-orange: hsl(33 100% 52% / 0.22);
+
+  --aurora-conic-blue: hsl(203 100% 47%);
+  --aurora-conic-green: hsl(87 75% 42%);
+  --aurora-conic-orange: hsl(33 100% 50%);
+
+  --aurora-conic-opacity: 0.25;
+  --aurora-conic-2-opacity: 0.18;
+  --aurora-blur: 100px;
+  --aurora-saturate: 1.2;
+}
+
+/* ── Accessibility ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-bloom {
+    opacity: 0.65;
+    transform: none;
+    animation: none;
+  }
+
+  .aurora-bg::before,
+  .aurora-bg::after {
+    animation: none;
+  }
+}
+
+/* ── Mobile tuning ── */
+
+@media (max-width: 640px) {
+  .aurora-bloom {
+    opacity: 0.45;
+  }
+
+  .aurora-bloom-1,
+  .aurora-bloom-2,
+  .aurora-bloom-3,
+  .aurora-bloom-4,
+  .aurora-bloom-5,
+  .aurora-bloom-6 {
+    width: 25vmax;
+    height: 25vmax;
+  }
+
+  .aurora-bg::before,
+  .aurora-bg::after {
+    --aurora-blur: 60px;
+  }
+}

@@ -5,11 +5,11 @@ export const NODE_AVATAR_RADIUS = NODE_AVATAR_SIZE / 2;
 export const NODE_HEIGHT = NODE_AVATAR_SIZE;
 
 // Edges dimensions
-export const FIXED_EDGE_WIDTH = 6;
+export const FIXED_EDGE_WIDTH = 4;
 
 // Zoom thresholds
-export const CARD_VIEW_SCALE = 0.6;
-export const BIRTHDAY_ANIMATION_MIN_SCALE = 0.3;
+export const CARD_VIEW_SCALE = 0.5;
+export const BIRTHDAY_ANIMATION_MIN_SCALE = 0.2;
 export const MIN_VIEWPORT_ZOOM = 0.03;
 export const MAX_VIEWPORT_ZOOM = 1.5;
 

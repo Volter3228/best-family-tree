@@ -18,7 +18,7 @@ export type MemberFormData = {
 
 export type MemberFormMode = "add" | "edit";
 
-export type DrawerMode = "info" | "edit";
+export type SidebarMode = "info" | "edit";
 
 export type DropdownOption = {
   text: string;

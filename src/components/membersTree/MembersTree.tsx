@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MembersTreeProvider } from "@/context/membersTree/MembersTreeProvider";
 import { FiltersProvider } from "@/context/FiltersContext";
 import { registerPixiPlugins } from "@/libs";
@@ -14,12 +14,16 @@ interface Props {
 }
 
 const MembersTree = ({ members }: Props) => {
+  const [isReady, setIsReady] = useState(didRegisterPixiPlugins);
+
   useEffect(() => {
     if (!didRegisterPixiPlugins) {
       didRegisterPixiPlugins = true;
-      registerPixiPlugins();
+      registerPixiPlugins().then(() => setIsReady(true));
     }
   }, []);
+
+  if (!isReady) return null;
 
   return (
     <FiltersProvider>
