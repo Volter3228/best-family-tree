@@ -2,7 +2,7 @@ import { Graphics } from "pixi.js";
 import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
 import type { Point, SegmentData } from "@/types";
 
-const BEZIER_SAMPLES = 24;
+const BEZIER_SAMPLES = 45;
 
 // Evaluate a cubic bezier at parameter t.
 const bezierEval = (
@@ -87,9 +87,18 @@ export const buildSegmentFromPositions = (
   return { points, arcLengths, totalLen: arcLengths[arcLengths.length - 1] };
 };
 
+interface DashStrokeOptions {
+  width: number;
+  alpha?: number;
+  cap?: "round" | "butt" | "square";
+  join?: "round" | "miter" | "bevel";
+  pixelLine?: boolean;
+}
+
 /**
- * Draw dashes along a pre-computed segment.
+ * Draw dashes along a pre-computed segment, cycling through `colors` per dash.
  * dashOffset controls animation position.
+ * Color is position-based so it flows smoothly as dashes animate.
  */
 export const drawDashes = (
   g: Graphics,
@@ -98,23 +107,30 @@ export const drawDashes = (
   gapLen: number,
   dashOffset: number,
   maxDist: number = seg.totalLen,
+  colors: readonly string[] = [],
+  strokeOptions: DashStrokeOptions = { width: 1 },
 ): void => {
   const { points, arcLengths, totalLen } = seg;
   const clampLen = Math.min(totalLen, maxDist);
-  if (clampLen <= 0) return;
+  if (clampLen <= 0 || colors.length === 0) return;
 
   const patternLen = dashLen + gapLen;
   let pos = -(dashOffset % patternLen);
   if (pos > 0) pos -= patternLen;
 
+  let groupIdx = Math.round((dashOffset + pos) / patternLen);
+
   while (pos < clampLen) {
     const ds = Math.max(pos, 0);
     const de = Math.min(pos + dashLen, clampLen);
     if (de > ds) {
+      const colorIdx =
+        ((groupIdx % colors.length) + colors.length) % colors.length;
+
+      g.beginPath();
       const startPt = pointAtDist(points, arcLengths, ds);
       g.moveTo(startPt.x, startPt.y);
 
-      // Walk through intermediate polyline vertices to follow the curve
       let i = 0;
       while (i < arcLengths.length && arcLengths[i] <= ds) i++;
       for (; i < arcLengths.length && arcLengths[i] < de; i++) {
@@ -123,7 +139,11 @@ export const drawDashes = (
 
       const endPt = pointAtDist(points, arcLengths, de);
       g.lineTo(endPt.x, endPt.y);
+
+      g.setStrokeStyle({ ...strokeOptions, color: colors[colorIdx] });
+      g.stroke();
     }
     pos += patternLen;
+    groupIdx++;
   }
 };

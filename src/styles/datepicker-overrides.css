@@ -14,26 +14,26 @@
 }
 
 .react-datepicker {
-  @apply border-accent-darken! rounded-2xl!;
+  @apply border-foreground! rounded-2xl! backdrop-blur-xl! bg-surface/90!;
 }
 
 .react-datepicker__tab-loop {
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(0.9);
   animation: zoomIn 0.2s ease-out forwards;
   position: absolute;
 }
 
 .react-datepicker__header {
-  @apply bg-accent! text-slate-50! rounded-t-xl! border-0!;
+  @apply bg-surface/70! backdrop-blur-xl text-foreground! rounded-t-2xl! border-0 border-b-2!;
 }
 
 .react-datepicker__month-container {
-  @apply border-accent-darken!;
+  @apply border-foreground! rounded-xl;
 }
 
 .react-datepicker__current-month {
-  @apply text-white! pointer-events-none!;
+  @apply text-foreground! pointer-events-none!;
 }
 
 .react-datepicker__year-read-view {
@@ -41,47 +41,47 @@
 }
 
 .react-datepicker__navigation:hover .react-datepicker__navigation-icon {
-  @apply before:border-accent-darken-hover!;
+  @apply before:border-foreground/70!;
 }
 
 .react-datepicker__navigation-icon {
-  @apply before:border-accent-darken!;
+  @apply before:border-foreground!;
 }
 
 .react-datepicker__year-read-view--down-arrow {
-  @apply border-accent-darken! hover:border-accent-darken-hover!;
+  @apply border-foreground! hover:border-foreground/70!;
 }
 
 /* Triangle ^ appears as separate block */
 .react-datepicker__triangle {
-  @apply stroke-accent-darken! fill-accent! text-accent! z-50;
+  @apply stroke-foreground! fill-surface! text-surface! z-50;
 }
 
 .react-datepicker__year-dropdown {
-  @apply bg-white! border-purple-500! shadow-md! text-foreground! scroll-p-0!;
+  @apply bg-surface! border-foreground! shadow-md! text-foreground! scroll-p-0!;
   scrollbar-width: none;
   scrollbar-color: transparent transparent;
 }
 
 .react-datepicker__year-option {
-  @apply hover:bg-purple-200!;
+  @apply hover:bg-foreground/15!;
 }
 
 .react-datepicker__year-option--selected {
-  @apply text-accent! font-bold!;
+  @apply text-surface! font-bold!;
 }
 
 .react-datepicker__day-name {
-  @apply text-accent! pointer-events-none!;
+  @apply text-foreground/60! pointer-events-none!;
 }
 
 .react-datepicker__day {
-  @apply hover:bg-purple-200!;
+  @apply text-foreground! hover:bg-foreground/20! transition-colors duration-200 rounded-md!;
 }
 
 .react-datepicker__day--keyboard-selected,
 .react-datepicker__day--selected {
-  @apply bg-accent! text-slate-50! hover:bg-accent-darken!;
+  @apply bg-foreground! text-surface! hover:bg-foreground/80! transition-colors duration-200;
 }
 
 @keyframes zoomIn {

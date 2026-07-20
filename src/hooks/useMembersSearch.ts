@@ -32,11 +32,12 @@ export const useMembersSearch = ({ members, onSelect }: Props) => {
     if (!query.trim()) return [];
     return members
       .filter((m) => matchesMember(m, query))
+      .sort((a, b) => a.name.localeCompare(b.name, "uk"))
       .slice(0, MAX_SUGGESTIONS);
   }, [members, query]);
 
   useEffect(() => {
-    setActiveIndex(0);
+    setActiveIndex(filteredMembers.length - 1);
   }, [filteredMembers.length]);
 
   const handleSelect = useCallback(

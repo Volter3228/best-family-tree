@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useMembersTree } from "./useMembersTree";
 import { useMembers } from "../useMembers";
-import { useFilters } from "../useFilters";
+import { useFilters } from "./useFilters";
 import { useViewportAnimation } from "./animations";
 import { transformMembersToFlowValues, getLayoutedElements } from "@/utils";
 import {

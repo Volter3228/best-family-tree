@@ -1,13 +1,7 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
-import {
-  Texture,
-  FederatedPointerEvent,
-  GraphicsContext,
-  Container,
-  Filter,
-} from "pixi.js";
+import { FederatedPointerEvent, Container, Filter } from "pixi.js";
 import gsap from "gsap";
-import { getMemberAvatar, getAvatarImage } from "@/utils";
+import { getMemberAvatar } from "@/utils";
 import {
   useHoverNodeAnimation,
   useCardAnimation,
@@ -23,6 +17,7 @@ import MemberNodeCard from "./MemberNodeCard";
 
 interface Props {
   member: Member;
+  placeholderColorIndex: number;
   isSelected: boolean;
   isZoomedOut: boolean;
   showBirthday: boolean;
@@ -39,14 +34,12 @@ const MemberNode = ({
   x,
   y,
   member,
+  placeholderColorIndex,
   isSelected,
   isZoomedOut,
   showBirthday,
   onClick,
 }: Props) => {
-  const [avatarImage, setAvatarImage] = useState<
-    Texture | GraphicsContext | null
-  >(null);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<Container>(null);
   const cardRef = useRef<Container>(null);
@@ -57,20 +50,7 @@ const MemberNode = ({
     isHovered,
     isSelected,
   });
-
-  useEffect(() => {
-    let mounted = true;
-    const loadAvatarImage = async () => {
-      const avatar = await getAvatarImage(avatarUrl);
-      if (mounted && avatar) {
-        setAvatarImage(avatar);
-      }
-    };
-    loadAvatarImage();
-    return () => {
-      mounted = false;
-    };
-  }, [avatarUrl]);
+  useCardAnimation({ cardRef, isZoomedOut, memberId: member.id });
 
   const handleClick = useCallback(
     (e: FederatedPointerEvent) => {
@@ -101,8 +81,6 @@ const MemberNode = ({
     return [shadowFilter];
   }, [isHovered, isSelected, shadowFilter]);
 
-  useCardAnimation({ cardRef, isZoomedOut, memberId: member.id });
-
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
   const birthdayRef = useRef<Container>(null);
 
@@ -131,20 +109,28 @@ const MemberNode = ({
         filters={filters}
         cullable
       >
-        {/* Card slides from behind the avatar on zoom in */}
         <pixiContainer
           ref={cardRef}
           pivot={{ x: CARD_PIVOT_X, y: CARD_PIVOT_Y }}
           x={CARD_PIVOT_X}
         >
-          <MemberNodeCard member={member} isSelected={isSelected} />
+          <MemberNodeCard
+            member={member}
+            isSelected={isSelected}
+            placeholderColorIndex={placeholderColorIndex}
+          />
         </pixiContainer>
 
-        <MemberNodeAvatar avatarImage={avatarImage} />
+        <MemberNodeAvatar
+          avatarUrl={avatarUrl}
+          memberName={member.name}
+          placeholderColorIndex={placeholderColorIndex}
+        />
 
         <MemberNodeMinimizedTooltip
           text={member.name}
           visible={isZoomedOut && isHovered}
+          placeholderColorIndex={placeholderColorIndex}
         />
       </pixiContainer>
       {isBirthday && (

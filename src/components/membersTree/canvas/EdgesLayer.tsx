@@ -1,5 +1,6 @@
 import { useCallback, memo } from "react";
 import { Graphics } from "pixi.js";
+import { useCanvasTheme } from "@/hooks";
 import { NODE_WIDTH, NODE_HEIGHT, FIXED_EDGE_WIDTH } from "@/constants/canvas";
 import type { NodePositions, TreeEdge } from "@/types";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const EdgesLayer = ({ edges, nodePositions, pixelLine }: Props) => {
+  const { edgeColor, edgeAlpha } = useCanvasTheme();
   const drawEdges = useCallback(
     (g: Graphics) => {
       g.clear();
@@ -17,7 +19,8 @@ const EdgesLayer = ({ edges, nodePositions, pixelLine }: Props) => {
       g.setStrokeStyle({
         pixelLine,
         width: FIXED_EDGE_WIDTH,
-        color: 0xf1f5f9,
+        color: edgeColor,
+        alpha: edgeAlpha,
         cap: "round",
         join: "round",
       });
@@ -51,7 +54,7 @@ const EdgesLayer = ({ edges, nodePositions, pixelLine }: Props) => {
         g.stroke();
       });
     },
-    [edges, nodePositions, pixelLine],
+    [edges, nodePositions, pixelLine, edgeColor, edgeAlpha],
   );
 
   return <pixiGraphics draw={drawEdges} />;

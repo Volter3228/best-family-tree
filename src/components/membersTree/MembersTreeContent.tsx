@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Application } from "@pixi/react";
 import { CullerPlugin } from "pixi.js";
 import {
   useMembersTree,
   useMembers,
-  useDrawer,
+  useSidebar,
   useViewportAnimation,
   useFilters,
   useSyncMembers,
@@ -15,10 +15,12 @@ import {
 import { isZoomedOut as getIsZoomedOut } from "@/utils";
 import { BIRTHDAY_ANIMATION_MIN_SCALE } from "@/constants/canvas";
 import { Member } from "@/models";
-import type { Member as MemberType } from "@/types";
+import type { Member as MemberType, AccentColor } from "@/types";
 import { Viewport, NodesLayer, EdgesLayer, LineageEdge } from "./canvas";
-import Drawer, { MemberDrawerContent } from "../drawer";
-import Sidebar from "./sidebar";
+import Sidebar, { MemberSidebarContent } from "../sidebar";
+import Toolbar from "./toolbar";
+
+const ACCENT_COLOR_MAP: AccentColor[] = ["blue", "green", "orange"];
 
 interface Props {
   members: MemberType[];
@@ -32,12 +34,12 @@ const MembersTreeContent = ({ members }: Props) => {
     useMembers();
 
   const {
-    isDrawerOpen,
-    drawerMode,
-    onClose: handleDrawerClose,
-    onEditClick: handleDrawerEditClick,
-    onBackToInfoClick: handleDrawerBackToInfo,
-  } = useDrawer(selectedMember, setSelectedMember);
+    isSidebarOpen,
+    sidebarMode,
+    onClose: handleSidebarClose,
+    onEditClick: handleSidebarEditClick,
+    onBackToInfoClick: handleSidebarBackToInfo,
+  } = useSidebar(selectedMember, setSelectedMember);
 
   const { filteredMemberIds, appliedFilters } = useFilters();
   const { focusNode, fitView } = useViewportAnimation();
@@ -47,6 +49,14 @@ const MembersTreeContent = ({ members }: Props) => {
   useTreeLayout();
 
   const handleFitView = useCallback(() => fitView(), [fitView]);
+
+  const getMemberAccentColor = useCallback(
+    (memberId: string): AccentColor => {
+      const node = nodes.find((n) => n.id === memberId);
+      return node ? ACCENT_COLOR_MAP[node.data.placeholderColorIndex] : "blue";
+    },
+    [nodes],
+  );
 
   const handleSearch = useCallback(
     (memberId: string) => {
@@ -60,6 +70,13 @@ const MembersTreeContent = ({ members }: Props) => {
   );
 
   const handleNodeClick = (member: Member) => setSelectedMember(member);
+
+  const isZoomedOut = getIsZoomedOut(scale);
+
+  const sidebarColor = useMemo<AccentColor>(() => {
+    if (!selectedMember) return "blue";
+    return getMemberAccentColor(selectedMember.id);
+  }, [selectedMember, getMemberAccentColor]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -81,7 +98,7 @@ const MembersTreeContent = ({ members }: Props) => {
             <EdgesLayer
               edges={edges}
               nodePositions={nodePositions}
-              pixelLine={getIsZoomedOut(scale)}
+              pixelLine={isZoomedOut}
             />
           )}
           {showTree && (
@@ -89,37 +106,39 @@ const MembersTreeContent = ({ members }: Props) => {
               selectedMember={selectedMember}
               membersMap={membersMap}
               nodePositions={nodePositions}
-              pixelLine={getIsZoomedOut(scale)}
+              pixelLine={isZoomedOut}
             />
           )}
           <NodesLayer
             nodes={nodes}
-            isZoomedOut={getIsZoomedOut(scale)}
+            isZoomedOut={isZoomedOut}
             showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
             selectedMember={selectedMember}
             onNodeClick={handleNodeClick}
           />
         </Viewport>
       </Application>
-      <Sidebar onFitView={handleFitView} onSearch={handleSearch} />
-      <Drawer
-        id="member-drawer"
-        headerTitle={drawerMode === "info" ? "Інфо" : "Редагувати"}
-        mode={drawerMode}
-        isOpen={isDrawerOpen}
-        onClose={handleDrawerClose}
-        onEditClick={handleDrawerEditClick}
-        onBackClick={handleDrawerBackToInfo}
+      <Toolbar onFitView={handleFitView} onSearch={handleSearch} />
+      <Sidebar
+        id="member-sidebar"
+        headerTitle={sidebarMode === "info" ? "Інфо" : "Редагувати"}
+        mode={sidebarMode}
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        onEditClick={handleSidebarEditClick}
+        onBackClick={handleSidebarBackToInfo}
         className="z-10"
+        color={sidebarColor}
       >
         {!!selectedMember && (
-          <MemberDrawerContent
+          <MemberSidebarContent
             member={selectedMember}
-            drawerMode={drawerMode}
-            onEditExit={handleDrawerBackToInfo}
+            sidebarMode={sidebarMode}
+            onEditExit={handleSidebarBackToInfo}
+            color={sidebarColor}
           />
         )}
-      </Drawer>
+      </Sidebar>
     </div>
   );
 };

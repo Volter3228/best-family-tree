@@ -23,7 +23,7 @@ const getCardAnimDelay = (id: string): number => {
   for (let i = 0; i < id.length; i++) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0;
   }
-  return (Math.abs(hash) % 150) / 1000; // 0–0.15s
+  return (Math.abs(hash) % 200) / 1000; // 0–0.2s
 };
 
 interface Props {

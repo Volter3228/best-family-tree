@@ -1,4 +1,4 @@
-export * from "./getAvatarImage";
+export * from "./memberNodeAvatar";
 export * from "./scale";
 export * from "./graph";
 export * from "./flattenTree";

@@ -34,14 +34,14 @@ export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
       // Get current viewport state
       const wasZoomedOut = isZoomedOut(viewport.scale.x);
 
-      // Determine view center offset (accounting for drawer)
-      const drawerElement = document.getElementById("member-drawer");
-      const drawerWidth = drawerElement ? drawerElement.offsetWidth : 0;
+      // Determine view center offset (accounting for sidebar)
+      const sidebarElement = document.getElementById("member-sidebar");
+      const sidebarWidth = sidebarElement ? sidebarElement.offsetWidth : 0;
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
 
-      // The center point of the visible area (left of drawer)
-      const visibleCenterX = (windowWidth - drawerWidth) / 2;
+      // The center point of the visible area (left of sidebar)
+      const visibleCenterX = (windowWidth - sidebarWidth) / 2;
       const visibleCenterY = windowHeight / 2;
 
       // Target scale calculation

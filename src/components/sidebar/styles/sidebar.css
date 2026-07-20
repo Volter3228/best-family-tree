@@ -1,0 +1,39 @@
+.member-info-row .info-value > span {
+  overflow-x: overlay;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+.sidebar-content {
+  max-height: calc(100dvh - 7rem);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sidebar-scroll-color, var(--accent-blue)) transparent;
+}
+
+@media (min-width: 768px) {
+  .sidebar-content {
+    max-height: calc(100dvh - 6rem);
+  }
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--sidebar-scroll-color, var(--accent-blue));
+  border-radius: 3px;
+}
+
+.sidebar-content.sidebar-height-animating {
+  scrollbar-color: transparent transparent;
+}
+
+.sidebar-content.sidebar-height-animating::-webkit-scrollbar-thumb,
+.sidebar-content.sidebar-height-animating:hover::-webkit-scrollbar-thumb {
+  background: transparent;
+}
