@@ -12,11 +12,26 @@ export const buildMemberFormData = (
     if (value instanceof Date) {
       formData.append(key, value.toISOString());
     } else if (value !== undefined && value !== null) {
-      // TODO: Make phone numbers an array with possibility to expand
       if (key === "phoneNumber") {
         formData.append("phoneNumbers", JSON.stringify([value]));
       } else if (key === "photo") {
-        formData.append(key, value);
+        if (value instanceof File) {
+          formData.append(key, value);
+        } else if (typeof value === "string") {
+          formData.append(key, value);
+        }
+      } else if (key === "positions") {
+        const positions = (value as MemberFormData["positions"])
+          .filter((position) => position.roleName.trim() !== "")
+          .map(
+            ({
+              id: _id,
+              isYearOnly: _isYearOnly,
+              isCurrent: _isCurrent,
+              ...position
+            }) => position,
+          );
+        formData.append("positions", JSON.stringify(positions));
       } else if (typeof value === "object") {
         formData.append(key, JSON.stringify(value));
       } else {

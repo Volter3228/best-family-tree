@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  type RefObject,
+} from "react";
 import type { DropdownOption } from "@/types";
 
 export const useDropdown = (
@@ -6,6 +13,7 @@ export const useDropdown = (
   onSelect: (optValue: string) => void,
   initialValue: string = "",
   autoComplete: boolean = false,
+  menuRef?: RefObject<HTMLUListElement | null>,
 ) => {
   const getInitialText = () => {
     if (!initialValue) return "";
@@ -18,6 +26,12 @@ export const useDropdown = (
   const [inputValue, setInputValue] = useState("");
   const [activeOptionIndex, setActiveOptionIndex] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+  }, []);
+
 
   useEffect(() => {
     setInputValue(getInitialText());
@@ -27,8 +41,8 @@ export const useDropdown = (
     () =>
       autoComplete
         ? options.filter((opt) =>
-            opt.text.toLowerCase().includes(inputValue.toLowerCase()),
-          )
+          opt.text.toLowerCase().includes(inputValue.toLowerCase()),
+        )
         : options,
     [autoComplete, options, inputValue],
   );
@@ -52,7 +66,7 @@ export const useDropdown = (
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
-    setTimeout(() => {
+    closeTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setIsClosing(false);
       // Prevent dropdown options vanish before animation end
@@ -61,19 +75,21 @@ export const useDropdown = (
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
+      const isInsideMenu = menuRef?.current?.contains(event.target as Node);
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        !isInsideMenu
       ) {
         handleSelect();
         handleClose();
       }
     },
-    [handleClose, handleSelect],
+    [handleClose, handleSelect, menuRef],
   );
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
+    (e: React.KeyboardEvent<HTMLInputElement>, dropUp: boolean = false) => {
       if (!isOpen || filteredOptions.length === 0) return;
 
       if (["ArrowDown", "ArrowUp", "Enter", "Escape"].includes(e.key)) {
@@ -89,15 +105,17 @@ export const useDropdown = (
             prev === 0 ? filteredOptions.length - 1 : prev - 1,
           );
           break;
-        case "Enter":
-          if (
-            activeOptionIndex >= 0 &&
-            activeOptionIndex < filteredOptions.length
-          ) {
-            handleSelect(filteredOptions[activeOptionIndex]);
+        case "Enter": {
+          // Active index is a display index; invert it for reversed (drop-up) menus.
+          const optionIndex = dropUp
+            ? filteredOptions.length - 1 - activeOptionIndex
+            : activeOptionIndex;
+          if (optionIndex >= 0 && optionIndex < filteredOptions.length) {
+            handleSelect(filteredOptions[optionIndex]);
             handleClose();
           }
           break;
+        }
         case "Escape":
         case "Tab":
           handleSelect();
@@ -131,6 +149,14 @@ export const useDropdown = (
   useEffect(() => {
     setActiveOptionIndex(0);
   }, [filteredOptions.length]);
+
+  // Keep the keyboard-focused option inside the menu's scroll window
+  useEffect(() => {
+    if (!isOpen) return;
+    menuRef?.current
+      ?.querySelector("[data-active]")
+      ?.scrollIntoView({ block: "nearest", behavior: "instant" });
+  }, [activeOptionIndex, isOpen, menuRef]);
 
   return {
     isOpen,

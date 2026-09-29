@@ -18,6 +18,10 @@ export const MembersTreeProvider = ({ children }: Props) => {
   const [edges, setEdges] = useState<TreeEdge[]>([]);
   const [scale, setScale] = useState(1);
   const [viewport, setViewport] = useState<Viewport | null>(null);
+  const [isFitViewAnimating, setIsFitViewAnimating] = useState(false);
+  const [fitViewTargetScale, setFitViewTargetScale] = useState<number | null>(
+    null,
+  );
 
   const nodePositions = useMemo(() => {
     const map = new Map<string, Point>();
@@ -33,8 +37,17 @@ export const MembersTreeProvider = ({ children }: Props) => {
   );
 
   const viewportValue = useMemo(
-    () => ({ scale, setScale, viewport, setViewport }),
-    [scale, viewport],
+    () => ({
+      scale,
+      setScale,
+      viewport,
+      setViewport,
+      isFitViewAnimating,
+      setIsFitViewAnimating,
+      fitViewTargetScale,
+      setFitViewTargetScale,
+    }),
+    [scale, viewport, isFitViewAnimating, fitViewTargetScale],
   );
 
   return (

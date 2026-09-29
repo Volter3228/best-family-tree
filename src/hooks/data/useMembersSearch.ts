@@ -37,7 +37,7 @@ export const useMembersSearch = ({ members, onSelect }: Props) => {
   }, [members, query]);
 
   useEffect(() => {
-    setActiveIndex(filteredMembers.length - 1);
+    setActiveIndex(0);
   }, [filteredMembers.length]);
 
   const handleSelect = useCallback(
@@ -55,15 +55,15 @@ export const useMembersSearch = ({ members, onSelect }: Props) => {
         case "ArrowDown":
           e.preventDefault();
           if (filteredMembers.length > 0) {
-            setActiveIndex((prev) => (prev + 1) % filteredMembers.length);
+            setActiveIndex((prev) =>
+              prev === 0 ? filteredMembers.length - 1 : prev - 1,
+            );
           }
           break;
         case "ArrowUp":
           e.preventDefault();
           if (filteredMembers.length > 0) {
-            setActiveIndex((prev) =>
-              prev === 0 ? filteredMembers.length - 1 : prev - 1,
-            );
+            setActiveIndex((prev) => (prev + 1) % filteredMembers.length);
           }
           break;
         case "Enter":

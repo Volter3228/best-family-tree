@@ -21,6 +21,7 @@ import {
   DropdownSelectInput,
 } from "../inputs";
 import SocialMediaFields from "./SocialMediaFormFields";
+import PositionFormFields from "./position/PositionFormFields";
 import FieldError from "./FieldError";
 
 interface Props {
@@ -79,7 +80,7 @@ const MemberFormFields = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 items-center h-5/6 overflow-y-visible">
+    <div className="flex flex-col gap-6 items-center w-full">
       <div className="flex flex-row flex-1 w-full justify-center mb-2">
         <AvatarFileInput
           onImageSelect={handleFileChange("photo")}
@@ -204,6 +205,11 @@ const MemberFormFields = ({
         form={form}
         onTextChange={handleTextChange}
         errors={errors}
+        color={color}
+      />
+      <PositionFormFields
+        positions={form.positions}
+        onChange={(positions) => setForm({ ...form, positions })}
         color={color}
       />
     </div>

@@ -8,9 +8,46 @@ interface Props {
   nodes: MemberNode[];
   viewport: Viewport | null;
   setScale: (scale: number) => void;
+  setIsFitViewAnimating: (value: boolean) => void;
+  setFitViewTargetScale: (scale: number | null) => void;
 }
 
-export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
+export const getFitViewTargetScale = (
+  nodes: MemberNode[],
+  width = window.innerWidth,
+  height = window.innerHeight,
+) => {
+  if (nodes.length === 0 || width === 0 || height === 0) return 1;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const node of nodes) {
+    const { x, y } = node.position;
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  const padding = 100;
+  const graphWidth = maxX - minX + NODE_WIDTH + padding * 2;
+  const graphHeight = maxY - minY + NODE_HEIGHT + padding * 2;
+  const scaleX = width / Math.max(graphWidth, 1);
+  const scaleY = height / Math.max(graphHeight, 1);
+
+  return Math.min(scaleX, scaleY, 1);
+};
+
+export const useFitViewAnimation = ({
+  nodes,
+  viewport,
+  setScale,
+  setIsFitViewAnimating,
+  setFitViewTargetScale,
+}: Props) => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
@@ -30,32 +67,19 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
         timelineRef.current.kill();
       }
 
+      const targetScale = getFitViewTargetScale(nodes, width, height);
+
       let minX = Infinity;
       let minY = Infinity;
       let maxX = -Infinity;
       let maxY = -Infinity;
 
-      for (let i = 0; i < nodes.length; i++) {
-        const { x, y } = nodes[i].position;
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
+      for (const node of nodes) {
+        minX = Math.min(minX, node.position.x);
+        minY = Math.min(minY, node.position.y);
+        maxX = Math.max(maxX, node.position.x + NODE_WIDTH);
+        maxY = Math.max(maxY, node.position.y + NODE_HEIGHT);
       }
-
-      maxX += NODE_WIDTH;
-      maxY += NODE_HEIGHT;
-
-      const graphWidth = maxX - minX;
-      const graphHeight = maxY - minY;
-      const padding = 100;
-
-      const fullWidth = Math.max(graphWidth + padding * 2, 1);
-      const fullHeight = Math.max(graphHeight + padding * 2, 1);
-
-      const scaleX = width / fullWidth;
-      const scaleY = height / fullHeight;
-      const targetScale = Math.min(scaleX, scaleY, 1);
 
       const centerX = (minX + maxX) / 2;
       const centerY = (minY + maxY) / 2;
@@ -64,6 +88,8 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
       const targetY = height / 2 - centerY * targetScale;
 
       lodTriggeredRef.current = false;
+      setFitViewTargetScale(targetScale);
+      setIsFitViewAnimating(true);
 
       const timeline = gsap.timeline({
         onUpdate: () => {
@@ -74,6 +100,13 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
         },
         onComplete: () => {
           setScale(targetScale);
+          setIsFitViewAnimating(false);
+          setFitViewTargetScale(null);
+          timelineRef.current = null;
+        },
+        onInterrupt: () => {
+          setIsFitViewAnimating(false);
+          setFitViewTargetScale(null);
           timelineRef.current = null;
         },
       });
@@ -102,6 +135,6 @@ export const useFitViewAnimation = ({ nodes, viewport, setScale }: Props) => {
 
       timelineRef.current = timeline;
     },
-    [nodes, viewport, setScale],
+    [nodes, viewport, setScale, setIsFitViewAnimating, setFitViewTargetScale],
   );
 };

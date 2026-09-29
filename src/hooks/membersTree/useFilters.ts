@@ -1,8 +1,9 @@
 import { useContext, useMemo } from "react";
 import { FiltersContext } from "@/context/FiltersContext";
-import { useMembers } from "../useMembers";
+import { useMembers } from "../data/useMembers";
 import { memberMatchesFilters, isFilterActive } from "@/utils/filters";
 import { computeLineageBranchIds } from "@/utils/membersTree/lineageBranch";
+import { getTeamTreeNodeIds } from "@/utils";
 
 export const useFilters = () => {
   const context = useContext(FiltersContext);
@@ -32,6 +33,14 @@ export const useFilters = () => {
     [draftFilters],
   );
 
+  const teamTreeNodeIds = useMemo(
+    () =>
+      appliedFilters.treeMode === "team"
+        ? getTeamTreeNodeIds(flatMembersList, appliedFilters.eventTypeNames)
+        : null,
+    [appliedFilters.treeMode, appliedFilters.eventTypeNames, flatMembersList],
+  );
+
   const filteredMemberIds = useMemo(() => {
     if (!active) return null;
 
@@ -59,8 +68,17 @@ export const useFilters = () => {
       ids.add(appliedFilters.lineageMemberId);
     }
 
+    // In team tree mode, intersect with team tree nodes
+    if (teamTreeNodeIds) {
+      for (const id of ids) {
+        if (!teamTreeNodeIds.has(id)) {
+          ids.delete(id);
+        }
+      }
+    }
+
     return ids;
-  }, [appliedFilters, flatMembersList, membersMap, active]);
+  }, [appliedFilters, flatMembersList, membersMap, active, teamTreeNodeIds]);
 
   const filteredCount = useMemo(() => {
     if (!filteredMemberIds) return flatMembersList.length;

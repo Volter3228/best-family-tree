@@ -19,7 +19,9 @@ export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
     (nodeId: string) => {
       if (!viewport || nodes.length === 0) return;
 
-      const node = nodes.find((n) => n.id === nodeId);
+      const node = nodes.find(
+        (n) => n.id === nodeId || n.data.member.id === nodeId,
+      );
       if (!node) return;
 
       // Kill any existing animation

@@ -1,7 +1,5 @@
 import { MongoClient, ObjectId } from "mongodb";
 import {
-  RoleCategory,
-  TeamType,
   Status,
   ActivityState,
   Member,
@@ -139,13 +137,13 @@ async function migrateData(): Promise<void> {
         const err = error as Error;
         console.error(
           `✗ Failed to create member ${memberData.name}:`,
-          err.message
+          err.message,
         );
         membersFailed++;
       }
     }
     console.log(
-      `Members: ${membersCreated} created/updated, ${membersFailed} failed\n`
+      `Members: ${membersCreated} created/updated, ${membersFailed} failed\n`,
     );
 
     // Phase 2: Add phone numbers
@@ -169,7 +167,7 @@ async function migrateData(): Promise<void> {
           const err = error as Error;
           console.error(
             `✗ Failed to add phone for ${member.name}:`,
-            err.message
+            err.message,
           );
         }
       }
@@ -211,7 +209,7 @@ async function migrateData(): Promise<void> {
         const err = error as Error;
         console.error(
           `✗ Failed to create family group "${familyName}":`,
-          err.message
+          err.message,
         );
       }
     }
@@ -234,7 +232,7 @@ async function migrateData(): Promise<void> {
           const err = error as Error;
           console.error(
             `✗ Failed to set family group for ${member.name}:`,
-            err.message
+            err.message,
           );
         }
       }
@@ -276,7 +274,7 @@ async function migrateData(): Promise<void> {
             mentorsSet++;
           } else {
             console.warn(
-              `⚠ Could not find mentor "${mentorName}" for ${member.name}`
+              `⚠ Could not find mentor "${mentorName}" for ${member.name}`,
             );
             mentorsNotFound++;
           }
@@ -284,7 +282,7 @@ async function migrateData(): Promise<void> {
           const err = error as Error;
           console.error(
             `✗ Failed to set mentor "${mentorName}" for ${member.name}:`,
-            err.message
+            err.message,
           );
         }
       }
@@ -295,8 +293,8 @@ async function migrateData(): Promise<void> {
     console.log("=== Phase 5: Creating board roles and positions ===");
     const boardMembers = Array.from(memberMap.values()).filter(({ mongoDoc }) =>
       BOARD_STATUSES.includes(
-        mongoDoc.status as (typeof BOARD_STATUSES)[number]
-      )
+        mongoDoc.status as (typeof BOARD_STATUSES)[number],
+      ),
     );
 
     if (boardMembers.length > 0) {
@@ -309,7 +307,6 @@ async function migrateData(): Promise<void> {
             update: {},
             create: {
               name: roleName,
-              category: RoleCategory.BOARD,
             },
           });
           boardRoles.set(roleName, role);
@@ -323,21 +320,23 @@ async function migrateData(): Promise<void> {
       // Create VEIN BOARD team for 2025
       let veinBoard: Team;
       try {
-        veinBoard = await prisma.team.upsert({
+        const existingBoard = await prisma.team.findFirst({
           where: {
-            name_type_year: {
-              name: "VEIN Board",
-              type: TeamType.BOARD,
-              year: 2025,
-            },
-          },
-          update: {},
-          create: {
             name: "VEIN Board",
-            type: TeamType.BOARD,
-            year: 2025,
+            eventTypeId: null,
           },
         });
+        if (existingBoard) {
+          veinBoard = existingBoard;
+        } else {
+          veinBoard = await prisma.team.create({
+            data: {
+              name: "VEIN Board",
+              startDate: new Date(2025, 0, 1),
+              endDate: new Date(2025, 11, 31),
+            },
+          });
+        }
         console.log("Created VEIN Board team");
       } catch (error) {
         const err = error as Error;
@@ -353,28 +352,29 @@ async function migrateData(): Promise<void> {
 
         if (role) {
           try {
-            await prisma.memberPosition.upsert({
+            const existingPos = await prisma.memberPosition.findFirst({
               where: {
-                memberId_roleId_teamId: {
-                  memberId: member.id,
-                  roleId: role.id,
-                  teamId: veinBoard.id,
-                },
-              },
-              update: {},
-              create: {
                 memberId: member.id,
                 roleId: role.id,
                 teamId: veinBoard.id,
-                startDate: new Date("2025-02-08"),
               },
             });
+            if (!existingPos) {
+              await prisma.memberPosition.create({
+                data: {
+                  memberId: member.id,
+                  roleId: role.id,
+                  teamId: veinBoard.id,
+                  startDate: new Date("2025-02-08"),
+                },
+              });
+            }
             positionsCreated++;
           } catch (error) {
             const err = error as Error;
             console.error(
               `✗ Failed to create position for ${member.name}:`,
-              err.message
+              err.message,
             );
           }
         }

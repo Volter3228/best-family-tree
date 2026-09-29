@@ -133,7 +133,8 @@ const LineageEdge = ({
 
   // Ticker for rendering
   useEffect(() => {
-    if (!app?.ticker) return;
+    const ticker = app?.ticker;
+    if (!ticker) return;
 
     let alive = true;
 
@@ -149,7 +150,7 @@ const LineageEdge = ({
         return;
       }
 
-      offsetRef.current -= (app.ticker.deltaMS / 1000) * SPEED;
+      offsetRef.current -= (ticker.deltaMS / 1000) * SPEED;
 
       // Skip redraw when dash offset delta is sub-pixel and no transition is active
       const offsetDelta = Math.abs(offsetRef.current - lastOffsetRef.current);
@@ -185,10 +186,10 @@ const LineageEdge = ({
     };
 
     onTick();
-    app.ticker.add(onTick);
+    ticker.add(onTick);
     return () => {
       alive = false;
-      app.ticker.remove(onTick);
+      ticker.remove(onTick);
     };
   }, [app, pixelLine, accentColors]);
 

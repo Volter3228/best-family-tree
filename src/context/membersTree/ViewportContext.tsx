@@ -8,6 +8,10 @@ export interface IViewportContext {
   setScale: Dispatch<SetStateAction<number>>;
   viewport: Viewport | null;
   setViewport: Dispatch<SetStateAction<Viewport | null>>;
+  isFitViewAnimating: boolean;
+  setIsFitViewAnimating: Dispatch<SetStateAction<boolean>>;
+  fitViewTargetScale: number | null;
+  setFitViewTargetScale: Dispatch<SetStateAction<number | null>>;
 }
 
 export const ViewportContext = createContext<IViewportContext | undefined>(

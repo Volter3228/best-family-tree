@@ -4,6 +4,7 @@ model MemberPosition {
   roleId   String
 
   teamId String?
+  year   Int?
 
   startDate DateTime?
   endDate   DateTime?
@@ -15,6 +16,6 @@ model MemberPosition {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([memberId, roleId, teamId])
+  @@unique([memberId, roleId, teamId, year])
   @@map("member_positions")
 }

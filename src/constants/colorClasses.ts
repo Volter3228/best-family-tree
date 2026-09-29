@@ -28,7 +28,7 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     hoverText: "hover:text-surface-blue",
     hoverTextAccent: "hover:text-accent-blue",
     accentBg: "bg-accent-blue",
-    hoverAccentBg: "hover:bg-accent-blue/80",
+    hoverAccentBg: "hover:bg-accent-blue/50",
     hoverSurfaceBg: "hover:bg-accent-blue/10",
     border: "border-accent-blue",
     surfaceBg: "bg-surface-blue",

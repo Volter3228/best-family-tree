@@ -14,82 +14,139 @@
 }
 
 .react-datepicker {
-  @apply border-foreground! rounded-2xl! backdrop-blur-xl! bg-surface/90!;
+  @apply rounded-2xl backdrop-blur-xl bg-surface/95;
+  border-color: var(--datepicker-accent, var(--foreground));
+  transform-origin: top center;
+  animation: fade-slide-down 0.2s ease-out forwards;
 }
 
 .react-datepicker__tab-loop {
-  opacity: 0;
-  transform: scale(0.9);
-  animation: zoomIn 0.2s ease-out forwards;
   position: absolute;
 }
 
 .react-datepicker__header {
-  @apply bg-surface/70! backdrop-blur-xl text-foreground! rounded-t-2xl! border-0 border-b-2!;
+  @apply backdrop-blur-xl text-foreground border-0 border-b-2;
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
+  background-color: var(--surface);
+  border-bottom-color: var(--datepicker-accent, var(--foreground));
 }
 
 .react-datepicker__month-container {
-  @apply border-foreground! rounded-xl;
+  @apply rounded-xl;
+  border-color: var(--datepicker-accent, var(--foreground));
 }
 
 .react-datepicker__current-month {
-  @apply text-foreground! pointer-events-none!;
+  pointer-events: none;
+  color: var(--datepicker-accent, var(--foreground));
 }
 
 .react-datepicker__year-read-view {
-  @apply text-xs!;
+  @apply text-xs;
+  color: var(--datepicker-accent, var(--foreground));
 }
 
-.react-datepicker__navigation:hover .react-datepicker__navigation-icon {
-  @apply before:border-foreground/70!;
+/* Accent color for calendar highlights. Set per-datepicker via
+   popperClassName="datepicker-accent-{color}". Falls back to --foreground. */
+.datepicker-accent-blue {
+  --datepicker-accent: var(--accent-blue);
+  --datepicker-on-accent: #fff;
 }
 
-.react-datepicker__navigation-icon {
-  @apply before:border-foreground!;
+.datepicker-accent-green {
+  --datepicker-accent: var(--accent-green);
+  --datepicker-on-accent: #fff;
+}
+
+.datepicker-accent-orange {
+  --datepicker-accent: var(--accent-orange);
+  --datepicker-on-accent: #fff;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--datepicker-accent, var(--foreground)) !important;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  opacity: 0.7;
 }
 
 .react-datepicker__year-read-view--down-arrow {
-  @apply border-foreground! hover:border-foreground/70!;
+  border-color: var(--datepicker-accent, var(--foreground)) !important;
+}
+
+.react-datepicker__year-read-view:hover .react-datepicker__year-read-view--down-arrow {
+  opacity: 0.7;
 }
 
 /* Triangle ^ appears as separate block */
 .react-datepicker__triangle {
-  @apply stroke-foreground! fill-surface! text-surface! z-50;
+  @apply !fill-surface !text-surface !z-50;
+  stroke: var(--datepicker-accent, var(--foreground)) !important;
 }
 
 .react-datepicker__year-dropdown {
-  @apply bg-surface! border-foreground! shadow-md! text-foreground! scroll-p-0!;
+  @apply bg-surface shadow-md text-foreground scroll-p-0;
+  border-color: var(--datepicker-accent, var(--foreground));
   scrollbar-width: none;
   scrollbar-color: transparent transparent;
 }
 
 .react-datepicker__year-option {
-  @apply hover:bg-foreground/15!;
+  @apply hover:bg-foreground/15;
 }
 
 .react-datepicker__year-option--selected {
-  @apply text-surface! font-bold!;
+  @apply font-bold;
+  color: var(--datepicker-accent, var(--surface)) !important;
 }
 
 .react-datepicker__day-name {
-  @apply text-foreground/60! pointer-events-none!;
+  @apply text-foreground/60 pointer-events-none;
 }
 
 .react-datepicker__day {
-  @apply text-foreground! hover:bg-foreground/20! transition-colors duration-200 rounded-md!;
+  @apply text-foreground transition-colors duration-200 rounded-md;
 }
 
-.react-datepicker__day--keyboard-selected,
+.react-datepicker__day:hover {
+  background-color: color-mix(in srgb,
+      var(--datepicker-accent, var(--foreground)) 20%,
+      transparent) !important;
+}
+
+.react-datepicker__day--today {
+  font-weight: 700;
+  color: var(--datepicker-accent, var(--foreground)) !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply transition-colors duration-200;
+  background-color: color-mix(in srgb,
+      var(--datepicker-accent, var(--foreground)) 30%,
+      transparent) !important;
+  color: var(--datepicker-accent, var(--foreground)) !important;
+}
+
 .react-datepicker__day--selected {
-  @apply bg-foreground! text-surface! hover:bg-foreground/80! transition-colors duration-200;
+  @apply transition-colors duration-200;
+  background-color: var(--datepicker-accent, var(--foreground)) !important;
+  color: var(--datepicker-on-accent, var(--surface)) !important;
 }
 
-@keyframes zoomIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.react-datepicker__day--keyboard-selected:hover {
+  background-color: color-mix(in srgb,
+      var(--datepicker-accent, var(--foreground)) 45%,
+      transparent) !important;
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: color-mix(in srgb,
+      var(--datepicker-accent, var(--foreground)) 80%,
+      transparent) !important;
+}
+
+.react-datepicker__day--disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
 }

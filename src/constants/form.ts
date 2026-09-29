@@ -20,4 +20,5 @@ export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   instagramLink: "",
   facebookLink: "",
   linkedinLink: "",
+  positions: [],
 };

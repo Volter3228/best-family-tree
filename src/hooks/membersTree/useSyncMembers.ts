@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMembers } from "../useMembers";
+import { useMembers } from "../data/useMembers";
 import type { Member as MemberType } from "@/types";
 
 /**

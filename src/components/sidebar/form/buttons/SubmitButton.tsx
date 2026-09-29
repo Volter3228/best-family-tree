@@ -17,7 +17,7 @@ const SubmitButton = ({
   return (
     <button
       className={twMerge(
-        "w-full h-10 rounded-full text-white font-semibold focus:outline-hidden focus:ring-2 transition-colors duration-300 ease-in-out hover:brightness-80",
+        "w-full h-10 rounded-full text-white font-semibold focus:outline-hidden focus:ring-2 transition-all duration-300 ease-in-out hover:brightness-80",
         COLOR_CLASSES[color].accentBg,
         COLOR_CLASSES[color].surfaceRing,
       )}
