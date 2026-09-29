@@ -15,6 +15,7 @@ interface Props {
   member: Member;
   isSelected: boolean;
   placeholderColorIndex: number;
+  teamRole?: string;
 }
 
 const TEXT_Y = NODE_AVATAR_SIZE + 17;
@@ -23,6 +24,7 @@ const MemberNodeCard = ({
   member,
   isSelected,
   placeholderColorIndex,
+  teamRole,
 }: Props) => {
   const centerX = NODE_WIDTH / 2;
   const {
@@ -47,9 +49,9 @@ const MemberNodeCard = ({
     [member.name, titleStyle],
   );
 
-  const seasonText = useMemo(
-    () => formatMemberRecruitmentSeason(member),
-    [member],
+  const subtitleText = useMemo(
+    () => teamRole || formatMemberRecruitmentSeason(member),
+    [member, teamRole],
   );
 
   const subtitleY = titleMetrics.height / 2 + 12;
@@ -95,7 +97,7 @@ const MemberNodeCard = ({
       <pixiContainer x={centerX} y={TEXT_Y}>
         <pixiBitmapText text={member.name} style={titleStyle} anchor={0.5} />
         <pixiBitmapText
-          text={seasonText}
+          text={subtitleText}
           anchor={0.5}
           y={subtitleY}
           style={subtitleStyle}

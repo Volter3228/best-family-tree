@@ -8,15 +8,36 @@ import {
   type AvatarFilterValue,
   type FilterState,
   type RecruitmentSeason,
+  type TreeMode,
   MemberStatus,
   ActivityState,
 } from "@/types";
+
+const TREE_MODES: TreeMode[] = ["family", "none", "team"];
 
 const parseNumberOrNull = (val: string | null): number | null => {
   if (!val) return null;
   const n = Number(val);
   return Number.isFinite(n) ? n : null;
 };
+
+const parseCsvStrings = (val: string | null): string[] => {
+  if (!val) return [];
+  return val
+    .split(",")
+    .filter(Boolean)
+    .map((part) => {
+      try {
+        return decodeURIComponent(part);
+      } catch {
+        return part;
+      }
+    });
+};
+
+// Names are encoded per segment so values containing commas survive a round-trip.
+const serializeNameCsv = (names: string[]): string =>
+  names.map(encodeURIComponent).join(",");
 
 const parseCsvArray = <T extends string>(
   val: string | null,
@@ -65,7 +86,11 @@ export const parseFiltersFromSearchParams = (
       AVATAR_VALUES,
     ),
     lineageMemberId: params.get("lineageMemberId") || null,
-    showTree: params.get("showTree") !== "0",
+    treeMode: TREE_MODES.includes(params.get("treeMode") as TreeMode)
+      ? (params.get("treeMode") as TreeMode)
+      : "family",
+    roleNames: parseCsvStrings(params.get("role")),
+    eventTypeNames: parseCsvStrings(params.get("eventType")),
   };
 };
 
@@ -93,7 +118,10 @@ export const filtersToSearchParams = (
   if (filters.birthdayIncludeYear) set("birthdayIncludeYear", "1");
   if (filters.avatars.length < AVATAR_VALUES.length)
     set("avatar", serializeCsv(filters.avatars));
-  if (!filters.showTree) set("showTree", "0");
+  if (filters.treeMode !== "family") set("treeMode", filters.treeMode);
+  if (filters.roleNames.length > 0) set("role", serializeNameCsv(filters.roleNames));
+  if (filters.eventTypeNames.length > 0)
+    set("eventType", serializeNameCsv(filters.eventTypeNames));
 
   const { lineageMemberId } = filters;
   if (lineageMemberId) {

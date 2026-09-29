@@ -36,7 +36,9 @@ export const EMPTY_FILTER_STATE: FilterState = {
   birthdayIncludeYear: false,
   avatars: [...AVATAR_VALUES],
   lineageMemberId: null,
-  showTree: true,
+  treeMode: "family",
+  roleNames: [],
+  eventTypeNames: [],
 };
 
 // Checkbox groups filter sections options

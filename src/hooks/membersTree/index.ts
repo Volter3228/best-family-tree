@@ -4,5 +4,6 @@ export * from "./useViewport";
 export * from "./useSyncMembers";
 export * from "./useTreeLayout";
 export * from "./useTexture";
+export * from "./useCanvasTheme";
 export * from "./animations";
 export * from "./useFilters";

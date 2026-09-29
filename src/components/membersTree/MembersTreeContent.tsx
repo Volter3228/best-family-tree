@@ -16,7 +16,13 @@ import { isZoomedOut as getIsZoomedOut } from "@/utils";
 import { BIRTHDAY_ANIMATION_MIN_SCALE } from "@/constants/canvas";
 import { Member } from "@/models";
 import type { Member as MemberType, AccentColor } from "@/types";
-import { Viewport, NodesLayer, EdgesLayer, LineageEdge } from "./canvas";
+import {
+  Viewport,
+  NodesLayer,
+  TeamLabelsLayer,
+  EdgesLayer,
+  LineageEdge,
+} from "./canvas";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
 import Toolbar from "./toolbar";
 
@@ -43,7 +49,7 @@ const MembersTreeContent = ({ members }: Props) => {
 
   const { filteredMemberIds, appliedFilters } = useFilters();
   const { focusNode, fitView } = useViewportAnimation();
-  const showTree = appliedFilters.showTree;
+  const showTree = appliedFilters.treeMode !== "none";
 
   useSyncMembers(members);
   useTreeLayout();
@@ -101,7 +107,7 @@ const MembersTreeContent = ({ members }: Props) => {
               pixelLine={isZoomedOut}
             />
           )}
-          {showTree && (
+          {showTree && appliedFilters.treeMode === "family" && (
             <LineageEdge
               selectedMember={selectedMember}
               membersMap={membersMap}
@@ -114,8 +120,12 @@ const MembersTreeContent = ({ members }: Props) => {
             isZoomedOut={isZoomedOut}
             showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
             selectedMember={selectedMember}
+            isTeamView={appliedFilters.treeMode === "team"}
             onNodeClick={handleNodeClick}
           />
+          {showTree && appliedFilters.treeMode === "team" && (
+            <TeamLabelsLayer nodes={nodes} isZoomedOut={isZoomedOut} />
+          )}
         </Viewport>
       </Application>
       <Toolbar onFitView={handleFitView} onSearch={handleSearch} />

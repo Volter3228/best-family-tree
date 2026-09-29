@@ -1,6 +1,7 @@
 import DatePicker from "react-datepicker";
 import { toDate, fromDate } from "@/utils";
 import { DATE_PICKER_CLASSES } from "@/constants/filters";
+import { MAX_DATE_BIRTHDAY, MIN_DATE_BIRTHDAY } from "@/constants/form";
 import type { FilterState } from "@/types";
 import FilterSection from "./FilterSection";
 import FilterCheckbox from "./FilterCheckbox";
@@ -55,6 +56,9 @@ const BirthdayFilterSection = ({
     });
   };
 
+  const minBound = birthdayIncludeYear ? MIN_DATE_BIRTHDAY : undefined;
+  const maxBound = birthdayIncludeYear ? MAX_DATE_BIRTHDAY : undefined;
+
   // Common datepicker props
   const pickerProps = {
     dateFormat: fmt,
@@ -65,6 +69,9 @@ const BirthdayFilterSection = ({
     dateFormatCalendar: birthdayIncludeYear ? "LLLL yyyy" : "LLLL",
     className: DATE_PICKER_CLASSES,
     portalId: "datepicker-portal",
+    popperClassName: "datepicker-accent-green",
+    minDate: minBound,
+    maxDate: maxBound,
   };
 
   const hasActiveValue = birthdayFrom !== null || birthdayTo !== null;
@@ -84,8 +91,8 @@ const BirthdayFilterSection = ({
                 selected={fromDateObj}
                 onChange={handleFromChange}
                 placeholderText="Від"
-                maxDate={toDateObj ?? undefined}
                 {...pickerProps}
+                maxDate={toDateObj ?? maxBound}
               />
               {birthdayFrom && (
                 <ClearButton onClick={handleClear("birthdayFrom")} />
@@ -97,8 +104,8 @@ const BirthdayFilterSection = ({
                 selected={toDateObj}
                 onChange={handleToChange}
                 placeholderText="До"
-                minDate={fromDateObj ?? undefined}
                 {...pickerProps}
+                minDate={fromDateObj ?? minBound}
               />
               {birthdayTo && (
                 <ClearButton onClick={handleClear("birthdayTo")} />

@@ -1,9 +1,10 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useMembers } from "@/hooks";
+import { useMembers, useDropdownPosition } from "@/hooks";
 import { normalize } from "@/utils";
 import { Member } from "@/models";
+import DropdownPortal from "@/components/common/DropdownPortal";
 
 const MAX_SUGGESTIONS = 6;
 
@@ -112,6 +113,12 @@ const LineageMemberSearch = ({
 
   const showDropdown = isOpen && filtered.length > 0 && !selectedMember;
 
+  const { position: dropdownPos } = useDropdownPosition({
+    isOpen: showDropdown,
+    anchorRef: wrapperRef,
+    threshold: 200,
+  });
+
   return (
     <div ref={wrapperRef} className="relative">
       <div className="flex items-center gap-2 bg-surface-green/40 rounded-lg px-2 py-1.5">
@@ -145,33 +152,39 @@ const LineageMemberSearch = ({
           </button>
         )}
       </div>
-      <ul
-        className={twMerge(
-          "fixed w-[calc(100%-24px)] z-50 max-h-48 overflow-y-auto rounded-lg bg-surface/80 backdrop-blur-lg shadow-lg transition-all duration-200 ease-in-out origin-bottom bottom-[90px]",
-          showDropdown
-            ? "opacity-100 translate-y-0 scale-y-100"
-            : "opacity-0 translate-y-1 scale-y-95 pointer-events-none",
-        )}
-        style={{
-          scrollbarWidth: "thin",
-          scrollbarColor: "var(--accent-green) transparent",
-        }}
-      >
-        {filtered.map((member, index) => (
-          <li
-            key={member.id}
-            onMouseDown={() => handleSelect(member)}
-            className={twMerge(
-              "px-3 py-1.5 text-sm cursor-pointer transition-colors",
-              index === activeIndex
-                ? "bg-accent-green text-white"
-                : "text-foreground hover:bg-accent-green/15",
-            )}
-          >
-            {member.name}
-          </li>
-        ))}
-      </ul>
+      <DropdownPortal>
+        <ul
+          className={twMerge(
+            "fixed z-50 max-h-48 overflow-y-auto rounded-lg bg-surface/80 backdrop-blur-lg shadow-lg transition-all duration-200 ease-in-out origin-top",
+            showDropdown
+              ? "opacity-100 translate-y-0 scale-y-100"
+              : "opacity-0 translate-y-1 scale-y-95 pointer-events-none",
+          )}
+          style={{
+            ...dropdownPos,
+            scrollbarWidth: "thin",
+            scrollbarColor: "var(--accent-green) transparent",
+          }}
+        >
+          {filtered.map((member, index) => (
+            <li
+              key={member.id}
+              onMouseDown={(event) => {
+                event.stopPropagation();
+                handleSelect(member);
+              }}
+              className={twMerge(
+                "px-3 py-1.5 text-sm cursor-pointer transition-colors",
+                index === activeIndex
+                  ? "bg-accent-green text-white"
+                  : "text-foreground hover:bg-accent-green/15",
+              )}
+            >
+              {member.name}
+            </li>
+          ))}
+        </ul>
+      </DropdownPortal>
     </div>
   );
 };

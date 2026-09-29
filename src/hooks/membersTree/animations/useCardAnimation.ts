@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { Container } from "pixi.js";
 import gsap from "gsap";
 import {
@@ -30,32 +30,50 @@ interface Props {
   cardRef: RefObject<Container | null>;
   isZoomedOut: boolean;
   memberId: string;
+  isFitViewAnimating: boolean;
+  fitViewTargetScale: number | null;
 }
 
-export const useCardAnimation = ({ cardRef, isZoomedOut, memberId }: Props) => {
+export const useCardAnimation = ({
+  cardRef,
+  isZoomedOut,
+  memberId,
+  isFitViewAnimating,
+  fitViewTargetScale,
+}: Props) => {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const isInitialMount = useRef(true);
+  const appliedStateRef = useRef<"shown" | "hidden" | null>(null);
   const delay = useMemo(() => getCardAnimDelay(memberId), [memberId]);
 
-  useEffect(() => {
+  const hideForFitView = isFitViewAnimating && fitViewTargetScale !== null;
+  const shouldBeHidden = isZoomedOut || hideForFitView;
+
+  useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card) return;
 
+    const setHiddenInstantly = () => {
+      card.visible = false;
+      card.alpha = 0;
+      card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
+      card.y = SLIDE_START_Y;
+    };
+
     // On first mount set initial state without animation
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (isZoomedOut) {
-        card.visible = false;
-        card.alpha = 0;
-        card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
-        card.y = SLIDE_START_Y;
-      }
+    if (appliedStateRef.current === null) {
+      appliedStateRef.current = shouldBeHidden ? "hidden" : "shown";
+      if (shouldBeHidden) setHiddenInstantly();
       return;
     }
 
+    // Only animate on actual visibility transitions
+    const targetState = shouldBeHidden ? "hidden" : "shown";
+    if (targetState === appliedStateRef.current) return;
+    appliedStateRef.current = targetState;
+
     tlRef.current?.kill();
 
-    if (!isZoomedOut) {
+    if (!shouldBeHidden) {
       // Zoom-in: card slides down from behind avatar center while expanding
       card.visible = true;
       card.alpha = 0;
@@ -93,5 +111,5 @@ export const useCardAnimation = ({ cardRef, isZoomedOut, memberId }: Props) => {
     return () => {
       tlRef.current?.kill();
     };
-  }, [isZoomedOut, delay, cardRef]);
+  }, [shouldBeHidden, delay, cardRef]);
 };

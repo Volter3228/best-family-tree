@@ -95,6 +95,31 @@ const matchesAvatar = (
   );
 };
 
+const matchesRoles = (member: Member, roleNames: string[]): boolean => {
+  if (roleNames.length === 0) return true;
+  return member.positions.some(
+    // Match ids too for backward compatibility with old URL params.
+    (position) =>
+      roleNames.includes(position.role.name) ||
+      roleNames.includes(position.roleId),
+  );
+};
+
+const matchesEventTypes = (
+  member: Member,
+  eventTypeNames: string[],
+): boolean => {
+  if (eventTypeNames.length === 0) return true;
+  return member.positions.some((p) => {
+    const eventType = p.team?.eventType;
+    if (!eventType) return false;
+    return (
+      eventTypeNames.includes(eventType.name) ||
+      eventTypeNames.includes(eventType.id)
+    );
+  });
+};
+
 export const memberMatchesFilters = (
   member: Member,
   filters: FilterState,
@@ -111,6 +136,8 @@ export const memberMatchesFilters = (
     return false;
   if (!matchesBirthday(member, filters)) return false;
   if (!matchesAvatar(member, filters.avatars)) return false;
+  if (!matchesRoles(member, filters.roleNames)) return false;
+  if (!matchesEventTypes(member, filters.eventTypeNames)) return false;
   return true;
 };
 
@@ -119,11 +146,16 @@ export const isFilterActive = (filters: FilterState): boolean => {
     filters.joinYearFrom !== null ||
     filters.joinYearTo !== null ||
     filters.joinSeasons.length < JOIN_SEASONS.length ||
-    filters.statuses.length < MEMBER_STATUSES.length ||
-    filters.activityStates.length < ACTIVITY_STATES.length ||
+    (filters.statuses.length < MEMBER_STATUSES.length &&
+      filters.statuses.length > 0) ||
+    (filters.activityStates.length < ACTIVITY_STATES.length &&
+      filters.activityStates.length > 0) ||
     filters.birthdayFrom !== null ||
     filters.birthdayTo !== null ||
     filters.avatars.length < AVATAR_VALUES.length ||
-    filters.lineageMemberId !== null
+    filters.lineageMemberId !== null ||
+    filters.roleNames.length > 0 ||
+    filters.eventTypeNames.length > 0 ||
+    filters.treeMode !== "family"
   );
 };

@@ -14,6 +14,7 @@ interface Props {
   placeholder?: string;
   maxDate?: Date;
   minDate?: Date;
+  disabled?: boolean;
   onChange: (date: Date | null) => void;
   color?: AccentColor;
 }
@@ -27,13 +28,14 @@ const DateInput = ({
   placeholder = "",
   maxDate,
   minDate,
+  disabled = false,
   onChange,
   color = "blue",
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
 
   return (
-    <div className="transition-all z-50">
+    <div className="transition-all">
       <InputLabel
         label={label}
         htmlFor={name}
@@ -51,6 +53,7 @@ const DateInput = ({
         scrollableYearDropdown
         maxDate={maxDate}
         minDate={minDate}
+        disabled={disabled}
         required={required}
         autoComplete="off"
         className={twMerge(
@@ -59,8 +62,15 @@ const DateInput = ({
           "placeholder:text-placeholder focus:outline-hidden focus:ring-2",
           colorClasses.accentRing,
           "transition-all duration-200 ease-out",
+          "disabled:cursor-not-allowed disabled:opacity-60",
         )}
-        calendarClassName="border-accent-blue bg-surface-blue text-foreground shadow-md rounded-lg"
+        popperClassName={`datepicker-accent-${color}`}
+        portalId="datepicker-portal"
+        calendarClassName={twMerge(
+          colorClasses.border,
+          colorClasses.surfaceBg,
+          "text-foreground shadow-md rounded-lg",
+        )}
         placeholderText={placeholder}
       />
       <div className="relative">
@@ -68,6 +78,7 @@ const DateInput = ({
           className={twMerge(
             "absolute -top-9 h-8 w-8 right-0 pr-2 flex items-center pointer-events-none",
             colorClasses.text,
+            disabled && "opacity-40",
           )}
         >
           <CalendarDaysIcon />

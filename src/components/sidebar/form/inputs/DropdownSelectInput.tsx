@@ -1,9 +1,11 @@
+import { useRef } from "react";
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
-import { useDropdown } from "@/hooks";
+import { useDropdown, useDropdownPosition } from "@/hooks";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor, DropdownOption } from "@/types";
+import DropdownMenu from "@/components/common/DropdownMenu";
 
 interface Props {
   name: string;
@@ -28,6 +30,9 @@ const DropdownSelectInput = ({
   initialValue,
   color = "blue",
 }: Props) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
+
   const {
     isOpen,
     setIsOpen,
@@ -40,27 +45,28 @@ const DropdownSelectInput = ({
     handleSelect,
     handleKeyDown,
     handleClose,
-  } = useDropdown(options, onSelect, initialValue, autoComplete);
+  } = useDropdown(options, onSelect, initialValue, autoComplete, menuRef);
 
-  const handleInputFocus = () => setIsOpen(true);
+  const {
+    dropUp,
+    position: dropdownPos,
+    update: updateDropdownPosition,
+  } = useDropdownPosition({ isOpen, anchorRef: inputRef });
+
+  const handleInputFocus = () => {
+    updateDropdownPosition();
+    setIsOpen(true);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
     setIsOpen(true);
   };
 
-  const handleOptionClick = (opt: DropdownOption) => () => {
+  const handleOptionSelect = (opt: DropdownOption) => {
     handleSelect(opt);
     handleClose();
   };
-
-  const handleOptionKeyDown =
-    (opt: DropdownOption) => (e: React.KeyboardEvent<HTMLLIElement>) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleOptionClick(opt)();
-      }
-    };
 
   const colorClasses = COLOR_CLASSES[color];
 
@@ -73,73 +79,56 @@ const DropdownSelectInput = ({
         required={required}
         color={color}
       />
-      <input
-        id={name}
-        type="text"
-        value={inputValue}
-        placeholder={placeholder}
-        required={required}
-        readOnly={!autoComplete}
-        onChange={handleInputChange}
-        onFocus={handleInputFocus}
-        onKeyDown={handleKeyDown}
-        autoComplete="off"
-        className={twMerge(
-          "block w-full px-3 py-2 rounded-xl shadow-inner font-light bg-surface",
-          colorClasses.border,
-          "placeholder:text-placeholder",
-          "focus:outline-hidden focus:ring-2",
-          colorClasses.accentRing,
-          colorClasses.caret,
-          "transition-all duration-200 ease-out",
-          !autoComplete ? "cursor-pointer select-none caret-transparent" : "",
-        )}
-      />
-      {(isOpen || isClosing) && !!filteredOptions.length && (
-        <ul
+      <div className="relative">
+        <input
+          id={name}
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          placeholder={placeholder}
+          required={required}
+          readOnly={!autoComplete}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onKeyDown={(e) => handleKeyDown(e, dropUp)}
+          autoComplete="off"
           className={twMerge(
-            "absolute z-10 mt-2 max-h-80 w-full overflow-y-auto",
-            "rounded-xl bg-surface/80 backdrop-blur-lg shadow-lg transition-all transform scale-95 scroll-smooth",
-            isClosing ? "animate-fade-slide-up" : "animate-fade-slide-down",
+            "block w-full px-3 py-2 rounded-xl shadow-inner font-light bg-surface",
+            colorClasses.border,
+            "placeholder:text-placeholder",
+            "focus:outline-hidden focus:ring-2",
+            colorClasses.accentRing,
+            colorClasses.caret,
+            "transition-all duration-200 ease-out",
+            !autoComplete ? "cursor-pointer select-none caret-transparent" : "",
           )}
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: `var(--accent-${color}) transparent`,
-          }}
-          tabIndex={-1}
-        >
-          {filteredOptions.map((opt, index) => (
-            <li
-              key={opt.value}
-              role="option"
-              aria-selected={opt.value === inputValue ? "true" : "false"}
-              tabIndex={-1}
-              onClick={handleOptionClick(opt)}
-              onKeyDown={handleOptionKeyDown(opt)}
-              className={twMerge(
-                "px-3 py-2 cursor-pointer",
-                index === activeOptionIndex
-                  ? `${colorClasses.accentBg} text-white`
-                  : `${colorClasses.hoverAccentBg} hover:text-white`,
-              )}
-            >
-              {opt.text}
-            </li>
-          ))}
-        </ul>
-      )}
-      {!autoComplete && (
-        <div className="relative">
+        />
+        {(isOpen || isClosing) && !!filteredOptions.length && (
+          <DropdownMenu
+            options={filteredOptions}
+            activeIndex={activeOptionIndex}
+            dropUp={dropUp}
+            isClosing={isClosing}
+            position={dropdownPos}
+            menuRef={menuRef}
+            color={color}
+            selectedValue={inputValue}
+            listClassName="drop-shadow-2xl"
+            onSelect={handleOptionSelect}
+          />
+        )}
+        {!autoComplete && (
           <div
             className={twMerge(
-              "absolute -top-9 h-8 w-8 right-0 pr-2 flex items-center pointer-events-none",
+              "absolute top-1/2 -translate-y-1/2 right-2 h-5 w-5 flex items-center pointer-events-none transition-transform duration-200",
               COLOR_CLASSES[color].text,
+              (isOpen || isClosing) && "rotate-180",
             )}
           >
             <ChevronDownIcon />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

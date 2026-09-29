@@ -2,6 +2,8 @@ import { RecruitmentSeason, MemberStatus, ActivityState } from "./members";
 
 export type AvatarFilterValue = "with" | "without";
 
+export type TreeMode = "family" | "none" | "team";
+
 export interface FilterState {
   joinYearFrom: number | null;
   joinYearTo: number | null;
@@ -15,7 +17,9 @@ export interface FilterState {
   birthdayIncludeYear: boolean;
   avatars: AvatarFilterValue[];
   lineageMemberId: string | null;
-  showTree: boolean;
+  treeMode: TreeMode;
+  roleNames: string[];
+  eventTypeNames: string[];
 }
 
 export type FilterSectionKey =
@@ -26,4 +30,6 @@ export type FilterSectionKey =
   | "birthday"
   | "avatar"
   | "lineage"
-  | "connections";
+  | "connections"
+  | "role"
+  | "project";

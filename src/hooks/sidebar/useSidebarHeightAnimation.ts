@@ -14,8 +14,14 @@ export function useSidebarHeightAnimation(
     const inner = innerRef.current;
     const outer = outerRef.current;
 
+    const clampScrollTop = () => {
+      const maxScroll = Math.max(0, outer.scrollHeight - outer.clientHeight);
+      if (outer.scrollTop > maxScroll) outer.scrollTop = maxScroll;
+    };
+
     const ro = new ResizeObserver(() => {
       const height = inner.offsetHeight;
+      clampScrollTop();
 
       if (!hasMountedRef.current) {
         gsap.set(outer, { height });
@@ -37,12 +43,18 @@ export function useSidebarHeightAnimation(
       outer.classList.add("sidebar-height-animating");
       heightTweenRef.current = gsap.to(outer, {
         height,
-        duration: 0.25,
+        duration: 0.4,
         ease: "power2.out",
         overwrite: "auto",
         onComplete: () => {
           outer.classList.remove("sidebar-height-animating");
           heightTweenRef.current = null;
+          const settled = inner.offsetHeight;
+          if (Math.abs(settled - height) >= 1) {
+            lastHeightRef.current = settled;
+            gsap.set(outer, { height: settled });
+          }
+          clampScrollTop();
         },
       });
     });

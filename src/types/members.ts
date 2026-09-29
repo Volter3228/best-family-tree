@@ -1,4 +1,5 @@
 import { Member as MemberModel } from "@/models";
+import type { MemberPosition } from "./positions";
 
 export enum MemberStatus {
   Observer = "OBSERVER",
@@ -34,6 +35,7 @@ export type Member = {
   mentor?: Member | null;
   mentees?: Member[];
   phoneNumbers: string[];
+  positions?: MemberPosition[];
 };
 
 export type MentorsListItem = {

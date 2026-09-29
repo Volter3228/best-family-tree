@@ -2,21 +2,16 @@ import { Router } from "express";
 import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
 import { deleteCloudinaryImage } from "../libs/cloudinary.js";
+import { validateMemberBody } from "../utils/index.js";
 import {
-  transformMemberPhoneNumbers,
-  validateMemberBody,
-  normalizeSocialLinks,
-} from "../utils/index.js";
-import type { MemberWithPhoneNumberRecords } from "../utils/index.js";
+  parsePhoneNumbers,
+  parsePositionsPayload,
+} from "./member/memberPayload.js";
+import { MEMBER_INCLUDE, serializeMember } from "./member/memberQueries.js";
+import { createMember, updateMember } from "./member/memberService.js";
 
 const router = Router();
 const uploadMemberPhoto = uploadMiddleware("best-family-tree/members");
-
-const MEMBER_INCLUDE = {
-  mentees: { include: { phoneNumbers: true as const } },
-  mentor: { include: { phoneNumbers: true as const } },
-  phoneNumbers: true as const,
-};
 
 router.get("/member/:id", async (req, res) => {
   try {
@@ -30,10 +25,7 @@ router.get("/member/:id", async (req, res) => {
       return;
     }
 
-    const transformed = transformMemberPhoneNumbers(
-      member as MemberWithPhoneNumberRecords,
-    );
-    res.status(200).json(transformed);
+    res.status(200).json(serializeMember(member));
   } catch (error) {
     console.error("Failed to fetch member:", error);
     res.status(500).json({ error: "Failed to fetch member" });
@@ -50,63 +42,25 @@ router.post(
       return;
     }
 
-    const {
-      firstName,
-      lastName,
-      birthday,
-      joinedAt,
-      mentorId,
-      status,
-      email,
-      telegramLink,
-      instagramLink,
-      facebookLink,
-      linkedinLink,
-    } = validation.data;
+    let phoneNumbers: string[];
+    let positions;
+    try {
+      phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
+      positions = parsePositionsPayload(req.body.positions) ?? [];
+    } catch {
+      res.status(400).json({ error: "Invalid phoneNumbers or positions payload" });
+      return;
+    }
 
     try {
       const photoUrl = req.file?.path || null;
-      const phoneNumbers: string[] = JSON.parse(validation.data.phoneNumbers);
-      const normalizedLinks = normalizeSocialLinks({
-        telegramLink,
-        instagramLink,
-        facebookLink,
-        linkedinLink,
-      });
-
-      const newMember = await prisma.$transaction(async (tx) => {
-        const member = await tx.member.create({
-          data: {
-            name: `${firstName} ${lastName}`,
-            birthday: new Date(birthday),
-            email: email || null,
-            status,
-            joinedAt: new Date(joinedAt),
-            photo: photoUrl,
-            mentorId,
-            ...normalizedLinks,
-          },
-        });
-
-        if (phoneNumbers.length) {
-          await tx.phoneNumber.createMany({
-            data: phoneNumbers.map((phoneNumber) => ({
-              phoneNumber,
-              ownerId: member.id,
-            })),
-          });
-        }
-
-        return tx.member.findUniqueOrThrow({
-          where: { id: member.id },
-          include: MEMBER_INCLUDE,
-        });
-      });
-
-      const transformed = transformMemberPhoneNumbers(
-        newMember as MemberWithPhoneNumberRecords,
+      const newMember = await createMember(
+        validation.data,
+        phoneNumbers,
+        positions,
+        photoUrl,
       );
-      res.status(201).json(transformed);
+      res.status(201).json(serializeMember(newMember));
     } catch (error) {
       console.error("Failed to create member:", error);
       res.status(500).json({ error: "Failed to create member" });
@@ -125,20 +79,6 @@ router.put(
       res.status(400).json({ error: validation.errors });
       return;
     }
-
-    const {
-      firstName,
-      lastName,
-      birthday,
-      joinedAt,
-      mentorId,
-      status,
-      email,
-      telegramLink,
-      instagramLink,
-      facebookLink,
-      linkedinLink,
-    } = validation.data;
 
     try {
       const existingMember = await prisma.member.findUnique({
@@ -166,50 +106,24 @@ router.put(
         }
       }
 
-      const phoneNumbers: string[] = JSON.parse(validation.data.phoneNumbers);
-      const normalizedLinks = normalizeSocialLinks({
-        telegramLink,
-        instagramLink,
-        facebookLink,
-        linkedinLink,
-      });
+      let phoneNumbers: string[];
+      let positions;
+      try {
+        phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
+        positions = parsePositionsPayload(req.body.positions);
+      } catch {
+        res.status(400).json({ error: "Invalid phoneNumbers or positions payload" });
+        return;
+      }
 
-      const updatedMember = await prisma.$transaction(async (tx) => {
-        await tx.member.update({
-          where: { id },
-          data: {
-            name: `${firstName} ${lastName}`,
-            birthday: new Date(birthday),
-            email: email || null,
-            status,
-            joinedAt: new Date(joinedAt),
-            photo: photoUrl,
-            mentorId,
-            ...normalizedLinks,
-          },
-        });
-
-        await tx.phoneNumber.deleteMany({ where: { ownerId: id } });
-
-        if (phoneNumbers.length) {
-          await tx.phoneNumber.createMany({
-            data: phoneNumbers.map((phoneNumber) => ({
-              phoneNumber,
-              ownerId: id,
-            })),
-          });
-        }
-
-        return tx.member.findUniqueOrThrow({
-          where: { id },
-          include: MEMBER_INCLUDE,
-        });
-      });
-
-      const transformed = transformMemberPhoneNumbers(
-        updatedMember as MemberWithPhoneNumberRecords,
+      const updatedMember = await updateMember(
+        id,
+        validation.data,
+        phoneNumbers,
+        positions,
+        photoUrl,
       );
-      res.status(200).json(transformed);
+      res.status(200).json(serializeMember(updatedMember));
     } catch (error) {
       console.error("Failed to update member:", error);
       res.status(500).json({ error: "Failed to update member" });

@@ -7,6 +7,7 @@ import {
   useCardAnimation,
   CARD_PIVOT_X,
   CARD_PIVOT_Y,
+  useViewport,
 } from "@/hooks";
 import { Member } from "@/models";
 import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
@@ -21,6 +22,7 @@ interface Props {
   isSelected: boolean;
   isZoomedOut: boolean;
   showBirthday: boolean;
+  teamRole?: string;
   x: number;
   y: number;
   onClick: (member: Member) => void;
@@ -38,6 +40,7 @@ const MemberNode = ({
   isSelected,
   isZoomedOut,
   showBirthday,
+  teamRole,
   onClick,
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -50,7 +53,14 @@ const MemberNode = ({
     isHovered,
     isSelected,
   });
-  useCardAnimation({ cardRef, isZoomedOut, memberId: member.id });
+  const { isFitViewAnimating, fitViewTargetScale } = useViewport();
+  useCardAnimation({
+    cardRef,
+    isZoomedOut,
+    memberId: member.id,
+    isFitViewAnimating,
+    fitViewTargetScale,
+  });
 
   const handleClick = useCallback(
     (e: FederatedPointerEvent) => {
@@ -106,6 +116,7 @@ const MemberNode = ({
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
         onClick={handleClick}
+        onTap={handleClick}
         filters={filters}
         cullable
       >
@@ -118,6 +129,7 @@ const MemberNode = ({
             member={member}
             isSelected={isSelected}
             placeholderColorIndex={placeholderColorIndex}
+            teamRole={teamRole}
           />
         </pixiContainer>
 

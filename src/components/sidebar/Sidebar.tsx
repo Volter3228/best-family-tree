@@ -56,7 +56,7 @@ const Sidebar = ({
     <div
       id={id}
       className={twMerge(
-        "fixed inset-y-0 right-0 flex w-dvw justify-end p-2 pb-24 items-end md:items-center md:min-w-lg md:w-2/3 md:p-4 md:pb-4 lg:w-1/3 xl:w-1/4 transform transition-transform duration-300 z-50",
+        "fixed inset-y-0 right-0 flex w-dvw justify-end p-2 pb-24 items-end md:items-center md:min-w-[35rem] md:w-2/3 md:p-4 md:pb-4 lg:w-1/3 xl:w-1/4 transform transition-transform duration-300 z-50",
         isOpen ? "translate-x-0" : "translate-x-full",
         className,
       )}
@@ -99,10 +99,10 @@ const Sidebar = ({
             </button>
           </div>
         </div>
-        <div className="sidebar-scroll-wrapper min-h-0 max-h-full overflow-hidden">
+        <div className="sidebar-scroll-wrapper min-h-0 flex-1 overflow-hidden">
           <div
             ref={contentOuterRef}
-            className="sidebar-content max-h-full overflow-y-auto"
+            className="sidebar-content h-full min-h-0 overflow-y-auto"
             style={contentStyle}
           >
             <div ref={contentInnerRef} className="px-6 pb-6 pt-0">

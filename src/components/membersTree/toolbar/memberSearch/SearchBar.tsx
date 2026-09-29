@@ -65,6 +65,12 @@ const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
 
   const handleSelectMember = (member: Member) => () => selectMember(member);
 
+  // First match should sit closest to the input at the bottom.
+  const displayMembers = useMemo(
+    () => [...filteredMembers].reverse(),
+    [filteredMembers],
+  );
+
   if (!isOpen) return null;
 
   return (
@@ -114,11 +120,13 @@ const SearchBar = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
               scrollbarColor: "var(--accent-blue) transparent",
             }}
           >
-            {filteredMembers.map((member, index) => (
+            {displayMembers.map((member, index) => (
               <SearchSuggestionItem
                 key={member.id}
                 member={member}
-                isActive={index === activeIndex}
+                isActive={
+                  filteredMembers.length - 1 - index === activeIndex
+                }
                 onClick={handleSelectMember(member)}
               />
             ))}

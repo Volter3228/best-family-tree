@@ -19,6 +19,8 @@ import {
   BirthdayFilterSection,
   LineageFilterSection,
   ConnectionsFilterSection,
+  RoleFilterSection,
+  EventTypeFilterSection,
 } from "./sections";
 
 interface Props {
@@ -46,6 +48,8 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
     avatar: false,
     lineage: false,
     connections: false,
+    role: false,
+    project: false,
   });
 
   const toggleSection = (key: FilterSectionKey) => {
@@ -143,6 +147,18 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
             isOpen={sections.lineage}
             onChange={handleChange}
             onToggle={handleToggleSection("lineage")}
+          />
+          <RoleFilterSection
+            filters={draftFilters}
+            isOpen={sections.role}
+            onChange={handleChange}
+            onToggle={handleToggleSection("role")}
+          />
+          <EventTypeFilterSection
+            filters={draftFilters}
+            isOpen={sections.project}
+            onChange={handleChange}
+            onToggle={handleToggleSection("project")}
           />
           <ConnectionsFilterSection
             filters={draftFilters}

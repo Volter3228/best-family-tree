@@ -54,8 +54,9 @@ const MemberNodeMinimizedTooltip = ({
       (target - animationProgress.current) * 0.15 * delta.speed;
 
     if (target === 0 && animationProgress.current < 0.01) {
-      tooltip.visible = false;
       animationProgress.current = 0;
+      tooltip.alpha = 0;
+      tooltip.visible = false;
       return;
     }
 
@@ -67,6 +68,7 @@ const MemberNodeMinimizedTooltip = ({
     if (parentScale > 0.0001) {
       const inverseScale = 1 / parentScale;
       tooltip.scale.set(inverseScale);
+      tooltip.x = NODE_WIDTH / 2;
       tooltip.y = -(NODE_TOOLTIP_OFFSET * inverseScale);
     }
   });
@@ -76,6 +78,7 @@ const MemberNodeMinimizedTooltip = ({
       ref={tooltipRef}
       x={NODE_WIDTH / 2}
       y={NODE_AVATAR_RADIUS}
+      alpha={0}
       eventMode="none"
     >
       <pixiGraphics draw={drawTooltipBackground} />

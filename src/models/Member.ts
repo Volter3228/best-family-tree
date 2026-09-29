@@ -3,6 +3,7 @@ import {
   type Member as MemberType,
   type RecruitmentSeason,
   type RecruitmentTerm,
+  type MemberPosition,
   ActivityState,
   MemberStatus,
 } from "@/types";
@@ -28,6 +29,7 @@ export default class Member {
   course: number | null;
   createdAt: Date;
   updatedAt: Date;
+  positions: MemberPosition[];
 
   constructor({
     id,
@@ -50,6 +52,7 @@ export default class Member {
     course,
     createdAt,
     updatedAt,
+    positions,
   }: MemberType) {
     this.id = id;
     this.birthday = birthday ? new Date(birthday) : null;
@@ -75,6 +78,7 @@ export default class Member {
     this.course = course;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.positions = positions || [];
   }
 
   // Add a mentee

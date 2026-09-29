@@ -1,6 +1,6 @@
-import type { FilterState } from "@/types";
+import type { FilterState, TreeMode } from "@/types";
 import FilterSection from "./FilterSection";
-import FilterCheckbox from "./FilterCheckbox";
+import FilterRadio from "./FilterRadio";
 
 interface Props {
   isOpen: boolean;
@@ -9,14 +9,20 @@ interface Props {
   onToggle: () => void;
 }
 
+const OPTIONS: { value: TreeMode; label: string }[] = [
+  { value: "family", label: "Сімейні дерева" },
+  { value: "none", label: "Без дерев" },
+  { value: "team", label: "Командні дерева" },
+];
+
 const ConnectionsFilterSection = ({
   filters,
   isOpen,
   onChange,
   onToggle,
 }: Props) => {
-  const handleShowTreeChange = () => {
-    onChange({ showTree: !filters.showTree });
+  const handleModeChange = (mode: TreeMode) => () => {
+    onChange({ treeMode: mode });
   };
 
   return (
@@ -24,13 +30,18 @@ const ConnectionsFilterSection = ({
       title="Розмітка"
       isOpen={isOpen}
       onToggle={onToggle}
-      hasActiveValue={!filters.showTree}
+      hasActiveValue={filters.treeMode !== "family"}
     >
-      <FilterCheckbox
-        checked={filters.showTree}
-        onChange={handleShowTreeChange}
-        label="Показувати дерева"
-      />
+      <div className="flex flex-col gap-1.5">
+        {OPTIONS.map((opt) => (
+          <FilterRadio
+            key={opt.value}
+            checked={filters.treeMode === opt.value}
+            onChange={handleModeChange(opt.value)}
+            label={opt.label}
+          />
+        ))}
+      </div>
     </FilterSection>
   );
 };

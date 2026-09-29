@@ -1,10 +1,11 @@
 import { FormEvent, useEffect, useState, useMemo } from "react";
-import { useMembers } from "@/hooks";
+import { useMembers, useEventTypes, useRoles, useTeams } from "@/hooks";
 import apiEditMember from "@/api/editMember";
 import { getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
 import type { MemberFormData, AccentColor } from "@/types";
 import { MemberFormFields } from "./fields";
+import { formatLocalDate } from "./fields/position/positionFormUtils";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
@@ -34,6 +35,20 @@ const getInitialFormData = (member: Member): MemberFormData => {
     instagramLink: member.instagramLink || "",
     facebookLink: member.facebookLink || "",
     linkedinLink: member.linkedinLink || "",
+    positions: (member.positions || []).map((p) => ({
+      id: crypto.randomUUID(),
+      roleId: p.roleId,
+      roleName: p.role?.name || "",
+      eventTypeId: p.team?.eventTypeId || undefined,
+      teamName: p.team?.name || undefined,
+      year: p.year || undefined,
+      startDate: p.startDate
+        ? formatLocalDate(new Date(p.startDate))
+        : undefined,
+      endDate: p.endDate ? formatLocalDate(new Date(p.endDate)) : undefined,
+      isYearOnly: Boolean(!p.startDate && p.year),
+      isCurrent: !p.endDate,
+    })),
   };
 };
 
@@ -47,6 +62,9 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { updateMember, mentorsList, getMentorsList } = useMembers();
+  const [, , reloadEventTypes] = useEventTypes();
+  const [, , reloadRoles] = useRoles();
+  const [, , reloadTeams] = useTeams();
 
   useEffect(() => {
     if (!mentorsList.length) {
@@ -69,18 +87,21 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
     }
 
     setIsSubmitting(true);
-    const formData = buildMemberFormData(form, new Set(["photo"]));
+    // buildMemberFormData skips null photo; send "" explicitly to request removal.
+    const formData = buildMemberFormData(form);
 
     if (!form.photo) {
       formData.append("photo", "");
-    } else {
-      formData.append("photo", form.photo);
     }
 
     try {
       const updatedMember = await apiEditMember(member.id, formData);
       if (updatedMember) {
         updateMember(updatedMember);
+        // Saving may have created new roles/teams/event types server-side.
+        reloadRoles();
+        reloadTeams();
+        reloadEventTypes();
         onExit();
       }
     } catch (error) {

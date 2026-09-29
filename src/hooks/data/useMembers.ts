@@ -43,7 +43,7 @@ export const useMembers = () => {
     (newMember: MemberType) => {
       const newMemberInstance = new Member(newMember);
 
-      setMentorsList(getUpdatedMentorsList(mentorsList, newMember));
+      setMentorsList((prevList) => getUpdatedMentorsList(prevList, newMember));
 
       setMembersTree((prevTree) => {
         if (!newMember.mentorId) {
@@ -187,8 +187,8 @@ export const useMembers = () => {
         return tree;
       });
 
-      setMentorsList(
-        getUpdatedMentorsList(mentorsList, updatedMemberData, "update"),
+      setMentorsList((prevList) =>
+        getUpdatedMentorsList(prevList, updatedMemberData, "update"),
       );
 
       setSelectedMember((prev) => {

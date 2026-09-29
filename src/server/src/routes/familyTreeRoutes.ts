@@ -29,14 +29,32 @@ router.get("/family-tree", async (_req, res) => {
         mentees: {
           include: {
             phoneNumbers: true,
+            positions: {
+              include: {
+                role: true,
+                team: { include: { eventType: true } },
+              },
+            },
           },
         },
         mentor: {
           include: {
             phoneNumbers: true,
+            positions: {
+              include: {
+                role: true,
+                team: { include: { eventType: true } },
+              },
+            },
           },
         },
         phoneNumbers: true,
+        positions: {
+          include: {
+            role: true,
+            team: { include: { eventType: true } },
+          },
+        },
       },
     });
 

@@ -25,6 +25,7 @@ import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 import MemberInfoActionIcon from "./MemberInfoActionIcon";
 import MentorMenteesDropdown from "./MentorMenteesDropdown";
+import PositionsDropdown from "./PositionsDropdown";
 
 interface Props {
   member: Member;
@@ -35,16 +36,7 @@ interface Props {
 
 const MemberInfo = ({
   member,
-  member: {
-    name,
-    photo,
-    birthday,
-    joinedAt,
-    email,
-    phoneNumbers,
-    status,
-    mentor,
-  },
+  member: { name, photo, birthday, joinedAt, phoneNumbers, status, mentor },
   onMemberNameClick,
   filteredMemberIds,
   color = "blue",
@@ -53,6 +45,20 @@ const MemberInfo = ({
     !filteredMemberIds || filteredMemberIds.has(id);
   const avatar = getMemberAvatar(member);
   const colorClasses = COLOR_CLASSES[color];
+
+  let email: React.ReactNode = null;
+  if (member.email) {
+    const atIdx = member.email.indexOf("@");
+    email =
+      member.email.length > 16 && atIdx !== -1 ? (
+        <>
+          {member.email.slice(0, atIdx)}
+          <wbr />@{member.email.slice(atIdx + 1)}
+        </>
+      ) : (
+        member.email
+      );
+  }
 
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
@@ -124,10 +130,11 @@ const MemberInfo = ({
               color={color}
             />
           )}
-          {!!email && (
+          {!!member.email && (
             <MemberInfoRow
               title="Email"
               value={email}
+              copyValue={member.email}
               icon={EnvelopeIcon}
               showCopyIcon
               color={color}
@@ -173,6 +180,9 @@ const MemberInfo = ({
               }
               color={color}
             />
+          )}
+          {member.positions.length > 0 && (
+            <PositionsDropdown positions={member.positions} color={color} />
           )}
           {member.mentees?.length > 0 && (
             <MentorMenteesDropdown
