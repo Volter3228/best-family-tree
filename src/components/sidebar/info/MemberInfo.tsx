@@ -19,7 +19,7 @@ import {
   getMemberAvatar,
 } from "@/utils";
 import { Member } from "@/models";
-import type { AccentColor } from "@/types";
+import type { AccentColor, MemberPosition } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
@@ -31,6 +31,10 @@ interface Props {
   member: Member;
   onMemberNameClick?: (memberId: string) => void;
   filteredMemberIds?: Set<string> | null;
+  // Team view: children are shown as plain text, badges jump to their team.
+  menteesClickable?: boolean;
+  onPositionClick?: (position: MemberPosition) => void;
+  canClickPosition?: (position: MemberPosition) => boolean;
   color?: AccentColor;
 }
 
@@ -39,6 +43,9 @@ const MemberInfo = ({
   member: { name, photo, birthday, joinedAt, phoneNumbers, status, mentor },
   onMemberNameClick,
   filteredMemberIds,
+  menteesClickable = true,
+  onPositionClick,
+  canClickPosition,
   color = "blue",
 }: Props) => {
   const isVisible = (id: string) =>
@@ -182,11 +189,17 @@ const MemberInfo = ({
             />
           )}
           {member.positions.length > 0 && (
-            <PositionsDropdown positions={member.positions} color={color} />
+            <PositionsDropdown
+              positions={member.positions}
+              onPositionClick={onPositionClick}
+              canClickPosition={canClickPosition}
+              color={color}
+            />
           )}
           {member.mentees?.length > 0 && (
             <MentorMenteesDropdown
               mentees={member.mentees}
+              clickable={menteesClickable}
               onMemberNameClick={onMemberNameClick}
               isVisible={isVisible}
               color={color}

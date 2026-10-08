@@ -1,18 +1,22 @@
-import { FormEvent, useEffect, useState, useMemo } from "react";
-import { useMembers, useEventTypes, useRoles, useTeams } from "@/hooks";
+import { FormEvent, useEffect, useId, useState, useMemo } from "react";
+import { useMembers, useTeamTypes, useRoles, useTeams } from "@/hooks";
 import apiEditMember from "@/api/editMember";
+import apiDeleteMember from "@/api/deleteMember";
 import { getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
 import type { MemberFormData, AccentColor } from "@/types";
 import { MemberFormFields } from "./fields";
-import { formatLocalDate } from "./fields/position/positionFormUtils";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
+import ConfirmDeleteControl from "./ConfirmDeleteControl";
+import FormFooter from "./FormFooter";
 
 interface Props {
   member: Member;
   onExit: () => void;
+  // Called instead of onExit once the member is deleted.
+  onDeleted?: () => void;
   color?: AccentColor;
 }
 
@@ -39,20 +43,16 @@ const getInitialFormData = (member: Member): MemberFormData => {
       id: crypto.randomUUID(),
       roleId: p.roleId,
       roleName: p.role?.name || "",
-      eventTypeId: p.team?.eventTypeId || undefined,
+      teamTypeId: p.team?.teamTypeId || undefined,
       teamName: p.team?.name || undefined,
-      year: p.year || undefined,
-      startDate: p.startDate
-        ? formatLocalDate(new Date(p.startDate))
-        : undefined,
-      endDate: p.endDate ? formatLocalDate(new Date(p.endDate)) : undefined,
-      isYearOnly: Boolean(!p.startDate && p.year),
-      isCurrent: !p.endDate,
+      organization: p.organization || undefined,
+      startYear: p.startYear || undefined,
+      endYear: p.endYear || undefined,
     })),
   };
 };
 
-const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
+const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) => {
   const initialFormData = useMemo(() => getInitialFormData(member), [member]);
 
   const [form, setForm] = useState<MemberFormData>(initialFormData);
@@ -60,9 +60,12 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
     Partial<Record<keyof MemberFormData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const formId = useId();
 
-  const { updateMember, mentorsList, getMentorsList } = useMembers();
-  const [, , reloadEventTypes] = useEventTypes();
+  const { updateMember, reloadMembers, mentorsList, getMentorsList } =
+    useMembers();
+  const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
   const [, , reloadTeams] = useTeams();
 
@@ -80,7 +83,7 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
     event.preventDefault();
 
     setErrors({});
-    const validationErrors = validateMemberForm(form, mentorsList);
+    const validationErrors = validateMemberForm(form, mentorsList, teamTypes);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -98,10 +101,10 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
       const updatedMember = await apiEditMember(member.id, formData);
       if (updatedMember) {
         updateMember(updatedMember);
-        // Saving may have created new roles/teams/event types server-side.
+        // Saving may have created new roles/teams/team types server-side.
         reloadRoles();
         reloadTeams();
-        reloadEventTypes();
+        reloadTeamTypes();
         onExit();
       }
     } catch (error) {
@@ -111,10 +114,29 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
     }
   };
 
+  // Mentees move up to this member's mentor on the server; refresh everything
+  // that showed the member (tree, mentor list, team rosters).
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+    try {
+      await apiDeleteMember(member.id);
+      await reloadMembers();
+      getMentorsList();
+      reloadTeams();
+      (onDeleted ?? onExit)();
+    } catch (error) {
+      console.error("Failed to delete member:", error);
+    } finally {
+      setIsSubmitting(false);
+      setIsConfirmingDelete(false);
+    }
+  };
+
   const submitLabel = isSubmitting ? "Зберігаємо..." : "Зберегти";
 
   return (
     <form
+      id={formId}
       className="flex flex-col items-center"
       onSubmit={handleSubmit}
       noValidate
@@ -127,14 +149,28 @@ const EditMemberForm = ({ member, onExit, color = "blue" }: Props) => {
         initialAvatar={getMemberAvatar(member)}
         color={color}
       />
-      <div className="flex flex-row w-4/5 mt-10 justify-center gap-3">
-        <ClearButton isSubmitting={isSubmitting} onClick={onExit} color={color}>
-          Скасувати
-        </ClearButton>
-        <SubmitButton isSubmitting={isSubmitting} color={color}>
-          {submitLabel}
-        </SubmitButton>
-      </div>
+      <FormFooter>
+        <div className="flex w-4/5 flex-row justify-center gap-3">
+          <ClearButton
+            isSubmitting={isSubmitting}
+            onClick={onExit}
+            color={color}
+          >
+            Скасувати
+          </ClearButton>
+          <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
+            {submitLabel}
+          </SubmitButton>
+        </div>
+        <ConfirmDeleteControl
+          label="Видалити учасника"
+          message={`Учасника «${member.name}» буде видалено разом з його посадами. Його менті перейдуть до ${member.mentorId ? "його ментора" : "верхнього рівня"}.`}
+          isConfirming={isConfirmingDelete}
+          isSubmitting={isSubmitting}
+          onAsk={setIsConfirmingDelete}
+          onConfirm={handleDelete}
+        />
+      </FormFooter>
     </form>
   );
 };

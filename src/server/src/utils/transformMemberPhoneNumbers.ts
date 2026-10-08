@@ -4,12 +4,12 @@ import {
   MemberPosition,
   Role,
   Team,
-  EventType,
+  TeamType,
 } from "../db/prisma/generated/client.js";
 
 export type PositionWithRelations = MemberPosition & {
   role: Role;
-  team?: (Team & { eventType?: EventType | null }) | null;
+  team?: (Team & { teamType?: TeamType | null }) | null;
 };
 
 export type MemberWithPhoneNumberRecords = PrismaMember & {

@@ -13,7 +13,7 @@ export const MEMBER_INCLUDE = {
   positions: {
     include: {
       role: true,
-      team: { include: { eventType: true } },
+      team: { include: { teamType: true } },
     },
   },
 };

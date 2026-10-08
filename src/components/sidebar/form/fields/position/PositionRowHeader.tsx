@@ -5,6 +5,7 @@ import type { AccentColor } from "@/types";
 
 interface Props {
   summary: string;
+  removeLabel?: string;
   isExpanded: boolean;
   color?: AccentColor;
   onToggle: () => void;
@@ -13,6 +14,7 @@ interface Props {
 
 const PositionRowHeader = ({
   summary,
+  removeLabel = "Видалити позицію",
   isExpanded,
   color = "blue",
   onToggle,
@@ -47,7 +49,7 @@ const PositionRowHeader = ({
           colorClasses.text,
           colorClasses.hoverAccentBg,
         )}
-        aria-label="Видалити позицію"
+        aria-label={removeLabel}
       >
         <XMarkIcon className="h-4 w-4" />
       </button>

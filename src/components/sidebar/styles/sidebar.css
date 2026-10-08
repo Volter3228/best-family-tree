@@ -4,8 +4,11 @@
   scrollbar-color: transparent transparent;
 }
 
+/* Only the standard scrollbar-* properties are used (no ::-webkit-scrollbar
+   rules): mixing both schemes makes Chromium drop the scrollbar without
+   repainting it when the stylesheet is hot-swapped in development. */
 .sidebar-content {
-  max-height: calc(100dvh - 7rem);
+  max-height: calc(100dvh - 7rem - var(--sidebar-footer-height, 0px));
   overflow-y: auto;
   overflow-anchor: none;
   scrollbar-gutter: stable;
@@ -15,28 +18,10 @@
 
 @media (min-width: 768px) {
   .sidebar-content {
-    max-height: calc(100dvh - 6rem);
+    max-height: calc(100dvh - 6rem - var(--sidebar-footer-height, 0px));
   }
-}
-
-.sidebar-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: var(--sidebar-scroll-color, var(--accent-blue));
-  border-radius: 3px;
 }
 
 .sidebar-content.sidebar-height-animating {
   scrollbar-color: transparent transparent;
-}
-
-.sidebar-content.sidebar-height-animating::-webkit-scrollbar-thumb,
-.sidebar-content.sidebar-height-animating:hover::-webkit-scrollbar-thumb {
-  background: transparent;
 }

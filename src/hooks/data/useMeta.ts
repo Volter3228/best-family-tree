@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { fetchEventTypes, fetchRoles, fetchTeams } from "@/api";
-import type { EventType, Role, Team } from "@/types";
+import { fetchTeamTypes, fetchRoles, fetchTeams } from "@/api";
+import type { TeamType, Role, Team } from "@/types";
 
 const EMPTY: never[] = [];
 
@@ -43,7 +43,7 @@ const createMetaStore = <T>(fetcher: () => Promise<T[]>) => {
   };
 };
 
-const eventTypesStore = createMetaStore<EventType>(fetchEventTypes);
+const teamTypesStore = createMetaStore<TeamType>(fetchTeamTypes);
 const rolesStore = createMetaStore<Role>(fetchRoles);
 const teamsStore = createMetaStore<Team>(() => fetchTeams());
 
@@ -63,6 +63,6 @@ const useMetaStore = <T>(
   return [value ?? EMPTY, setValue, store.reload];
 };
 
-export const useEventTypes = () => useMetaStore(eventTypesStore);
+export const useTeamTypes = () => useMetaStore(teamTypesStore);
 export const useRoles = () => useMetaStore(rolesStore);
 export const useTeams = () => useMetaStore(teamsStore);

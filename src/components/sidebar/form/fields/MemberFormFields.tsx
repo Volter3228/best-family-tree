@@ -208,6 +208,7 @@ const MemberFormFields = ({
         color={color}
       />
       <PositionFormFields
+        error={errors.positions}
         positions={form.positions}
         onChange={(positions) => setForm({ ...form, positions })}
         color={color}

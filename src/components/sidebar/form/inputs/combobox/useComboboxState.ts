@@ -42,11 +42,13 @@ export const useComboboxState = (
     [options, inputValue],
   );
 
+  // Existing matches come first (the first one is focused by default); the
+  // "create" option is last, so it is only focused when nothing else matches.
   const allOptions = useMemo(() => {
     if (inputValue.trim() && !isExistingOption) {
       return [
-        { value: NEW_OPTION_VALUE, text: `Створити: "${inputValue}"` },
         ...filteredOptions,
+        { value: NEW_OPTION_VALUE, text: `Створити: "${inputValue}"` },
       ];
     }
     return filteredOptions;
@@ -75,6 +77,8 @@ export const useComboboxState = (
 
   const tryAutoSelect = useCallback(() => {
     if (!inputValue.trim()) {
+      // Clearing a field that had a value clears the value as well.
+      if (initialValue) onSelect("", "");
       close();
       return;
     }
@@ -90,7 +94,7 @@ export const useComboboxState = (
       onSelect("", inputValue);
       close();
     }
-  }, [inputValue, allOptions, onSelect, close, selectOption]);
+  }, [inputValue, initialValue, allOptions, onSelect, close, selectOption]);
 
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
@@ -106,24 +110,28 @@ export const useComboboxState = (
       event.preventDefault();
     }
 
+    // activeIndex is always the logical option index. A menu opening upwards is
+    // laid out in reverse (first option next to the input), so the arrows
+    // move the other way there.
+    const step = (direction: 1 | -1) =>
+      setActiveIndex(
+        (current) =>
+          (current + direction * (dropUp ? -1 : 1) + allOptions.length) %
+          allOptions.length,
+      );
+
     switch (event.key) {
       case "ArrowDown":
-        setActiveIndex((current) => (current + 1) % allOptions.length);
+        step(1);
         break;
       case "ArrowUp":
-        setActiveIndex((current) =>
-          current === 0 ? allOptions.length - 1 : current - 1,
-        );
+        step(-1);
         break;
-      case "Enter": {
-        const optionIndex = dropUp
-          ? allOptions.length - 1 - activeIndex
-          : activeIndex;
-        if (optionIndex >= 0 && optionIndex < allOptions.length) {
-          selectOption(allOptions[optionIndex]);
+      case "Enter":
+        if (activeIndex >= 0 && activeIndex < allOptions.length) {
+          selectOption(allOptions[activeIndex]);
         }
         break;
-      }
       case "Escape":
         close();
         break;
@@ -139,7 +147,7 @@ export const useComboboxState = (
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [allOptions.length]);
+  }, [allOptions.length, inputValue]);
 
   return {
     isOpen,

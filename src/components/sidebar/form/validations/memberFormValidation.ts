@@ -4,7 +4,12 @@ import {
   MIN_DATE_JOIN,
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
-import { MemberFormData, MentorsListItem } from "@/types";
+import type {
+  MemberFormData,
+  MentorsListItem,
+  PositionFormRow,
+  TeamType,
+} from "@/types";
 
 const REQUIRED_MESSAGE = "Обов'язкове поле.";
 const INVALID_LINK_MESSAGE = "Некоректне посилання.";
@@ -46,9 +51,28 @@ const validateLinks = ({
   return errors;
 };
 
+// Events without a team name are named "<type> <start year>", so they need it.
+const validatePositions = (
+  positions: PositionFormRow[],
+  teamTypes: TeamType[],
+): string | undefined => {
+  for (const position of positions) {
+    if (!position.roleName.trim() || position.teamName?.trim()) continue;
+
+    const teamType = teamTypes.find(({ id }) => id === position.teamTypeId);
+    const typeName = teamType?.name ?? position.teamTypeName;
+    const isEvent = teamType ? teamType.isEvent : Boolean(typeName);
+
+    if (typeName && isEvent && !position.teamStartYear) {
+      return `Вкажіть рік початку для «${typeName}» або назву команди.`;
+    }
+  }
+};
+
 const validateMemberForm = (
   form: MemberFormData,
   mentorsList: MentorsListItem[],
+  teamTypes: TeamType[] = [],
 ): Partial<Record<keyof MemberFormData, string>> => {
   let errors: Partial<Record<keyof MemberFormData, string>> = {};
   const {
@@ -109,6 +133,9 @@ const validateMemberForm = (
   } else if (!/^(\+380|380|0)\d{9}$/.test(phoneNumber)) {
     errors.phoneNumber = "Некоректний номер.";
   }
+
+  const positionsError = validatePositions(form.positions, teamTypes);
+  if (positionsError) errors.positions = positionsError;
 
   errors = {
     ...errors,

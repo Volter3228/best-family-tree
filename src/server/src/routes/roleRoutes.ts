@@ -1,5 +1,8 @@
 import { Router } from "express";
 import prisma from "../db/prisma/clientInstance.js";
+import { parseWith, roleBodySchema } from "../utils/catalogValidation.js";
+import { sendRouteError } from "../utils/httpErrors.js";
+import { sameName } from "../utils/names.js";
 
 const router = Router();
 
@@ -10,22 +13,22 @@ router.get("/roles", async (_req, res) => {
     });
     res.status(200).json(roles);
   } catch (error) {
-    console.error("Failed to fetch roles:", error);
-    res.status(500).json({ error: "Failed to fetch roles" });
+    sendRouteError(res, error, "Failed to fetch roles");
   }
 });
 
 router.post("/roles", async (req, res) => {
+  const body = parseWith(roleBodySchema, req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.errors });
+    return;
+  }
+
   try {
-    const { name, isLeaderPosition, description } = req.body;
+    const { name, isLeaderPosition, description } = body.data;
 
-    if (!name) {
-      res.status(400).json({ error: "Name is required" });
-      return;
-    }
-
-    const existing = await prisma.role.findUnique({
-      where: { name },
+    const existing = await prisma.role.findFirst({
+      where: { name: sameName(name) },
     });
 
     if (existing) {
@@ -43,8 +46,7 @@ router.post("/roles", async (req, res) => {
 
     res.status(201).json(role);
   } catch (error) {
-    console.error("Failed to create role:", error);
-    res.status(500).json({ error: "Failed to create role" });
+    sendRouteError(res, error, "Failed to create role");
   }
 });
 

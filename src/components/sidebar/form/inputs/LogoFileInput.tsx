@@ -10,6 +10,10 @@ interface Props {
   image: string | File | null;
   initialImage: string | null;
   color?: AccentColor;
+  label?: string;
+  // Checkerboard backdrop behind the logo (shows transparent PNGs clearly).
+  // On by default; pass `false` to render on a plain surface instead.
+  showCheckerboard?: boolean;
 }
 
 const LogoFileInput = ({
@@ -17,6 +21,8 @@ const LogoFileInput = ({
   image,
   initialImage = null,
   color = "blue",
+  label = "Логотип",
+  showCheckerboard = true,
 }: Props) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImage,
@@ -76,15 +82,15 @@ const LogoFileInput = ({
 
   return (
     <div className="flex flex-col items-center gap-2 w-full">
-      <label className="text-sm font-medium text-foreground/80">Логотип</label>
+      <label className="text-sm font-medium text-foreground/80">{label}</label>
       <div className="relative w-24 h-24">
         <label className="group cursor-pointer relative block w-full h-full rounded-xl overflow-hidden shadow-lg bg-surface">
           {selectedImage ? (
-            <div className="absolute inset-0 bg-checkerboard">
+            <div className={twMerge("absolute inset-0", showCheckerboard && "bg-checkerboard")}>
               <Image
                 src={selectedImage}
                 alt="Logo"
-                className="object-contain p-2"
+                className={showCheckerboard ? "object-contain p-2" : "object-cover"}
                 fill
               />
             </div>

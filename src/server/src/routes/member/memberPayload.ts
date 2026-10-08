@@ -1,31 +1,33 @@
+import { z } from "zod";
 import { normalizeSocialLinks } from "../../utils/index.js";
+import {
+  formatZodErrors,
+  positionSchema,
+  type PositionInput,
+} from "../../utils/catalogValidation.js";
+import { ValidationError } from "../../utils/httpErrors.js";
 import type { MemberBody } from "../../utils/validation.js";
 
-export interface PositionInput {
-  roleId?: string;
-  roleName?: string;
-  eventTypeId?: string;
-  eventTypeName?: string;
-  teamName?: string;
-  year?: number;
-  startDate?: string;
-  endDate?: string;
-  isLeaderPosition?: boolean;
-}
+export type { PositionInput };
 
-const isPositionInput = (value: unknown): value is PositionInput =>
-  typeof value === "object" &&
-  value !== null &&
-  (typeof (value as PositionInput).roleId === "string" ||
-    typeof (value as PositionInput).roleName === "string");
-
+// null means "positions were not sent" (leave the member's positions alone).
 export const parsePositionsPayload = (raw: unknown): PositionInput[] | null => {
   if (raw === undefined) return null;
-  const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-  if (!Array.isArray(parsed) || !parsed.every(isPositionInput)) {
-    throw new Error("Invalid positions payload");
+
+  let parsed: unknown;
+  try {
+    parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch {
+    throw new ValidationError("Positions must be valid JSON");
   }
-  return parsed;
+
+  const result = z.array(positionSchema).safeParse(parsed);
+  if (!result.success) {
+    throw new ValidationError(
+      "Invalid positions: " + formatZodErrors(result.error),
+    );
+  }
+  return result.data;
 };
 
 export const parsePhoneNumbers = (raw: string): string[] => {

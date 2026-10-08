@@ -2,7 +2,7 @@ import { RecruitmentSeason, MemberStatus, ActivityState } from "./members";
 
 export type AvatarFilterValue = "with" | "without";
 
-export type TreeMode = "family" | "none" | "team";
+export type TreeMode = "family" | "grid" | "team";
 
 export interface FilterState {
   joinYearFrom: number | null;
@@ -18,8 +18,16 @@ export interface FilterState {
   avatars: AvatarFilterValue[];
   lineageMemberId: string | null;
   treeMode: TreeMode;
+  // Team filters. In team view they pick teams; elsewhere they keep members
+  // that hold a matching position.
   roleNames: string[];
-  eventTypeNames: string[];
+  teamTypeNames: string[];
+  teamYearFrom: number | null;
+  teamYearTo: number | null;
+  teamYearRange: boolean;
+  // Only teams that are still running / only event teams.
+  teamOnlyOngoing: boolean;
+  teamOnlyEvents: boolean;
 }
 
 export type FilterSectionKey =
@@ -30,6 +38,6 @@ export type FilterSectionKey =
   | "birthday"
   | "avatar"
   | "lineage"
-  | "connections"
   | "role"
-  | "project";
+  | "teamType"
+  | "teamPeriod";

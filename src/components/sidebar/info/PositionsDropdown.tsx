@@ -3,47 +3,63 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { BriefcaseIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { getPositionPeriod } from "@/utils";
 import type { AccentColor, MemberPosition } from "@/types";
 import MemberInfoRow from "./MemberInfoRow";
 import PositionBadge from "./PositionBadge";
 
 interface Props {
   positions: MemberPosition[];
+  onPositionClick?: (position: MemberPosition) => void;
+  canClickPosition?: (position: MemberPosition) => boolean;
   color?: AccentColor;
 }
 
-const PositionsDropdown = ({ positions, color = "blue" }: Props) => {
+const PositionsDropdown = ({
+  positions,
+  onPositionClick,
+  canClickPosition,
+  color = "blue",
+}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const colorClasses = COLOR_CLASSES[color];
 
   const sortedPositions = useMemo(
     () =>
       [...positions].sort((a, b) => {
-        const getTimestamp = (position: MemberPosition) => {
-          const date =
-            position.startDate ||
-            position.endDate ||
-            position.team?.startDate ||
-            position.team?.endDate;
-          return date ? new Date(date).getTime() : null;
+        const getYear = (position: MemberPosition) => {
+          const { start, end } = getPositionPeriod(position);
+          return start ?? end ?? null;
         };
-        const aDate = getTimestamp(a);
-        const bDate = getTimestamp(b);
-        if (aDate === null && bDate === null) {
+        const aYear = getYear(a);
+        const bYear = getYear(b);
+        if (aYear === null && bYear === null) {
           return a.role.name.localeCompare(b.role.name, "uk");
         }
-        if (aDate === null) return 1;
-        if (bDate === null) return -1;
-        return bDate - aDate;
+        if (aYear === null) return 1;
+        if (bYear === null) return -1;
+        return bYear - aYear;
       }),
     [positions],
+  );
+
+  const renderBadge = (position: MemberPosition) => (
+    <PositionBadge
+      key={position.id}
+      position={position}
+      onClick={
+        onPositionClick && canClickPosition?.(position)
+          ? () => onPositionClick(position)
+          : undefined
+      }
+    />
   );
 
   if (sortedPositions.length === 1) {
     return (
       <MemberInfoRow
         title="Посади"
-        value={<PositionBadge position={sortedPositions[0]} />}
+        value={renderBadge(sortedPositions[0])}
         icon={BriefcaseIcon}
         color={color}
       />
@@ -63,14 +79,16 @@ const PositionsDropdown = ({ positions, color = "blue" }: Props) => {
         <BriefcaseIcon className="inline-block mr-1 h-6 mt-0.5" />
         Посади
       </p>
-      <div className="flex grow flex-col overflow-x-hidden">
-        <div className="flex items-center gap-2">
-          <PositionBadge position={latest} />
+      <div className="flex grow flex-col overflow-x-hidden -m-1 p-1">
+        {/* items-start + a button as tall as the label keeps the toggle level
+            with "Посади" even when the badge wraps onto two rows */}
+        <div className="flex min-w-0 items-start gap-2">
+          {renderBadge(latest)}
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
             className={twMerge(
-              "flex items-center gap-1 text-sm transition-colors duration-200",
+              "flex h-7 shrink-0 items-center gap-1 text-sm transition-colors duration-200",
               colorClasses.text,
               colorClasses.hoverTextAccent,
             )}
@@ -96,9 +114,7 @@ const PositionsDropdown = ({ positions, color = "blue" }: Props) => {
         >
           <div className="overflow-hidden">
             <div className="flex flex-col items-start gap-1.5 pt-2">
-              {sortedPositions.slice(1).map((pos) => (
-                <PositionBadge key={pos.id} position={pos} />
-              ))}
+              {sortedPositions.slice(1).map(renderBadge)}
             </div>
           </div>
         </div>

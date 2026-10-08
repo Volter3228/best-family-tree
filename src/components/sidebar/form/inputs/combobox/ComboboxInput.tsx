@@ -98,7 +98,9 @@ const ComboboxInput = ({
       {(isOpen || isClosing) && (
         <DropdownMenu
           options={allOptions}
-          activeIndex={activeIndex}
+          // DropdownMenu counts rows from the top; a reversed (upward) menu
+          // shows the first option at the bottom.
+          activeIndex={dropUp ? allOptions.length - 1 - activeIndex : activeIndex}
           dropUp={dropUp}
           isClosing={isClosing}
           position={dropdownPos}

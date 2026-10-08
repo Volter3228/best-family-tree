@@ -1,5 +1,6 @@
 import { useCallback, useContext } from "react";
-import { fetchMentorsList } from "@/api";
+import { fetchFamilyTree, fetchMentorsList } from "@/api";
+import { flattenTree } from "@/utils";
 import { getUpdatedMentorsList } from "@/utils/membersTree";
 import { MembersContext } from "@/context/MembersContext";
 import { Member } from "@/models";
@@ -38,6 +39,16 @@ export const useMembers = () => {
       setMentorsList([]);
     }
   }, [setMentorsList]);
+
+  // Refetch the whole tree (e.g. after a team change touched many positions)
+  // and keep the open sidebar member in sync.
+  const reloadMembers = useCallback(async () => {
+    const tree = (await fetchFamilyTree()).map((m) => new Member(m));
+    setMembersTree(tree);
+    setSelectedMember((prev) =>
+      prev ? (flattenTree(tree).find((m) => m.id === prev.id) ?? null) : prev,
+    );
+  }, [setMembersTree, setSelectedMember]);
 
   const addMember = useCallback(
     (newMember: MemberType) => {
@@ -214,6 +225,7 @@ export const useMembers = () => {
     getMemberById,
     getMentorsList,
     setMembers,
+    reloadMembers,
     addMember,
     updateMember,
   };

@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Member } from "@/models";
-import { parseTeamNodeId } from "@/utils";
+import { getMemberTeamRoles, parseTeamNodeId } from "@/utils";
 import type { MemberNode } from "@/types";
 import PixiMemberNode from "./memberNode/MemberNode";
 
@@ -9,8 +9,9 @@ interface Props {
   isZoomedOut: boolean;
   showBirthday: boolean;
   selectedMember: Member | null;
+  selectedTeamId: string | null;
   isTeamView: boolean;
-  onNodeClick: (member: Member) => void;
+  onNodeClick: (member: Member, teamId?: string) => void;
 }
 
 const NodesLayer = ({
@@ -18,18 +19,29 @@ const NodesLayer = ({
   isZoomedOut,
   showBirthday,
   selectedMember,
+  selectedTeamId,
   isTeamView,
   onNodeClick,
 }: Props) => {
+  // Team ids and role labels only change with the nodes, not with selection.
+  const entries = useMemo(
+    () =>
+      nodes.map((node) => {
+        const teamId = isTeamView ? parseTeamNodeId(node.id).teamId : undefined;
+        const teamRole = teamId
+          ? getMemberTeamRoles(node.data.member, teamId)
+          : undefined;
+        return { node, teamId, teamRole };
+      }),
+    [nodes, isTeamView],
+  );
+
   return (
     <pixiContainer>
-      {nodes.map((node) => {
-        const teamRole = isTeamView
-          ? node.data.member.positions.find(
-            (position) =>
-              position.teamId === parseTeamNodeId(node.id).teamId,
-          )?.role.name
-          : undefined;
+      {entries.map(({ node, teamId, teamRole }) => {
+        const isSelected =
+          selectedMember?.id === node.data.member.id &&
+          (!teamId || !selectedTeamId || selectedTeamId === teamId);
 
         return (
           <PixiMemberNode
@@ -40,8 +52,9 @@ const NodesLayer = ({
             showBirthday={showBirthday}
             member={node.data.member}
             placeholderColorIndex={node.data.placeholderColorIndex}
-            isSelected={selectedMember?.id === node.data.member.id}
+            isSelected={isSelected}
             teamRole={teamRole}
+            teamId={teamId}
             onClick={onNodeClick}
           />
         );

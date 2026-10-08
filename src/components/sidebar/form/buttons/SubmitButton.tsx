@@ -5,12 +5,15 @@ import type { AccentColor } from "@/types";
 
 interface Props {
   isSubmitting?: boolean;
+  // Id of the form to submit when the button is rendered outside of it.
+  form?: string;
   children: Readonly<React.ReactNode>;
   color?: AccentColor;
 }
 
 const SubmitButton = ({
   isSubmitting = false,
+  form,
   children,
   color = "blue",
 }: Props) => {
@@ -22,6 +25,7 @@ const SubmitButton = ({
         COLOR_CLASSES[color].surfaceRing,
       )}
       type="submit"
+      form={form}
       disabled={isSubmitting}
     >
       {isSubmitting && <Spinner className="h-5 w-5 mr-2" />}

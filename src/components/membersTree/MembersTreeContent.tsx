@@ -11,19 +11,14 @@ import {
   useFilters,
   useSyncMembers,
   useTreeLayout,
+  useTeamSelection,
+  useTeamInfoSidebar,
 } from "@/hooks";
-import { isZoomedOut as getIsZoomedOut } from "@/utils";
-import { BIRTHDAY_ANIMATION_MIN_SCALE } from "@/constants/canvas";
-import { Member } from "@/models";
-import type { Member as MemberType, AccentColor } from "@/types";
-import {
-  Viewport,
-  NodesLayer,
-  TeamLabelsLayer,
-  EdgesLayer,
-  LineageEdge,
-} from "./canvas";
+import type { Member as MemberType, AccentColor, TeamFrame } from "@/types";
+import { Viewport } from "./canvas";
+import MembersTreeScene from "./MembersTreeScene";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
+import TeamInfoSidebar from "./TeamInfoSidebar";
 import Toolbar from "./toolbar";
 
 const ACCENT_COLOR_MAP: AccentColor[] = ["blue", "green", "orange"];
@@ -33,8 +28,17 @@ interface Props {
 }
 
 const MembersTreeContent = ({ members }: Props) => {
-  const { nodes, edges, scale, setScale, setViewport, nodePositions } =
-    useMembersTree();
+  const {
+    nodes,
+    edges,
+    teamFrames,
+    layoutMode,
+    sceneRef,
+    scale,
+    setScale,
+    setViewport,
+    nodePositions,
+  } = useMembersTree();
 
   const { selectedMember, setSelectedMember, getMemberById, membersMap } =
     useMembers();
@@ -47,22 +51,94 @@ const MembersTreeContent = ({ members }: Props) => {
     onBackToInfoClick: handleSidebarBackToInfo,
   } = useSidebar(selectedMember, setSelectedMember);
 
+  const teamInfo = useTeamInfoSidebar(selectedMember, handleSidebarClose);
+
   const { filteredMemberIds, appliedFilters } = useFilters();
-  const { focusNode, fitView } = useViewportAnimation();
-  const showTree = appliedFilters.treeMode !== "none";
+  const { focusNode, fitView, focusFrame } = useViewportAnimation();
+  // Follow the mode of the nodes actually drawn, which lags behind the filter
+  // while the scene cross-fades between modes.
+  const treeMode = layoutMode ?? appliedFilters.treeMode;
+  const isTeamView = treeMode === "team";
+
+  const {
+    selectedTeamId,
+    handleNodeClick,
+    rememberTeamFor,
+    canFocusMemberInTeam,
+    focusMemberInTeam,
+  } = useTeamSelection({
+    isTeamView,
+    nodes,
+    nodePositions,
+    teamFrames,
+    selectedMember,
+    setSelectedMember,
+    getMemberById,
+    focusNode,
+  });
+
+  // The frame to highlight: the team whose info is open, otherwise the team of
+  // the selected member.
+  const highlightedTeamId =
+    teamInfo.isOpen && teamInfo.teamId ? teamInfo.teamId : selectedTeamId;
+
+  // Clicking a team's badge only opens its info (no fit-to-view); clicking its
+  // square when zoomed out (or via the toolbar) fits it in view and opens info.
+  const handleBadgeClick = useCallback(
+    (frame: TeamFrame) => {
+      teamInfo.open(frame.teamId);
+    },
+    [teamInfo.open],
+  );
+
+  const handleFrameClick = useCallback(
+    (frame: TeamFrame) => {
+      focusFrame(frame);
+      teamInfo.open(frame.teamId);
+    },
+    [focusFrame, teamInfo.open],
+  );
+
+  const handleTeamTitleClick = useCallback(() => {
+    const frame = teamFrames.find((item) => item.teamId === teamInfo.teamId);
+    if (frame) focusFrame(frame);
+  }, [teamFrames, teamInfo.teamId, focusFrame]);
+
+  // In grid/family view a roster row always selects the member (if they have
+  // a node on the canvas), regardless of the layout type. Mirrors the member
+  // sidebar's name-click handler.
+  const canSelectMember = useCallback(
+    (memberId: string) => nodePositions.has(memberId),
+    [nodePositions],
+  );
+  const handleSelectMember = useCallback(
+    (memberId: string) => {
+      const member = getMemberById(memberId);
+      if (!member) return;
+      setSelectedMember(member);
+      focusNode(memberId);
+    },
+    [getMemberById, setSelectedMember, focusNode],
+  );
 
   useSyncMembers(members);
   useTreeLayout();
 
   const handleFitView = useCallback(() => fitView(), [fitView]);
 
-  const getMemberAccentColor = useCallback(
-    (memberId: string): AccentColor => {
-      const node = nodes.find((n) => n.id === memberId);
-      return node ? ACCENT_COLOR_MAP[node.data.placeholderColorIndex] : "blue";
-    },
-    [nodes],
-  );
+  // Accent colour by member id (the first node of a member wins in team view).
+  const accentByMemberId = useMemo(() => {
+    const map = new Map<string, AccentColor>();
+    for (const node of nodes) {
+      if (!map.has(node.data.member.id)) {
+        map.set(
+          node.data.member.id,
+          ACCENT_COLOR_MAP[node.data.placeholderColorIndex],
+        );
+      }
+    }
+    return map;
+  }, [nodes]);
 
   const handleSearch = useCallback(
     (memberId: string) => {
@@ -70,19 +146,22 @@ const MembersTreeContent = ({ members }: Props) => {
       if (!member) return;
       if (filteredMemberIds && !filteredMemberIds.has(memberId)) return;
       setSelectedMember(member);
+      rememberTeamFor(memberId);
       focusNode(memberId);
     },
-    [getMemberById, setSelectedMember, focusNode, filteredMemberIds],
+    [
+      getMemberById,
+      setSelectedMember,
+      focusNode,
+      filteredMemberIds,
+      rememberTeamFor,
+    ],
   );
-
-  const handleNodeClick = (member: Member) => setSelectedMember(member);
-
-  const isZoomedOut = getIsZoomedOut(scale);
 
   const sidebarColor = useMemo<AccentColor>(() => {
     if (!selectedMember) return "blue";
-    return getMemberAccentColor(selectedMember.id);
-  }, [selectedMember, getMemberAccentColor]);
+    return accentByMemberId.get(selectedMember.id) ?? "blue";
+  }, [selectedMember, accentByMemberId]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -100,35 +179,28 @@ const MembersTreeContent = ({ members }: Props) => {
           height={window.innerHeight}
           onScaleChange={setScale}
         >
-          {showTree && (
-            <EdgesLayer
-              edges={edges}
-              nodePositions={nodePositions}
-              pixelLine={isZoomedOut}
-            />
-          )}
-          {showTree && appliedFilters.treeMode === "family" && (
-            <LineageEdge
-              selectedMember={selectedMember}
-              membersMap={membersMap}
-              nodePositions={nodePositions}
-              pixelLine={isZoomedOut}
-            />
-          )}
-          <NodesLayer
+          <MembersTreeScene
+            sceneRef={sceneRef}
+            treeMode={treeMode}
+            scale={scale}
             nodes={nodes}
-            isZoomedOut={isZoomedOut}
-            showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
+            edges={edges}
+            teamFrames={teamFrames}
+            nodePositions={nodePositions}
+            membersMap={membersMap}
             selectedMember={selectedMember}
-            isTeamView={appliedFilters.treeMode === "team"}
+            selectedTeamId={highlightedTeamId}
             onNodeClick={handleNodeClick}
+            onBadgeClick={handleBadgeClick}
+            onFrameClick={handleFrameClick}
           />
-          {showTree && appliedFilters.treeMode === "team" && (
-            <TeamLabelsLayer nodes={nodes} isZoomedOut={isZoomedOut} />
-          )}
         </Viewport>
       </Application>
-      <Toolbar onFitView={handleFitView} onSearch={handleSearch} />
+      <Toolbar
+        onFitView={handleFitView}
+        onSearch={handleSearch}
+        onTeamSearch={handleFrameClick}
+      />
       <Sidebar
         id="member-sidebar"
         headerTitle={sidebarMode === "info" ? "Інфо" : "Редагувати"}
@@ -146,9 +218,22 @@ const MembersTreeContent = ({ members }: Props) => {
             sidebarMode={sidebarMode}
             onEditExit={handleSidebarBackToInfo}
             color={sidebarColor}
+            isTeamView={isTeamView}
+            canFocusMemberInTeam={canFocusMemberInTeam}
+            onFocusMemberInTeam={focusMemberInTeam}
+            onOpenTeamInfo={teamInfo.open}
+            onDeleted={handleSidebarClose}
           />
         )}
       </Sidebar>
+      <TeamInfoSidebar
+        state={teamInfo}
+        canFocusMemberInTeam={canFocusMemberInTeam}
+        onFocusMemberInTeam={focusMemberInTeam}
+        canSelectMember={canSelectMember}
+        onSelectMember={handleSelectMember}
+        onTitleClick={handleTeamTitleClick}
+      />
     </div>
   );
 };

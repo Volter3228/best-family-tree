@@ -15,14 +15,26 @@ interface Props {
   member: Member;
   sidebarMode: SidebarMode;
   onEditExit: () => void;
+  onDeleted?: () => void;
   color?: AccentColor;
+  isTeamView?: boolean;
+  canFocusMemberInTeam?: (teamId: string, memberId: string) => boolean;
+  onFocusMemberInTeam?: (teamId: string, memberId: string) => void;
+  // Opens the team info sidebar for a position's team. Used in grid/family
+  // view, where the badge cannot focus the member inside their team.
+  onOpenTeamInfo?: (teamId: string) => void;
 }
 
 const MemberSidebarContent = ({
   member,
   sidebarMode,
   onEditExit,
+  onDeleted,
   color = "blue",
+  isTeamView = false,
+  canFocusMemberInTeam,
+  onFocusMemberInTeam,
+  onOpenTeamInfo,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevViewRef = useRef<"info" | "edit">(sidebarMode);
@@ -80,10 +92,30 @@ const MemberSidebarContent = ({
           member={member}
           onMemberNameClick={handleMemberNameClick}
           filteredMemberIds={filteredMemberIds}
+          menteesClickable={!isTeamView}
+          onPositionClick={
+            isTeamView
+              ? (position) =>
+                position.teamId &&
+                onFocusMemberInTeam?.(position.teamId, member.id)
+              : (position) =>
+                position.teamId && onOpenTeamInfo?.(position.teamId)
+          }
+          canClickPosition={(position) =>
+            !!position.teamId &&
+            (isTeamView
+              ? !!canFocusMemberInTeam?.(position.teamId, member.id)
+              : !!onOpenTeamInfo)
+          }
           color={color}
         />
       ) : (
-        <EditMemberForm member={member} onExit={onEditExit} color={color} />
+        <EditMemberForm
+          member={member}
+          onExit={onEditExit}
+          onDeleted={onDeleted}
+          color={color}
+        />
       )}
     </div>
   );

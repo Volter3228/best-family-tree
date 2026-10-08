@@ -3,12 +3,17 @@ import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
 import { deleteCloudinaryImage } from "../libs/cloudinary.js";
 import { validateMemberBody } from "../utils/index.js";
+import { sendRouteError } from "../utils/httpErrors.js";
 import {
   parsePhoneNumbers,
   parsePositionsPayload,
 } from "./member/memberPayload.js";
 import { MEMBER_INCLUDE, serializeMember } from "./member/memberQueries.js";
-import { createMember, updateMember } from "./member/memberService.js";
+import {
+  createMember,
+  deleteMember,
+  updateMember,
+} from "./member/memberService.js";
 
 const router = Router();
 const uploadMemberPhoto = uploadMiddleware("best-family-tree/members");
@@ -47,8 +52,8 @@ router.post(
     try {
       phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
       positions = parsePositionsPayload(req.body.positions) ?? [];
-    } catch {
-      res.status(400).json({ error: "Invalid phoneNumbers or positions payload" });
+    } catch (error) {
+      sendRouteError(res, error, "Invalid phoneNumbers or positions payload");
       return;
     }
 
@@ -62,8 +67,7 @@ router.post(
       );
       res.status(201).json(serializeMember(newMember));
     } catch (error) {
-      console.error("Failed to create member:", error);
-      res.status(500).json({ error: "Failed to create member" });
+      sendRouteError(res, error, "Failed to create member");
     }
   },
 );
@@ -91,6 +95,17 @@ router.put(
         return;
       }
 
+      // Validate the payload before touching the stored photo.
+      let phoneNumbers: string[];
+      let positions;
+      try {
+        phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
+        positions = parsePositionsPayload(req.body.positions);
+      } catch (error) {
+        sendRouteError(res, error, "Invalid phoneNumbers or positions payload");
+        return;
+      }
+
       let photoUrl = existingMember.photo;
       const oldPhotoUrl = existingMember.photo;
 
@@ -106,16 +121,6 @@ router.put(
         }
       }
 
-      let phoneNumbers: string[];
-      let positions;
-      try {
-        phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
-        positions = parsePositionsPayload(req.body.positions);
-      } catch {
-        res.status(400).json({ error: "Invalid phoneNumbers or positions payload" });
-        return;
-      }
-
       const updatedMember = await updateMember(
         id,
         validation.data,
@@ -125,10 +130,19 @@ router.put(
       );
       res.status(200).json(serializeMember(updatedMember));
     } catch (error) {
-      console.error("Failed to update member:", error);
-      res.status(500).json({ error: "Failed to update member" });
+      sendRouteError(res, error, "Failed to update member");
     }
   },
 );
+
+router.delete("/members/:id", async (req, res) => {
+  try {
+    const photoUrl = await deleteMember(req.params.id);
+    if (photoUrl) await deleteCloudinaryImage(photoUrl);
+    res.status(204).send();
+  } catch (error) {
+    sendRouteError(res, error, "Failed to delete member");
+  }
+});
 
 export default router;

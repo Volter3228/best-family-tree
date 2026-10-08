@@ -37,7 +37,8 @@ const MemberInfoRow = ({
         <Icon className="inline-block mr-1 h-6 mt-0.5" />
         {title}
       </p>
-      <p className="info-value flex grow items-center overflow-x-hidden">
+      {/* Padding + negative margin keep hover lifts/shadows from being clipped */}
+      <p className="info-value flex grow items-center overflow-x-hidden -m-1 p-1">
         <span>
           {value}
           {showCopyIcon && (

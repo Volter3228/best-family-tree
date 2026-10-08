@@ -1,19 +1,19 @@
 import { http } from "@/libs/http";
 import { ENDPOINTS } from "@/constants/endpoints";
-import type { EventType, Role, Team } from "@/types";
+import type { TeamType, Role, Team } from "@/types";
 
 // Shared reference-data APIs used by forms and filters.
-export async function fetchEventTypes(): Promise<EventType[]> {
-  const res = await http(ENDPOINTS.getEventTypes);
+export async function fetchTeamTypes(): Promise<TeamType[]> {
+  const res = await http(ENDPOINTS.getTeamTypes);
   if (!res.ok) {
     throw new Error(`HTTP Error! Status: ${res.status}`);
   }
   return res.json();
 }
 
-export async function createEventType(formData: FormData): Promise<EventType> {
+export async function createTeamType(formData: FormData): Promise<TeamType> {
   const res = await http(
-    ENDPOINTS.createEventType,
+    ENDPOINTS.createTeamType,
     { method: "POST", body: formData },
     true,
   );
@@ -24,12 +24,12 @@ export async function createEventType(formData: FormData): Promise<EventType> {
   return res.json();
 }
 
-export async function updateEventType(
+export async function updateTeamType(
   id: string,
   formData: FormData,
-): Promise<EventType> {
+): Promise<TeamType> {
   const res = await http(
-    ENDPOINTS.updateEventType(id),
+    ENDPOINTS.updateTeamType(id),
     { method: "PUT", body: formData },
     true,
   );
@@ -64,9 +64,9 @@ export async function createRole(data: {
   return res.json();
 }
 
-export async function fetchTeams(eventTypeId?: string): Promise<Team[]> {
-  const url = eventTypeId
-    ? `${ENDPOINTS.getTeams}?eventTypeId=${eventTypeId}`
+export async function fetchTeams(teamTypeId?: string): Promise<Team[]> {
+  const url = teamTypeId
+    ? `${ENDPOINTS.getTeams}?teamTypeId=${teamTypeId}`
     : ENDPOINTS.getTeams;
   const res = await http(url);
   if (!res.ok) {

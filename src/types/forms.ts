@@ -2,17 +2,40 @@ import { MemberStatus } from "@/types";
 
 export type PositionFormRow = {
   id: string;
-  eventTypeId?: string;
-  eventTypeName?: string;
+  teamTypeId?: string;
+  teamTypeName?: string;
   teamName?: string;
+  // Period of the team this row creates (an existing team keeps its own).
+  teamStartYear?: number;
+  teamEndYear?: number;
   roleName: string;
   roleId?: string;
-  year?: number;
-  startDate?: string;
-  endDate?: string;
-  isYearOnly?: boolean;
-  isCurrent?: boolean;
   isLeaderPosition?: boolean;
+  // Only for rows without a team: an external organisation and its years.
+  organization?: string;
+  startYear?: number;
+  endYear?: number;
+};
+
+// One roster line of the team form: an existing member and a role.
+export type TeamMemberRow = {
+  id: string;
+  memberId?: string;
+  memberName: string;
+  roleName: string;
+  roleId?: string;
+};
+
+export type TeamFormData = {
+  name: string;
+  teamTypeId?: string;
+  teamTypeName?: string;
+  description: string;
+  startYear?: number;
+  endYear?: number;
+  isOngoing?: boolean;
+  icon: File | string | null;
+  members: TeamMemberRow[];
 };
 
 export type MemberFormData = {
@@ -32,13 +55,12 @@ export type MemberFormData = {
   positions: PositionFormRow[];
 };
 
-export type EventTypeFormData = {
+export type TeamTypeFormData = {
   name: string;
+  isEvent: boolean;
   color?: string;
   icon?: File | string | null;
 };
-
-export type FormType = "member" | "event";
 
 export type MemberFormMode = "add" | "edit";
 

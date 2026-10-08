@@ -1,49 +1,55 @@
 import { useMemo } from "react";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
-import { useEventTypes, useRoles, useTeams } from "@/hooks";
+import { useTeamTypes, useRoles, useTeams } from "@/hooks";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor, PositionFormRow } from "@/types";
 import {
-  findTeamForPosition,
-  getEventTypeOptions,
+  getTeamTypeOptions,
+  getTeamTypeSelectionPatch,
   getRoleOptions,
-  getTeamDatePatch,
   getTeamOptions,
+  getTeamSelectionPatch,
 } from "./positionFormUtils";
+import FieldError from "../FieldError";
 import PositionRow from "./PositionRow";
 import { usePositionRows } from "./usePositionRows";
 
 interface Props {
   positions: PositionFormRow[];
   onChange: (positions: PositionFormRow[]) => void;
+  error?: string;
   color?: AccentColor;
 }
 
-const PositionFormFields = ({ positions, onChange, color = "blue" }: Props) => {
-  const [eventTypes] = useEventTypes();
+const PositionFormFields = ({
+  positions,
+  onChange,
+  error,
+  color = "blue",
+}: Props) => {
+  const [teamTypes] = useTeamTypes();
   const [roles] = useRoles();
   const [teams] = useTeams();
   const { expandedRows, updateRow, addRow, removeRow, toggleRow } =
     usePositionRows(positions, onChange);
 
-  const eventTypeOptions = useMemo(
-    () => getEventTypeOptions(eventTypes),
-    [eventTypes],
+  const teamTypeOptions = useMemo(
+    () => getTeamTypeOptions(teamTypes),
+    [teamTypes],
   );
   const roleOptions = useMemo(() => getRoleOptions(roles), [roles]);
   const colorClasses = COLOR_CLASSES[color];
 
   const handleTeamSelect = (id: string, teamName: string) => {
     const row = positions.find((position) => position.id === id);
-    if (!row) return;
-    const team = findTeamForPosition(teams, row, teamName);
-    updateRow(
-      id,
-      team
-        ? { teamName, ...getTeamDatePatch(team, row.isYearOnly) }
-        : { teamName },
-    );
+    if (row) updateRow(id, getTeamSelectionPatch(teams, row, teamName));
+  };
+
+  const handleTeamTypeSelect = (id: string, value: string, text: string) => {
+    const row = positions.find((position) => position.id === id);
+    const patch = row && getTeamTypeSelectionPatch(teams, row, value, text);
+    if (patch) updateRow(id, patch);
   };
 
   return (
@@ -55,9 +61,10 @@ const PositionFormFields = ({ positions, onChange, color = "blue" }: Props) => {
         <PositionRow
           key={row.id}
           row={row}
-          eventTypes={eventTypes}
-          eventTypeOptions={eventTypeOptions}
-          teamOptions={getTeamOptions(teams, row.eventTypeId)}
+          teams={teams}
+          teamTypes={teamTypes}
+          teamTypeOptions={teamTypeOptions}
+          teamOptions={getTeamOptions(teams, row.teamTypeId)}
           roleOptions={roleOptions}
           isExpanded={expandedRows.has(row.id)}
           color={color}
@@ -65,8 +72,12 @@ const PositionFormFields = ({ positions, onChange, color = "blue" }: Props) => {
           onRemove={() => removeRow(row.id)}
           onUpdate={(patch) => updateRow(row.id, patch)}
           onTeamSelect={(teamName) => handleTeamSelect(row.id, teamName)}
+          onTeamTypeSelect={(value, text) =>
+            handleTeamTypeSelect(row.id, value, text)
+          }
         />
       ))}
+      <FieldError message={error} color={color} />
       <button
         type="button"
         onClick={addRow}

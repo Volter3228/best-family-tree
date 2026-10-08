@@ -1,5 +1,6 @@
 import type { MemberBody } from "../../utils/validation.js";
 import prisma from "../../db/prisma/clientInstance.js";
+import { NotFoundError } from "../../utils/httpErrors.js";
 import { buildMemberFields } from "./memberPayload.js";
 import type { PositionInput } from "./memberPayload.js";
 import { MEMBER_INCLUDE, type MemberTransaction } from "./memberQueries.js";
@@ -59,4 +60,29 @@ export const updateMember = async (
       where: { id: memberId },
       include: MEMBER_INCLUDE,
     });
+  });
+
+/**
+ * Removes a member together with their positions and phone numbers. Their
+ * mentees move up to the removed member's mentor (or become roots), so the
+ * family tree stays connected. Returns the photo URL to delete from storage.
+ */
+export const deleteMember = (memberId: string) =>
+  prisma.$transaction(async (tx) => {
+    const member = await tx.member.findUnique({ where: { id: memberId } });
+    if (!member) throw new NotFoundError("Member not found");
+
+    await tx.member.updateMany({
+      where: { mentorId: memberId },
+      data: { mentorId: member.mentorId },
+    });
+    await tx.familyGroup.updateMany({
+      where: { founderId: memberId },
+      data: { founderId: null },
+    });
+    await tx.memberPosition.deleteMany({ where: { memberId } });
+    await tx.phoneNumber.deleteMany({ where: { ownerId: memberId } });
+    await tx.member.delete({ where: { id: memberId } });
+
+    return member.photo;
   });

@@ -20,6 +20,8 @@ router.get("/family-tree", async (_req, res) => {
                 { status: MemberStatus.ALUMNI },
                 { mentees: { none: {} } },
                 { mentorId: null },
+                // Alumni who hold positions still belong in team view.
+                { positions: { none: {} } },
               ],
             },
           },
@@ -32,7 +34,7 @@ router.get("/family-tree", async (_req, res) => {
             positions: {
               include: {
                 role: true,
-                team: { include: { eventType: true } },
+                team: { include: { teamType: true } },
               },
             },
           },
@@ -43,7 +45,7 @@ router.get("/family-tree", async (_req, res) => {
             positions: {
               include: {
                 role: true,
-                team: { include: { eventType: true } },
+                team: { include: { teamType: true } },
               },
             },
           },
@@ -52,7 +54,7 @@ router.get("/family-tree", async (_req, res) => {
         positions: {
           include: {
             role: true,
-            team: { include: { eventType: true } },
+            team: { include: { teamType: true } },
           },
         },
       },

@@ -17,3 +17,20 @@ export const hashString = (s: string): number => {
   }
   return Math.abs(hash);
 };
+
+type PluralForms = readonly [one: string, few: string, many: string];
+
+export const PARTICIPANT_FORMS: PluralForms = ["учасник", "учасники", "учасників"];
+export const TEAM_FORMS: PluralForms = ["команда", "команди", "команд"];
+
+// Ukrainian plural: 1 учасник, 2-4 учасники, 5+ учасників (11-14 are "many").
+export const pluralizeUk = (count: number, [one, few, many]: PluralForms) => {
+  const lastTwo = count % 100;
+  const last = count % 10;
+  if (last === 1 && lastTwo !== 11) return one;
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return few;
+  return many;
+};
+
+export const formatCount = (count: number, forms: PluralForms) =>
+  `${count} ${pluralizeUk(count, forms)}`;

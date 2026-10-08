@@ -3,11 +3,14 @@ model MemberPosition {
   memberId String
   roleId   String
 
+  // A position either belongs to a team (and takes its period from it) ...
   teamId String?
-  year   Int?
 
-  startDate DateTime?
-  endDate   DateTime?
+  // ... or stands alone (e.g. a role in an external project) and keeps its own
+  // organisation and years.
+  organization String?
+  startYear    Int?
+  endYear      Int?
 
   member Member @relation(fields: [memberId], references: [id])
   role   Role   @relation(fields: [roleId], references: [id])
@@ -16,6 +19,7 @@ model MemberPosition {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([memberId, roleId, teamId, year])
+  @@index([memberId])
+  @@index([teamId])
   @@map("member_positions")
 }

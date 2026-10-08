@@ -1,19 +1,24 @@
 model Team {
-  id          String    @id @default(cuid())
-  name        String? // "Board HUB", "BLM", "A-Board"
+  id          String  @id @default(cuid())
+  // Globally unique, never empty: defaults to "<type> <start year>" (events)
+  // or the type name (working groups) when the user gives no name.
+  name        String  @unique
   description String?
-  eventTypeId String?
-  iteration   Int?
-  startDate   DateTime?
-  endDate     DateTime?
+  // Own logo; falls back to the team type's icon.
+  iconUrl     String?
+  teamTypeId  String?
+  // The period belongs to the team, in whole years. Either end may be unknown.
+  startYear   Int?
+  endYear     Int?
+  isOngoing   Boolean @default(false)
 
   // Relations
-  eventType EventType?       @relation(fields: [eventTypeId], references: [id])
+  teamType  TeamType?        @relation(fields: [teamTypeId], references: [id])
   positions MemberPosition[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([eventTypeId, name])
+  @@index([teamTypeId])
   @@map("teams")
 }

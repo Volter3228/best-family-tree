@@ -1,28 +1,37 @@
+import {
+  PARTICIPANT_FORMS,
+  TEAM_FORMS,
+  formatCount,
+} from "@/utils";
+
 interface Props {
   count: number;
-  isActive: boolean;
-  isDraftActive: boolean;
+  // Team view counts teams, the other views count members.
+  isTeamMode: boolean;
+  // Some criteria (not just the layout) are set, so there is something to clear.
+  canReset: boolean;
   onReset: () => void;
   onApply: () => void;
 }
 
 const FiltersHeader = ({
   count,
-  isActive,
-  isDraftActive,
+  isTeamMode,
+  canReset,
   onReset,
   onApply,
 }: Props) => {
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between px-3 py-2.5">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">Фільтри</span>
-          {isActive && (
-            <span className="text-xs text-accent-green">Знайдено: {count}</span>
-          )}
+          <span className="text-xs text-accent-green">
+            Знайдено:{" "}
+            {formatCount(count, isTeamMode ? TEAM_FORMS : PARTICIPANT_FORMS)}
+          </span>
         </div>
-        {(isActive || isDraftActive) && (
+        {canReset && (
           <button
             type="button"
             onClick={onReset}
