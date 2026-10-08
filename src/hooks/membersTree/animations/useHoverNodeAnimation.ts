@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useRef, useState } from "react";
 import { Container } from "pixi.js";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -22,6 +22,18 @@ const calculateTargetScale = (appScale: number, isHovered: boolean) => {
   return NODE_HOVER_SCALE;
 };
 
+const createShadowFilter = () => {
+  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+  return new DropShadowFilter({
+    color: 0xffffff,
+    alpha: 0,
+    offset: { x: 0, y: 0 },
+    resolution: Math.max(dpr, 2),
+    quality: 5,
+    shadowOnly: false,
+  });
+};
+
 interface Props {
   container: Container | null;
   isHovered: boolean;
@@ -33,17 +45,12 @@ export const useHoverNodeAnimation = ({
   isHovered,
   isSelected,
 }: Props) => {
-  const shadowFilter = useMemo(() => {
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-    return new DropShadowFilter({
-      color: 0xffffff,
-      alpha: 0,
-      offset: { x: 0, y: 0 },
-      resolution: Math.max(dpr, 2),
-      quality: 5,
-      shadowOnly: false,
-    });
-  }, []);
+  // Created on first hover/selection: most nodes never need one, and each
+  // filter builds blur passes and GPU programs.
+  const filterRef = useRef<DropShadowFilter | null>(null);
+  const [shadowFilter, setShadowFilter] = useState<DropShadowFilter | null>(
+    null,
+  );
 
   useGSAP(() => {
     if (!container) return;
@@ -60,7 +67,13 @@ export const useHoverNodeAnimation = ({
     });
 
     const shouldShowShadow = isHovered || isSelected;
-    gsap.to(shadowFilter, {
+    if (!filterRef.current && shouldShowShadow) {
+      filterRef.current = createShadowFilter();
+      setShadowFilter(filterRef.current);
+    }
+    const filter = filterRef.current;
+    if (!filter) return;
+    gsap.to(filter, {
       blur: shouldShowShadow ? 8 : 0,
       alpha: shouldShowShadow ? 0.6 : 0,
       duration: NODE_HOVER_ANIMATION_DURATION / 2,

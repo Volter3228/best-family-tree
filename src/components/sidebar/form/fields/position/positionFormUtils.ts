@@ -1,23 +1,11 @@
-import type { DropdownOption, EventType, PositionFormRow, Team } from "@/types";
+import type { DropdownOption, TeamType, PositionFormRow, Team } from "@/types";
+import { formatYearRange } from "@/utils";
 
-export const MIN_POSITION_DATE = new Date(2002, 0, 1);
-export const MAX_POSITION_DATE = new Date();
-export const CURRENT_DATE_LABEL = new Date().toLocaleDateString("uk-UA", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
+export const MIN_POSITION_YEAR = 1990;
+export const MAX_POSITION_YEAR = new Date().getFullYear() + 1;
 
 const EMPTY_POSITION_ROW: Omit<PositionFormRow, "id"> = {
-  eventTypeId: undefined,
-  eventTypeName: undefined,
-  teamName: undefined,
   roleName: "",
-  roleId: undefined,
-  year: undefined,
-  startDate: undefined,
-  endDate: undefined,
-  isCurrent: true,
 };
 
 export const createEmptyPositionRow = (): PositionFormRow => ({
@@ -25,19 +13,12 @@ export const createEmptyPositionRow = (): PositionFormRow => ({
   id: crypto.randomUUID(),
 });
 
-export const formatLocalDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-export const getEventTypeOptions = (
-  eventTypes: EventType[],
+export const getTeamTypeOptions = (
+  teamTypes: TeamType[],
 ): DropdownOption[] =>
-  eventTypes.map((eventType) => ({
-    value: eventType.id,
-    text: eventType.name,
+  teamTypes.map((teamType) => ({
+    value: teamType.id,
+    text: teamType.name,
   }));
 
 export const getRoleOptions = (
@@ -45,77 +26,111 @@ export const getRoleOptions = (
 ): DropdownOption[] =>
   roles.map((role) => ({ value: role.id, text: role.name }));
 
+// Names of the selected team type's teams, or of every team when none is chosen.
 export const getTeamOptions = (
   teams: Team[],
-  eventTypeId?: string,
+  teamTypeId?: string,
 ): DropdownOption[] =>
   teams
-    .filter(
-      (team) =>
-        team.name && (!eventTypeId || team.eventTypeId === eventTypeId),
-    )
-    .map((team) => ({ value: team.name as string, text: team.name as string }));
+    .filter((team) => !teamTypeId || team.teamTypeId === teamTypeId)
+    .map((team) => ({ value: team.name, text: team.name }));
 
 export const getPositionRowSummary = (
   row: PositionFormRow,
-  eventTypes: EventType[],
+  teamTypes: TeamType[],
 ): string => {
   const title = row.roleName.trim() || "Нова посада";
   const context =
     row.teamName?.trim() ||
-    eventTypes.find((eventType) => eventType.id === row.eventTypeId)?.name ||
-    row.eventTypeName;
-  const start = row.isYearOnly
-    ? row.year?.toString()
-    : row.startDate?.slice(0, 4);
-  const end = row.isCurrent ? "зараз" : row.endDate?.slice(0, 4);
-  const date = start && end ? `${start}-${end}` : start || end;
-  return [context, title, date].filter(Boolean).join(" · ");
+    teamTypes.find((teamType) => teamType.id === row.teamTypeId)?.name ||
+    row.teamTypeName ||
+    row.organization?.trim();
+  const years = formatYearRange({
+    start: row.teamStartYear ?? row.startYear,
+    end: row.teamEndYear ?? row.endYear,
+  });
+  return [context, title, years].filter(Boolean).join(" · ");
 };
 
-export const getTeamDatePatch = (
-  team: Team,
-  isYearOnly = false,
-): Partial<PositionFormRow> => {
-  const patch: Partial<PositionFormRow> = {};
-
-  if (isYearOnly) {
-    if (team.startDate) {
-      patch.year = new Date(team.startDate).getFullYear();
-    }
-    patch.startDate = undefined;
-    patch.endDate = team.endDate
-      ? `${new Date(team.endDate).getFullYear()}-12-31`
-      : undefined;
-    if (team.startDate || team.endDate) {
-      patch.isCurrent = !team.endDate;
-    }
-    return patch;
-  }
-
-  if (team.startDate) {
-    patch.startDate = formatLocalDate(new Date(team.startDate));
-  }
-  if (team.endDate) {
-    patch.endDate = formatLocalDate(new Date(team.endDate));
-  }
-  if (team.startDate || team.endDate) {
-    patch.year = undefined;
-    patch.isCurrent = !team.endDate;
-    if (!team.endDate) patch.endDate = undefined;
-  }
-
-  return patch;
+// Team names are unique (ignoring case), so a name identifies its team.
+export const findTeamByName = (
+  teams: Team[],
+  name?: string,
+): Team | undefined => {
+  const wanted = name?.trim().toLowerCase();
+  return wanted
+    ? teams.find((team) => team.name.toLowerCase() === wanted)
+    : undefined;
 };
 
-export const findTeamForPosition = (
+/**
+ * Where the row's years live:
+ * - an existing team already has its period (shown, not editable here);
+ * - a new team (or a team named after type + year) gets the years entered here;
+ * - without any team the row is a standalone position with its own years.
+ */
+export type PositionPeriod =
+  | { kind: "existingTeam"; team: Team }
+  | { kind: "newTeam" }
+  | { kind: "standalone" };
+
+export const getRowPeriod = (
+  teams: Team[],
+  row: PositionFormRow,
+): PositionPeriod => {
+  if (row.teamName?.trim()) {
+    const team = findTeamByName(teams, row.teamName);
+    return team ? { kind: "existingTeam", team } : { kind: "newTeam" };
+  }
+  return row.teamTypeId || row.teamTypeName
+    ? { kind: "newTeam" }
+    : { kind: "standalone" };
+};
+
+// Picking an existing team also picks its type; its period comes with it.
+export const getTeamSelectionPatch = (
   teams: Team[],
   row: PositionFormRow,
   teamName: string,
-): Team | undefined =>
-  teams.find(
-    (team) =>
-      team.name === teamName &&
-      (team.eventTypeId === row.eventTypeId ||
-        (!team.eventTypeId && !row.eventTypeId)),
-  );
+): Partial<PositionFormRow> => {
+  if (!teamName.trim()) return { teamName: undefined };
+
+  const team = findTeamByName(teams, teamName);
+  if (!team) return { teamName };
+
+  return {
+    teamName: team.name,
+    teamTypeId: team.teamTypeId ?? row.teamTypeId,
+    teamTypeName: undefined,
+    teamStartYear: undefined,
+    teamEndYear: undefined,
+  };
+};
+
+// Picking a team type drops the team name only when it names an existing team
+// of another type (re-picking the same type changes nothing).
+export const getTeamTypeSelectionPatch = (
+  teams: Team[],
+  row: PositionFormRow,
+  teamTypeId: string,
+  text: string,
+): Partial<PositionFormRow> | null => {
+  const teamTypeName = teamTypeId ? undefined : text.trim() || undefined;
+  if (
+    teamTypeId
+      ? teamTypeId === row.teamTypeId
+      : teamTypeName === row.teamTypeName && !row.teamTypeId
+  ) {
+    return null;
+  }
+
+  const currentTeam = findTeamByName(teams, row.teamName);
+  const dropsTeam =
+    !!currentTeam && (currentTeam.teamTypeId ?? "") !== teamTypeId;
+
+  return {
+    teamTypeId: teamTypeId || undefined,
+    teamTypeName,
+    ...(dropsTeam && { teamName: undefined }),
+  };
+};

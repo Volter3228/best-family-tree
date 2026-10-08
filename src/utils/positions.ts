@@ -1,38 +1,44 @@
-import { getYear } from "date-fns";
 import type { MemberPosition } from "@/types";
 
-export const getPositionYearLabel = (position: MemberPosition): string => {
-  const { startDate, endDate, team, year } = position;
+type Years = {
+  start?: number | null;
+  end?: number | null;
+  ongoing?: boolean;
+};
 
-  if (!startDate && year) {
-    const endYear = endDate ? getYear(new Date(endDate)) : null;
-    if (!endYear || endYear === year) return String(year);
-    return `${year}-${endYear}`;
-  }
+// "2018 - 2019", "2018 - ..." (still running), the single known year, or ""
+// when nothing is known.
+export const formatYearRange = ({ start, end, ongoing }: Years): string => {
+  if (start && ongoing) return `${start} - ...`;
+  if (start && end && start !== end) return `${start} - ${end}`;
+  return String(start ?? end ?? "");
+};
 
-  if (startDate || endDate) {
-    const startYear = startDate ? getYear(new Date(startDate)) : null;
-    const endYear = endDate ? getYear(new Date(endDate)) : null;
-    if (startYear && endYear) {
-      return startYear === endYear
-        ? String(startYear)
-        : `${startYear}-${endYear}`;
+// A team position takes its team's period; a standalone one keeps its own
+// (standalone positions have no "ongoing" flag).
+export const getPositionPeriod = (position: MemberPosition): Years =>
+  position.team
+    ? {
+      start: position.team.startYear,
+      end: position.team.endYear,
+      ongoing: position.team.isOngoing,
     }
-    if (startYear) return String(startYear);
-    if (endYear) return String(endYear);
-  }
+    : { start: position.startYear, end: position.endYear };
 
-  if (year) return String(year);
+export const getPositionYearLabel = (position: MemberPosition): string =>
+  formatYearRange(getPositionPeriod(position));
 
-  const teamStart = team?.startDate ? getYear(new Date(team.startDate)) : null;
-  const teamEnd = team?.endDate ? getYear(new Date(team.endDate)) : null;
-  if (teamStart && teamEnd) {
-    return teamStart === teamEnd
-      ? String(teamStart)
-      : `${teamStart}-${teamEnd}`;
-  }
-  if (teamStart) return String(teamStart);
-  if (teamEnd) return String(teamEnd);
-
-  return "";
+// Every role the member holds in one team, leader roles first ("President, Secretary").
+export const getMemberTeamRoles = (
+  member: { positions: MemberPosition[] },
+  teamId: string,
+): string => {
+  const roles = member.positions
+    .filter((position) => position.teamId === teamId)
+    .sort(
+      (a, b) =>
+        Number(b.role.isLeaderPosition) - Number(a.role.isLeaderPosition),
+    )
+    .map((position) => position.role.name);
+  return Array.from(new Set(roles)).join(", ");
 };

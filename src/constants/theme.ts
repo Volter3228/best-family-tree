@@ -107,4 +107,4 @@ export const THEMES: Record<ThemeId, ThemeDefinition> = {
   dark: darkTheme,
 };
 
-export const DEFAULT_THEME: ThemeId = "dark";
+export const DEFAULT_THEME: ThemeId = "light";

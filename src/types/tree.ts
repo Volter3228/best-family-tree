@@ -50,3 +50,30 @@ export type MemberNode = TreeNode & {
 };
 
 export type NodePositions = Map<string, Point>;
+
+// S-curve from `start` to `end`; with `bendY` it ends its curve there and
+// continues straight down to `end` (used to pass between upper-row nodes).
+// `fanStart` / `fanEnd` make the curve leave / reach its point at an angle
+// instead of vertically, so edges sharing one point do not overlap.
+export interface TeamEdge {
+  start: Point;
+  end: Point;
+  bendY?: number;
+  fanStart?: boolean;
+  fanEnd?: boolean;
+}
+
+export interface TeamFrame {
+  teamId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  name: string;
+  teamTypeName: string;
+  color: string | null;
+  iconUrl: string | null;
+  teamTypeId: string | null;
+  nodeIds: string[];
+  edges: TeamEdge[];
+}

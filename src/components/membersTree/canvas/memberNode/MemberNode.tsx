@@ -1,7 +1,7 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
-import { FederatedPointerEvent, Container, Filter } from "pixi.js";
+import { FederatedPointerEvent, Container, Filter, Rectangle } from "pixi.js";
 import gsap from "gsap";
-import { getMemberAvatar } from "@/utils";
+import { getMemberNodeAvatar } from "@/utils";
 import {
   useHoverNodeAnimation,
   useCardAnimation,
@@ -10,7 +10,12 @@ import {
   useViewport,
 } from "@/hooks";
 import { Member } from "@/models";
-import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
+import {
+  NODE_WIDTH,
+  NODE_HEIGHT,
+  NODE_CARD_TOP,
+  NODE_CARD_HEIGHT,
+} from "@/constants/canvas";
 import MemberBirthdayAnimation from "@/components/animations/memberBirthday";
 import MemberNodeAvatar from "./MemberNodeAvatar";
 import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
@@ -23,12 +28,31 @@ interface Props {
   isZoomedOut: boolean;
   showBirthday: boolean;
   teamRole?: string;
+  teamId?: string;
   x: number;
   y: number;
-  onClick: (member: Member) => void;
+  onClick: (member: Member, teamId?: string) => void;
 }
 
 const EMPTY_FILTERS: Filter[] = [];
+// Culling box: the avatar and the card below it, with room for the hover glow.
+const CULL_MARGIN = 80;
+const CULL_AREA = new Rectangle(
+  -CULL_MARGIN,
+  -CULL_MARGIN,
+  NODE_WIDTH + CULL_MARGIN * 2,
+  NODE_CARD_TOP + NODE_CARD_HEIGHT + CULL_MARGIN * 2,
+);
+// Pointer hit areas, so the event system never walks the node's children:
+// the whole node with its card, or just the avatar while the card is hidden.
+const CARD_BOTTOM = NODE_CARD_TOP + NODE_CARD_HEIGHT;
+const NODE_HIT_AREA = new Rectangle(0, 0, NODE_WIDTH, CARD_BOTTOM);
+const AVATAR_HIT_AREA = new Rectangle(
+  (NODE_WIDTH - NODE_HEIGHT) / 2,
+  0,
+  NODE_HEIGHT,
+  NODE_HEIGHT,
+);
 const CONTENT_CENTER_X = NODE_WIDTH / 2;
 const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
 
@@ -41,12 +65,13 @@ const MemberNode = ({
   isZoomedOut,
   showBirthday,
   teamRole,
+  teamId,
   onClick,
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<Container>(null);
   const cardRef = useRef<Container>(null);
-  const avatarUrl = useMemo(() => getMemberAvatar(member), [member.photo]);
+  const avatarUrl = useMemo(() => getMemberNodeAvatar(member), [member.photo]);
 
   const { shadowFilter } = useHoverNodeAnimation({
     container: containerRef.current,
@@ -65,10 +90,17 @@ const MemberNode = ({
   const handleClick = useCallback(
     (e: FederatedPointerEvent) => {
       e.stopPropagation();
-      onClick(member);
+      onClick(member, teamId);
     },
-    [member, onClick],
+    [member, teamId, onClick],
   );
+
+  // The tooltip only exists while it is needed (and while it fades out).
+  const [isTooltipMounted, setIsTooltipMounted] = useState(false);
+  const handleTooltipHidden = useCallback(() => setIsTooltipMounted(false), []);
+  useEffect(() => {
+    if (isZoomedOut && isHovered) setIsTooltipMounted(true);
+  }, [isZoomedOut, isHovered]);
 
   const handlePointerEnter = useCallback(() => setIsHovered(true), []);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
@@ -87,7 +119,7 @@ const MemberNode = ({
   }, [isHovered]);
 
   const filters = useMemo(() => {
-    if (!isHovered && !isSelected) return EMPTY_FILTERS;
+    if ((!isHovered && !isSelected) || !shadowFilter) return EMPTY_FILTERS;
     return [shadowFilter];
   }, [isHovered, isSelected, shadowFilter]);
 
@@ -112,6 +144,8 @@ const MemberNode = ({
         pivot={{ x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y }}
         zIndex={isHovered ? 1000 : 0}
         eventMode="static"
+        interactiveChildren={false}
+        hitArea={isZoomedOut ? AVATAR_HIT_AREA : NODE_HIT_AREA}
         cursor="pointer"
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
@@ -119,6 +153,7 @@ const MemberNode = ({
         onTap={handleClick}
         filters={filters}
         cullable
+        cullArea={CULL_AREA}
       >
         <pixiContainer
           ref={cardRef}
@@ -139,11 +174,14 @@ const MemberNode = ({
           placeholderColorIndex={placeholderColorIndex}
         />
 
-        <MemberNodeMinimizedTooltip
-          text={member.name}
-          visible={isZoomedOut && isHovered}
-          placeholderColorIndex={placeholderColorIndex}
-        />
+        {isTooltipMounted && (
+          <MemberNodeMinimizedTooltip
+            text={member.name}
+            visible={isZoomedOut && isHovered}
+            placeholderColorIndex={placeholderColorIndex}
+            onHidden={handleTooltipHidden}
+          />
+        )}
       </pixiContainer>
       {isBirthday && (
         <pixiContainer

@@ -1,3 +1,3 @@
 export * from "./useMembers";
-export * from "./useMembersSearch";
+export * from "./useSearchSuggestions";
 export * from "./useMeta";

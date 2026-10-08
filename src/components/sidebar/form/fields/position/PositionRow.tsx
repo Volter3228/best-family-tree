@@ -3,18 +3,20 @@ import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type {
   AccentColor,
   DropdownOption,
-  EventType,
+  Team,
+  TeamType,
   PositionFormRow as PositionFormData,
 } from "@/types";
 import { getPositionRowSummary } from "./positionFormUtils";
 import PositionAssignmentFields from "./PositionAssignmentFields";
-import PositionDateFields from "./PositionDateFields";
+import PositionPeriodFields from "./PositionPeriodFields";
 import PositionRowHeader from "./PositionRowHeader";
 
 interface Props {
   row: PositionFormData;
-  eventTypes: EventType[];
-  eventTypeOptions: DropdownOption[];
+  teams: Team[];
+  teamTypes: TeamType[];
+  teamTypeOptions: DropdownOption[];
   teamOptions: DropdownOption[];
   roleOptions: DropdownOption[];
   isExpanded: boolean;
@@ -23,12 +25,14 @@ interface Props {
   onRemove: () => void;
   onUpdate: (patch: Partial<PositionFormData>) => void;
   onTeamSelect: (teamName: string) => void;
+  onTeamTypeSelect: (value: string, text: string) => void;
 }
 
 const PositionRow = ({
   row,
-  eventTypes,
-  eventTypeOptions,
+  teams,
+  teamTypes,
+  teamTypeOptions,
   teamOptions,
   roleOptions,
   isExpanded,
@@ -37,6 +41,7 @@ const PositionRow = ({
   onRemove,
   onUpdate,
   onTeamSelect,
+  onTeamTypeSelect,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
   return (
@@ -47,7 +52,7 @@ const PositionRow = ({
       )}
     >
       <PositionRowHeader
-        summary={getPositionRowSummary(row, eventTypes)}
+        summary={getPositionRowSummary(row, teamTypes)}
         isExpanded={isExpanded}
         onToggle={onToggle}
         onRemove={onRemove}
@@ -58,16 +63,18 @@ const PositionRow = ({
           <PositionAssignmentFields
             rowId={row.id}
             row={row}
-            eventTypeOptions={eventTypeOptions}
+            teamTypeOptions={teamTypeOptions}
             teamOptions={teamOptions}
             roleOptions={roleOptions}
             color={color}
             onUpdate={onUpdate}
             onTeamSelect={onTeamSelect}
+            onTeamTypeSelect={onTeamTypeSelect}
           />
-          <PositionDateFields
+          <PositionPeriodFields
             rowId={row.id}
             row={row}
+            teams={teams}
             color={color}
             onUpdate={onUpdate}
           />

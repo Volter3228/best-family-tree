@@ -2,15 +2,18 @@ import { useEffect, useRef } from "react";
 import { useMembersTree } from "./useMembersTree";
 import { useMembers } from "../data/useMembers";
 import { useFilters } from "./useFilters";
+import { useSceneTransition } from "./useSceneTransition";
 import { getFitViewTargetScale, useViewportAnimation } from "./animations";
-import type { MemberNode } from "@/types";
+import type { MemberNode, TeamFrame, TreeEdge } from "@/types";
 import {
+  layoutTeamFrames,
   transformMembersToFlowValues,
   transformMembersToTeamTreeValues,
   getLayoutedElements,
 } from "@/utils";
 import {
   reconnectEdgesToVisibleAncestors,
+  isDetachedAlumnus,
   computeGridLayout,
   reorderEdgesForLineageCentering,
   alignLineageLayout,
@@ -26,6 +29,8 @@ export const useTreeLayout = () => {
     nodes,
     setNodes,
     setEdges,
+    setTeamFrames,
+    setLayoutMode,
     setIsFitViewAnimating,
     setFitViewTargetScale,
   } = useMembersTree();
@@ -40,10 +45,22 @@ export const useTreeLayout = () => {
   const prevFilterVersionRef = useRef(filterVersion);
   const pendingFitViewRef = useRef(false);
   const layoutRequestRef = useRef(0);
+  const prevTreeModeRef = useRef(treeMode);
+  const transitionScene = useSceneTransition();
 
-  const prepareFitView = (layoutedNodes: MemberNode[]) => {
+  const prepareFitView = (
+    layoutedNodes: MemberNode[],
+    frames: TeamFrame[] = [],
+  ) => {
     if (!hasInitialFitView.current || pendingFitViewRef.current) {
-      setFitViewTargetScale(getFitViewTargetScale(layoutedNodes));
+      setFitViewTargetScale(
+        getFitViewTargetScale(
+          layoutedNodes,
+          window.innerWidth,
+          window.innerHeight,
+          frames,
+        ),
+      );
       setIsFitViewAnimating(true);
     }
   };
@@ -57,15 +74,24 @@ export const useTreeLayout = () => {
       return;
 
     // Build the unfiltered graph for the selected layout mode.
-    const { nodes: allNodes, edges: allEdges } =
+    const { nodes: allNodes, edges: allEdges }: {
+      nodes: MemberNode[];
+      edges: TreeEdge[];
+    } =
       treeMode === "team"
-        ? transformMembersToTeamTreeValues(
-          flatMembersList,
-          appliedFilters.eventTypeNames,
-        )
+        ? {
+          nodes: transformMembersToTeamTreeValues(
+            flatMembersList,
+            appliedFilters,
+          ),
+          edges: [],
+        }
         : transformMembersToFlowValues(membersTree);
 
-    let finalNodes = allNodes;
+    let finalNodes =
+      treeMode === "team"
+        ? allNodes
+        : allNodes.filter((node) => !isDetachedAlumnus(node.data.member));
     let finalEdges = allEdges;
 
     // Keep only nodes matching the current filters.
@@ -75,24 +101,37 @@ export const useTreeLayout = () => {
           ? filteredMemberIds.has(node.data.member.id)
           : filteredMemberIds.has(node.id),
       );
-      if (treeMode === "team") {
-        // Team edges only survive when both endpoints remain visible.
-        const visibleNodeIds = new Set(finalNodes.map((node) => node.id));
-        finalEdges = allEdges.filter(
-          (edge) =>
-            visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target),
-        );
-      } else {
-        // Family edges reconnect children to their nearest visible ancestor.
+      // Family edges reconnect children to their nearest visible ancestor
+      // (team view has no edge list: its edges come from the frame layout).
+      if (treeMode !== "team") {
         finalEdges = reconnectEdgesToVisibleAncestors(finalNodes, membersMap);
       }
     }
+
+    // Newer runs invalidate older (async or fading) ones.
+    const requestId = ++layoutRequestRef.current;
+
+    // Switching tree mode cross-fades the scene instead of popping.
+    const modeChanged =
+      hasInitialFitView.current && prevTreeModeRef.current !== treeMode;
+    prevTreeModeRef.current = treeMode;
+    const commit = (apply: () => void) => {
+      const guarded = () => {
+        if (requestId !== layoutRequestRef.current) return;
+        setLayoutMode(treeMode);
+        apply();
+      };
+      if (modeChanged) transitionScene(guarded);
+      else guarded();
+    };
 
     if (finalNodes.length === 0) {
       setIsFitViewAnimating(false);
       setFitViewTargetScale(null);
       setNodes([]);
       setEdges([]);
+      setTeamFrames([]);
+      setLayoutMode(treeMode);
       return;
     }
 
@@ -106,16 +145,31 @@ export const useTreeLayout = () => {
     }
 
     // Flat grid layout — no tree, no edges
-    if (treeMode === "none") {
+    if (treeMode === "grid") {
       const layoutedNodes = computeGridLayout(finalNodes);
-      prepareFitView(layoutedNodes);
-      setNodes(layoutedNodes);
-      setEdges([]);
+      commit(() => {
+        prepareFitView(layoutedNodes);
+        setNodes(layoutedNodes);
+        setEdges([]);
+        setTeamFrames([]);
+      });
+      return;
+    }
+
+    // Team view: custom framed layout, no ELK
+    if (treeMode === "team") {
+      const { nodes: layoutedNodes, frames } = layoutTeamFrames(finalNodes);
+      commit(() => {
+        prepareFitView(layoutedNodes, frames);
+        setNodes(layoutedNodes);
+        setEdges([]);
+        setTeamFrames(frames);
+      });
       return;
     }
 
     // Reorder edges so lineage member is centered among siblings
-    if (lineageMemberId && treeMode !== "team") {
+    if (lineageMemberId) {
       finalEdges = reorderEdgesForLineageCentering(
         finalEdges,
         lineageMemberId,
@@ -123,7 +177,6 @@ export const useTreeLayout = () => {
       );
     }
 
-    const requestId = ++layoutRequestRef.current;
     getLayoutedElements(finalNodes, finalEdges).then((res) => {
       if (requestId !== layoutRequestRef.current) return;
 
@@ -131,9 +184,12 @@ export const useTreeLayout = () => {
         ? alignLineageLayout(res.layoutedNodes, lineageMemberId, membersMap)
         : res.layoutedNodes;
 
-      prepareFitView(layoutedNodes);
-      setNodes(layoutedNodes);
-      setEdges(res.layoutedEdges);
+      commit(() => {
+        prepareFitView(layoutedNodes);
+        setNodes(layoutedNodes);
+        setEdges(res.layoutedEdges);
+        setTeamFrames([]);
+      });
     });
   }, [
     membersTree,
@@ -143,7 +199,10 @@ export const useTreeLayout = () => {
     filterVersion,
     lineageMemberId,
     treeMode,
-    appliedFilters.eventTypeNames,
+    appliedFilters,
+    setTeamFrames,
+    setLayoutMode,
+    transitionScene,
     setFitViewTargetScale,
     setIsFitViewAnimating,
   ]);

@@ -1,4 +1,7 @@
-import { getPhotoUrlAsAvatar } from "@/libs/cloudinary";
+import {
+  getPhotoUrlAsAvatar,
+  getPhotoUrlAsRoundAvatar,
+} from "@/libs/cloudinary";
 import { Member } from "@/models";
 import type { RecruitmentSeason, RecruitmentTerm } from "@/types";
 
@@ -19,6 +22,10 @@ export const getMemberAvatar = (
   if (!member.photo) return null;
   return getPhotoUrlAsAvatar(member.photo, options);
 };
+
+// Pre-rounded avatar texture for the canvas nodes.
+export const getMemberNodeAvatar = (member: Pick<Member, "photo">) =>
+  member.photo ? getPhotoUrlAsRoundAvatar(member.photo) : null;
 
 export const formatRecruitmentTerm = (
   term: RecruitmentTerm | null,

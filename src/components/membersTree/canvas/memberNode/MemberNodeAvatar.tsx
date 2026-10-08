@@ -1,5 +1,5 @@
-import { useState, useMemo, memo } from "react";
-import { Assets, Sprite, TextStyle } from "pixi.js";
+import { useMemo, memo } from "react";
+import { Assets, TextStyle } from "pixi.js";
 import { useTexture, useCanvasTheme } from "@/hooks";
 import { getInitials } from "@/utils";
 import {
@@ -24,10 +24,9 @@ const MemberNodeAvatar = ({
   placeholderColorIndex,
 }: Props) => {
   const { accentColors, textStyles } = useCanvasTheme();
-  const avatarImage = useTexture(avatarUrl);
+  const avatarImage = useTexture(avatarUrl, { mipmaps: true });
   const circleTexture = Assets.get(CIRCLE_TEXTURE_SRC);
   const patternTexture = Assets.get(PATTERN_TEXTURE_SRC);
-  const [circleMaskSprite, setCircleMaskSprite] = useState<Sprite | null>(null);
 
   const initials = useMemo(() => getInitials(memberName), [memberName]);
   const placeholderStyle = useMemo(
@@ -36,27 +35,16 @@ const MemberNodeAvatar = ({
   );
 
   if (avatarImage) {
+    // The texture is already a circle (see getMemberNodeAvatar): no mask.
     return (
-      <pixiContainer mask={circleMaskSprite}>
-        <pixiSprite
-          ref={setCircleMaskSprite}
-          renderable={false}
-          texture={circleTexture}
-          anchor={0.5}
-          x={CENTER_X}
-          y={NODE_AVATAR_RADIUS}
-          width={NODE_AVATAR_SIZE}
-          height={NODE_AVATAR_SIZE}
-        />
-        <pixiSprite
-          texture={avatarImage}
-          anchor={0.5}
-          x={CENTER_X}
-          y={NODE_AVATAR_RADIUS}
-          width={NODE_AVATAR_SIZE}
-          height={NODE_AVATAR_SIZE}
-        />
-      </pixiContainer>
+      <pixiSprite
+        texture={avatarImage}
+        anchor={0.5}
+        x={CENTER_X}
+        y={NODE_AVATAR_RADIUS}
+        width={NODE_AVATAR_SIZE}
+        height={NODE_AVATAR_SIZE}
+      />
     );
   }
 

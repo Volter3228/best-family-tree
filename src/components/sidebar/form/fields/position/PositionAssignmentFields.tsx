@@ -4,43 +4,36 @@ import { ComboboxInput, FormCheckbox } from "../../inputs";
 interface Props {
   rowId: string;
   row: PositionFormRow;
-  eventTypeOptions: DropdownOption[];
+  teamTypeOptions: DropdownOption[];
   teamOptions: DropdownOption[];
   roleOptions: DropdownOption[];
   color?: AccentColor;
   onUpdate: (patch: Partial<PositionFormRow>) => void;
   onTeamSelect: (teamName: string) => void;
+  onTeamTypeSelect: (value: string, text: string) => void;
 }
 
 const PositionAssignmentFields = ({
   rowId,
   row,
-  eventTypeOptions,
+  teamTypeOptions,
   teamOptions,
   roleOptions,
   color = "blue",
   onUpdate,
   onTeamSelect,
+  onTeamTypeSelect,
 }: Props) => (
   <>
     <div className="flex flex-row gap-2">
       <div className="flex flex-col flex-1 relative">
         <ComboboxInput
-          name={`position-eventType-${rowId}`}
-          label="Оберіть івент"
-          options={eventTypeOptions}
-          onSelect={(value, text) =>
-            onUpdate({
-              eventTypeId: value || undefined,
-              eventTypeName: value ? undefined : text.trim() || undefined,
-              teamName: undefined,
-              startDate: undefined,
-              endDate: undefined,
-              isCurrent: true,
-            })
-          }
+          name={`position-teamType-${rowId}`}
+          label="Тип команди"
+          options={teamTypeOptions}
+          onSelect={onTeamTypeSelect}
           placeholder="BTW"
-          initialValue={row.eventTypeId ?? row.eventTypeName}
+          initialValue={row.teamTypeId ?? row.teamTypeName}
           color={color}
         />
       </div>

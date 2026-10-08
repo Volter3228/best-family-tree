@@ -13,7 +13,13 @@ import {
   ActivityState,
 } from "@/types";
 
-const TREE_MODES: TreeMode[] = ["family", "none", "team"];
+const TREE_MODES: TreeMode[] = ["family", "grid", "team"];
+
+// "none" was the old name of the grid mode; keep old links working.
+const parseTreeMode = (value: string | null): TreeMode => {
+  const mode = value === "none" ? "grid" : value;
+  return TREE_MODES.includes(mode as TreeMode) ? (mode as TreeMode) : "family";
+};
 
 const parseNumberOrNull = (val: string | null): number | null => {
   if (!val) return null;
@@ -86,11 +92,17 @@ export const parseFiltersFromSearchParams = (
       AVATAR_VALUES,
     ),
     lineageMemberId: params.get("lineageMemberId") || null,
-    treeMode: TREE_MODES.includes(params.get("treeMode") as TreeMode)
-      ? (params.get("treeMode") as TreeMode)
-      : "family",
+    treeMode: parseTreeMode(params.get("treeMode")),
     roleNames: parseCsvStrings(params.get("role")),
-    eventTypeNames: parseCsvStrings(params.get("eventType")),
+    // "eventType" is the pre-rename name of this parameter.
+    teamTypeNames: parseCsvStrings(
+      params.get("teamType") ?? params.get("eventType"),
+    ),
+    teamYearFrom: parseNumberOrNull(params.get("teamYearFrom")),
+    teamYearTo: parseNumberOrNull(params.get("teamYearTo")),
+    teamYearRange: params.get("teamYearRange") === "1",
+    teamOnlyOngoing: params.get("teamOngoing") === "1",
+    teamOnlyEvents: params.get("teamEvents") === "1",
   };
 };
 
@@ -120,8 +132,13 @@ export const filtersToSearchParams = (
     set("avatar", serializeCsv(filters.avatars));
   if (filters.treeMode !== "family") set("treeMode", filters.treeMode);
   if (filters.roleNames.length > 0) set("role", serializeNameCsv(filters.roleNames));
-  if (filters.eventTypeNames.length > 0)
-    set("eventType", serializeNameCsv(filters.eventTypeNames));
+  if (filters.teamTypeNames.length > 0)
+    set("teamType", serializeNameCsv(filters.teamTypeNames));
+  set("teamYearFrom", serializeNumber(filters.teamYearFrom));
+  set("teamYearTo", serializeNumber(filters.teamYearTo));
+  if (filters.teamYearRange) set("teamYearRange", "1");
+  if (filters.teamOnlyOngoing) set("teamOngoing", "1");
+  if (filters.teamOnlyEvents) set("teamEvents", "1");
 
   const { lineageMemberId } = filters;
   if (lineageMemberId) {

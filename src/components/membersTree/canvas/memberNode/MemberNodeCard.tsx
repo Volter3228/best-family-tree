@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { CanvasTextMetrics, Graphics, TextStyle } from "pixi.js";
 import { Member } from "@/models";
-import { formatMemberRecruitmentSeason } from "@/utils";
+import { formatMemberRecruitmentSeason, truncateText } from "@/utils";
 import { useCanvasTheme } from "@/hooks";
 import {
   NODE_AVATAR_SIZE,
@@ -19,6 +19,7 @@ interface Props {
 }
 
 const TEXT_Y = NODE_AVATAR_SIZE + 17;
+const SUBTITLE_PADDING = 16;
 
 const MemberNodeCard = ({
   member,
@@ -49,9 +50,15 @@ const MemberNodeCard = ({
     [member.name, titleStyle],
   );
 
+  // Several roles in one team are comma separated; keep them inside the card.
   const subtitleText = useMemo(
-    () => teamRole || formatMemberRecruitmentSeason(member),
-    [member, teamRole],
+    () =>
+      truncateText(
+        teamRole || formatMemberRecruitmentSeason(member),
+        subtitleStyle,
+        NODE_WIDTH - 2 * SUBTITLE_PADDING,
+      ),
+    [member, teamRole, subtitleStyle],
   );
 
   const subtitleY = titleMetrics.height / 2 + 12;

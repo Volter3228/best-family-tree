@@ -38,7 +38,12 @@ export const EMPTY_FILTER_STATE: FilterState = {
   lineageMemberId: null,
   treeMode: "family",
   roleNames: [],
-  eventTypeNames: [],
+  teamTypeNames: [],
+  teamYearFrom: null,
+  teamYearTo: null,
+  teamYearRange: false,
+  teamOnlyOngoing: false,
+  teamOnlyEvents: false,
 };
 
 // Checkbox groups filter sections options

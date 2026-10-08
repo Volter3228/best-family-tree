@@ -1,11 +1,12 @@
 import { useState, memo } from "react";
-import Sidebar, { AddMemberForm } from "@/components/sidebar";
+import Sidebar, { ManageForm } from "@/components/sidebar";
 import {
-  PlusIcon,
+  PencilSquareIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { useFilters, usePanelToggle } from "@/hooks";
+import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
 import { FiltersPanel } from "./filters";
 import ToolbarIconButton from "./ToolbarIconButton";
@@ -14,9 +15,10 @@ import FitViewButton from "./FitViewButton";
 interface Props {
   onFitView: () => void;
   onSearch: (memberId: string) => void;
+  onTeamSearch: (frame: TeamFrame) => void;
 }
 
-const Toolbar = ({ onFitView, onSearch }: Props) => {
+const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const search = usePanelToggle();
   const filters = usePanelToggle();
@@ -49,9 +51,9 @@ const Toolbar = ({ onFitView, onSearch }: Props) => {
           />
           <FitViewButton onClick={onFitView} color="orange" />
           <ToolbarIconButton
-            title="Add Member"
+            title="Керування"
             onClick={toggleSidebar}
-            icon={PlusIcon}
+            icon={PencilSquareIcon}
             color="blue"
             isActive={isSidebarOpen}
           />
@@ -62,15 +64,16 @@ const Toolbar = ({ onFitView, onSearch }: Props) => {
         isClosing={search.isClosing}
         onClose={search.close}
         onSearch={onSearch}
+        onTeamSearch={onTeamSearch}
       />
       <FiltersPanel isOpen={filters.isOpen} isClosing={filters.isClosing} />
       <Sidebar
-        headerTitle="Додати"
+        headerTitle="Керування"
         onClose={closeSidebar}
         isOpen={isSidebarOpen}
         color="blue"
       >
-        <AddMemberForm onSuccess={closeSidebar} color="blue" />
+        <ManageForm onSuccess={closeSidebar} color="blue" />
       </Sidebar>
     </>
   );

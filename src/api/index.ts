@@ -4,9 +4,9 @@ import addMember from "./addMember";
 import editMember from "./editMember";
 import fetchMentorsList from "./fetchMentorsList";
 import {
-  fetchEventTypes,
-  createEventType,
-  updateEventType,
+  fetchTeamTypes,
+  createTeamType,
+  updateTeamType,
   fetchRoles,
   createRole,
   fetchTeams,
@@ -18,9 +18,9 @@ export {
   fetchMentorsList,
   editMember,
   addMember,
-  fetchEventTypes,
-  createEventType,
-  updateEventType,
+  fetchTeamTypes,
+  createTeamType,
+  updateTeamType,
   fetchRoles,
   createRole,
   fetchTeams,

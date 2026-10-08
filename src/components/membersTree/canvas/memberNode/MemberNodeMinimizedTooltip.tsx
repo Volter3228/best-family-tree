@@ -12,12 +12,15 @@ interface Props {
   text: string;
   visible: boolean;
   placeholderColorIndex: number;
+  // Called once the fade-out has finished, so the owner can unmount it.
+  onHidden?: () => void;
 }
 
 const MemberNodeMinimizedTooltip = ({
   text,
   visible,
   placeholderColorIndex,
+  onHidden,
 }: Props) => {
   const { accentColors, textStyles } = useCanvasTheme();
   const tooltipRef = useRef<Container>(null);
@@ -57,6 +60,7 @@ const MemberNodeMinimizedTooltip = ({
       animationProgress.current = 0;
       tooltip.alpha = 0;
       tooltip.visible = false;
+      onHidden?.();
       return;
     }
 

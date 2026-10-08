@@ -9,6 +9,7 @@ import {
   type SetStateAction,
 } from "react";
 import { useFilterSearchParams } from "@/hooks";
+import { useFilteredMembers } from "@/hooks/membersTree/useFilteredMembers";
 import { EMPTY_FILTER_STATE } from "@/constants/filters";
 import type { FilterState } from "@/types";
 
@@ -21,6 +22,10 @@ interface IFiltersContext {
   resetFilters: () => void;
   /** Filters change counter, bumps on every apply. */
   filterVersion: number;
+  /** Members passing the applied filters (null = no filtering). */
+  filteredMemberIds: Set<string> | null;
+  filteredCount: number;
+  isFilterActive: boolean;
 }
 
 export const FiltersContext = createContext<IFiltersContext | undefined>(
@@ -43,8 +48,12 @@ export const FiltersProvider = ({ children }: Props) => {
     setFilterVersion((v) => v + 1);
   }, [draftFilters]);
 
+  // Clearing the criteria keeps the chosen layout.
   const resetFilters = useCallback(() => {
-    setDraftFilters(EMPTY_FILTER_STATE);
+    setDraftFilters((prev) => ({
+      ...EMPTY_FILTER_STATE,
+      treeMode: prev.treeMode,
+    }));
   }, []);
 
   const applySearchParamsFilters = useCallback((filters: FilterState) => {
@@ -58,6 +67,9 @@ export const FiltersProvider = ({ children }: Props) => {
     setFilters: applySearchParamsFilters,
   });
 
+  const { filteredMemberIds, filteredCount, isFilterActive } =
+    useFilteredMembers(appliedFilters);
+
   const value = useMemo(
     () => ({
       draftFilters,
@@ -66,8 +78,20 @@ export const FiltersProvider = ({ children }: Props) => {
       applyFilters,
       resetFilters,
       filterVersion,
+      filteredMemberIds,
+      filteredCount,
+      isFilterActive,
     }),
-    [draftFilters, appliedFilters, applyFilters, resetFilters, filterVersion],
+    [
+      draftFilters,
+      appliedFilters,
+      applyFilters,
+      resetFilters,
+      filterVersion,
+      filteredMemberIds,
+      filteredCount,
+      isFilterActive,
+    ],
   );
 
   return (

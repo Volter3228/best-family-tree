@@ -1,3 +1,4 @@
+name: best-family-tree
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -25,12 +26,15 @@ services:
     container_name: best-family-tree-backend
     ports:
       - "3001:3001"
-      - "5556:5556"
+      - "51212:51212"
     environment:
       - NODE_ENV=development
       - PORT=3001
     env_file:
       - ./src/server/.env
+    # The server sources are bind-mounted, so regenerate the Prisma client and
+    # apply pending migrations on every start instead of at image build time.
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run serve"
     volumes:
       - ./src/server:/app
       - /app/node_modules

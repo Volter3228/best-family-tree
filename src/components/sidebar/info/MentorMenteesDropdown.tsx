@@ -10,6 +10,8 @@ interface Props {
   mentees: Member[];
   onMemberNameClick?: (memberId: string) => void;
   isVisible: (id: string) => boolean;
+  // false in team view: names are listed but not navigable (and not greyed).
+  clickable?: boolean;
   color?: AccentColor;
 }
 
@@ -17,6 +19,7 @@ const MentorMenteesDropdown = ({
   mentees,
   onMemberNameClick,
   isVisible,
+  clickable = true,
   color = "blue",
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,7 +71,13 @@ const MentorMenteesDropdown = ({
 
               return (
                 <li key={mentee.id} className="mb-1 leading-7">
-                  {visible ? (
+                  {!clickable ? (
+                    <span
+                      className="overflow-hidden text-ellipsis whitespace-nowrap text-foreground"
+                    >
+                      {mentee.name}
+                    </span>
+                  ) : visible ? (
                     <span
                       className={twMerge(
                         "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap transition-colors duration-200",

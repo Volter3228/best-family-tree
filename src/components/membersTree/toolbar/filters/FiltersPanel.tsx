@@ -1,32 +1,30 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import type { FilterState, FilterSectionKey } from "@/types";
 import { useFilters } from "@/hooks/membersTree/useFilters";
-import {
-  MEMBER_STATUSES,
-  ACTIVITY_STATES,
-  JOIN_SEASONS,
-  AVATAR_VALUES,
-  SEASON_OPTIONS,
-  STATUS_OPTIONS,
-  ACTIVITY_OPTIONS,
-  AVATAR_OPTIONS,
-} from "@/constants/filters";
+import { isFilterActive } from "@/utils/filters";
 import FiltersHeader from "./FiltersHeader";
-import {
-  CheckboxGroupFilterSection,
-  JoinYearFilterSection,
-  BirthdayFilterSection,
-  LineageFilterSection,
-  ConnectionsFilterSection,
-  RoleFilterSection,
-  EventTypeFilterSection,
-} from "./sections";
+import MemberFilterCategory from "./MemberFilterCategory";
+import TeamFilterCategory from "./TeamFilterCategory";
+import ViewModeSwitch from "./ViewModeSwitch";
 
 interface Props {
   isOpen: boolean;
   isClosing: boolean;
 }
+
+const ALL_SECTIONS_CLOSED: Record<FilterSectionKey, boolean> = {
+  joinYear: false,
+  joinSeason: false,
+  status: false,
+  activity: false,
+  birthday: false,
+  avatar: false,
+  lineage: false,
+  role: false,
+  teamType: false,
+  teamPeriod: false,
+};
 
 const FiltersPanel = ({ isOpen, isClosing }: Props) => {
   const {
@@ -35,41 +33,39 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
     applyFilters,
     resetFilters,
     filteredCount,
-    isFilterActive: active,
-    isDraftActive,
+    appliedFilters,
   } = useFilters();
 
-  const [sections, setSections] = useState<Record<FilterSectionKey, boolean>>({
-    joinYear: false,
-    joinSeason: false,
-    status: false,
-    activity: false,
-    birthday: false,
-    avatar: false,
-    lineage: false,
-    connections: false,
-    role: false,
-    project: false,
-  });
+  const [openSections, setOpenSections] = useState(ALL_SECTIONS_CLOSED);
 
-  const toggleSection = (key: FilterSectionKey) => {
-    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleToggleSection = useCallback(
-    (key: FilterSectionKey) => () => toggleSection(key),
-    [toggleSection],
+  // The layout alone is not a criterion: "Очистити" keeps it.
+  const canReset = useMemo(
+    () =>
+      isFilterActive({ ...appliedFilters, treeMode: "family" }) ||
+      isFilterActive({ ...draftFilters, treeMode: "family" }),
+    [appliedFilters, draftFilters],
   );
 
-  const handleChange = (patch: Partial<FilterState>) => {
-    setDraftFilters((prev) => ({ ...prev, ...patch }));
-  };
+  const handleToggleSection = useCallback(
+    (key: FilterSectionKey) => () =>
+      setOpenSections((prev) => ({ ...prev, [key]: !prev[key] })),
+    [],
+  );
 
-  const handleFilterChange =
-    (filter: keyof FilterState) => (next: string[] | string) =>
-      handleChange({ [filter]: next });
+  const handleChange = useCallback(
+    (patch: Partial<FilterState>) =>
+      setDraftFilters((prev) => ({ ...prev, ...patch })),
+    [setDraftFilters],
+  );
 
   if (!isOpen) return null;
+
+  const groupProps = {
+    filters: draftFilters,
+    openSections,
+    onChange: handleChange,
+    onToggleSection: handleToggleSection,
+  };
 
   return (
     <div
@@ -82,10 +78,14 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
       <div className="rounded-2xl bg-surface/70 shadow-2xl flex flex-col max-h-[60vh]">
         <FiltersHeader
           count={filteredCount}
-          isActive={active}
-          isDraftActive={isDraftActive}
+          isTeamMode={appliedFilters.treeMode === "team"}
+          canReset={canReset}
           onApply={applyFilters}
           onReset={resetFilters}
+        />
+        <ViewModeSwitch
+          value={draftFilters.treeMode}
+          onChange={(treeMode) => handleChange({ treeMode })}
         />
         <div
           className="overflow-y-auto overflow-x-hidden flex-1 transparent"
@@ -94,78 +94,8 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
             scrollbarColor: "var(--accent-green) transparent",
           }}
         >
-          <JoinYearFilterSection
-            filters={draftFilters}
-            isOpen={sections.joinYear}
-            onChange={handleChange}
-            onToggle={handleToggleSection("joinYear")}
-          />
-          <CheckboxGroupFilterSection
-            title="Сезон вступу"
-            options={SEASON_OPTIONS}
-            allValues={JOIN_SEASONS}
-            selected={draftFilters.joinSeasons}
-            isOpen={sections.joinSeason}
-            onChangeSelected={handleFilterChange("joinSeasons")}
-            onToggle={handleToggleSection("joinSeason")}
-          />
-          <BirthdayFilterSection
-            filters={draftFilters}
-            isOpen={sections.birthday}
-            onChange={handleChange}
-            onToggle={handleToggleSection("birthday")}
-          />
-          <CheckboxGroupFilterSection
-            title="Статус"
-            options={STATUS_OPTIONS}
-            allValues={MEMBER_STATUSES}
-            selected={draftFilters.statuses}
-            isOpen={sections.status}
-            onChangeSelected={handleFilterChange("statuses")}
-            onToggle={handleToggleSection("status")}
-          />
-          <CheckboxGroupFilterSection
-            title="Стан активності"
-            options={ACTIVITY_OPTIONS}
-            allValues={ACTIVITY_STATES}
-            selected={draftFilters.activityStates}
-            isOpen={sections.activity}
-            onChangeSelected={handleFilterChange("activityStates")}
-            onToggle={handleToggleSection("activity")}
-          />
-          <CheckboxGroupFilterSection
-            title="Аватар"
-            options={AVATAR_OPTIONS}
-            allValues={AVATAR_VALUES}
-            selected={draftFilters.avatars}
-            isOpen={sections.avatar}
-            onChangeSelected={handleFilterChange("avatars")}
-            onToggle={handleToggleSection("avatar")}
-          />
-          <LineageFilterSection
-            filters={draftFilters}
-            isOpen={sections.lineage}
-            onChange={handleChange}
-            onToggle={handleToggleSection("lineage")}
-          />
-          <RoleFilterSection
-            filters={draftFilters}
-            isOpen={sections.role}
-            onChange={handleChange}
-            onToggle={handleToggleSection("role")}
-          />
-          <EventTypeFilterSection
-            filters={draftFilters}
-            isOpen={sections.project}
-            onChange={handleChange}
-            onToggle={handleToggleSection("project")}
-          />
-          <ConnectionsFilterSection
-            filters={draftFilters}
-            isOpen={sections.connections}
-            onChange={handleChange}
-            onToggle={handleToggleSection("connections")}
-          />
+          <MemberFilterCategory {...groupProps} />
+          <TeamFilterCategory {...groupProps} />
         </div>
       </div>
     </div>

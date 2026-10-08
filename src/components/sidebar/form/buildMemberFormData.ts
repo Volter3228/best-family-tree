@@ -23,14 +23,7 @@ export const buildMemberFormData = (
       } else if (key === "positions") {
         const positions = (value as MemberFormData["positions"])
           .filter((position) => position.roleName.trim() !== "")
-          .map(
-            ({
-              id: _id,
-              isYearOnly: _isYearOnly,
-              isCurrent: _isCurrent,
-              ...position
-            }) => position,
-          );
+          .map(({ id: _id, ...position }) => position);
         formData.append("positions", JSON.stringify(positions));
       } else if (typeof value === "object") {
         formData.append(key, JSON.stringify(value));

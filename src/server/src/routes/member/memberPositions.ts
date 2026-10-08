@@ -1,85 +1,85 @@
 import type { MemberTransaction } from "./memberQueries.js";
 import type { PositionInput } from "./memberPayload.js";
+import {
+  resolveRole,
+  resolveTeam,
+  resolveTeamType,
+} from "../shared/catalogResolvers.js";
 
-const findOrCreateRole = async (
+interface ResolvedPosition {
+  roleId: string;
+  teamId: string | null;
+  organization: string | null;
+  startYear: number | null;
+  endYear: number | null;
+}
+
+const getPositionKey = (position: ResolvedPosition) =>
+  [
+    position.roleId,
+    position.teamId ?? "",
+    position.organization ?? "",
+    position.startYear ?? "",
+    position.endYear ?? "",
+  ].join("|");
+
+const resolvePosition = async (
   tx: MemberTransaction,
   position: PositionInput,
-) => {
-  if (position.roleId) return { id: position.roleId };
-
-  if (position.roleName) {
-    return tx.role.upsert({
-      where: { name: position.roleName },
-      update: {},
-      create: {
-        name: position.roleName,
-        isLeaderPosition: Boolean(position.isLeaderPosition),
-      },
-    });
-  }
-
-  throw new Error("Position must have either roleId or roleName");
-};
-
-const findOrCreateEventTypeId = async (
-  tx: MemberTransaction,
-  position: PositionInput,
-): Promise<string | null> => {
-  if (position.eventTypeId) return position.eventTypeId;
-
-  const name = position.eventTypeName?.trim();
-  if (!name) return null;
-
-  const eventType = await tx.eventType.upsert({
-    where: { name },
-    update: {},
-    create: { name },
+): Promise<ResolvedPosition> => {
+  const role = await resolveRole(tx, position);
+  const teamType = await resolveTeamType(tx, position);
+  const team = await resolveTeam(tx, teamType, {
+    name: position.teamName,
+    startYear: position.teamStartYear,
+    endYear: position.teamEndYear,
   });
-  return eventType.id;
+
+  // A team carries the period; only standalone positions keep their own.
+  return {
+    roleId: role.id,
+    teamId: team?.id ?? null,
+    organization: team ? null : (position.organization ?? null),
+    startYear: team ? null : (position.startYear ?? null),
+    endYear: team ? null : (position.endYear ?? null),
+  };
 };
 
-const findOrCreateTeam = async (
-  tx: MemberTransaction,
-  eventTypeId: string | null,
-  position: PositionInput,
-) => {
-  const teamName = position.teamName?.trim();
-  if (!teamName) return undefined;
-
-  const where = { eventTypeId, name: teamName };
-  const existing = await tx.team.findFirst({ where });
-  if (existing) return existing;
-
-  return await tx.team.create({ data: where });
-};
-
+/**
+ * Make the member's positions match `positions` while keeping the rows that did
+ * not change (ids and timestamps survive). Only exact duplicates are merged;
+ * several roles in the same team are all stored.
+ */
 export const syncPositions = async (
   tx: MemberTransaction,
   memberId: string,
   positions: PositionInput[],
 ) => {
-  await tx.memberPosition.deleteMany({ where: { memberId } });
-
-  const seen = new Set<string>();
+  const desired = new Map<string, ResolvedPosition>();
   for (const position of positions) {
-    const role = await findOrCreateRole(tx, position);
-    const eventTypeId = await findOrCreateEventTypeId(tx, position);
-    const team = await findOrCreateTeam(tx, eventTypeId, position);
+    const resolved = await resolvePosition(tx, position);
+    desired.set(getPositionKey(resolved), resolved);
+  }
 
-    const year = position.year ?? null;
-    const key = `${role.id}|${team?.id ?? ""}|${year ?? ""}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
+  const existing = await tx.memberPosition.findMany({ where: { memberId } });
+  const keptKeys = new Set<string>();
+  const keptIds: string[] = [];
+  for (const row of existing) {
+    const key = getPositionKey(row);
+    if (desired.has(key) && !keptKeys.has(key)) {
+      keptKeys.add(key);
+      keptIds.push(row.id);
+    }
+  }
 
-    await tx.memberPosition.create({
-      data: {
-        memberId,
-        roleId: role.id,
-        teamId: team?.id,
-        year,
-        startDate: position.startDate ? new Date(position.startDate) : null,
-        endDate: position.endDate ? new Date(position.endDate) : null,
-      },
+  await tx.memberPosition.deleteMany({
+    where: { memberId, id: { notIn: keptIds } },
+  });
+
+  const created = [...desired].filter(([key]) => !keptKeys.has(key));
+  if (created.length > 0) {
+    await tx.memberPosition.createMany({
+      data: created.map(([, position]) => ({ memberId, ...position })),
     });
   }
 };

@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { Assets, Texture } from "pixi.js";
 
-export const useTexture = (src: string | null): Texture | null => {
+interface Options {
+  // Mipmaps keep heavily minified images (avatars at overview zoom) smooth and
+  // cheap to sample.
+  mipmaps?: boolean;
+}
+
+export const useTexture = (
+  src: string | null,
+  { mipmaps = false }: Options = {},
+): Texture | null => {
   const [texture, setTexture] = useState<Texture | null>(() =>
     src && Assets.cache.has(src) ? Assets.get(src) : null,
   );
@@ -18,7 +27,9 @@ export const useTexture = (src: string | null): Texture | null => {
     }
 
     let mounted = true;
-    Assets.load({ src })
+    Assets.load(
+      mipmaps ? { src, data: { autoGenerateMipmaps: true } } : { src },
+    )
       .then((tex) => {
         if (mounted) setTexture(tex);
       })
@@ -27,7 +38,7 @@ export const useTexture = (src: string | null): Texture | null => {
     return () => {
       mounted = false;
     };
-  }, [src]);
+  }, [src, mipmaps]);
 
   return texture;
 };

@@ -323,7 +323,7 @@ async function migrateData(): Promise<void> {
         const existingBoard = await prisma.team.findFirst({
           where: {
             name: "VEIN Board",
-            eventTypeId: null,
+            teamTypeId: null,
           },
         });
         if (existingBoard) {
@@ -332,8 +332,8 @@ async function migrateData(): Promise<void> {
           veinBoard = await prisma.team.create({
             data: {
               name: "VEIN Board",
-              startDate: new Date(2025, 0, 1),
-              endDate: new Date(2025, 11, 31),
+              startYear: 2025,
+              endYear: 2025,
             },
           });
         }
@@ -365,7 +365,6 @@ async function migrateData(): Promise<void> {
                   memberId: member.id,
                   roleId: role.id,
                   teamId: veinBoard.id,
-                  startDate: new Date("2025-02-08"),
                 },
               });
             }
