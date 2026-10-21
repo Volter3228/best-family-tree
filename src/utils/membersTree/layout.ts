@@ -1,7 +1,16 @@
 import { NODE_WIDTH, NODE_HEIGHT, NODE_CARD_HEIGHT } from "@/constants/canvas";
 import { MemberStatus } from "@/types";
 import type { Member } from "@/models";
-import type { TreeEdge, MemberNode, MembersMap, Point } from "@/types";
+import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
+import { Position } from "@/types";
+import type {
+  ChildrenMap,
+  Direction,
+  TreeEdge,
+  MemberNode,
+  MembersMap,
+  Point,
+} from "@/types";
 
 /**
  * Reconnect edges to the nearest visible ancestor when nodes are filtered out.
@@ -51,18 +60,39 @@ export const reconnectEdgesToVisibleAncestors = (
 };
 
 /**
+ * Place nodes at the positions ELK computed (one per node, same order).
+ */
+export const applyElkPositions = (
+  nodes: MemberNode[],
+  positions: Point[],
+  direction: Direction = FLOW_VIEWPORT_DIRECTION.DESKTOP,
+): MemberNode[] => {
+  const [targetPosition, sourcePosition] =
+    direction === FLOW_VIEWPORT_DIRECTION.DESKTOP
+      ? [Position.Top, Position.Bottom]
+      : [Position.Left, Position.Right];
+
+  return nodes.map((node, index) => ({
+    ...node,
+    targetPosition,
+    sourcePosition,
+    position: positions[index],
+  }));
+};
+
+/**
  * Arrange nodes in a flat grid layout (no tree structure, no edges).
  */
 export const computeGridLayout = (
   nodes: MemberNode[],
-  gap: number = 50,
+  gapX: number = 70,
 ): MemberNode[] => {
   const cols = Math.ceil(Math.sqrt(nodes.length));
   return nodes.map((n, i) => ({
     ...n,
     position: {
-      x: (i % cols) * (NODE_WIDTH + gap),
-      y: Math.floor(i / cols) * (NODE_HEIGHT + NODE_CARD_HEIGHT),
+      x: (i % cols) * (NODE_WIDTH + gapX),
+      y: Math.floor(i / cols) * (NODE_HEIGHT + NODE_CARD_HEIGHT + 20),
     },
   }));
 };
@@ -104,6 +134,7 @@ export const alignLineageLayout = (
   layoutedNodes: MemberNode[],
   lineageMemberId: string,
   membersMap: MembersMap,
+  childrenOf: ChildrenMap,
 ): MemberNode[] => {
   const focus = layoutedNodes.find((n) => n.id === lineageMemberId);
   if (!focus) return layoutedNodes;
@@ -115,8 +146,10 @@ export const alignLineageLayout = (
   }
 
   // 1. Align ancestor chain directly above the lineage member
+  const seen = new Set<string>();
   let cur = membersMap.get(lineageMemberId);
-  while (cur?.mentorId) {
+  while (cur?.mentorId && !seen.has(cur.mentorId)) {
+    seen.add(cur.mentorId);
     const pos = posMap.get(cur.mentorId);
     if (pos) pos.x = targetX;
     cur = membersMap.get(cur.mentorId);
@@ -130,9 +163,9 @@ export const alignLineageLayout = (
     if (mentorData?.mentorId) {
       const grandmentor = membersMap.get(mentorData.mentorId);
       if (grandmentor) {
-        const mSiblingIds = grandmentor.mentees
-          .map((m) => m.id)
-          .filter((id) => id !== mentorId && posMap.has(id));
+        const mSiblingIds = (childrenOf.get(grandmentor.id) ?? []).filter(
+          (id) => id !== mentorId && posMap.has(id),
+        );
 
         if (mSiblingIds.length > 0) {
           const spacing = NODE_WIDTH + 60;
@@ -167,7 +200,10 @@ export const alignLineageLayout = (
  * tree and grid. The API still returns them (they may hold team positions),
  * so every mode except team view hides them.
  */
-export const isDetachedAlumnus = (member: Member): boolean =>
+export const isDetachedAlumnus = (
+  member: Member,
+  childrenOf: ChildrenMap,
+): boolean =>
   member.status === MemberStatus.Alumni &&
   !member.mentorId &&
-  member.mentees.length === 0;
+  !childrenOf.get(member.id)?.length;

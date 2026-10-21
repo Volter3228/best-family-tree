@@ -6,7 +6,7 @@ import {
   setTeamMembers,
   updateTeam,
 } from "@/api/teams";
-import { useMembers } from "../data/useMembers";
+import { useMembersActions } from "../data/useMembers";
 import { useRoles, useTeamTypes, useTeams } from "../data/useMeta";
 import type { TeamFormData, TeamMemberRow } from "@/types";
 import {
@@ -46,7 +46,7 @@ export const useTeamForm = ({
   const [teams, , reloadTeams] = useTeams();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
-  const { reloadMembers } = useMembers();
+  const { reloadMembers } = useMembersActions();
 
   const selectedTeam = useMemo(
     () => teams.find((team) => team.id === selectedTeamId) ?? null,

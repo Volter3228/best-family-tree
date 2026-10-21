@@ -3,73 +3,64 @@ import type {
   Member as MemberType,
   MembersByMentorId,
   TreeCache,
+  TreeNode,
 } from "@/types";
+
+type Cache = { size: TreeCache; depth: TreeCache };
 
 // Recursively build the tree
 const buildTree = (
   membersByMentorId: MembersByMentorId,
-  mentorId: string,
-  cache: { size: TreeCache; depth: TreeCache },
-) => {
-  const members = membersByMentorId[mentorId];
-  if (!members.length) return [];
-
-  const treeMembers = members.map(
-    (member): MemberType => ({
-      ...member,
-      mentees: member.mentees.length
-        ? buildTree(membersByMentorId, member.id, cache) // Build the tree for all direct ascendants that are mentors themselves
-        : [],
+  members: MemberType[],
+  cache: Cache,
+): TreeNode[] => {
+  const nodes = members.map(
+    (member): TreeNode => ({
+      member,
+      children: buildTree(membersByMentorId, membersByMentorId[member.id] ?? [], cache),
     }),
   );
 
   // Order current level mentees to ensure optimal arrangament of the nodes
-  return sortMembersBalanced(treeMembers, cache);
+  return sortMembersBalanced(nodes, cache);
 };
 
-const transformMembersToTree = (members: MemberType[]) => {
+// Pre-order walk: mentors come before their mentees, siblings keep the order
+// chosen by the balanced sort. The client rebuilds the tree from this order.
+const flattenTree = (nodes: TreeNode[], result: MemberType[] = []) => {
+  for (const { member, children } of nodes) {
+    result.push(member);
+    flattenTree(children, result);
+  }
+  return result;
+};
+
+/**
+ * Orders members for the family tree and returns them as a flat list, each
+ * member once, with no nested mentees or embedded mentor. Members whose
+ * mentor is missing from the list count as roots.
+ */
+const transformMembersToTree = (members: MemberType[]): MemberType[] => {
   // Request-scoped cache — no shared mutable state between concurrent calls
-  const cache: { size: TreeCache; depth: TreeCache } = {
-    size: new Map(),
-    depth: new Map(),
-  };
+  const cache: Cache = { size: new Map(), depth: new Map() };
 
   // O(1) lookup set instead of O(n) members.some() per member
   const memberIds = new Set(members.map((m) => m.id));
-  const mentorIdsNotInMembers = new Set<string>();
 
   // Create a dictionary where key is mentorId and value is an array of related mentees
-  const membersByMentorId = members.reduce<MembersByMentorId>((acc, member) => {
-    const mentorId = member.mentorId;
-    if (!mentorId || mentorIdsNotInMembers.has(mentorId)) return acc;
-
-    if (!memberIds.has(mentorId)) {
-      mentorIdsNotInMembers.add(mentorId);
-      return acc;
+  const membersByMentorId: MembersByMentorId = {};
+  const rootMembers: MemberType[] = [];
+  for (const member of members) {
+    const { mentorId } = member;
+    if (!mentorId || !memberIds.has(mentorId)) {
+      // Root members are founders of the organisation
+      rootMembers.push(member);
+      continue;
     }
+    (membersByMentorId[mentorId] ??= []).push(member);
+  }
 
-    acc[mentorId] = acc[mentorId] || [];
-    acc[mentorId].push(member);
-
-    return acc;
-  }, {});
-
-  // Root members are founders of the organisation
-  const rootMembers = members
-    .filter(
-      (member) =>
-        member.mentorId === null || mentorIdsNotInMembers.has(member.mentorId),
-    )
-    .map(
-      (member): MemberType => ({
-        ...member,
-        mentees: member.mentees.length
-          ? buildTree(membersByMentorId, member.id, cache)
-          : [],
-      }),
-    );
-
-  return sortMembersBalanced(rootMembers, cache);
+  return flattenTree(buildTree(membersByMentorId, rootMembers, cache));
 };
 
 export default transformMembersToTree;

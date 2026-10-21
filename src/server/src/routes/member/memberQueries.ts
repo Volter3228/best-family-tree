@@ -7,8 +7,6 @@ export type MemberTransaction = Parameters<
 >[0];
 
 export const MEMBER_INCLUDE = {
-  mentees: { include: { phoneNumbers: true as const } },
-  mentor: { include: { phoneNumbers: true as const } },
   phoneNumbers: true as const,
   positions: {
     include: {

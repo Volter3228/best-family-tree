@@ -7,6 +7,9 @@ interface Options {
   mipmaps?: boolean;
 }
 
+// URLs that failed to load: not retried on every mount.
+const failedSources = new Set<string>();
+
 export const useTexture = (
   src: string | null,
   { mipmaps = false }: Options = {},
@@ -26,6 +29,11 @@ export const useTexture = (
       return;
     }
 
+    if (failedSources.has(src)) {
+      setTexture(null);
+      return;
+    }
+
     let mounted = true;
     Assets.load(
       mipmaps ? { src, data: { autoGenerateMipmaps: true } } : { src },
@@ -33,7 +41,9 @@ export const useTexture = (
       .then((tex) => {
         if (mounted) setTexture(tex);
       })
-      .catch(() => {});
+      .catch(() => {
+        failedSources.add(src);
+      });
 
     return () => {
       mounted = false;

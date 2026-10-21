@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMembers, useTeams } from "@/hooks";
+import { useMembersList, useTeams } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
 import { getTeamRoster } from "@/utils";
 import Sidebar from "../sidebar";
@@ -29,7 +29,7 @@ const TeamInfoSidebar = ({
 }: Props) => {
   const { teamId, isOpen, mode } = state;
   const [teams] = useTeams();
-  const { flatMembersList } = useMembers();
+  const flatMembersList = useMembersList();
 
   const team = useMemo(
     () => teams.find((item) => item.id === teamId) ?? null,

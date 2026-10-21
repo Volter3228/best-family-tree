@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useMembers } from "@/hooks";
+import { useMembersList, useMemberById } from "@/hooks";
 import type { AccentColor } from "@/types";
 import { DropdownSelectInput } from "./inputs";
 import EditMemberForm from "./EditMemberForm";
@@ -10,7 +10,7 @@ interface Props {
 
 // Pick any member by name and edit or delete them without finding them in the tree.
 const MemberEditPanel = ({ color = "blue" }: Props) => {
-  const { flatMembersList, getMemberById } = useMembers();
+  const flatMembersList = useMembersList();
   const [memberId, setMemberId] = useState("");
   // Remounts the picker so it is empty again after saving or cancelling.
   const [pickerKey, setPickerKey] = useState(0);
@@ -23,7 +23,7 @@ const MemberEditPanel = ({ color = "blue" }: Props) => {
     [flatMembersList],
   );
 
-  const member = memberId ? getMemberById(memberId) : undefined;
+  const member = useMemberById(memberId);
 
   const handleExit = () => {
     setMemberId("");

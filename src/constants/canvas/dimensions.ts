@@ -4,6 +4,13 @@ export const NODE_AVATAR_SIZE = 192;
 export const NODE_AVATAR_RADIUS = NODE_AVATAR_SIZE / 2;
 export const NODE_HEIGHT = NODE_AVATAR_SIZE;
 
+// Avatar texture sizes (delivered px). Every node loads the small one; the big
+// one is only loaded for nodes near the viewport while zoomed in far enough.
+export const AVATAR_LOW_RES_SIZE = 128;
+export const AVATAR_HIGH_RES_SIZE = 480;
+// Largest device pixel ratio the canvas renders at.
+export const MAX_RENDER_RESOLUTION = 2;
+
 // Edges dimensions
 export const FIXED_EDGE_WIDTH = 4;
 

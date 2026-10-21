@@ -1,6 +1,6 @@
 import type { MemberBody } from "../../utils/validation.js";
 import prisma from "../../db/prisma/clientInstance.js";
-import { NotFoundError } from "../../utils/httpErrors.js";
+import { NotFoundError, ValidationError } from "../../utils/httpErrors.js";
 import { buildMemberFields } from "./memberPayload.js";
 import type { PositionInput } from "./memberPayload.js";
 import { MEMBER_INCLUDE, type MemberTransaction } from "./memberQueries.js";
@@ -16,6 +16,30 @@ const savePhoneNumbers = async (
   await tx.phoneNumber.createMany({
     data: phoneNumbers.map((phoneNumber) => ({ phoneNumber, ownerId: memberId })),
   });
+};
+
+// A member can not be their own mentor or the mentor of one of their mentors:
+// the family tree (and every walker over it) assumes there are no cycles.
+const assertNoMentorCycle = async (
+  tx: MemberTransaction,
+  memberId: string,
+  mentorId: string,
+) => {
+  const visited = new Set<string>();
+  let currentId: string | null = mentorId;
+
+  while (currentId && !visited.has(currentId)) {
+    if (currentId === memberId) {
+      throw new ValidationError("A member can not be mentored by themself or by one of their mentees");
+    }
+    visited.add(currentId);
+    const current: { mentorId: string | null } | null =
+      await tx.member.findUnique({
+        where: { id: currentId },
+        select: { mentorId: true },
+      });
+    currentId = current?.mentorId ?? null;
+  }
 };
 
 export const createMember = async (
@@ -46,6 +70,7 @@ export const updateMember = async (
   photoUrl: string | null,
 ) =>
   prisma.$transaction(async (tx) => {
+    await assertNoMentorCycle(tx, memberId, body.mentorId);
     await tx.member.update({
       where: { id: memberId },
       data: buildMemberFields(body, photoUrl),

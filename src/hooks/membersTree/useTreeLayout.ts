@@ -1,22 +1,25 @@
 import { useEffect, useRef } from "react";
-import { useMembersTree } from "./useMembersTree";
-import { useMembers } from "../data/useMembers";
-import { useFilters } from "./useFilters";
+import { useMembersStore } from "@/store/membersStore";
+import { useFiltersStore } from "@/store/filtersStore";
+import { useTreeStore } from "@/store/treeStore";
 import { useSceneTransition } from "./useSceneTransition";
 import { getFitViewTargetScale, useViewportAnimation } from "./animations";
 import type { MemberNode, TeamFrame, TreeEdge } from "@/types";
 import {
-  layoutTeamFrames,
+  applyTeamLayout,
+  toTeamLayoutInputs,
   transformMembersToFlowValues,
   transformMembersToTeamTreeValues,
-  getLayoutedElements,
+  refreshNodeMembers,
 } from "@/utils";
+import { requestLayout } from "@/libs/layoutClient";
 import {
   reconnectEdgesToVisibleAncestors,
   isDetachedAlumnus,
   computeGridLayout,
   reorderEdgesForLineageCentering,
   alignLineageLayout,
+  applyElkPositions,
 } from "@/utils/membersTree/layout";
 
 /**
@@ -25,17 +28,18 @@ import {
  * after layout changes.
  */
 export const useTreeLayout = () => {
-  const {
-    nodes,
-    setNodes,
-    setEdges,
-    setTeamFrames,
-    setLayoutMode,
-    setIsFitViewAnimating,
-    setFitViewTargetScale,
-  } = useMembersTree();
-  const { membersTree, flatMembersList, membersMap } = useMembers();
-  const { filteredMemberIds, filterVersion, appliedFilters } = useFilters();
+  const nodes = useTreeStore((s) => s.nodes);
+  const setNodes = useTreeStore((s) => s.setNodes);
+  const setEdges = useTreeStore((s) => s.setEdges);
+  const setTeamFrames = useTreeStore((s) => s.setTeamFrames);
+  const setLayoutMode = useTreeStore((s) => s.setLayoutMode);
+  const setIsFitViewAnimating = useTreeStore((s) => s.setIsFitViewAnimating);
+  const setFitViewTargetScale = useTreeStore((s) => s.setFitViewTargetScale);
+  const structureVersion = useMembersStore((s) => s.structureVersion);
+  const byId = useMembersStore((s) => s.byId);
+  const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
+  const filterVersion = useFiltersStore((s) => s.filterVersion);
+  const appliedFilters = useFiltersStore((s) => s.appliedFilters);
   const { fitView } = useViewportAnimation();
 
   const lineageMemberId = appliedFilters.lineageMemberId;
@@ -65,13 +69,17 @@ export const useTreeLayout = () => {
     }
   };
 
+  // Edits that keep the tree's shape (names, photos, contacts) only swap the
+  // member records inside the existing nodes; positions and ELK stay as is.
+  useEffect(() => {
+    setNodes((prev) => refreshNodeMembers(prev, byId));
+  }, [byId, setNodes]);
+
   // Layout computation
   useEffect(() => {
-    if (
-      (treeMode === "team" && flatMembersList.length === 0) ||
-      (treeMode !== "team" && membersTree.length === 0)
-    )
-      return;
+    const { members, byId: membersMap, childrenOf, rootIds } =
+      useMembersStore.getState();
+    if (members.length === 0) return;
 
     // Build the unfiltered graph for the selected layout mode.
     const { nodes: allNodes, edges: allEdges }: {
@@ -81,17 +89,19 @@ export const useTreeLayout = () => {
       treeMode === "team"
         ? {
           nodes: transformMembersToTeamTreeValues(
-            flatMembersList,
+            members,
             appliedFilters,
           ),
           edges: [],
         }
-        : transformMembersToFlowValues(membersTree);
+        : transformMembersToFlowValues({ byId: membersMap, childrenOf, rootIds });
 
     let finalNodes =
       treeMode === "team"
         ? allNodes
-        : allNodes.filter((node) => !isDetachedAlumnus(node.data.member));
+        : allNodes.filter(
+          (node) => !isDetachedAlumnus(node.data.member, childrenOf),
+        );
     let finalEdges = allEdges;
 
     // Keep only nodes matching the current filters.
@@ -107,6 +117,10 @@ export const useTreeLayout = () => {
         finalEdges = reconnectEdgesToVisibleAncestors(finalNodes, membersMap);
       }
     }
+
+    // Edits that land while a layout is pending must not be overwritten.
+    const withLatestMembers = (layoutedNodes: MemberNode[]) =>
+      refreshNodeMembers(layoutedNodes, useMembersStore.getState().byId);
 
     // Newer runs invalidate older (async or fading) ones.
     const requestId = ++layoutRequestRef.current;
@@ -149,22 +163,27 @@ export const useTreeLayout = () => {
       const layoutedNodes = computeGridLayout(finalNodes);
       commit(() => {
         prepareFitView(layoutedNodes);
-        setNodes(layoutedNodes);
+        setNodes(withLatestMembers(layoutedNodes));
         setEdges([]);
         setTeamFrames([]);
       });
       return;
     }
 
-    // Team view: custom framed layout, no ELK
+    // Team view: custom framed layout (packing runs in the worker), no ELK
     if (treeMode === "team") {
-      const { nodes: layoutedNodes, frames } = layoutTeamFrames(finalNodes);
-      commit(() => {
-        prepareFitView(layoutedNodes, frames);
-        setNodes(layoutedNodes);
-        setEdges([]);
-        setTeamFrames(frames);
-      });
+      requestLayout("team", toTeamLayoutInputs(finalNodes))
+        .then(({ positions, frames }) => {
+          if (requestId !== layoutRequestRef.current) return;
+          const layoutedNodes = applyTeamLayout(finalNodes, positions);
+          commit(() => {
+            prepareFitView(layoutedNodes, frames);
+            setNodes(withLatestMembers(layoutedNodes));
+            setEdges([]);
+            setTeamFrames(frames);
+          });
+        })
+        .catch((error) => console.error("Team layout failed:", error));
       return;
     }
 
@@ -177,25 +196,34 @@ export const useTreeLayout = () => {
       );
     }
 
-    getLayoutedElements(finalNodes, finalEdges).then((res) => {
-      if (requestId !== layoutRequestRef.current) return;
+    requestLayout("elk", {
+      nodeIds: finalNodes.map((node) => node.id),
+      edges: finalEdges.map(({ id, source, target }) => ({ id, source, target })),
+    })
+      .then((positions) => {
+        if (requestId !== layoutRequestRef.current) return;
 
-      const layoutedNodes = lineageMemberId
-        ? alignLineageLayout(res.layoutedNodes, lineageMemberId, membersMap)
-        : res.layoutedNodes;
+        const positioned = applyElkPositions(finalNodes, positions);
+        const layoutedNodes = lineageMemberId
+          ? alignLineageLayout(
+            positioned,
+            lineageMemberId,
+            membersMap,
+            childrenOf,
+          )
+          : positioned;
 
-      commit(() => {
-        prepareFitView(layoutedNodes);
-        setNodes(layoutedNodes);
-        setEdges(res.layoutedEdges);
-        setTeamFrames([]);
-      });
-    });
+        commit(() => {
+          prepareFitView(layoutedNodes);
+          setNodes(withLatestMembers(layoutedNodes));
+          setEdges(finalEdges);
+          setTeamFrames([]);
+        });
+      })
+      .catch((error) => console.error("Tree layout failed:", error));
   }, [
-    membersTree,
-    flatMembersList,
+    structureVersion,
     filteredMemberIds,
-    membersMap,
     filterVersion,
     lineageMemberId,
     treeMode,

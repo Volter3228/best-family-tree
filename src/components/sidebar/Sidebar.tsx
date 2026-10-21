@@ -136,7 +136,7 @@ const Sidebar = ({
         </div>
         <div
           ref={setFooterElement}
-          className="flex shrink-0 flex-col items-center gap-3 px-6 pb-4 empty:hidden"
+          className="flex shrink-0 flex-col items-center gap-3 px-6 py-4 empty:hidden"
         />
       </div>
     </div>

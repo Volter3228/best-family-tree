@@ -1,13 +1,13 @@
 import { centerSingleSubtree, calculateMemberMetrics } from "./calculations.js";
-import type { Member as MemberType, MemberMetrics, TreeCache } from "@/types";
+import type { TreeNode, MemberMetrics, TreeCache } from "@/types";
 
 // Distribute subtrees evenly across available positions
 const distributeSubtrees = (
   withChildren: MemberMetrics[],
   withoutChildren: MemberMetrics[],
   totalLength: number,
-): MemberType[] => {
-  const arrangement: (MemberType | null)[] = new Array(totalLength).fill(null);
+): TreeNode[] => {
+  const arrangement: (TreeNode | null)[] = new Array(totalLength).fill(null);
 
   if (withChildren.length === 1) {
     // Single large subtree: center it and fill around
@@ -22,7 +22,7 @@ const distributeSubtrees = (
       withChildren.length === 1
         ? Math.floor(totalLength / 2)
         : Math.round((i * (totalLength - 1)) / (withChildren.length - 1));
-    arrangement[position] = metric.member;
+    arrangement[position] = metric.node;
   });
 
   // Fill remaining positions in empty gaps
@@ -33,26 +33,22 @@ const distributeSubtrees = (
     i++
   ) {
     if (arrangement[i] === null) {
-      arrangement[i] = withoutChildren[withoutChildrenIndex++].member;
+      arrangement[i] = withoutChildren[withoutChildrenIndex++].node;
     }
   }
 
-  return arrangement.filter((member): member is MemberType => member !== null);
+  return arrangement.filter((node): node is TreeNode => node !== null);
 };
 
 // This function arranges members at each level of the tree in specific order.
 // The goal is to minimize empty space between nodes and create visually balanced, centered graph.
 const sortMembersBalanced = (
-  mentees: MemberType[],
+  siblings: TreeNode[],
   cache: { size: TreeCache; depth: TreeCache },
-): MemberType[] => {
-  if (!mentees?.length || mentees.length <= 1) {
-    return mentees || [];
-  }
+): TreeNode[] => {
+  if (siblings.length <= 1) return siblings;
 
-  const metrics = mentees.map((member) =>
-    calculateMemberMetrics(member, cache),
-  );
+  const metrics = siblings.map((node) => calculateMemberMetrics(node, cache));
 
   // Separate members with and without children
   const withChildren = metrics // Branches of the tree
@@ -61,14 +57,14 @@ const sortMembersBalanced = (
 
   // If no complex subtrees, then use simple alternating placement
   if (withChildren.length === 0) {
-    return mentees;
+    return siblings;
   }
   const withoutChildren = metrics // Leaves of the tree
     .filter((m) => !m.hasChildren)
     .toSorted((a, b) => b.weight - a.weight);
 
   // If there are 1+ subtrees
-  return distributeSubtrees(withChildren, withoutChildren, mentees.length);
+  return distributeSubtrees(withChildren, withoutChildren, siblings.length);
 };
 
 export default sortMembersBalanced;

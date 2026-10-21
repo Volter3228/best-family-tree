@@ -4,7 +4,7 @@ import type { SidebarMode } from "@/types";
 
 export const useSidebar = (
   selectedMember: Member | null,
-  setSelectedMember: (member: Member | null) => void,
+  selectMember: (id: string | null) => void,
 ) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<SidebarMode>("info");
@@ -20,9 +20,9 @@ export const useSidebar = (
     setIsOpen(false);
     setTimeout(() => {
       setMode("info");
-      setSelectedMember(null);
+      selectMember(null);
     }, 300);
-  }, []);
+  }, [selectMember]);
 
   const onEditClick = () => setMode("edit");
   const onBackToInfoClick = () => setMode("info");

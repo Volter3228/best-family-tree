@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { useMembersTree, useSearchSuggestions } from "@/hooks";
+import { useSearchSuggestions } from "@/hooks";
+import { useTreeStore } from "@/store/treeStore";
 import { PARTICIPANT_FORMS, formatCount } from "@/utils";
 import type { TeamFrame } from "@/types";
 import SearchPanel from "./SearchPanel";
@@ -23,7 +24,7 @@ const getSubtitle = (frame: TeamFrame) =>
 // Team view lists each member once per team, so searching by member is
 // ambiguous; the search box finds team frames instead.
 const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
-  const { teamFrames } = useMembersTree();
+  const teamFrames = useTreeStore((s) => s.teamFrames);
 
   const { query, setQuery, suggestions, activeIndex, handleSelect, handleKeyDown } =
     useSearchSuggestions({

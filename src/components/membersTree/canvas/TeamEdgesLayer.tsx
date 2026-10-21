@@ -34,7 +34,6 @@ const TeamEdgesLayer = ({ frames, pixelLine }: Props) => {
           const control = Math.abs(curveEndY - start.y) * 0.5;
           const dx = end.x - start.x;
 
-          g.beginPath();
           g.moveTo(start.x, start.y);
           g.bezierCurveTo(
             fanStart ? start.x + dx * FAN_LEAN : start.x,
@@ -45,14 +44,15 @@ const TeamEdgesLayer = ({ frames, pixelLine }: Props) => {
             curveEndY,
           );
           if (bendY !== undefined) g.lineTo(end.x, end.y);
-          g.stroke();
         }
       }
+
+      g.stroke();
     },
     [frames, pixelLine, edgeColor, edgeAlpha],
   );
 
-  return <pixiGraphics draw={draw} />;
+  return <pixiGraphics draw={draw} eventMode="none" />;
 };
 
 export default memo(TeamEdgesLayer);

@@ -1,5 +1,7 @@
 import { useMemo } from "react";
-import { useMembers } from "@/hooks";
+import { useMembersStore } from "@/store/membersStore";
+import { useMentorsList, useSelectedId } from "@/hooks";
+import { collectDescendantIds } from "@/utils/membersTree";
 import { capitalizeOnlyFirstLetter } from "@/utils";
 import {
   MAX_DATE_BIRTHDAY,
@@ -41,11 +43,16 @@ const MemberFormFields = ({
   initialAvatar = null,
   color = "blue",
 }: Props) => {
-  const { mentorsList, selectedMember } = useMembers();
+  const mentorsList = useMentorsList();
+  const selectedId = useSelectedId();
+  const childrenOf = useMembersStore((s) => s.childrenOf);
 
   const mentorOptions: DropdownOption[] = useMemo(() => {
-    const excludedIds = selectedMember
-      ? new Set([selectedMember.id, ...selectedMember.getDescendantIds()])
+    const excludedIds = selectedId
+      ? new Set([
+        selectedId,
+        ...collectDescendantIds(childrenOf, selectedId),
+      ])
       : new Set<string>();
 
     return mentorsList
@@ -54,7 +61,7 @@ const MemberFormFields = ({
         text: name,
         value: id,
       }));
-  }, [mentorsList, selectedMember]);
+  }, [mentorsList, selectedId, childrenOf]);
 
   const statusOptions: DropdownOption[] = useMemo(
     () =>

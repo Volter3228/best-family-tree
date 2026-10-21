@@ -1,5 +1,6 @@
 import EdgesLayer from "./EdgesLayer";
 import LineageEdge from "./LineageEdge";
+import SharpAvatarTracker from "./SharpAvatarTracker";
 import NodesLayer from "./NodesLayer";
 import TeamEdgesLayer from "./TeamEdgesLayer";
 import TeamFramesLayer from "./TeamFramesLayer";
@@ -11,6 +12,7 @@ export {
   EdgesLayer,
   LineageEdge,
   NodesLayer,
+  SharpAvatarTracker,
   TeamEdgesLayer,
   TeamFramesLayer,
   TeamOverviewLayer,

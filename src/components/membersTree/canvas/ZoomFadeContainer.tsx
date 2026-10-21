@@ -1,9 +1,9 @@
 import { memo, type ReactNode, useRef } from "react";
 import { Container } from "pixi.js";
 import { useTick } from "@pixi/react";
-import { useViewport } from "@/hooks";
 import { getTeamOverviewFade, getTeamOverviewProgress } from "@/utils";
 import { TEAM_OVERVIEW_INTERACTIVE_PROGRESS } from "@/constants/canvas";
+import { useTreeStore } from "@/store/treeStore";
 
 interface Props {
   enabled: boolean;
@@ -14,7 +14,7 @@ interface Props {
 // Fades children towards `minAlpha` in the team overview and makes them
 // non-interactive there, so team cards underneath can take the pointer.
 const ZoomFadeContainer = ({ enabled, minAlpha, children }: Props) => {
-  const { viewport } = useViewport();
+  const viewport = useTreeStore((s) => s.viewport);
   const containerRef = useRef<Container>(null);
 
   useTick(() => {

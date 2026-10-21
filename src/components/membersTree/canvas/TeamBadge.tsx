@@ -12,7 +12,6 @@ import {
   useCanvasTheme,
   useTapWithoutDrag,
   useTexture,
-  useViewport,
 } from "@/hooks";
 import { getIconUrlAsRounded } from "@/libs/cloudinary";
 import {
@@ -31,6 +30,7 @@ import {
   TEAM_TITLE_SCREEN_PX,
 } from "@/constants/canvas";
 import type { TeamFrame } from "@/types";
+import { useTreeStore } from "@/store/treeStore";
 
 interface Props {
   frame: TeamFrame;
@@ -49,7 +49,7 @@ const ICON_TEXT_PX = 3;
 // Pill on the top border with the team name, plus the event logo if present.
 const TeamBadge = ({ frame, color, isDark, selectionRef, onClick }: Props) => {
   const { textStyles, text } = useCanvasTheme();
-  const { viewport } = useViewport();
+  const viewport = useTreeStore((s) => s.viewport);
   // Pre-rounded logo (no Pixi mask: it would flush the batch). Falls back to
   // the raw logo when Cloudinary can't transform the URL (e.g. .ico source).
   const roundedUrl = useMemo(

@@ -2,11 +2,12 @@ import gsap from "gsap";
 import { useCallback, useEffect, useRef } from "react";
 import {
   useViewportAnimation,
-  useMembers,
-  useFilters,
+  useMembersActions,
   useMemberSwitchAnimation,
 } from "@/hooks";
 import { Member } from "@/models";
+import { getMemberById } from "@/store/membersStore";
+import { useFiltersStore } from "@/store/filtersStore";
 import type { SidebarMode, AccentColor } from "@/types";
 import { EditMemberForm } from "./form";
 import MemberInfo from "./info";
@@ -39,20 +40,19 @@ const MemberSidebarContent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const prevViewRef = useRef<"info" | "edit">(sidebarMode);
 
-  const { setSelectedMember, getMemberById } = useMembers();
+  const { selectMember } = useMembersActions();
   const { focusNode } = useViewportAnimation();
-  const { filteredMemberIds } = useFilters();
+  const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
 
   const handleMemberNameClick = useCallback(
     (memberId: string) => {
       if (filteredMemberIds && !filteredMemberIds.has(memberId)) return;
-      const targetMember = getMemberById(memberId);
-      if (targetMember) {
-        setSelectedMember(targetMember);
+      if (getMemberById(memberId)) {
+        selectMember(memberId);
         focusNode(memberId);
       }
     },
-    [getMemberById, setSelectedMember, focusNode, filteredMemberIds],
+    [selectMember, focusNode, filteredMemberIds],
   );
 
   // Animate sidebar mode change

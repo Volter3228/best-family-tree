@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import type { FilterState, FilterSectionKey } from "@/types";
-import { useFilters } from "@/hooks/membersTree/useFilters";
+import { useFiltersStore } from "@/store/filtersStore";
 import { isFilterActive } from "@/utils/filters";
 import FiltersHeader from "./FiltersHeader";
 import MemberFilterCategory from "./MemberFilterCategory";
@@ -27,14 +27,12 @@ const ALL_SECTIONS_CLOSED: Record<FilterSectionKey, boolean> = {
 };
 
 const FiltersPanel = ({ isOpen, isClosing }: Props) => {
-  const {
-    draftFilters,
-    setDraftFilters,
-    applyFilters,
-    resetFilters,
-    filteredCount,
-    appliedFilters,
-  } = useFilters();
+  const draftFilters = useFiltersStore((s) => s.draftFilters);
+  const setDraftFilters = useFiltersStore((s) => s.setDraftFilters);
+  const applyFilters = useFiltersStore((s) => s.applyFilters);
+  const resetFilters = useFiltersStore((s) => s.resetFilters);
+  const filteredCount = useFiltersStore((s) => s.filteredCount);
+  const appliedFilters = useFiltersStore((s) => s.appliedFilters);
 
   const [openSections, setOpenSections] = useState(ALL_SECTIONS_CLOSED);
 

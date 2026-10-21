@@ -19,6 +19,7 @@ import {
   getMemberAvatar,
 } from "@/utils";
 import { Member } from "@/models";
+import { useMemberById, useMentees } from "@/hooks";
 import type { AccentColor, MemberPosition } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import MemberInfoRow from "./MemberInfoRow";
@@ -40,7 +41,7 @@ interface Props {
 
 const MemberInfo = ({
   member,
-  member: { name, photo, birthday, joinedAt, phoneNumbers, status, mentor },
+  member: { name, photo, birthday, joinedAt, phoneNumbers, status },
   onMemberNameClick,
   filteredMemberIds,
   menteesClickable = true,
@@ -48,6 +49,8 @@ const MemberInfo = ({
   canClickPosition,
   color = "blue",
 }: Props) => {
+  const mentor = useMemberById(member.mentorId);
+  const mentees = useMentees(member.id);
   const isVisible = (id: string) =>
     !filteredMemberIds || filteredMemberIds.has(id);
   const avatar = getMemberAvatar(member);
@@ -196,9 +199,9 @@ const MemberInfo = ({
               color={color}
             />
           )}
-          {member.mentees?.length > 0 && (
+          {mentees.length > 0 && (
             <MentorMenteesDropdown
-              mentees={member.mentees}
+              mentees={mentees}
               clickable={menteesClickable}
               onMemberNameClick={onMemberNameClick}
               isVisible={isVisible}
