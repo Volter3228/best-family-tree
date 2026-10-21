@@ -1,0 +1,10 @@
+/cache
+
+# graphify regenerable artifacts
+graph.html
+manifest.json
+.graphify_analysis.json
+.graphify_labels.json
+.graphify_labels.json.sig
+.graphify_root
+.cloud-cta-shown
