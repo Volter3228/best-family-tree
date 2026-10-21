@@ -1,15 +1,14 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { FederatedPointerEvent, Container, Filter, Rectangle } from "pixi.js";
 import gsap from "gsap";
-import { getMemberNodeAvatar } from "@/utils";
 import {
   useHoverNodeAnimation,
   useCardAnimation,
   CARD_PIVOT_X,
   CARD_PIVOT_Y,
-  useViewport,
 } from "@/hooks";
 import { Member } from "@/models";
+import { useTreeStore } from "@/store/treeStore";
 import {
   NODE_WIDTH,
   NODE_HEIGHT,
@@ -22,6 +21,7 @@ import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
 import MemberNodeCard from "./MemberNodeCard";
 
 interface Props {
+  nodeId: string;
   member: Member;
   placeholderColorIndex: number;
   isSelected: boolean;
@@ -57,6 +57,7 @@ const CONTENT_CENTER_X = NODE_WIDTH / 2;
 const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
 
 const MemberNode = ({
+  nodeId,
   x,
   y,
   member,
@@ -71,14 +72,14 @@ const MemberNode = ({
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<Container>(null);
   const cardRef = useRef<Container>(null);
-  const avatarUrl = useMemo(() => getMemberNodeAvatar(member), [member.photo]);
 
   const { shadowFilter } = useHoverNodeAnimation({
     container: containerRef.current,
     isHovered,
     isSelected,
   });
-  const { isFitViewAnimating, fitViewTargetScale } = useViewport();
+  const isFitViewAnimating = useTreeStore((s) => s.isFitViewAnimating);
+  const fitViewTargetScale = useTreeStore((s) => s.fitViewTargetScale);
   useCardAnimation({
     cardRef,
     isZoomedOut,
@@ -169,7 +170,8 @@ const MemberNode = ({
         </pixiContainer>
 
         <MemberNodeAvatar
-          avatarUrl={avatarUrl}
+          nodeId={nodeId}
+          photo={member.photo}
           memberName={member.name}
           placeholderColorIndex={placeholderColorIndex}
         />

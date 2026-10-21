@@ -1,17 +1,8 @@
 import { useCallback, useRef } from "react";
-import { Viewport } from "pixi-viewport";
 import { CARD_VIEW_SCALE, NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 import type { MemberNode, TeamFrame } from "@/types";
+import { useTreeStore } from "@/store/treeStore";
 import gsap from "gsap";
-
-interface Props {
-  nodes: MemberNode[];
-  teamFrames: TeamFrame[];
-  viewport: Viewport | null;
-  setScale: (scale: number) => void;
-  setIsFitViewAnimating: (value: boolean) => void;
-  setFitViewTargetScale: (scale: number | null) => void;
-}
 
 const getBounds = (nodes: MemberNode[], frames: TeamFrame[]) => {
   let minX = Infinity;
@@ -57,14 +48,7 @@ export const getFitViewTargetScale = (
   return Math.min(scaleX, scaleY, 1);
 };
 
-export const useFitViewAnimation = ({
-  nodes,
-  teamFrames,
-  viewport,
-  setScale,
-  setIsFitViewAnimating,
-  setFitViewTargetScale,
-}: Props) => {
+export const useFitViewAnimation = () => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
@@ -76,6 +60,14 @@ export const useFitViewAnimation = ({
         height = window.innerHeight,
       }: { width?: number; height?: number } = {},
     ) => {
+      const {
+        nodes,
+        teamFrames,
+        viewport,
+        setScale,
+        setIsFitViewAnimating,
+        setFitViewTargetScale,
+      } = useTreeStore.getState();
       if (!viewport || nodes.length === 0 || width === 0 || height === 0)
         return;
 
@@ -146,13 +138,6 @@ export const useFitViewAnimation = ({
 
       timelineRef.current = timeline;
     },
-    [
-      nodes,
-      teamFrames,
-      viewport,
-      setScale,
-      setIsFitViewAnimating,
-      setFitViewTargetScale,
-    ],
+    [],
   );
 };

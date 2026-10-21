@@ -13,8 +13,6 @@ export type MemberPositionWithRelations = PositionWithRelations;
 
 type Member = PrismaMember & {
   phoneNumbers: string[];
-  mentees: Member[];
-  mentor?: Member;
   positions: MemberPositionWithRelations[];
 };
 

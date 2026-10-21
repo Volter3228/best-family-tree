@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useMemo } from "react";
-import { useMembers, useRoles } from "@/hooks";
+import { useMembersList, useRoles } from "@/hooks";
 import type { AccentColor, Team, TeamFormData, TeamType } from "@/types";
 import type { useTeamForm } from "@/hooks/forms";
 import {
@@ -72,7 +72,7 @@ const TeamFormContent = ({
   members,
 }: Props) => {
   const [roles] = useRoles();
-  const { flatMembersList } = useMembers();
+  const flatMembersList = useMembersList();
 
   const teamTypeOptions = useMemo(
     () => getTeamTypeOptions(teamTypes),

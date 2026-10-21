@@ -8,7 +8,7 @@ interface Props {
   nodes: MemberNode[];
   isZoomedOut: boolean;
   showBirthday: boolean;
-  selectedMember: Member | null;
+  selectedId: string | null;
   selectedTeamId: string | null;
   isTeamView: boolean;
   onNodeClick: (member: Member, teamId?: string) => void;
@@ -18,7 +18,7 @@ const NodesLayer = ({
   nodes,
   isZoomedOut,
   showBirthday,
-  selectedMember,
+  selectedId,
   selectedTeamId,
   isTeamView,
   onNodeClick,
@@ -40,12 +40,13 @@ const NodesLayer = ({
     <pixiContainer>
       {entries.map(({ node, teamId, teamRole }) => {
         const isSelected =
-          selectedMember?.id === node.data.member.id &&
+          selectedId === node.data.member.id &&
           (!teamId || !selectedTeamId || selectedTeamId === teamId);
 
         return (
           <PixiMemberNode
             key={node.id}
+            nodeId={node.id}
             x={node.position.x}
             y={node.position.y}
             isZoomedOut={isZoomedOut}

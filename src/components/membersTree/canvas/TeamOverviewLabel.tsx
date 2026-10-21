@@ -12,7 +12,6 @@ import {
   useCanvasTheme,
   useCardHover,
   useTapWithoutDrag,
-  useViewport,
 } from "@/hooks";
 import {
   getReadableColor,
@@ -33,6 +32,7 @@ import {
   TEAM_OVERVIEW_WRAP_WIDTHS,
 } from "@/constants/canvas";
 import type { TeamFrame } from "@/types";
+import { useTreeStore } from "@/store/treeStore";
 
 const HOVER_SMOOTHING_MS = 120;
 
@@ -46,7 +46,7 @@ interface Props {
 const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
   const { accentColors, textStyles, text } = useCanvasTheme();
   const { themeId } = useTheme();
-  const { viewport } = useViewport();
+  const viewport = useTreeStore((s) => s.viewport);
   const isDark = themeId === "dark";
 
   const containerRef = useRef<Container>(null);

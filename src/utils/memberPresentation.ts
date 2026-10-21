@@ -24,8 +24,10 @@ export const getMemberAvatar = (
 };
 
 // Pre-rounded avatar texture for the canvas nodes.
-export const getMemberNodeAvatar = (member: Pick<Member, "photo">) =>
-  member.photo ? getPhotoUrlAsRoundAvatar(member.photo) : null;
+export const getMemberNodeAvatar = (
+  member: Pick<Member, "photo">,
+  size?: number,
+) => (member.photo ? getPhotoUrlAsRoundAvatar(member.photo, size) : null);
 
 export const formatRecruitmentTerm = (
   term: RecruitmentTerm | null,

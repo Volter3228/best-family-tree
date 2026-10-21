@@ -1,4 +1,3 @@
-import ELK from "elkjs/lib/elk.bundled.js";
 import type { FlowViewportDirection } from "@/types";
 
 // Using a larger width and height values creates more space between nodes
@@ -9,7 +8,3 @@ export const FLOW_VIEWPORT_DIRECTION: FlowViewportDirection = {
   DESKTOP: "TB",
   MOBILE: "LR",
 };
-
-const elk = new ELK();
-
-export default elk;

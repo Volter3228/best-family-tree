@@ -9,7 +9,11 @@ import {
   TEAM_ROW_GAP,
 } from "@/constants/canvas";
 import type { MemberNode, MemberPosition, Point, TeamFrame } from "@/types";
-import { parseTeamNodeId } from "./graph";
+import type {
+  TeamLayoutInput,
+  TeamLayoutResult,
+} from "@/workers/layout/protocol";
+import { parseTeamNodeId } from "./teamNodeId";
 import { buildTeamEdges } from "./teamEdges";
 import { packLanes } from "./teamPacking";
 import { centeredCenters, planMemberRows } from "./teamRows";
@@ -25,10 +29,10 @@ interface TeamBlock {
   endYear: number;
 }
 
-const getTeamPosition = (nodes: MemberNode[], teamId: string) => {
+const getTeamPosition = (nodes: TeamLayoutInput[], teamId: string) => {
   let fallback: MemberPosition | undefined;
   for (const node of nodes) {
-    for (const position of node.data.member.positions) {
+    for (const position of node.positions) {
       if (position.teamId !== teamId || !position.team) continue;
       if (position.role?.isLeaderPosition) return position;
       fallback ??= position;
@@ -37,8 +41,8 @@ const getTeamPosition = (nodes: MemberNode[], teamId: string) => {
   return fallback;
 };
 
-const isLeaderOf = (node: MemberNode, teamId: string) =>
-  node.data.member.positions.some(
+const isLeaderOf = (node: TeamLayoutInput, teamId: string) =>
+  node.positions.some(
     (position) => position.teamId === teamId && position.role?.isLeaderPosition,
   );
 
@@ -48,7 +52,10 @@ const getIconUrl = (url?: string | null) =>
     ? url.replace(/\.ico(\?.*)?$/i, ".png$1")
     : (url ?? null);
 
-const buildTeamBlock = (teamId: string, nodes: MemberNode[]): TeamBlock => {
+const buildTeamBlock = (
+  teamId: string,
+  nodes: TeamLayoutInput[],
+): TeamBlock => {
   const leaders = nodes.filter((node) => isLeaderOf(node, teamId));
   const members = nodes.filter((node) => !isLeaderOf(node, teamId));
 
@@ -62,7 +69,7 @@ const buildTeamBlock = (teamId: string, nodes: MemberNode[]): TeamBlock => {
   const axisX = width / 2;
 
   const offsets = new Map<string, Point>();
-  const place = (row: MemberNode[], centers: number[], y: number) =>
+  const place = (row: TeamLayoutInput[], centers: number[], y: number) =>
     row.forEach((node, i) =>
       offsets.set(node.id, { x: axisX + centers[i] - NODE_WIDTH / 2, y }),
     );
@@ -80,7 +87,7 @@ const buildTeamBlock = (teamId: string, nodes: MemberNode[]): TeamBlock => {
   }
 
   const firstRowTop = y;
-  const memberRows: MemberNode[][] = [];
+  const memberRows: TeamLayoutInput[][] = [];
   let memberIndex = 0;
   for (const centers of memberCenters) {
     const row = members.slice(memberIndex, memberIndex + centers.length);
@@ -167,11 +174,12 @@ const groupIntoLanes = (blocks: TeamBlock[]): TeamBlock[][] => {
 /**
  * Lay out team nodes: each team is a compact block (leaders on top, members
  * below) wrapped in a frame; frames are then laid out in lanes by team type.
+ * Returns the position of every node and the frames.
  */
-export const layoutTeamFrames = (
-  nodes: MemberNode[],
-): { nodes: MemberNode[]; frames: TeamFrame[] } => {
-  const nodesByTeam = new Map<string, MemberNode[]>();
+export const computeTeamLayout = (
+  nodes: TeamLayoutInput[],
+): TeamLayoutResult => {
+  const nodesByTeam = new Map<string, TeamLayoutInput[]>();
   for (const node of nodes) {
     const { teamId } = parseTeamNodeId(node.id);
     if (!teamId) continue;
@@ -186,7 +194,7 @@ export const layoutTeamFrames = (
     ),
   );
   const blocks = lanes.flat();
-  if (blocks.length === 0) return { nodes, frames: [] };
+  if (blocks.length === 0) return { positions: new Map(), frames: [] };
 
   const spots = packLanes(lanes.map((lane) => lane.map(({ frame }) => frame)));
   const positions = new Map<string, Point>();
@@ -199,11 +207,26 @@ export const layoutTeamFrames = (
     );
   });
 
-  return {
-    nodes: nodes.map((node) => ({
-      ...node,
-      position: positions.get(node.id) ?? node.position,
-    })),
-    frames: blocks.map(({ frame }) => frame),
-  };
+  return { positions, frames: blocks.map(({ frame }) => frame) };
 };
+
+// Only the member's positions in the node's own team matter for the layout.
+export const toTeamLayoutInputs = (nodes: MemberNode[]): TeamLayoutInput[] =>
+  nodes.map((node) => {
+    const { teamId } = parseTeamNodeId(node.id);
+    return {
+      id: node.id,
+      positions: node.data.member.positions.filter(
+        (position) => position.teamId === teamId,
+      ),
+    };
+  });
+
+export const applyTeamLayout = (
+  nodes: MemberNode[],
+  positions: Map<string, Point>,
+): MemberNode[] =>
+  nodes.map((node) => ({
+    ...node,
+    position: positions.get(node.id) ?? node.position,
+  }));

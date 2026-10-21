@@ -1,5 +1,11 @@
 import { FormEvent, useEffect, useId, useState, useMemo } from "react";
-import { useMembers, useTeamTypes, useRoles, useTeams } from "@/hooks";
+import {
+  useMembersActions,
+  useMentorsList,
+  useTeamTypes,
+  useRoles,
+  useTeams,
+} from "@/hooks";
 import apiEditMember from "@/api/editMember";
 import apiDeleteMember from "@/api/deleteMember";
 import { getMemberAvatar } from "@/utils";
@@ -63,8 +69,8 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const formId = useId();
 
-  const { updateMember, reloadMembers, mentorsList, getMentorsList } =
-    useMembers();
+  const { updateMember, reloadMembers, getMentorsList } = useMembersActions();
+  const mentorsList = useMentorsList();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
   const [, , reloadTeams] = useTeams();

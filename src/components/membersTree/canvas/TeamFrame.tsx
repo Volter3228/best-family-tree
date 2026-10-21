@@ -9,7 +9,7 @@ import {
 import { Container, Graphics, Rectangle } from "pixi.js";
 import { useTick } from "@pixi/react";
 import { useTheme } from "@/context/ThemeContext";
-import { useCanvasTheme, useViewport } from "@/hooks";
+import { useCanvasTheme } from "@/hooks";
 import { getTeamOverviewFade, resolveTeamColor } from "@/utils";
 import {
   TEAM_FRAME_RADIUS,
@@ -17,6 +17,7 @@ import {
 } from "@/constants/canvas";
 import type { TeamFrame as TeamFrameData } from "@/types";
 import TeamBadge from "./TeamBadge";
+import { useTreeStore } from "@/store/treeStore";
 
 interface Props {
   frame: TeamFrameData;
@@ -41,7 +42,7 @@ const lerp = (range: readonly [number, number], t: number) =>
 const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
   const { accentColors } = useCanvasTheme();
   const { themeId } = useTheme();
-  const { viewport } = useViewport();
+  const viewport = useTreeStore((s) => s.viewport);
 
   const fillRef = useRef<Graphics>(null);
   const strokeRef = useRef<Graphics>(null);
@@ -164,10 +165,16 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
       cullable
       cullArea={cullArea}
     >
-      <pixiGraphics ref={fillRef} draw={drawFill} alpha={FILL_ALPHA[0]} />
+      <pixiGraphics
+        ref={fillRef}
+        draw={drawFill}
+        alpha={FILL_ALPHA[0]}
+        eventMode="none"
+      />
       <pixiGraphics
         ref={strokeRef}
         draw={drawStroke}
+        eventMode="none"
         alpha={STROKE_ALPHA[0]}
       />
       {hasBeenSelected && (

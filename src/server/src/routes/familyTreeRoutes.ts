@@ -9,47 +9,23 @@ import type { MemberWithPhoneNumberRecords } from "../utils/index.js";
 
 const router = Router();
 
+// Flat, ordered list: each member once, mentors before their mentees. The
+// client rebuilds the tree from `mentorId` and the order of the list.
 router.get("/family-tree", async (_req, res) => {
   try {
     const rawMembers = await prisma.member.findMany({
       where: {
-        AND: [
-          {
-            NOT: {
-              AND: [
-                { status: MemberStatus.ALUMNI },
-                { mentees: { none: {} } },
-                { mentorId: null },
-                // Alumni who hold positions still belong in team view.
-                { positions: { none: {} } },
-              ],
-            },
-          },
-        ],
+        NOT: {
+          AND: [
+            { status: MemberStatus.ALUMNI },
+            { mentees: { none: {} } },
+            { mentorId: null },
+            // Alumni who hold positions still belong in team view.
+            { positions: { none: {} } },
+          ],
+        },
       },
       include: {
-        mentees: {
-          include: {
-            phoneNumbers: true,
-            positions: {
-              include: {
-                role: true,
-                team: { include: { teamType: true } },
-              },
-            },
-          },
-        },
-        mentor: {
-          include: {
-            phoneNumbers: true,
-            positions: {
-              include: {
-                role: true,
-                team: { include: { teamType: true } },
-              },
-            },
-          },
-        },
         phoneNumbers: true,
         positions: {
           include: {
@@ -60,13 +36,11 @@ router.get("/family-tree", async (_req, res) => {
       },
     });
 
-    const members = (rawMembers || []).map((m) =>
+    const members = rawMembers.map((m) =>
       transformMemberPhoneNumbers(m as MemberWithPhoneNumberRecords),
     ) as MemberType[];
 
-    const familyTree = transformMembersToTree(members);
-
-    res.status(200).json(familyTree);
+    res.status(200).json(transformMembersToTree(members));
   } catch (error) {
     console.error("Failed to fetch family tree:", error);
     res.status(500).json({ error: "Failed to fetch family tree" });

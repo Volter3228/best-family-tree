@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import gsap from "gsap";
-import { useMembersTreeData } from "./useMembersTreeData";
+import { useTreeStore } from "@/store/treeStore";
 
 const FADE_OUT_SECONDS = 0.2;
 const FADE_IN_SECONDS = 0.45;
@@ -11,7 +11,7 @@ const FADE_IN_SECONDS = 0.45;
  * cross-fades instead of popping.
  */
 export const useSceneTransition = () => {
-  const { sceneRef } = useMembersTreeData();
+  const sceneRef = useTreeStore((s) => s.sceneRef);
 
   return useCallback(
     (swap: () => void) => {

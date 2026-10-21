@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useMembers } from "../data/useMembers";
+import { useMembersActions } from "../data/useMembers";
+import { useMembersStore } from "@/store/membersStore";
 import type { Member as MemberType } from "@/types";
 
 /**
@@ -7,11 +8,11 @@ import type { Member as MemberType } from "@/types";
  * once, when the context tree is still empty.
  */
 export const useSyncMembers = (members: MemberType[]) => {
-  const { membersTree, setMembers } = useMembers();
+  const { setMembers } = useMembersActions();
 
   useEffect(() => {
-    if (!membersTree.length) {
+    if (!useMembersStore.getState().members.length) {
       setMembers(members);
     }
-  }, [membersTree, members]);
+  }, [members, setMembers]);
 };

@@ -1,22 +1,16 @@
 import { useCallback, useRef } from "react";
-import { Viewport } from "pixi-viewport";
 import gsap from "gsap";
-import type { MemberNode } from "@/types";
+import { useTreeStore } from "@/store/treeStore";
 import { isZoomedOut } from "@/utils";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 
-interface Props {
-  nodes: MemberNode[];
-  viewport: Viewport | null;
-  setScale: (scale: number) => void;
-}
-
-export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
+export const useFocusNodeAnimation = () => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
   return useCallback(
     (nodeId: string) => {
+      const { nodes, viewport, setScale } = useTreeStore.getState();
       if (!viewport || nodes.length === 0) return;
 
       const node = nodes.find(
@@ -101,6 +95,6 @@ export const useFocusNodeAnimation = ({ nodes, viewport, setScale }: Props) => {
 
       timelineRef.current = timeline;
     },
-    [nodes, viewport, setScale],
+    [],
   );
 };

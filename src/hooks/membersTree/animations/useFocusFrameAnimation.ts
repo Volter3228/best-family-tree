@@ -1,23 +1,19 @@
 import { useCallback, useRef } from "react";
-import { Viewport } from "pixi-viewport";
 import gsap from "gsap";
 import type { TeamFrame } from "@/types";
 import { isZoomedOut } from "@/utils";
-
-interface Props {
-  viewport: Viewport | null;
-  setScale: (scale: number) => void;
-}
+import { useTreeStore } from "@/store/treeStore";
 
 const FIT_PADDING = 160;
 const DURATION = 1.2;
 
 // Fit one team frame into the middle of the screen (no sidebar opens for it).
-export const useFocusFrameAnimation = ({ viewport, setScale }: Props) => {
+export const useFocusFrameAnimation = () => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
   return useCallback(
     (frame: TeamFrame) => {
+      const { viewport, setScale } = useTreeStore.getState();
       if (!viewport) return;
       timelineRef.current?.kill();
 
@@ -72,6 +68,6 @@ export const useFocusFrameAnimation = ({ viewport, setScale }: Props) => {
 
       timelineRef.current = timeline;
     },
-    [viewport, setScale],
+    [],
   );
 };

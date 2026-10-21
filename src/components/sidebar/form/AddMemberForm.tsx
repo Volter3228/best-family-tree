@@ -1,5 +1,11 @@
 import { FormEvent, useEffect, useId, useState } from "react";
-import { useMembers, useTeamTypes, useRoles, useTeams } from "@/hooks";
+import {
+  useMembersActions,
+  useMentorsList,
+  useTeamTypes,
+  useRoles,
+  useTeams,
+} from "@/hooks";
 import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
 import apiAddMember from "@/api/addMember";
 import type {
@@ -26,7 +32,8 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formId = useId();
 
-  const { addMember, mentorsList, getMentorsList } = useMembers();
+  const { addMember, getMentorsList } = useMembersActions();
+  const mentorsList = useMentorsList();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
   const [, , reloadTeams] = useTeams();

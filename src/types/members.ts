@@ -32,8 +32,6 @@ export type Member = {
   linkedinLink: string | null;
   createdAt: Date;
   updatedAt: Date;
-  mentor?: Member | null;
-  mentees?: Member[];
   phoneNumbers: string[];
   positions?: MemberPosition[];
 };
@@ -51,6 +49,9 @@ export interface RecruitmentTerm {
 }
 
 export type MembersMap = Map<string, MemberModel>;
+
+// Ordered mentee ids by mentor id.
+export type ChildrenMap = Map<string, string[]>;
 
 export type MembersByMentorId = {
   [mentorId: string]: Member[];

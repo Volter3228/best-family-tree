@@ -1,18 +1,15 @@
-import { useMembersTree } from "../useMembersTree";
+import { useMemo } from "react";
 import { useFitViewAnimation } from "./useFitViewAnimation";
 import { useFocusNodeAnimation } from "./useFocusNodeAnimation";
 import { useFocusFrameAnimation } from "./useFocusFrameAnimation";
 
 export const useViewportAnimation = () => {
-  const context = useMembersTree();
+  const fitView = useFitViewAnimation();
+  const focusNode = useFocusNodeAnimation();
+  const focusFrame = useFocusFrameAnimation();
 
-  const fitView = useFitViewAnimation(context);
-  const focusNode = useFocusNodeAnimation(context);
-  const focusFrame = useFocusFrameAnimation(context);
-
-  return {
-    fitView,
-    focusNode,
-    focusFrame,
-  };
+  return useMemo(
+    () => ({ fitView, focusNode, focusFrame }),
+    [fitView, focusNode, focusFrame],
+  );
 };

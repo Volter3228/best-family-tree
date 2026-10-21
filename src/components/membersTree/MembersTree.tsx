@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MembersTreeProvider } from "@/context/membersTree/MembersTreeProvider";
-import { FiltersProvider } from "@/context/FiltersContext";
 import { registerPixiPlugins } from "@/libs";
 import type { Member as MemberType } from "@/types";
 import MembersTreeContent from "./MembersTreeContent";
@@ -25,13 +23,7 @@ const MembersTree = ({ members }: Props) => {
 
   if (!isReady) return null;
 
-  return (
-    <FiltersProvider>
-      <MembersTreeProvider>
-        <MembersTreeContent members={members} />
-      </MembersTreeProvider>
-    </FiltersProvider>
-  );
+  return <MembersTreeContent members={members} />;
 };
 
 export default MembersTree;

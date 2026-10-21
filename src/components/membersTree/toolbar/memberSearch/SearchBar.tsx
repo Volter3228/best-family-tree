@@ -1,4 +1,4 @@
-import { useFilters } from "@/hooks";
+import { useFiltersStore } from "@/store/filtersStore";
 import type { TeamFrame } from "@/types";
 import MemberSearch from "./MemberSearch";
 import TeamSearch from "./TeamSearch";
@@ -13,9 +13,9 @@ interface Props {
 
 // Searches members, or teams while the team layout is selected.
 const SearchBar = ({ onSearch, onTeamSearch, ...panelProps }: Props) => {
-  const { appliedFilters } = useFilters();
+  const isTeamView = useFiltersStore((s) => s.appliedFilters.treeMode === "team");
 
-  return appliedFilters.treeMode === "team" ? (
+  return isTeamView ? (
     <TeamSearch {...panelProps} onSearch={onTeamSearch} />
   ) : (
     <MemberSearch {...panelProps} onSearch={onSearch} />

@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { memo, type RefObject } from "react";
 import type { Container } from "pixi.js";
 import { isZoomedOut as getIsZoomedOut } from "@/utils";
 import {
@@ -9,7 +9,6 @@ import {
 import { Member } from "@/models";
 import type {
   MemberNode,
-  MembersMap,
   NodePositions,
   TeamFrame,
   TreeEdge,
@@ -33,8 +32,7 @@ interface Props {
   edges: TreeEdge[];
   teamFrames: TeamFrame[];
   nodePositions: NodePositions;
-  membersMap: MembersMap;
-  selectedMember: Member | null;
+  selectedId: string | null;
   selectedTeamId: string | null;
   onNodeClick: (member: Member, teamId?: string) => void;
   // Badge click only opens the team info (no fit-to-view).
@@ -53,8 +51,7 @@ const MembersTreeScene = ({
   edges,
   teamFrames,
   nodePositions,
-  membersMap,
-  selectedMember,
+  selectedId,
   selectedTeamId,
   onNodeClick,
   onBadgeClick,
@@ -89,8 +86,7 @@ const MembersTreeScene = ({
       )}
       {treeMode === "family" && (
         <LineageEdge
-          selectedMember={selectedMember}
-          membersMap={membersMap}
+          selectedId={selectedId}
           nodePositions={nodePositions}
           pixelLine={isZoomedOut}
         />
@@ -103,7 +99,7 @@ const MembersTreeScene = ({
           nodes={nodes}
           isZoomedOut={isZoomedOut}
           showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
-          selectedMember={selectedMember}
+          selectedId={selectedId}
           selectedTeamId={selectedTeamId}
           isTeamView={isTeamView}
           onNodeClick={onNodeClick}
@@ -116,4 +112,4 @@ const MembersTreeScene = ({
   );
 };
 
-export default MembersTreeScene;
+export default memo(MembersTreeScene);

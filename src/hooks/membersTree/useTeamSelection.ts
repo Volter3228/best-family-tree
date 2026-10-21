@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { getTeamNodeId, parseTeamNodeId } from "@/utils";
 import { Member } from "@/models";
+import { getMemberById } from "@/store/membersStore";
 import type { MemberNode, NodePositions, TeamFrame } from "@/types";
 
 interface Options {
@@ -8,9 +9,8 @@ interface Options {
   nodes: MemberNode[];
   nodePositions: NodePositions;
   teamFrames: TeamFrame[];
-  selectedMember: Member | null;
-  setSelectedMember: (member: Member | null) => void;
-  getMemberById: (id: string) => Member | undefined;
+  selectedId: string | null;
+  selectMember: (id: string | null) => void;
   focusNode: (nodeId: string) => void;
 }
 
@@ -23,30 +23,29 @@ export const useTeamSelection = ({
   nodes,
   nodePositions,
   teamFrames,
-  selectedMember,
-  setSelectedMember,
-  getMemberById,
+  selectedId,
+  selectMember,
   focusNode,
 }: Options) => {
   const [clickedTeamId, setClickedTeamId] = useState<string | null>(null);
 
   // Only highlight a frame that still contains the selected member.
   const selectedTeamId = useMemo(() => {
-    if (!isTeamView || !selectedMember || !clickedTeamId) return null;
-    const nodeId = getTeamNodeId(clickedTeamId, selectedMember.id);
+    if (!isTeamView || !selectedId || !clickedTeamId) return null;
+    const nodeId = getTeamNodeId(clickedTeamId, selectedId);
     const hasNode = teamFrames.some(
       (frame) =>
         frame.teamId === clickedTeamId && frame.nodeIds.includes(nodeId),
     );
     return hasNode ? clickedTeamId : null;
-  }, [isTeamView, selectedMember, clickedTeamId, teamFrames]);
+  }, [isTeamView, selectedId, clickedTeamId, teamFrames]);
 
   const handleNodeClick = useCallback(
     (member: Member, teamId?: string) => {
-      setSelectedMember(member);
+      selectMember(member.id);
       setClickedTeamId(teamId ?? null);
     },
-    [setSelectedMember],
+    [selectMember],
   );
 
   // Search has no team context: fall back to the member's first visible team.
@@ -68,13 +67,13 @@ export const useTeamSelection = ({
 
   const focusMemberInTeam = useCallback(
     (teamId: string, memberId: string) => {
-      const member = getMemberById(memberId);
-      if (!member || !canFocusMemberInTeam(teamId, memberId)) return;
-      setSelectedMember(member);
+      if (!getMemberById(memberId) || !canFocusMemberInTeam(teamId, memberId))
+        return;
+      selectMember(memberId);
       setClickedTeamId(teamId);
       focusNode(getTeamNodeId(teamId, memberId));
     },
-    [getMemberById, canFocusMemberInTeam, setSelectedMember, focusNode],
+    [canFocusMemberInTeam, selectMember, focusNode],
   );
 
   return {

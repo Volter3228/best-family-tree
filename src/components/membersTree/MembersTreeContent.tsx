@@ -4,18 +4,22 @@ import { useCallback, useMemo } from "react";
 import { Application } from "@pixi/react";
 import { CullerPlugin } from "pixi.js";
 import {
-  useMembersTree,
-  useMembers,
+  useMembersActions,
+  useSelectedMember,
   useSidebar,
   useViewportAnimation,
-  useFilters,
+  useFilterSearchParams,
   useSyncMembers,
   useTreeLayout,
   useTeamSelection,
   useTeamInfoSidebar,
 } from "@/hooks";
+import { getMemberById } from "@/store/membersStore";
+import { useFiltersStore } from "@/store/filtersStore";
+import { useTreeStore } from "@/store/treeStore";
 import type { Member as MemberType, AccentColor, TeamFrame } from "@/types";
-import { Viewport } from "./canvas";
+import { getRenderResolution } from "@/utils";
+import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
 import TeamInfoSidebar from "./TeamInfoSidebar";
@@ -28,20 +32,19 @@ interface Props {
 }
 
 const MembersTreeContent = ({ members }: Props) => {
-  const {
-    nodes,
-    edges,
-    teamFrames,
-    layoutMode,
-    sceneRef,
-    scale,
-    setScale,
-    setViewport,
-    nodePositions,
-  } = useMembersTree();
+  const nodes = useTreeStore((s) => s.nodes);
+  const edges = useTreeStore((s) => s.edges);
+  const teamFrames = useTreeStore((s) => s.teamFrames);
+  const layoutMode = useTreeStore((s) => s.layoutMode);
+  const sceneRef = useTreeStore((s) => s.sceneRef);
+  const nodePositions = useTreeStore((s) => s.nodePositions);
+  const scale = useTreeStore((s) => s.scale);
+  const setScale = useTreeStore((s) => s.setScale);
+  const setViewport = useTreeStore((s) => s.setViewport);
 
-  const { selectedMember, setSelectedMember, getMemberById, membersMap } =
-    useMembers();
+  const selectedMember = useSelectedMember();
+  const selectedId = selectedMember?.id ?? null;
+  const { selectMember } = useMembersActions();
 
   const {
     isSidebarOpen,
@@ -49,11 +52,17 @@ const MembersTreeContent = ({ members }: Props) => {
     onClose: handleSidebarClose,
     onEditClick: handleSidebarEditClick,
     onBackToInfoClick: handleSidebarBackToInfo,
-  } = useSidebar(selectedMember, setSelectedMember);
+  } = useSidebar(selectedMember, selectMember);
 
   const teamInfo = useTeamInfoSidebar(selectedMember, handleSidebarClose);
 
-  const { filteredMemberIds, appliedFilters } = useFilters();
+  const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
+  const appliedFilters = useFiltersStore((s) => s.appliedFilters);
+  const applyUrlFilters = useFiltersStore((s) => s.applyUrlFilters);
+  useFilterSearchParams({
+    filters: appliedFilters,
+    setFilters: applyUrlFilters,
+  });
   const { focusNode, fitView, focusFrame } = useViewportAnimation();
   // Follow the mode of the nodes actually drawn, which lags behind the filter
   // while the scene cross-fades between modes.
@@ -71,9 +80,8 @@ const MembersTreeContent = ({ members }: Props) => {
     nodes,
     nodePositions,
     teamFrames,
-    selectedMember,
-    setSelectedMember,
-    getMemberById,
+    selectedId,
+    selectMember,
     focusNode,
   });
 
@@ -113,12 +121,11 @@ const MembersTreeContent = ({ members }: Props) => {
   );
   const handleSelectMember = useCallback(
     (memberId: string) => {
-      const member = getMemberById(memberId);
-      if (!member) return;
-      setSelectedMember(member);
+      if (!getMemberById(memberId)) return;
+      selectMember(memberId);
       focusNode(memberId);
     },
-    [getMemberById, setSelectedMember, focusNode],
+    [selectMember, focusNode],
   );
 
   useSyncMembers(members);
@@ -142,33 +149,26 @@ const MembersTreeContent = ({ members }: Props) => {
 
   const handleSearch = useCallback(
     (memberId: string) => {
-      const member = getMemberById(memberId);
-      if (!member) return;
+      if (!getMemberById(memberId)) return;
       if (filteredMemberIds && !filteredMemberIds.has(memberId)) return;
-      setSelectedMember(member);
+      selectMember(memberId);
       rememberTeamFor(memberId);
       focusNode(memberId);
     },
-    [
-      getMemberById,
-      setSelectedMember,
-      focusNode,
-      filteredMemberIds,
-      rememberTeamFor,
-    ],
+    [selectMember, focusNode, filteredMemberIds, rememberTeamFor],
   );
 
   const sidebarColor = useMemo<AccentColor>(() => {
-    if (!selectedMember) return "blue";
-    return accentByMemberId.get(selectedMember.id) ?? "blue";
-  }, [selectedMember, accentByMemberId]);
+    if (!selectedId) return "blue";
+    return accentByMemberId.get(selectedId) ?? "blue";
+  }, [selectedId, accentByMemberId]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
       <Application
         resizeTo={window}
         backgroundAlpha={0}
-        resolution={window.devicePixelRatio || 1}
+        resolution={getRenderResolution()}
         antialias
         autoDensity
         extensions={[CullerPlugin]}
@@ -179,6 +179,7 @@ const MembersTreeContent = ({ members }: Props) => {
           height={window.innerHeight}
           onScaleChange={setScale}
         >
+          <SharpAvatarTracker />
           <MembersTreeScene
             sceneRef={sceneRef}
             treeMode={treeMode}
@@ -187,8 +188,7 @@ const MembersTreeContent = ({ members }: Props) => {
             edges={edges}
             teamFrames={teamFrames}
             nodePositions={nodePositions}
-            membersMap={membersMap}
-            selectedMember={selectedMember}
+            selectedId={selectedId}
             selectedTeamId={highlightedTeamId}
             onNodeClick={handleNodeClick}
             onBadgeClick={handleBadgeClick}

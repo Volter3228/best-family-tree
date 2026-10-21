@@ -1,60 +1,52 @@
-import { Member as MemberType, TreeCache, MemberMetrics } from "@/types";
+import type { TreeNode, TreeCache, MemberMetrics } from "@/types";
 
 // Function to calculate the total number of descendants (subtree size)
 // Answers the following question: "Including this member, how many total descendants are in its entire branch?"
-const calculateSubtreeSize = (member: MemberType, cache: TreeCache): number => {
-  if (cache.has(member.id)) {
-    return cache.get(member.id)!; // cache subtree size value
-  }
+const calculateSubtreeSize = (node: TreeNode, cache: TreeCache): number => {
+  const cached = cache.get(node.member.id);
+  if (cached !== undefined) return cached;
 
-  const size = member.mentees.length
-    ? 1 +
-      member.mentees.reduce(
-        (sum, mentee) => sum + calculateSubtreeSize(mentee, cache),
-        0,
-      ) // Sum of all mentees subtrees
-    : 1; // Return 1 for member themself
+  // 1 for the member themself plus the sum of all mentees subtrees
+  const size = node.children.reduce(
+    (sum, child) => sum + calculateSubtreeSize(child, cache),
+    1,
+  );
 
-  cache.set(member.id, size);
+  cache.set(node.member.id, size);
   return size;
 };
 
 // Function to calculate the maximum depth of a subtree
 // Answers the following question: "What is the longest path of descendants from this member down to the bottom of the tree?"
-const calculateSubtreeDepth = (
-  member: MemberType,
-  cache: TreeCache,
-): number => {
-  if (cache.has(member.id)) {
-    return cache.get(member.id)!; // cache subtree depth value
-  }
+const calculateSubtreeDepth = (node: TreeNode, cache: TreeCache): number => {
+  const cached = cache.get(node.member.id);
+  if (cached !== undefined) return cached;
 
-  const depth = member.mentees.length
-    ? 1 +
-      Math.max(
-        ...member.mentees.map((member) => calculateSubtreeDepth(member, cache)),
-      ) // The longest path down to the bottom of the tree from current member
-    : 1; // Return 1 for member level themself
+  // The longest path down to the bottom of the tree from current member
+  const depth = node.children.reduce(
+    (max, child) => Math.max(max, calculateSubtreeDepth(child, cache) + 1),
+    1,
+  );
 
-  cache.set(member.id, depth);
+  cache.set(node.member.id, depth);
   return depth;
 };
 
 // Bundle all the metrics together to single object
 // Calculate weight, primary value for sorting
 export const calculateMemberMetrics = (
-  member: MemberType,
+  node: TreeNode,
   cache: { size: TreeCache; depth: TreeCache },
 ): MemberMetrics => {
-  const size = calculateSubtreeSize(member, cache.size);
-  const depth = calculateSubtreeDepth(member, cache.depth);
+  const size = calculateSubtreeSize(node, cache.size);
+  const depth = calculateSubtreeDepth(node, cache.depth);
 
   return {
-    member,
+    node,
     size,
     depth,
     weight: size * 100 + depth, // "size*100" because size is more important then depth
-    hasChildren: !!member.mentees.length,
+    hasChildren: node.children.length > 0,
   };
 };
 
@@ -64,11 +56,11 @@ export const centerSingleSubtree = (
   largeSubtree: MemberMetrics,
   smallItems: MemberMetrics[],
   totalLength: number,
-): MemberType[] => {
-  const arrangement: (MemberType | null)[] = new Array(totalLength).fill(null);
+): TreeNode[] => {
+  const arrangement: (TreeNode | null)[] = new Array(totalLength).fill(null);
   const centerIndex = Math.floor(totalLength / 2);
 
-  arrangement[centerIndex] = largeSubtree.member;
+  arrangement[centerIndex] = largeSubtree.node;
 
   // Fill alternately left and right from center
   let leftIndex = centerIndex - 1;
@@ -77,12 +69,12 @@ export const centerSingleSubtree = (
 
   while (itemIndex < smallItems.length) {
     if (leftIndex >= 0 && itemIndex < smallItems.length) {
-      arrangement[leftIndex--] = smallItems[itemIndex++].member;
+      arrangement[leftIndex--] = smallItems[itemIndex++].node;
     }
     if (rightIndex < totalLength && itemIndex < smallItems.length) {
-      arrangement[rightIndex++] = smallItems[itemIndex++].member;
+      arrangement[rightIndex++] = smallItems[itemIndex++].node;
     }
   }
 
-  return arrangement.filter((member) => member !== null);
+  return arrangement.filter((node) => node !== null);
 };

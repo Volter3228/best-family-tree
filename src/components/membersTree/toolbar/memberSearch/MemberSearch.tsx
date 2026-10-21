@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { Member } from "@/models";
 import { isDetachedAlumnus } from "@/utils/membersTree/layout";
-import { useMembers, useSearchSuggestions, useFilters } from "@/hooks";
+import { useMembersStore } from "@/store/membersStore";
+import { useMembersList, useSearchSuggestions } from "@/hooks";
+import { useFiltersStore } from "@/store/filtersStore";
 import SearchPanel from "./SearchPanel";
 import SearchSuggestionItem from "./SearchSuggestionItem";
 
@@ -16,18 +18,19 @@ const getSearchable = (member: Member) => [member.name, member.status];
 const compare = (a: Member, b: Member) => a.name.localeCompare(b.name, "uk");
 
 const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
-  const { flatMembersList } = useMembers();
-  const { filteredMemberIds } = useFilters();
+  const flatMembersList = useMembersList();
+  const childrenOf = useMembersStore((s) => s.childrenOf);
+  const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
 
   // Members that are currently displayed in the tree
   const items = useMemo(
     () =>
       flatMembersList.filter(
         (m) =>
-          !isDetachedAlumnus(m) &&
+          !isDetachedAlumnus(m, childrenOf) &&
           (!filteredMemberIds || filteredMemberIds.has(m.id)),
       ),
-    [flatMembersList, filteredMemberIds],
+    [flatMembersList, childrenOf, filteredMemberIds],
   );
 
   const { query, setQuery, suggestions, activeIndex, handleSelect, handleKeyDown } =

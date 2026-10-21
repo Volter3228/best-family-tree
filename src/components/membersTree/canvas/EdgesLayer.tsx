@@ -36,7 +36,6 @@ const EdgesLayer = ({ edges, nodePositions, pixelLine }: Props) => {
         const endX = targetPos.x + NODE_WIDTH / 2;
         const endY = targetPos.y;
 
-        g.beginPath();
         g.moveTo(startX, startY);
 
         const distY = Math.abs(endY - startY);
@@ -50,14 +49,14 @@ const EdgesLayer = ({ edges, nodePositions, pixelLine }: Props) => {
           endX,
           endY,
         );
-
-        g.stroke();
       });
+
+      g.stroke();
     },
     [edges, nodePositions, pixelLine, edgeColor, edgeAlpha],
   );
 
-  return <pixiGraphics draw={drawEdges} />;
+  return <pixiGraphics draw={drawEdges} eventMode="none" />;
 };
 
 export default memo(EdgesLayer);

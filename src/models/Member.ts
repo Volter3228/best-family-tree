@@ -8,6 +8,34 @@ import {
   MemberStatus,
 } from "@/types";
 
+const getRecruitmentTerm = (joinedAt: Date | null): RecruitmentTerm | null => {
+  if (!joinedAt) return null;
+  const month = getMonth(joinedAt);
+  const year = getYear(joinedAt);
+
+  let season: RecruitmentSeason = "spring";
+  if (month > 6 && month < 12) {
+    season = "autumn";
+  }
+
+  return { season, year };
+};
+
+const isBirthdayToday = (name: string, birthday: Date | null): boolean => {
+  if (!birthday) return false;
+  if (name.includes("Оксана") && name.includes("Магіс")) return true;
+
+  const today = new Date();
+  return (
+    getMonth(birthday) === getMonth(today) && birthday.getDate() === today.getDate()
+  );
+};
+
+/**
+ * A plain member record with derived values computed once on construction.
+ * The mentor/mentee relations live in the members store (`byId`,
+ * `childrenOf`), not on the member, so members never hold copies of each other.
+ */
 export default class Member {
   id: string;
   birthday: Date | null;
@@ -17,8 +45,6 @@ export default class Member {
   instagramLink: string | null;
   joinedAt: Date;
   linkedinLink: string | null;
-  mentees: Member[];
-  mentor: Member | null;
   mentorId: string | null;
   name: string;
   phoneNumbers: string[];
@@ -30,6 +56,8 @@ export default class Member {
   createdAt: Date;
   updatedAt: Date;
   positions: MemberPosition[];
+  private readonly recruitmentTerm: RecruitmentTerm | null;
+  private readonly birthdayToday: boolean;
 
   constructor({
     id,
@@ -40,8 +68,6 @@ export default class Member {
     instagramLink,
     joinedAt,
     linkedinLink,
-    mentees,
-    mentor,
     mentorId,
     name,
     phoneNumbers,
@@ -62,12 +88,6 @@ export default class Member {
     this.instagramLink = instagramLink;
     this.joinedAt = joinedAt;
     this.linkedinLink = linkedinLink;
-    this.mentees =
-      mentees?.map((mentee: MemberType) =>
-        mentee instanceof Member ? mentee : new Member(mentee),
-      ) || [];
-    this.mentor =
-      mentor instanceof Member ? mentor : mentor ? new Member(mentor) : null;
     this.mentorId = mentorId;
     this.name = name;
     this.phoneNumbers = phoneNumbers;
@@ -79,27 +99,12 @@ export default class Member {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.positions = positions || [];
-  }
-
-  // Add a mentee
-  addMentee(mentee: Member) {
-    this.mentees.push(mentee); // Add mentee if this is the mentor
+    this.recruitmentTerm = joinedAt ? getRecruitmentTerm(joinedAt) : null;
+    this.birthdayToday = isBirthdayToday(name, this.birthday);
   }
 
   getRecruitmentTerm(): RecruitmentTerm | null {
-    if (!this.joinedAt) return null;
-    const month = getMonth(this.joinedAt);
-    const year = getYear(this.joinedAt);
-
-    let season: RecruitmentSeason = "spring";
-    if (month > 6 && month < 12) {
-      season = "autumn";
-    }
-
-    return {
-      season,
-      year,
-    };
+    return this.recruitmentTerm;
   }
 
   isMentor(): boolean {
@@ -108,46 +113,11 @@ export default class Member {
     );
   }
 
-  getMenteesNamesString(): string {
-    return this.mentees.length
-      ? this.mentees.map(({ name }) => name).join(", ")
-      : "";
-  }
-
-  getDescendantIds(): Set<string> {
-    const descendantIds = new Set<string>();
-    const collectDescendants = (mentees: Member[]) => {
-      for (const mentee of mentees) {
-        descendantIds.add(mentee.id);
-        if (mentee.mentees.length) {
-          collectDescendants(mentee.mentees);
-        }
-      }
-    };
-
-    collectDescendants(this.mentees);
-    return descendantIds;
-  }
-
   clone(overrides: Partial<MemberType> = {}): Member {
-    const cloned = new Member({
-      ...this,
-      ...overrides,
-    } as MemberType);
-    return cloned;
+    return new Member({ ...this, ...overrides } as MemberType);
   }
 
   isBirthdayToday(): boolean {
-    if (!this.birthday) return false;
-    if (this.name.includes("Оксана") && this.name.includes("Магіс"))
-      return true;
-
-    const today = new Date();
-    const birthdayMonth = getMonth(this.birthday);
-    const birthdayDay = this.birthday.getDate();
-    const todayMonth = getMonth(today);
-    const todayDay = today.getDate();
-
-    return birthdayMonth === todayMonth && birthdayDay === todayDay;
+    return this.birthdayToday;
   }
 }

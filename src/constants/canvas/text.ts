@@ -1,4 +1,4 @@
-import { TextStyleOptions } from "pixi.js";
+import type { TextStyleOptions } from "pixi.js";
 
 const FONT_FAMILY = ["Nunito", "Arial", "Helvetica", "sans-serif"];
 

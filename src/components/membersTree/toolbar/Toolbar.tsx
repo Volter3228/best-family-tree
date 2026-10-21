@@ -5,7 +5,8 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { useFilters, usePanelToggle } from "@/hooks";
+import { usePanelToggle } from "@/hooks";
+import { useFiltersStore } from "@/store/filtersStore";
 import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
 import { FiltersPanel } from "./filters";
@@ -22,7 +23,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const search = usePanelToggle();
   const filters = usePanelToggle();
-  const { isFilterActive: hasActiveFilters } = useFilters();
+  const hasActiveFilters = useFiltersStore((s) => s.isFilterActive);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);

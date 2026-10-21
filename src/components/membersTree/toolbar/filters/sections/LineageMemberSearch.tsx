@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useMembers, useDropdownPosition } from "@/hooks";
+import { useMembersList, useMemberById, useDropdownPosition } from "@/hooks";
 import { normalize } from "@/utils";
 import { Member } from "@/models";
 import DropdownPortal from "@/components/common/DropdownPortal";
@@ -19,16 +19,13 @@ const LineageMemberSearch = ({
   onSelect,
   onClear,
 }: Props) => {
-  const { flatMembersList, getMemberById } = useMembers();
+  const flatMembersList = useMembersList();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const selectedMember = useMemo(
-    () => (selectedMemberId ? getMemberById(selectedMemberId) : null),
-    [selectedMemberId, getMemberById],
-  );
+  const selectedMember = useMemberById(selectedMemberId);
 
   const filtered = useMemo(() => {
     const q = normalize(query);

@@ -1,4 +1,3 @@
-import { MembersProvider } from "@/context/MembersContext";
 import MembersTreeDynamic from "@/components/membersTree/MembersTreeDynamic";
 import fetchFamilyTree from "@/api/fetchFamilyTree";
 
@@ -10,11 +9,7 @@ export default async function Home() {
 
   return (
     <div className="h-screen w-screen">
-      <MembersProvider>
-        {!!familyTreeMembers && (
-          <MembersTreeDynamic members={familyTreeMembers} />
-        )}
-      </MembersProvider>
+      {!!familyTreeMembers && <MembersTreeDynamic members={familyTreeMembers} />}
     </div>
   );
 }
