@@ -1,12 +1,12 @@
 # Graph Report - best-family-tree  (2026-10-23)
 
 ## Corpus Check
-- 383 files · ~149,007 words
+- 391 files · ~160,864 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 24 file(s) not represented in the graph (top: .prisma 8, (none) 5, .css 5)
 
 ## Summary
-- 2309 nodes · 5057 edges · 128 communities (122 shown, 6 thin omitted)
+- 2470 nodes · 5227 edges · 146 communities (139 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 57 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
@@ -24,21 +24,20 @@
 - src/types/index.ts
 - treeStore.ts
 - FilterState
-- MemberFormFields.tsx
+- PositionFormFields.tsx
 - ThemeContext.tsx
-- Member
+- GSAP Plugins
 - teamFrame.ts
 - memberService.ts
 - useDashedPathAnimation.ts
-- memberUpdateValidation.ts
 - src/index.ts
 - FiltersPanel.tsx
 - memberFormValidation.ts
 - TeamFrame
 - catalogValidation.ts
 - constants/canvas/index.ts
-- src/utils/index.ts
-- members.ts
+- PositionsDropdown.tsx
+- useMeta.ts
 - constants/filters.ts
 - teamService.ts
 - protocol.ts
@@ -62,7 +61,7 @@
 - ApplicationOptions reference
 - Process
 - Common Mistakes
-- Sidebar.tsx
+- cardVisibilityDriver.ts
 - membersStore.ts
 - During the session
 - ManageForm.tsx
@@ -95,9 +94,12 @@
 - Core Patterns
 - Core Patterns
 - Core Patterns
+- gsap.utils
+- src/utils/index.ts
 - Core Patterns
 - Constructor options (Container-inherited)
 - Test-Driven Development
+- GSAP Core
 - Core Patterns
 - Core Patterns
 - Scene Objects
@@ -120,6 +122,8 @@
 - AnimatedSprite
 - Core Patterns
 - pixijs-scene-sprite/SKILL.md
+- useTeamForm.ts
+- transformMembersToTree.ts
 - Process
 - Renderers: WebGPU, WebGL, and Canvas
 - pixijs-events/SKILL.md
@@ -131,16 +135,29 @@
 - Sprite
 - Core Patterns
 - Core Patterns
-- pixijs-color/SKILL.md
+- GSAP ScrollTrigger
+- Member
 - Core Patterns
 - Foundations
 - Advanced
+- utils/membersTree/index.ts
 - Core Patterns
+- GSAP with React
 - Common Mistakes
-- memberPresentation.ts
+- Member
 - hitl-loop.template.sh
 - Common Mistakes
 - pixijs-scene-graphics/SKILL.md
+- Core Patterns
+- GSAP Performance
+- GSAP Timeline
+- pixi.js
+- MemberStatus
+- src/types/tree.ts
+- filterTeams.ts
+- useTeamTypeForm.ts
+- dashedBezier.ts
+- elk.ts
 
 ## God Nodes (most connected - your core abstractions)
 1. `AccentColor` - 101 edges
@@ -149,22 +166,22 @@
 4. `tailwind-merge` - 47 edges
 5. `TeamFrame` - 39 edges
 6. `COLOR_CLASSES` - 35 edges
-7. `pixi.js` - 31 edges
+7. `pixi.js` - 32 edges
 8. `FilterState` - 29 edges
 9. `useTreeStore` - 27 edges
 10. `http()` - 26 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Manual Spritesheet creation` --references--> `parse()`  [INFERRED]
+  .agents/skills/pixijs-assets/references/spritesheet.md → src/api/teams.ts
+- `[MEDIUM] Not awaiting spritesheet parse` --references--> `parse()`  [INFERRED]
+  .agents/skills/pixijs-assets/references/spritesheet.md → src/api/teams.ts
 - `pixijs-scene-container` --references--> `getBounds()`  [INFERRED]
   .agents/skills/pixijs/references/index.md → src/hooks/membersTree/animations/useFitViewAnimation.ts
 - `[HIGH] Expecting getBounds() to return a Rectangle` --references--> `getBounds()`  [INFERRED]
   .agents/skills/pixijs-scene-container/SKILL.md → src/hooks/membersTree/animations/useFitViewAnimation.ts
-- `Bounds in different spaces` --references--> `getBounds()`  [INFERRED]
-  .agents/skills/pixijs-scene-core-concepts/references/transforms.md → src/hooks/membersTree/animations/useFitViewAnimation.ts
 - `Quick Start` --references--> `name()`  [INFERRED]
   .agents/skills/pixijs-assets/references/manifests.md → src/server/src/utils/catalogValidation.ts
-- `pixijs-math` --references--> `Point`  [INFERRED]
-  .agents/skills/pixijs/references/index.md → src/types/tree.ts
 
 ## Import Cycles
 - 3-file cycle: `src/utils/index.ts -> src/utils/membersTree/index.ts -> src/utils/membersTree/lineageEdgePath.ts -> src/utils/index.ts`
@@ -172,111 +189,107 @@
 - 4-file cycle: `src/models/Member.ts -> src/types/index.ts -> src/types/tree.ts -> src/models/index.ts -> src/models/Member.ts`
 - 5-file cycle: `src/models/Member.ts -> src/types/index.ts -> src/types/filters.ts -> src/types/members.ts -> src/models/index.ts -> src/models/Member.ts`
 
-## Communities (128 total, 6 thin omitted)
+## Communities (146 total, 7 thin omitted)
 
 ### Community 0 - "EditMemberForm.tsx"
-Cohesion: 0.10
-Nodes (37): deleteMember(), AddMemberForm(), buildMemberFormData(), ClearButton(), SubmitButton(), ConfirmDeleteControl(), Props, EditMemberForm() (+29 more)
+Cohesion: 0.16
+Nodes (28): AddMemberForm(), buildMemberFormData(), ClearButton(), SubmitButton(), ConfirmDeleteControl(), Props, EditMemberForm(), getInitialFormData() (+20 more)
 
 ### Community 1 - "computeFilteredMembers.ts"
-Cohesion: 0.21
-Nodes (17): areSetsEqual(), computeFilteredMembers(), getTeamSpan(), hasRole(), hasTeamCriteria(), isTeamFilterActive(), matchesPeriod(), memberMatchesTeamFilters() (+9 more)
+Cohesion: 0.35
+Nodes (9): areSetsEqual(), computeFilteredMembers(), isFilterActive(), TeamFilters, countVisibleTeams(), getTeamTreeNodeIds(), groupMembersByTeam(), TeamGroup (+1 more)
 
 ### Community 2 - "http"
-Cohesion: 0.07
-Nodes (46): API Reference, Cleanup, Common Mistakes, Core Patterns, [HIGH] Spritesheet meta.scale behavior change, Manual Spritesheet creation, [MEDIUM] Not awaiting spritesheet parse, Multi-pack spritesheets (+38 more)
+Cohesion: 0.28
+Nodes (12): addMember(), deleteMember(), editMember(), fetchMemberById(), createRole(), createTeamType(), fetchRoles(), fetchTeams() (+4 more)
 
 ### Community 3 - "filtersStore.ts"
-Cohesion: 0.08
-Nodes (32): Props, FitViewButton(), compare(), getSearchable(), MemberSearch(), Props, SearchBar(), Props (+24 more)
+Cohesion: 0.07
+Nodes (39): FiltersHeader(), Props, FiltersPanel(), FitViewButton(), compare(), getSearchable(), MemberSearch(), Props (+31 more)
 
 ### Community 4 - "migrateMembersFromMongodb.ts"
-Cohesion: 0.07
-Nodes (29): mongodb, ACTIVITY_MAP, BOARD_STATUSES, MemberMapEntry, migrateData(), mongoClient, MongoMember, STATUSES_MAP (+21 more)
+Cohesion: 0.09
+Nodes (15): mongodb, ACTIVITY_MAP, BOARD_STATUSES, MemberMapEntry, migrateData(), mongoClient, MongoMember, STATUSES_MAP (+7 more)
 
 ### Community 5 - "src/types/index.ts"
-Cohesion: 0.11
-Nodes (37): @heroicons/react, tailwind-merge, Props, Props, Props, Props, Props, Props (+29 more)
+Cohesion: 0.08
+Nodes (44): @heroicons/react, next, tailwind-merge, Props, Props, Props, Props, Props (+36 more)
 
 ### Community 6 - "treeStore.ts"
 Cohesion: 0.08
-Nodes (48): pixi.js, MemberNodeAvatar(), Props, TeamBadge(), FILL_ALPHA, lerp(), Props, STROKE_ALPHA (+40 more)
+Nodes (43): Props, TeamBadge(), FILL_ALPHA, lerp(), Props, STROKE_ALPHA, TeamFrame(), Props (+35 more)
 
 ### Community 7 - "FilterState"
-Cohesion: 0.14
-Nodes (18): BirthdayFilterSection(), CheckboxGroupFilterSection(), Option, Props, ClearButton(), FilterCheckbox(), Props, JoinYearFilterSection() (+10 more)
+Cohesion: 0.24
+Nodes (10): BirthdayFilterSection(), ClearButton(), parseYear(), Props, YearInput(), YearInputProps, YearRangeValue, DATE_PICKER_CLASSES (+2 more)
 
-### Community 8 - "MemberFormFields.tsx"
-Cohesion: 0.15
-Nodes (24): FieldError(), Props, MemberFormFields(), Props, PositionFormFields(), createEmptyPositionRow(), EMPTY_POSITION_ROW, findTeamByName() (+16 more)
+### Community 8 - "PositionFormFields.tsx"
+Cohesion: 0.14
+Nodes (27): FieldError(), PositionAssignmentFields(), Props, PositionFormFields(), Props, createEmptyPositionRow(), EMPTY_POSITION_ROW, findTeamByName() (+19 more)
 
 ### Community 9 - "ThemeContext.tsx"
-Cohesion: 0.07
-Nodes (33): react-datepicker, metadata, nunito, RootLayout(), PositionBadge(), Props, AuroraBackground(), FONT_FAMILY (+25 more)
+Cohesion: 0.10
+Nodes (22): react-datepicker, metadata, nunito, RootLayout(), AuroraBackground(), darkTheme, DEFAULT_THEME, lightTheme (+14 more)
 
-### Community 10 - "Member"
-Cohesion: 0.25
-Nodes (8): Props, NodesLayer(), Props, Props, Member, SidebarMode, TeamRosterEntry, getMemberTeamRoles()
+### Community 10 - "GSAP Plugins"
+Cohesion: 0.05
+Nodes (36): Best practices, CustomBounce, CustomEase, CustomWiggle, Development, Do Not, DOM / UI, Draggable (+28 more)
 
 ### Community 11 - "teamFrame.ts"
-Cohesion: 0.06
-Nodes (49): TEAM_COLUMN_GAP, TEAM_EDGE_DROP, TEAM_EDGE_SPREAD_STEP, TEAM_EDGE_SPREAD_WIDTH, TEAM_EDGE_START_Y, TEAM_FRAME_GAP, TEAM_FRAME_HEADER, TEAM_FRAME_MIN_WIDTH (+41 more)
+Cohesion: 0.07
+Nodes (47): Types, TEAM_COLUMN_GAP, TEAM_EDGE_DROP, TEAM_EDGE_SPREAD_STEP, TEAM_EDGE_SPREAD_WIDTH, TEAM_EDGE_START_Y, TEAM_FRAME_GAP, TEAM_FRAME_HEADER (+39 more)
 
 ### Community 12 - "memberService.ts"
-Cohesion: 0.13
-Nodes (23): zod, adapter, prisma, buildMemberFields(), buildMemberUpdateFields(), buildSharedFields(), parsePhoneNumbers(), MEMBER_INCLUDE (+15 more)
+Cohesion: 0.10
+Nodes (28): zod, buildMemberFields(), buildMemberUpdateFields(), buildSharedFields(), getPositionKey(), ResolvedPosition, syncPositions(), MemberTransaction (+20 more)
 
 ### Community 13 - "useDashedPathAnimation.ts"
-Cohesion: 0.13
-Nodes (24): LineageEdge(), Props, FIXED_EDGE_WIDTH, DASH_LEN, DRAW_IN_BASE, EMPTY_PATH, GAP_LEN, MIN_ANIM_DURATION (+16 more)
-
-### Community 14 - "memberUpdateValidation.ts"
-Cohesion: 0.14
-Nodes (10): ExistingMember, findClearedFields(), MemberUpdateBody, memberUpdateBodySchema, parsePhones(), splitName(), completeMember, sparseMember (+2 more)
+Cohesion: 0.18
+Nodes (17): LineageEdge(), Props, DASH_LEN, DRAW_IN_BASE, EMPTY_PATH, GAP_LEN, MIN_ANIM_DURATION, PATTERN_LEN (+9 more)
 
 ### Community 15 - "src/index.ts"
-Cohesion: 0.13
-Nodes (17): compression, cors, express, app, loadFamilyTree, router, router, router (+9 more)
+Cohesion: 0.11
+Nodes (24): compression, cors, express, @prisma/adapter-pg, adapter, prisma, app, loadFamilyTree (+16 more)
 
 ### Community 16 - "FiltersPanel.tsx"
-Cohesion: 0.14
-Nodes (18): FilterCategory(), LION_GROUP_ICON, LION_ICON, Props, FilterGroupProps, FiltersHeader(), ALL_SECTIONS_CLOSED, FiltersPanel() (+10 more)
+Cohesion: 0.16
+Nodes (15): FilterCategory(), LION_GROUP_ICON, LION_ICON, Props, FilterGroupProps, ALL_SECTIONS_CLOSED, Props, RoleFilterSection() (+7 more)
 
 ### Community 17 - "memberFormValidation.ts"
-Cohesion: 0.10
-Nodes (24): CheckedField, getStoredFieldValues(), Links, StoredMemberValues, complete, mentors, sparse, toTime() (+16 more)
+Cohesion: 0.15
+Nodes (19): Props, Props, CheckedField, getStoredFieldValues(), Links, StoredMemberValues, complete, mentors (+11 more)
 
 ### Community 18 - "TeamFrame"
-Cohesion: 0.06
-Nodes (36): EdgesLayer(), Props, EMPTY_IDS, View, Props, Props, TeamEdgesLayer(), Props (+28 more)
+Cohesion: 0.08
+Nodes (28): Props, NodesLayer(), Props, Props, TeamFramesLayer(), MembersTreeScene(), Props, OPTIONS (+20 more)
 
 ### Community 19 - "catalogValidation.ts"
-Cohesion: 0.08
-Nodes (32): Renderer selection at runtime, [MEDIUM] Using container.name instead of container.label, deleteCloudinaryImage(), extractCloudinaryPublicId(), parsePositionsPayload(), TEAM_INCLUDE, router, uploadTeamIcon (+24 more)
+Cohesion: 0.09
+Nodes (27): Renderer selection at runtime, [MEDIUM] Using container.name instead of container.label, deleteCloudinaryImage(), extractCloudinaryPublicId(), parsePositionsPayload(), rejectUpload(), uploadTeamTypeIcon, booleanLike (+19 more)
 
 ### Community 20 - "constants/canvas/index.ts"
-Cohesion: 0.06
-Nodes (50): gsap, pixi-filters, AVATAR_HIT_AREA, CULL_AREA, EMPTY_FILTERS, NODE_HIT_AREA, Props, MemberNodeMinimizedTooltip() (+42 more)
+Cohesion: 0.07
+Nodes (42): EdgesLayer(), AVATAR_HIT_AREA, CULL_AREA, EMPTY_FILTERS, MemberNode(), NODE_HIT_AREA, Props, MemberNodeAvatar() (+34 more)
 
-### Community 21 - "src/utils/index.ts"
-Cohesion: 0.21
-Nodes (11): MemberInfo(), MemberInfoActionIcon(), MentorMenteesDropdown(), PositionsDropdown(), MemberSidebarContent(), useMemberSwitchAnimation(), generateGoogleCalendarLink(), getClosestBirthday() (+3 more)
+### Community 21 - "PositionsDropdown.tsx"
+Cohesion: 0.19
+Nodes (14): PositionBadge(), Props, PositionsDropdown(), Props, Props, useStackOnOverflow(), MemberPosition, getTeamRoster() (+6 more)
 
-### Community 22 - "members.ts"
-Cohesion: 0.17
-Nodes (10): date-fns, Props, ActivityState, Active, Excluded, Inactive, MemberMetrics, MembersByMentorId (+2 more)
+### Community 22 - "useMeta.ts"
+Cohesion: 0.15
+Nodes (9): EMPTY, rolesStore, teamsStore, teamTypesStore, MemberMetrics, MembersByMentorId, MentorsListItem, Role (+1 more)
 
 ### Community 23 - "constants/filters.ts"
-Cohesion: 0.21
-Nodes (17): ACTIVITY_OPTIONS, ACTIVITY_STATES, AVATAR_OPTIONS, AVATAR_VALUES, JOIN_SEASONS, MEMBER_STATUSES, SEASON_OPTIONS, STATUS_OPTIONS (+9 more)
+Cohesion: 0.20
+Nodes (18): MemberFilterCategory(), ACTIVITY_OPTIONS, ACTIVITY_STATES, AVATAR_OPTIONS, AVATAR_VALUES, JOIN_SEASONS, MEMBER_STATUSES, SEASON_OPTIONS (+10 more)
 
 ### Community 24 - "teamService.ts"
-Cohesion: 0.14
-Nodes (26): getPositionKey(), ResolvedPosition, resolvePosition(), syncPositions(), deriveTeamName(), resolveRole(), resolveTeam(), resolveTeamType() (+18 more)
+Cohesion: 0.12
+Nodes (30): resolvePosition(), deleteMember(), deriveTeamName(), resolveRole(), resolveTeam(), resolveTeamType(), RoleRef, TeamRef (+22 more)
 
 ### Community 25 - "protocol.ts"
-Cohesion: 0.16
-Nodes (21): elkjs, failOver(), getWorker(), Pending, requestLayout(), runInline(), Point, Input (+13 more)
+Cohesion: 0.19
+Nodes (17): elkjs, failOver(), getWorker(), Pending, requestLayout(), runInline(), computeLayout(), LAYOUT_OPTIONS (+9 more)
 
 ### Community 26 - "compilerOptions"
 Cohesion: 0.10
@@ -287,56 +300,56 @@ Cohesion: 0.10
 Nodes (20): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+12 more)
 
 ### Community 28 - "MembersTreeContent.tsx"
-Cohesion: 0.15
-Nodes (20): SharpAvatarTracker(), MembersTree(), Props, ACCENT_COLOR_MAP, EVENT_FEATURES, MembersTreeContent(), Props, Props (+12 more)
+Cohesion: 0.18
+Nodes (19): EMPTY_IDS, SharpAvatarTracker(), View, Viewport(), ACCENT_COLOR_MAP, EVENT_FEATURES, MembersTreeContent(), Props (+11 more)
 
 ### Community 29 - "react"
 Cohesion: 0.11
-Nodes (27): react, DropdownMenu(), Props, DropdownPortal(), Props, BadgeInput(), Props, BadgeInputField() (+19 more)
+Nodes (28): react, react-dom, DropdownMenu(), Props, DropdownPortal(), Props, BadgeInput(), Props (+20 more)
 
 ### Community 30 - "dependencies"
 Cohesion: 0.11
 Nodes (19): dependencies, date-fns, dotenv, elkjs, gsap, @gsap/react, @heroicons/react, lodash (+11 more)
 
 ### Community 31 - "server/package.json"
-Cohesion: 0.06
-Nodes (28): cloudinary, concurrently, multer, multer-storage-cloudinary, nodemon, @prisma/adapter-pg, @prisma/config, ts-node (+20 more)
+Cohesion: 0.07
+Nodes (27): cloudinary, concurrently, multer, multer-storage-cloudinary, nodemon, @prisma/config, ts-node, tsx (+19 more)
 
 ### Community 32 - "inputs/index.ts"
-Cohesion: 0.15
-Nodes (20): PositionAssignmentFields(), Props, Props, getPositionRowSummary(), MAX_POSITION_YEAR, MIN_POSITION_YEAR, PositionPeriodFields(), Props (+12 more)
+Cohesion: 0.24
+Nodes (9): LionIcon(), Props, AvatarFileInput(), Props, FormCheckbox(), Props, Props, toYear() (+1 more)
 
 ### Community 33 - "MemberInfoSocial.tsx"
-Cohesion: 0.20
-Nodes (11): next, LionIcon(), Props, FacebookIcon(), InstagramIcon(), LinkedinIcon(), TelegramIcon(), Props (+3 more)
+Cohesion: 0.41
+Nodes (5): FacebookIcon(), InstagramIcon(), LinkedinIcon(), TelegramIcon(), MemberInfoSocial()
 
 ### Community 34 - "FilterState"
-Cohesion: 0.18
-Nodes (13): zustand, Props, Props, Props, Props, Props, EMPTY_FILTER_STATE, derive() (+5 more)
+Cohesion: 0.16
+Nodes (17): Props, CheckboxGroupFilterSection(), Option, Props, FilterCheckbox(), Props, FilterSection(), Props (+9 more)
 
 ### Community 35 - "@pixi/react"
-Cohesion: 0.19
-Nodes (10): @pixi/react, PixiElements, @gsap/react, @pixi/react, pixi-viewport, CIRCLE_TEXTURE_SRC, PATTERN_TEXTURE_SRC, CHARS (+2 more)
+Cohesion: 0.14
+Nodes (13): @pixi/react, PixiElements, @gsap/react, @pixi/react, pixi-viewport, Props, BIRTHDAY_ANIMATION_MIN_SCALE, MAX_VIEWPORT_ZOOM (+5 more)
 
 ### Community 36 - "package.json"
-Cohesion: 0.11
-Nodes (18): dotenv, prisma, @prisma/client, @types/node, typescript, vitest, name, private (+10 more)
+Cohesion: 0.10
+Nodes (19): dotenv, prisma, @prisma/client, @types/node, typescript, vitest, name, private (+11 more)
 
 ### Community 37 - "Core Patterns"
-Cohesion: 0.19
-Nodes (13): Adding and removing children, Bounds and coordinate conversion, Constructor options, Container events, Core Patterns, Destroy, Finding and removing from parent, Leaves vs containers (+5 more)
+Cohesion: 0.18
+Nodes (14): Adding and removing children, Bounds and coordinate conversion, Constructor options, Container events, Core Patterns, Destroy, Finding and removing from parent, Leaves vs containers (+6 more)
 
 ### Community 38 - "filterSearchParams.ts"
-Cohesion: 0.18
-Nodes (13): Props, useFilterSearchParams(), AvatarFilterValue, filtersToSearchParams(), parseCsvArray(), parseCsvStrings(), parseFiltersFromSearchParams(), parseNumberOrNull() (+5 more)
+Cohesion: 0.13
+Nodes (17): Props, AvatarFilterValue, ActivityState, Active, Excluded, Inactive, RecruitmentSeason, filtersToSearchParams() (+9 more)
 
 ### Community 39 - "useTreeLayout.ts"
-Cohesion: 0.10
-Nodes (27): getFitViewTargetScale(), useSceneTransition(), useTreeLayout(), DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, DEFAULT_POSITION, FLOW_VIEWPORT_DIRECTION, MembersState (+19 more)
+Cohesion: 0.26
+Nodes (12): useSceneTransition(), useTreeLayout(), refreshNodeMembers(), transformMembersToFlowValues(), alignLineageLayout(), applyElkPositions(), computeGridLayout(), EMPTY_EDGE_STYLE (+4 more)
 
 ### Community 40 - "Core Patterns"
 Cohesion: 0.11
-Nodes (18): API Reference, Bounds in different spaces, Common Mistakes, Coordinate conversion, Core Patterns, Cumulative alpha (getGlobalAlpha), Global, local, and screen coordinates, [HIGH] Setting scale to 0 (+10 more)
+Nodes (17): API Reference, Common Mistakes, Coordinate conversion, Core Patterns, Cumulative alpha (getGlobalAlpha), Global, local, and screen coordinates, [HIGH] Setting scale to 0, [MEDIUM] Confusing anchor and pivot (+9 more)
 
 ### Community 41 - "devDependencies"
 Cohesion: 0.15
@@ -358,28 +371,28 @@ Nodes (25): 1. State the question, 2. Isolate the logic in a portable module, 3.
 Cohesion: 0.25
 Nodes (7): API Reference, Common Mistakes, [CRITICAL] Adding children to leaf scene objects, [HIGH] Expecting getBounds() to return a Rectangle, [HIGH] Using cacheAsBitmap instead of cacheAsTexture, [MEDIUM] Setting both pivot and origin on the same container, Quick Start
 
-### Community 46 - "Sidebar.tsx"
-Cohesion: 0.32
-Nodes (4): react-dom, Props, Props, SidebarFooterContext
+### Community 46 - "cardVisibilityDriver.ts"
+Cohesion: 0.10
+Nodes (26): canAnimateCard(), cardHideReveal(), cardShowReveal(), clamp01(), Driver, easeBackOut, easePower2In, easePower2Out (+18 more)
 
 ### Community 47 - "membersStore.ts"
 Cohesion: 0.20
-Nodes (15): membersActions, {
+Nodes (15): zustand, fetchMentorsList(), membersActions, {
   setMembers,
   reloadMembers,
   addMember,
   updateMember,
   selectMember,
   getMentorsList,
-}, useMemberById(), useMembersMap(), useMentees(), useMentorsList(), useSelectedId(), changesStructure() (+7 more)
+}, useMembersMap(), useMentees(), useSelectedId(), useSelectedMember() (+7 more)
 
 ### Community 48 - "During the session"
 Cohesion: 0.09
 Nodes (19): ADR Format, Numbering, Optional sections, Template, What qualifies, When to offer an ADR, GLOSSARY.md Format, Rules (+11 more)
 
 ### Community 49 - "ManageForm.tsx"
-Cohesion: 0.19
-Nodes (18): TeamInfoSidebar(), DropdownSelectInput(), ManageForm(), MemberMode, Section, SECTIONS, TEAM_KINDS, TeamKind (+10 more)
+Cohesion: 0.21
+Nodes (15): DropdownSelectInput(), ManageForm(), MemberMode, Section, SECTIONS, TEAM_KINDS, TeamKind, CREATE_EDIT_OPTIONS (+7 more)
 
 ### Community 50 - "Bitmap fonts"
 Cohesion: 0.10
@@ -485,6 +498,14 @@ Nodes (13): Alpha mask (Sprite-based), API Reference, Common Mistakes, Core Patt
 Cohesion: 0.14
 Nodes (13): API Reference, Common Mistakes, Construction options, Core Patterns, [HIGH] Nesting many render groups, [MEDIUM] Constantly adding/removing from a render group, [MEDIUM] Overusing render groups, Profile before adding (+5 more)
 
+### Community 81 - "gsap.utils"
+Cohesion: 0.07
+Nodes (26): Arrays and Collections, Best practices, clamp(min, max, value?), Clamping and Ranges, distribute(config), Do Not, getUnit(value), gsap.utils (+18 more)
+
+### Community 82 - "src/utils/index.ts"
+Cohesion: 0.19
+Nodes (15): gsap, NODE_HOVER_ANIMATION_DURATION, NODE_HOVER_SCALE, ZOOMED_OUT_HOVER_SCALE_MAP, NODE_HEIGHT, getFitViewTargetScale(), useFitViewAnimation(), useFocusFrameAnimation() (+7 more)
+
 ### Community 83 - "Core Patterns"
 Cohesion: 0.15
 Nodes (13): Context and device loss, Core Patterns, Destroying a renderer, Direct renderer construction, Lazy-loading backend-specific systems and pipes, Manual rendering, Per-renderer options, Preference forms (+5 more)
@@ -497,13 +518,17 @@ Nodes (13): Advanced options and aliases, Before / after, Callbacks, Constructor
 Cohesion: 0.15
 Nodes (10): Designing for Mockability, When to Mock, Anti-patterns, Rules of the loop, Seams: where tests go, Test-Driven Development, What a good test is, Bad Tests (+2 more)
 
+### Community 86 - "GSAP Core"
+Cohesion: 0.10
+Nodes (20): Accessibility and responsive (gsap.matchMedia()), Common vars, Core Tween Methods, Custom: use CustomEase (plugin), Defaults, Do Not, Easing, Function-based values (+12 more)
+
 ### Community 87 - "Core Patterns"
 Cohesion: 0.17
 Nodes (12): Capture phase events, Core Patterns, Cursor styles, Event features, Event properties, Event types, eventMode values, Global move events and drag (+4 more)
 
 ### Community 88 - "Core Patterns"
-Cohesion: 0.15
-Nodes (13): Constants, Coordinate transforms via Container, Core Patterns, Geometry utility functions, math-extras (side-effect import), Matrix (2D affine transform), Point and ObservablePoint, Point / ObservablePoint vector methods (+5 more)
+Cohesion: 0.17
+Nodes (12): Constants, Coordinate transforms via Container, Core Patterns, Geometry utility functions, math-extras (side-effect import), Matrix (2D affine transform), Point and ObservablePoint, Point / ObservablePoint vector methods (+4 more)
 
 ### Community 89 - "Scene Objects"
 Cohesion: 0.17
@@ -514,8 +539,8 @@ Cohesion: 0.17
 Nodes (11): API Reference, Common Mistakes, [HIGH] Not importing `pixi.js/text-bitmap` in custom builds, [HIGH] Positional constructor args, [HIGH] Updating `Text.text` every frame, [MEDIUM] Adding children to a text instance, Quick concepts, Quick Start (+3 more)
 
 ### Community 91 - "pixijs/SKILL.md"
-Cohesion: 0.25
-Nodes (7): Advanced, Fallback: canonical PixiJS docs, Foundations, How to use this skill, Scene Objects, Skill router, Utilities
+Cohesion: 0.13
+Nodes (13): API Reference, Common Mistakes, [MEDIUM] Expecting toRgba() to return 0-255 values, [MEDIUM] Using 0-255 range in color arrays, [MEDIUM] Using utils.string2hex or utils.hex2string, Quick Start, Advanced, Fallback: canonical PixiJS docs (+5 more)
 
 ### Community 92 - "Core Concepts"
 Cohesion: 0.18
@@ -585,6 +610,14 @@ Nodes (9): Anchor, Construction, Core Patterns, Dynamic textures, Round pixels, 
 Cohesion: 0.22
 Nodes (8): Anchor vs pivot, API Reference, Dynamic textures, Loading before creating, Quick concepts, Quick Start, Variants, When to use what
 
+### Community 109 - "useTeamForm.ts"
+Cohesion: 0.24
+Nodes (16): createTeam(), deleteTeam(), fetchTeamDetails(), parse(), setTeamMembers(), TeamMemberPayload, updateTeam(), buildTeamRequestBody() (+8 more)
+
+### Community 110 - "transformMembersToTree.ts"
+Cohesion: 0.22
+Nodes (14): Member, MembersByMentorId, MemberMetrics, TreeCache, TreeNode, calculateMemberMetrics(), calculateSubtreeDepth(), calculateSubtreeSize() (+6 more)
+
 ### Community 111 - "Process"
 Cohesion: 0.25
 Nodes (7): 1. Pin the fixed point, 2. Identify the spec source, 3. Identify the standards sources, 4. Spawn both sub-agents in parallel, 5. Aggregate, Process, Why two axes
@@ -629,9 +662,13 @@ Nodes (8): Core Patterns, Dynamic fonts (system font -> runtime atlas), Install 
 Cohesion: 0.25
 Nodes (8): Core Patterns, Dynamic content, Font loading, Gradient and pattern fills, Resolution and mipmaps, Sharing a TextStyle across instances, Tagged text, TextStyle properties
 
-### Community 123 - "pixijs-color/SKILL.md"
-Cohesion: 0.29
-Nodes (6): API Reference, Common Mistakes, [MEDIUM] Expecting toRgba() to return 0-255 values, [MEDIUM] Using 0-255 range in color arrays, [MEDIUM] Using utils.string2hex or utils.hex2string, Quick Start
+### Community 122 - "GSAP ScrollTrigger"
+Cohesion: 0.12
+Nodes (14): Basic Trigger, Do Not, GSAP ScrollTrigger, Horizontal scroll (containerAnimation), Key config options, Learn More, Markers (Development), Official GSAP best practices (+6 more)
+
+### Community 123 - "Member"
+Cohesion: 0.18
+Nodes (13): fetchFamilyTree(), Home(), MembersTree(), Props, Props, MembersTreeDynamic, Props, Props (+5 more)
 
 ### Community 124 - "Core Patterns"
 Cohesion: 0.29
@@ -645,17 +682,25 @@ Nodes (7): Foundations, pixijs-application, pixijs-core-concepts, pixijs-create,
 Cohesion: 0.33
 Nodes (6): Advanced, pixijs-accessibility, pixijs-blend-modes, pixijs-custom-rendering, pixijs-filters, pixijs-performance
 
+### Community 127 - "utils/membersTree/index.ts"
+Cohesion: 0.24
+Nodes (9): MembersState, ChildrenMap, MembersMap, Source, collectAllAncestorIds(), collectSiblingIds(), computeLineageBranchIds(), collectDescendantIds() (+1 more)
+
 ### Community 128 - "Core Patterns"
 Cohesion: 0.33
 Nodes (6): Async rendering, Core Patterns, Custom tags via `tagStyles`, Raw CSS overrides, Resolution and mipmaps, Word wrap
+
+### Community 129 - "GSAP with React"
+Cohesion: 0.15
+Nodes (12): Best practices, Context-Safe Callbacks, Dependency array, scope, and revertOnUpdate, Do Not, gsap.context() in useEffect (when useGSAP isn't used), GSAP with React, Installation, Learn More (+4 more)
 
 ### Community 130 - "Common Mistakes"
 Cohesion: 0.40
 Nodes (5): Common Mistakes, [HIGH] Confusing anchor and pivot, [HIGH] Old `NineSlicePlane` name, [HIGH] Using `Texture.from(url)` to load, [MEDIUM] Adding children to a sprite
 
-### Community 131 - "memberPresentation.ts"
-Cohesion: 0.21
-Nodes (9): MemberNode(), MemberNodeCard(), getPhotoUrlAsAvatar(), RecruitmentTerm, formatMemberRecruitmentSeason(), formatRecruitmentTerm(), getMemberAvatar(), RECRUITMENT_SEASON_EMOJI (+1 more)
+### Community 131 - "Member"
+Cohesion: 0.12
+Nodes (17): date-fns, Props, SearchSuggestionItem(), Props, Props, Props, Props, getPhotoUrlAsAvatar() (+9 more)
 
 ### Community 132 - "hitl-loop.template.sh"
 Cohesion: 0.83
@@ -669,25 +714,65 @@ Nodes (4): Common Mistakes, [HIGH] Accessing app.renderer before init() resolves
 Cohesion: 0.50
 Nodes (3): API Reference, Constructor options, Quick Start
 
+### Community 135 - "Core Patterns"
+Cohesion: 0.15
+Nodes (12): API Reference, Cleanup, Common Mistakes, Core Patterns, [HIGH] Spritesheet meta.scale behavior change, Manual Spritesheet creation, [MEDIUM] Not awaiting spritesheet parse, Multi-pack spritesheets (+4 more)
+
+### Community 137 - "GSAP Performance"
+Cohesion: 0.17
+Nodes (11): Batch Reads and Writes, Best practices, Do Not, Frequently updated properties (e.g. mouse followers), GSAP Performance, Many Elements (Stagger, Lists), Prefer Transform and Opacity, Reduce Simultaneous Work (+3 more)
+
+### Community 138 - "GSAP Timeline"
+Cohesion: 0.17
+Nodes (11): Controlling Playback, Creating a Timeline, Do Not, GSAP Timeline, Labels, Nesting Timelines, Official GSAP Best practices, Position Parameter (+3 more)
+
+### Community 139 - "pixi.js"
+Cohesion: 0.23
+Nodes (7): pixi.js, useCardHover(), failedSources, Options, textWidth(), truncateText(), wrapTeamTitle()
+
+### Community 140 - "MemberStatus"
+Cohesion: 0.24
+Nodes (8): FOUNDER_JOIN_YEAR, MEMBER_STATUSES, MENTOR_STATUSES, MemberStatus, Alumni, Baby, Full, Observer
+
+### Community 141 - "src/types/tree.ts"
+Cohesion: 0.18
+Nodes (10): Direction, FlowViewportDirection, Position, Bottom, Left, Right, Top, SegmentData (+2 more)
+
+### Community 142 - "filterTeams.ts"
+Cohesion: 0.44
+Nodes (8): getTeamSpan(), hasRole(), hasTeamCriteria(), isTeamFilterActive(), matchesPeriod(), memberMatchesTeamFilters(), positionMatchesTeamFilters(), teamMatchesFilters()
+
+### Community 143 - "useTeamTypeForm.ts"
+Cohesion: 0.38
+Nodes (6): Props, EMPTY_FORM, TeamTypeFormMode, toFormData(), useTeamTypeForm(), TeamTypeFormData
+
+### Community 144 - "dashedBezier.ts"
+Cohesion: 0.47
+Nodes (5): bezierEval(), buildSegmentFromPositions(), DashStrokeOptions, drawDashes(), pointAtDist()
+
+### Community 145 - "elk.ts"
+Cohesion: 0.40
+Nodes (4): DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, DEFAULT_POSITION, FLOW_VIEWPORT_DIRECTION
+
 ## Knowledge Gaps
 - **40 isolated node(s):** `@prisma/client`, `dotenv`, `lodash`, `@tailwindcss/postcss`, `@types/lodash` (+35 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1013 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1137 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Point` connect `protocol.ts` to `treeStore.ts`, `useTreeLayout.ts`, `teamFrame.ts`, `useDashedPathAnimation.ts`, `TeamFrame`, `Utilities`, `Core Patterns`, `pixijs/SKILL.md`?**
-  _High betweenness centrality (0.244) - this node is a cross-community bridge._
+- **Why does `Point` connect `teamFrame.ts` to `useTreeLayout.ts`, `src/types/tree.ts`, `dashedBezier.ts`, `TeamFrame`, `Utilities`, `protocol.ts`, `pixijs/SKILL.md`?**
+  _High betweenness centrality (0.211) - this node is a cross-community bridge._
 - **What connects `@prisma/client`, `dotenv`, `lodash` to the rest of the system?**
   _40 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `EditMemberForm.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.09879336349924585 - nodes in this community are weakly interconnected._
-- **Why does `Utilities` connect `pixijs/SKILL.md` to `protocol.ts`?**
-  _High betweenness centrality (0.230) - this node is a cross-community bridge._
-- **Should `http` be split into smaller, more focused modules?**
-  _Cohesion score 0.0744047619047619 - nodes in this community are weakly interconnected._
 - **Should `filtersStore.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08484848484848485 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07127882599580712 - nodes in this community are weakly interconnected._
+- **Why does `Utilities` connect `pixijs/SKILL.md` to `teamFrame.ts`?**
+  _High betweenness centrality (0.198) - this node is a cross-community bridge._
 - **Should `migrateMembersFromMongodb.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.0730804810360777 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09259259259259259 - nodes in this community are weakly interconnected._
+- **Should `src/types/index.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.08025308025308026 - nodes in this community are weakly interconnected._
+- **Should `treeStore.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._

@@ -106,10 +106,11 @@ const TeamMembersEditor = ({
         type="button"
         onClick={handleAdd}
         className={twMerge(
-          "flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed",
+          "flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed focus:outline-hidden focus:ring-2",
           colorClasses.border,
           colorClasses.text,
           colorClasses.hoverSurfaceBg,
+          colorClasses.accentRing,
           "transition-all duration-200",
         )}
       >
