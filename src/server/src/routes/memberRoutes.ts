@@ -3,7 +3,10 @@ import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
 import { deleteCloudinaryImage } from "../libs/cloudinary.js";
 import { validateMemberBody } from "../utils/index.js";
-import { validateMemberUpdate } from "../utils/memberUpdateValidation.js";
+import {
+  validateMemberUpdate,
+  validateSparseMemberBody,
+} from "../utils/memberUpdateValidation.js";
 import { sendRouteError } from "../utils/httpErrors.js";
 import {
   parsePhoneNumbers,
@@ -48,7 +51,11 @@ router.post(
       if (uploadedPhoto) await deleteCloudinaryImage(uploadedPhoto);
     };
 
-    const validation = validateMemberBody(req.body);
+    // Minimal records (old members with little data) opt in explicitly.
+    const sparse = req.body.sparse === "true";
+    const validation = sparse
+      ? validateSparseMemberBody(req.body)
+      : validateMemberBody(req.body);
     if (!validation.success) {
       await discardUpload();
       res.status(400).json({ error: validation.errors });
@@ -72,6 +79,7 @@ router.post(
         phoneNumbers,
         positions,
         uploadedPhoto || null,
+        sparse,
       );
       res.status(201).json(serializeMember(newMember));
     } catch (error) {

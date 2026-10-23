@@ -8,13 +8,35 @@ const isValidDate = (val: string) => val === "" || !isNaN(Date.parse(val));
 
 export const memberUpdateBodySchema = memberBodySchema.extend({
   firstName: z.string(),
-  lastName: z.string(),
-  birthday: z.string().refine(isValidDate, "Invalid birthday date"),
-  joinedAt: z.string().refine(isValidDate, "Invalid join date"),
-  mentorId: z.string(),
+  lastName: z.string().default(""),
+  birthday: z.string().refine(isValidDate, "Invalid birthday date").default(""),
+  joinedAt: z.string().refine(isValidDate, "Invalid join date").default(""),
+  mentorId: z.string().default(""),
 });
 
 export type MemberUpdateBody = z.infer<typeof memberUpdateBodySchema>;
+
+// Minimal records (old members known only by name): everything but the name,
+// status and join date may be left empty. Malformed values are still refused.
+export const sparseMemberBodySchema = memberUpdateBodySchema.extend({
+  firstName: z.string().trim().min(1, "First name is required"),
+  joinedAt: z
+    .string()
+    .min(1, "Join date is required")
+    .refine(isValidDate, "Invalid join date"),
+});
+
+export const validateSparseMemberBody = (
+  body: unknown,
+): { success: true; data: MemberUpdateBody } | { success: false; errors: string } => {
+  const result = sparseMemberBodySchema.safeParse(body);
+  if (result.success) return { success: true, data: result.data };
+
+  const errors = result.error.issues
+    .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+    .join("; ");
+  return { success: false, errors };
+};
 
 export interface ExistingMember {
   name: string;

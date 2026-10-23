@@ -35,7 +35,7 @@ A member guided by a mentor.
 _Avoid_: Child, newbie
 
 **Sparse record**:
-A member for whom some data is missing (old or migrated records). Sparse records are shown like any other member and can be completed gradually.
+A member for whom some data is missing (old or migrated records). Sparse records are shown like any other member and can be completed gradually. A sparse record can be added on purpose in the Add form's minimal mode (name, status and join date only); normal adds still require everything.
 _Avoid_: Broken record, incomplete member
 
 **Completeness rule**:

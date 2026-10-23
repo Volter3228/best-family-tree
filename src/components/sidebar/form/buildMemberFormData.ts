@@ -13,7 +13,7 @@ export const buildMemberFormData = (
       formData.append(key, value.toISOString());
     } else if (value !== undefined && value !== null) {
       if (key === "phoneNumber") {
-        formData.append("phoneNumbers", JSON.stringify([value]));
+        formData.append("phoneNumbers", JSON.stringify(value ? [value] : []));
       } else if (key === "photo") {
         if (value instanceof File) {
           formData.append(key, value);

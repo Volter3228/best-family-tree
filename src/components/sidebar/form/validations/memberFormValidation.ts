@@ -111,6 +111,7 @@ const validateMemberForm = (
   mentorsList: MentorsListItem[],
   teamTypes: TeamType[] = [],
   stored: StoredMemberValues | null = null,
+  { minimal = false }: { minimal?: boolean } = {},
 ): Partial<Record<keyof MemberFormData, string>> => {
   let errors: Partial<Record<keyof MemberFormData, string>> = {};
   const {
@@ -130,8 +131,11 @@ const validateMemberForm = (
 
   const storedValues = stored && getStoredFieldValues(stored);
   // Adding: everything is required. Editing: only what is already stored.
+  // Minimal record (old member): only the name and join date are demanded.
   const isRequired = (field: CheckedField) =>
-    !storedValues || !!storedValues[field];
+    minimal
+      ? field === "firstName" || field === "joinedAt"
+      : !storedValues || !!storedValues[field];
   // A stored value the user did not touch is not judged again.
   const isUnchanged = (field: CheckedField, value: string | Date | null) =>
     !!storedValues &&

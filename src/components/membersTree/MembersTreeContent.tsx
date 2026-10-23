@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo } from "react";
 import { Application } from "@pixi/react";
-import { CullerPlugin } from "pixi.js";
 import {
   useMembersActions,
   useSelectedMember,
@@ -21,6 +20,7 @@ import type { Member as MemberType, AccentColor, TeamFrame } from "@/types";
 import { getRenderResolution } from "@/utils";
 import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
+import ViewportCulling from "./ViewportCulling";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
 import TeamInfoSidebar from "./TeamInfoSidebar";
 import Toolbar from "./toolbar";
@@ -179,7 +179,6 @@ const MembersTreeContent = ({ members }: Props) => {
         antialias={resolution < 2}
         eventFeatures={EVENT_FEATURES}
         autoDensity
-        extensions={[CullerPlugin]}
       >
         <Viewport
           ref={setViewport}
@@ -187,6 +186,7 @@ const MembersTreeContent = ({ members }: Props) => {
           height={window.innerHeight}
           onScaleChange={setScale}
         >
+          <ViewportCulling />
           <SharpAvatarTracker />
           <MembersTreeScene
             sceneRef={sceneRef}

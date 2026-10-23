@@ -1,7 +1,11 @@
 import type { MemberBody } from "../../utils/validation.js";
 import prisma from "../../db/prisma/clientInstance.js";
 import { NotFoundError, ValidationError } from "../../utils/httpErrors.js";
-import { buildMemberFields, buildMemberUpdateFields } from "./memberPayload.js";
+import {
+  buildMemberFields,
+  buildMemberUpdateFields,
+  buildSparseMemberFields,
+} from "./memberPayload.js";
 import type { MemberUpdateBody } from "../../utils/memberUpdateValidation.js";
 import type { PositionInput } from "./memberPayload.js";
 import { MEMBER_INCLUDE, type MemberTransaction } from "./memberQueries.js";
@@ -43,16 +47,27 @@ const assertNoMentorCycle = async (
   }
 };
 
+const assertMentorExists = async (tx: MemberTransaction, mentorId: string) => {
+  const mentor = await tx.member.findUnique({
+    where: { id: mentorId },
+    select: { id: true },
+  });
+  if (!mentor) throw new ValidationError("Mentor not found");
+};
+
 export const createMember = async (
-  body: MemberBody,
+  body: MemberBody | MemberUpdateBody,
   phoneNumbers: string[],
   positions: PositionInput[],
   photoUrl: string | null,
+  sparse = false,
 ) =>
   prisma.$transaction(async (tx) => {
-    const member = await tx.member.create({
-      data: buildMemberFields(body, photoUrl),
-    });
+    const data = sparse
+      ? buildSparseMemberFields(body as MemberUpdateBody, photoUrl)
+      : buildMemberFields(body as MemberBody, photoUrl);
+    if (data.mentorId) await assertMentorExists(tx, data.mentorId);
+    const member = await tx.member.create({ data });
 
     await savePhoneNumbers(tx, member.id, phoneNumbers);
     if (positions.length > 0) await syncPositions(tx, member.id, positions);

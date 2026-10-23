@@ -68,6 +68,7 @@ const TeamForm = ({ teamId, onSaved, onDeleted, color = "blue" }: Props) => {
           <div className="flex flex-col w-full">
             <DropdownSelectInput
               name="teamSelect"
+              autoComplete
               label="Команда"
               options={teamOptions}
               onSelect={setSelectedTeamId}

@@ -36,7 +36,7 @@ export const parsePhoneNumbers = (raw: string): string[] => {
   if (!Array.isArray(parsed) || !parsed.every((p) => typeof p === "string")) {
     throw new Error("Invalid phoneNumbers payload");
   }
-  return parsed;
+  return parsed.map((p: string) => p.trim()).filter(Boolean);
 };
 
 export const buildMemberFields = (
@@ -70,6 +70,15 @@ export const buildMemberUpdateFields = (
     mentorId: mentorId || null,
   };
 };
+
+// A minimal record: like an update, but the (required) join date is set.
+export const buildSparseMemberFields = (
+  body: MemberUpdateBody,
+  photoUrl: string | null,
+) => ({
+  ...buildMemberUpdateFields(body, photoUrl),
+  joinedAt: new Date(body.joinedAt),
+});
 
 const buildSharedFields = (
   body: MemberBody | MemberUpdateBody,

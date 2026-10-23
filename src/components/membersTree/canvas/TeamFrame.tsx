@@ -55,12 +55,17 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
   const rippleProgressRef = useRef(-1);
 
   const { width, height } = frame;
-  // Culling box: the frame plus room for its badge, which grows with zoom-out
+  // Culling box in world coordinates: the frame plus room for its badge, which grows with zoom-out
   // (never wider than 90% of the frame) and for the selection ripple.
   const cullArea = useMemo(() => {
     const pad = 100 + width * 0.3;
-    return new Rectangle(-pad, -pad, width + pad * 2, height + pad * 2);
-  }, [width, height]);
+    return new Rectangle(
+      frame.x - pad,
+      frame.y - pad,
+      width + pad * 2,
+      height + pad * 2,
+    );
+  }, [frame.x, frame.y, width, height]);
   const color = useMemo(
     () => resolveTeamColor(frame, accentColors),
     [frame, accentColors],
@@ -163,6 +168,7 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
       y={frame.y}
       eventMode="passive"
       cullable
+      cullableChildren={false}
       cullArea={cullArea}
     >
       <pixiGraphics

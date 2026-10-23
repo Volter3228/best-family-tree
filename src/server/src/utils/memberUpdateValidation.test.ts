@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   validateMemberUpdate,
+  validateSparseMemberBody,
   type ExistingMember,
 } from "./memberUpdateValidation";
 
@@ -43,6 +44,20 @@ describe("validateMemberUpdate", () => {
       bodyFor(sparseMember, { telegramLink: "@ivan_p" }),
       sparseMember,
     );
+
+    expect(result.success).toBe(true);
+  });
+
+  it("treats missing birthday / joinedAt / mentorId keys as empty", () => {
+    const { birthday, joinedAt, mentorId, ...body } = bodyFor(sparseMember);
+    void birthday, joinedAt, mentorId;
+    const nameOnly: ExistingMember = {
+      ...sparseMember,
+      birthday: null,
+      joinedAt: null,
+    };
+
+    const result = validateMemberUpdate(body, nameOnly);
 
     expect(result.success).toBe(true);
   });
@@ -103,5 +118,30 @@ describe("validateMemberUpdate", () => {
     );
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("validateSparseMemberBody", () => {
+  const nameOnly = {
+    firstName: "Ivan",
+    status: "ALUMNI",
+    joinedAt: "2008-09-01",
+    phoneNumbers: "[]",
+  };
+
+  it("accepts name, status and join date only", () => {
+    expect(validateSparseMemberBody(nameOnly).success).toBe(true);
+  });
+
+  it.each([
+    ["firstName", { firstName: "" }],
+    ["joinedAt", { joinedAt: "" }],
+    ["status", { status: "LEGEND" }],
+    ["email", { email: "not-an-email" }],
+  ])("rejects an invalid %s", (field, overrides) => {
+    const result = validateSparseMemberBody({ ...nameOnly, ...overrides });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.errors).toContain(field);
   });
 });

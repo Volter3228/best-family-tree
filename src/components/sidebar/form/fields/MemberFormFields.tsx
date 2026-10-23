@@ -33,6 +33,7 @@ interface Props {
   mode?: MemberFormMode;
   initialAvatar?: string | null;
   color?: AccentColor;
+  minimal?: boolean;
 }
 
 const MemberFormFields = ({
@@ -42,6 +43,7 @@ const MemberFormFields = ({
   mode = "add",
   initialAvatar = null,
   color = "blue",
+  minimal = false,
 }: Props) => {
   const mentorsList = useMentorsList();
   const selectedId = useSelectedId();
@@ -116,7 +118,7 @@ const MemberFormFields = ({
             value={form.lastName}
             onChange={handleTextChange("lastName")}
             placeholder="Українцев"
-            required
+            required={!minimal}
             color={color}
           />
           <FieldError message={errors.lastName} color={color} />
@@ -132,7 +134,7 @@ const MemberFormFields = ({
             placeholder="18.04.2000"
             maxDate={MAX_DATE_BIRTHDAY}
             minDate={MIN_DATE_BIRTHDAY}
-            required
+            required={!minimal}
             color={color}
           />
           <FieldError message={errors.birthday} color={color} />
@@ -173,7 +175,7 @@ const MemberFormFields = ({
             onSelect={handleTextChange("mentorId")}
             placeholder="Ментор Менторовенко"
             autoComplete
-            required
+            required={!minimal}
             initialValue={form.mentorId || undefined}
             color={color}
           />
