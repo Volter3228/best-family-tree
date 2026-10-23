@@ -21,5 +21,6 @@ model MemberPosition {
 
   @@index([memberId])
   @@index([teamId])
+  @@index([roleId])
   @@map("member_positions")
 }
