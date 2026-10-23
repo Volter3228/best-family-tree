@@ -1,11 +1,11 @@
 import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { Container } from "pixi.js";
-import gsap from "gsap";
 import {
   NODE_WIDTH,
   NODE_AVATAR_SIZE,
   NODE_AVATAR_RADIUS,
 } from "@/constants/canvas";
+import { finishCardReveal, registerCardReveal } from "./cardVisibilityDriver";
 
 // Card animation pivot: top-center of the card (where it hides behind the avatar)
 export const CARD_PIVOT_X = NODE_WIDTH / 2;
@@ -26,6 +26,20 @@ const getCardAnimDelay = (id: string): number => {
   return (Math.abs(hash) % 200) / 1000; // 0–0.2s
 };
 
+const applyShown = (card: Container): void => {
+  card.visible = true;
+  card.alpha = 1;
+  card.scale.set(1, 1);
+  card.y = CARD_PIVOT_Y;
+};
+
+const applyHidden = (card: Container): void => {
+  card.visible = false;
+  card.alpha = 0;
+  card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
+  card.y = SLIDE_START_Y;
+};
+
 interface Props {
   cardRef: RefObject<Container | null>;
   isZoomedOut: boolean;
@@ -41,7 +55,6 @@ export const useCardAnimation = ({
   isFitViewAnimating,
   fitViewTargetScale,
 }: Props) => {
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
   const appliedStateRef = useRef<"shown" | "hidden" | null>(null);
   const delay = useMemo(() => getCardAnimDelay(memberId), [memberId]);
 
@@ -52,17 +65,10 @@ export const useCardAnimation = ({
     const card = cardRef.current;
     if (!card) return;
 
-    const setHiddenInstantly = () => {
-      card.visible = false;
-      card.alpha = 0;
-      card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
-      card.y = SLIDE_START_Y;
-    };
-
     // On first mount set initial state without animation
     if (appliedStateRef.current === null) {
       appliedStateRef.current = shouldBeHidden ? "hidden" : "shown";
-      if (shouldBeHidden) setHiddenInstantly();
+      if (shouldBeHidden) applyHidden(card);
       return;
     }
 
@@ -71,45 +77,17 @@ export const useCardAnimation = ({
     if (targetState === appliedStateRef.current) return;
     appliedStateRef.current = targetState;
 
-    tlRef.current?.kill();
+    if (!shouldBeHidden) card.visible = true;
+    registerCardReveal(card, {
+      direction: shouldBeHidden ? "hide" : "show",
+      delay,
+      finalize: shouldBeHidden ? applyHidden : applyShown,
+      collapsedScaleX: COLLAPSED_SCALE_X,
+      collapsedScaleY: COLLAPSED_SCALE_Y,
+      slideStartY: SLIDE_START_Y,
+      restY: CARD_PIVOT_Y,
+    });
 
-    if (!shouldBeHidden) {
-      // Zoom-in: card slides down from behind avatar center while expanding
-      card.visible = true;
-      card.alpha = 0;
-      card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
-      card.y = SLIDE_START_Y;
-
-      const tl = gsap.timeline({ delay });
-      tlRef.current = tl;
-      tl.to(card, { alpha: 1, duration: 0.25, ease: "power2.out" }, 0)
-        .to(card.scale, { x: 1, y: 1, duration: 0.4, ease: "back.out(1.5)" }, 0)
-        .to(card, { y: CARD_PIVOT_Y, duration: 0.4, ease: "back.out(1.5)" }, 0);
-    } else {
-      // Zoom-out: card slides up behind avatar while shrinking
-      const tl = gsap.timeline({
-        delay,
-        onComplete: () => {
-          card.visible = false;
-        },
-      });
-      tlRef.current = tl;
-      tl.to(card, { alpha: 0, duration: 0.2, ease: "power2.in" }, 0)
-        .to(
-          card.scale,
-          {
-            x: COLLAPSED_SCALE_X,
-            y: COLLAPSED_SCALE_Y,
-            duration: 0.24,
-            ease: "power2.in",
-          },
-          0,
-        )
-        .to(card, { y: SLIDE_START_Y, duration: 0.24, ease: "power2.in" }, 0);
-    }
-
-    return () => {
-      tlRef.current?.kill();
-    };
+    return () => finishCardReveal(card);
   }, [shouldBeHidden, delay, cardRef]);
 };

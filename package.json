@@ -7,7 +7,9 @@
     "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start ",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -19,7 +21,7 @@
     "elkjs": "^0.10.0",
     "gsap": "^3.14.2",
     "lodash": "^4.17.21",
-    "next": "^16.0.7",
+    "next": "16.4.2",
     "pixi-filters": "^6.1.5",
     "pixi-viewport": "^6.0.3",
     "pixi.js": "^8.14.3",
@@ -32,14 +34,15 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@types/lodash": "^4.17.19",
-    "@types/node": "^20",
+    "@types/node": "^22.20.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "eslint": "^4.1.1",
-    "eslint-config-next": "^0.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.4.2",
     "postcss": "^8",
     "prisma": "^7.8.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^5.0.5"
   }
 }

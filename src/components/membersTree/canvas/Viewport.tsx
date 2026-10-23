@@ -8,6 +8,7 @@ import {
 import { Viewport as PixiViewport } from "pixi-viewport";
 import { useApplication } from "@pixi/react";
 import { isZoomedOut } from "@/utils";
+import { markCameraMoving } from "@/hooks/membersTree/cameraMotion";
 import {
   BIRTHDAY_ANIMATION_MIN_SCALE,
   MAX_VIEWPORT_ZOOM,
@@ -77,12 +78,16 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
       }
     };
 
+    viewport.on("moved", markCameraMoving);
+    viewport.on("zoomed", markCameraMoving);
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
     viewport.on("wheel", handleWheel);
     viewport.on("zoomed", handleZoomed);
 
     return () => {
+      viewport.off("moved", markCameraMoving);
+      viewport.off("zoomed", markCameraMoving);
       viewport.off("drag-start", handleDragStart);
       viewport.off("drag-end", handleDragEnd);
       viewport.off("wheel", handleWheel);

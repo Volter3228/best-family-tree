@@ -15,7 +15,6 @@ import {
 import { requestLayout } from "@/libs/layoutClient";
 import {
   reconnectEdgesToVisibleAncestors,
-  isDetachedAlumnus,
   computeGridLayout,
   reorderEdgesForLineageCentering,
   alignLineageLayout,
@@ -96,12 +95,7 @@ export const useTreeLayout = () => {
         }
         : transformMembersToFlowValues({ byId: membersMap, childrenOf, rootIds });
 
-    let finalNodes =
-      treeMode === "team"
-        ? allNodes
-        : allNodes.filter(
-          (node) => !isDetachedAlumnus(node.data.member, childrenOf),
-        );
+    let finalNodes = allNodes;
     let finalEdges = allEdges;
 
     // Keep only nodes matching the current filters.

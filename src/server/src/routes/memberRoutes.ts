@@ -3,6 +3,7 @@ import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
 import { deleteCloudinaryImage } from "../libs/cloudinary.js";
 import { validateMemberBody } from "../utils/index.js";
+import { validateMemberUpdate } from "../utils/memberUpdateValidation.js";
 import { sendRouteError } from "../utils/httpErrors.js";
 import {
   parsePhoneNumbers,
@@ -41,8 +42,15 @@ router.post(
   "/add-member",
   uploadMemberPhoto.single("photo"),
   async (req, res) => {
+    // The photo is already in Cloudinary by now; drop it if the member is not saved.
+    const uploadedPhoto = req.file?.path;
+    const discardUpload = async () => {
+      if (uploadedPhoto) await deleteCloudinaryImage(uploadedPhoto);
+    };
+
     const validation = validateMemberBody(req.body);
     if (!validation.success) {
+      await discardUpload();
       res.status(400).json({ error: validation.errors });
       return;
     }
@@ -53,20 +61,21 @@ router.post(
       phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
       positions = parsePositionsPayload(req.body.positions) ?? [];
     } catch (error) {
+      await discardUpload();
       sendRouteError(res, error, "Invalid phoneNumbers or positions payload");
       return;
     }
 
     try {
-      const photoUrl = req.file?.path || null;
       const newMember = await createMember(
         validation.data,
         phoneNumbers,
         positions,
-        photoUrl,
+        uploadedPhoto || null,
       );
       res.status(201).json(serializeMember(newMember));
     } catch (error) {
+      await discardUpload();
       sendRouteError(res, error, "Failed to create member");
     }
   },
@@ -77,12 +86,14 @@ router.put(
   uploadMemberPhoto.single("photo"),
   async (req, res) => {
     const { id } = req.params;
-
-    const validation = validateMemberBody(req.body);
-    if (!validation.success) {
-      res.status(400).json({ error: validation.errors });
-      return;
-    }
+    const uploadedPhoto = req.file?.path;
+    const discardUpload = async () => {
+      if (uploadedPhoto) await deleteCloudinaryImage(uploadedPhoto);
+    };
+    const reject = async (status: number, error: string) => {
+      await discardUpload();
+      res.status(status).json({ error });
+    };
 
     try {
       const existingMember = await prisma.member.findUnique({
@@ -91,7 +102,17 @@ router.put(
       });
 
       if (!existingMember) {
-        res.status(404).json({ error: "Member not found" });
+        await reject(404, "Member not found");
+        return;
+      }
+
+      // Old records may lack data: only emptying a stored value is refused.
+      const validation = validateMemberUpdate(req.body, {
+        ...existingMember,
+        phoneNumbers: existingMember.phoneNumbers.map((p) => p.phoneNumber),
+      });
+      if (!validation.success) {
+        await reject(400, validation.errors);
         return;
       }
 
@@ -102,32 +123,34 @@ router.put(
         phoneNumbers = parsePhoneNumbers(validation.data.phoneNumbers);
         positions = parsePositionsPayload(req.body.positions);
       } catch (error) {
+        await discardUpload();
         sendRouteError(res, error, "Invalid phoneNumbers or positions payload");
         return;
       }
 
-      let photoUrl = existingMember.photo;
       const oldPhotoUrl = existingMember.photo;
+      let photoUrl = oldPhotoUrl;
+      if (uploadedPhoto) photoUrl = uploadedPhoto;
+      else if (req.body.photo === "") photoUrl = null;
 
-      if (req.file?.path) {
-        photoUrl = req.file.path;
-        if (oldPhotoUrl) {
-          await deleteCloudinaryImage(oldPhotoUrl);
-        }
-      } else if (req.body.photo === "") {
-        photoUrl = null;
-        if (oldPhotoUrl) {
-          await deleteCloudinaryImage(oldPhotoUrl);
-        }
+      let updatedMember;
+      try {
+        updatedMember = await updateMember(
+          id,
+          validation.data,
+          phoneNumbers,
+          positions,
+          photoUrl,
+        );
+      } catch (error) {
+        await discardUpload();
+        throw error;
       }
 
-      const updatedMember = await updateMember(
-        id,
-        validation.data,
-        phoneNumbers,
-        positions,
-        photoUrl,
-      );
+      // The old photo goes only once the new data is safely stored.
+      if (oldPhotoUrl && photoUrl !== oldPhotoUrl) {
+        await deleteCloudinaryImage(oldPhotoUrl);
+      }
       res.status(200).json(serializeMember(updatedMember));
     } catch (error) {
       sendRouteError(res, error, "Failed to update member");

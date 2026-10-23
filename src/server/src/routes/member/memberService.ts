@@ -1,7 +1,8 @@
 import type { MemberBody } from "../../utils/validation.js";
 import prisma from "../../db/prisma/clientInstance.js";
 import { NotFoundError, ValidationError } from "../../utils/httpErrors.js";
-import { buildMemberFields } from "./memberPayload.js";
+import { buildMemberFields, buildMemberUpdateFields } from "./memberPayload.js";
+import type { MemberUpdateBody } from "../../utils/memberUpdateValidation.js";
 import type { PositionInput } from "./memberPayload.js";
 import { MEMBER_INCLUDE, type MemberTransaction } from "./memberQueries.js";
 import { syncPositions } from "./memberPositions.js";
@@ -64,16 +65,16 @@ export const createMember = async (
 
 export const updateMember = async (
   memberId: string,
-  body: MemberBody,
+  body: MemberUpdateBody,
   phoneNumbers: string[],
   positions: PositionInput[] | null,
   photoUrl: string | null,
 ) =>
   prisma.$transaction(async (tx) => {
-    await assertNoMentorCycle(tx, memberId, body.mentorId);
+    if (body.mentorId) await assertNoMentorCycle(tx, memberId, body.mentorId);
     await tx.member.update({
       where: { id: memberId },
-      data: buildMemberFields(body, photoUrl),
+      data: buildMemberUpdateFields(body, photoUrl),
     });
 
     await tx.phoneNumber.deleteMany({ where: { ownerId: memberId } });

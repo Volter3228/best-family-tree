@@ -89,7 +89,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
     event.preventDefault();
 
     setErrors({});
-    const validationErrors = validateMemberForm(form, mentorsList, teamTypes);
+    const validationErrors = validateMemberForm(form, mentorsList, teamTypes, member);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;

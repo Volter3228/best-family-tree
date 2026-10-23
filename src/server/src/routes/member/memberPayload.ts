@@ -7,6 +7,7 @@ import {
 } from "../../utils/catalogValidation.js";
 import { ValidationError } from "../../utils/httpErrors.js";
 import type { MemberBody } from "../../utils/validation.js";
+import type { MemberUpdateBody } from "../../utils/memberUpdateValidation.js";
 
 export type { PositionInput };
 
@@ -42,12 +43,39 @@ export const buildMemberFields = (
   body: MemberBody,
   photoUrl: string | null,
 ) => {
-  const {
-    firstName,
-    lastName,
-    birthday,
-    joinedAt,
+  const { firstName, lastName, birthday, joinedAt, mentorId } = body;
+
+  return {
+    ...buildSharedFields(body, photoUrl),
+    name: `${firstName} ${lastName}`,
+    birthday: new Date(birthday),
+    joinedAt: new Date(joinedAt),
     mentorId,
+  };
+};
+
+// Updates may leave birthday / mentor empty (records that never had them);
+// an empty join date means "keep the stored one".
+export const buildMemberUpdateFields = (
+  body: MemberUpdateBody,
+  photoUrl: string | null,
+) => {
+  const { firstName, lastName, birthday, joinedAt, mentorId } = body;
+
+  return {
+    ...buildSharedFields(body, photoUrl),
+    name: `${firstName} ${lastName}`.trim(),
+    birthday: birthday ? new Date(birthday) : null,
+    joinedAt: joinedAt ? new Date(joinedAt) : undefined,
+    mentorId: mentorId || null,
+  };
+};
+
+const buildSharedFields = (
+  body: MemberBody | MemberUpdateBody,
+  photoUrl: string | null,
+) => {
+  const {
     status,
     email,
     telegramLink,
@@ -57,13 +85,9 @@ export const buildMemberFields = (
   } = body;
 
   return {
-    name: `${firstName} ${lastName}`,
-    birthday: new Date(birthday),
     email: email || null,
     status,
-    joinedAt: new Date(joinedAt),
     photo: photoUrl,
-    mentorId,
     ...normalizeSocialLinks({
       telegramLink,
       instagramLink,

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import prisma from "../db/prisma/clientInstance.js";
-import { Member as MemberType, MemberStatus } from "../types/index.js";
+import { Member as MemberType } from "../types/index.js";
 import {
   transformMembersToTree,
   transformMemberPhoneNumbers,
@@ -14,17 +14,6 @@ const router = Router();
 // client rebuilds the tree from `mentorId` and the order of the list.
 const loadFamilyTree = createVersionedCache(async () => {
   const rawMembers = await prisma.member.findMany({
-    where: {
-      NOT: {
-        AND: [
-          { status: MemberStatus.ALUMNI },
-          { mentees: { none: {} } },
-          { mentorId: null },
-          // Alumni who hold positions still belong in team view.
-          { positions: { none: {} } },
-        ],
-      },
-    },
     include: {
       phoneNumbers: true,
       positions: {

@@ -4,6 +4,7 @@ import {
   MIN_DATE_JOIN,
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
+import type { Member } from "@/models";
 import type {
   MemberFormData,
   MentorsListItem,
@@ -69,10 +70,47 @@ const validatePositions = (
   }
 };
 
+// What the stored member already has (edit mode). A stored value can be
+// replaced but never emptied, while a field the record never had stays
+// optional, so old records with gaps can be completed bit by bit.
+export type StoredMemberValues = Pick<
+  Member,
+  "name" | "birthday" | "joinedAt" | "mentorId" | "email" | "phoneNumbers"
+>;
+
+type CheckedField =
+  | "firstName"
+  | "lastName"
+  | "birthday"
+  | "joinedAt"
+  | "mentorId"
+  | "email"
+  | "phoneNumber";
+
+// The API delivers dates as ISO strings although the model types them as Date.
+const toTime = (value: Date | string | null | undefined): number | null =>
+  value ? new Date(value).getTime() : null;
+
+const getStoredFieldValues = (
+  stored: StoredMemberValues,
+): Record<CheckedField, string | number | null> => {
+  const [firstName = "", ...rest] = stored.name.split(" ");
+  return {
+    firstName,
+    lastName: rest.join(" "),
+    birthday: toTime(stored.birthday),
+    joinedAt: toTime(stored.joinedAt),
+    mentorId: stored.mentorId,
+    email: stored.email,
+    phoneNumber: stored.phoneNumbers[0] ?? null,
+  };
+};
+
 const validateMemberForm = (
   form: MemberFormData,
   mentorsList: MentorsListItem[],
   teamTypes: TeamType[] = [],
+  stored: StoredMemberValues | null = null,
 ): Partial<Record<keyof MemberFormData, string>> => {
   let errors: Partial<Record<keyof MemberFormData, string>> = {};
   const {
@@ -90,23 +128,36 @@ const validateMemberForm = (
     linkedinLink,
   } = form;
 
-  if (!firstName) {
+  const storedValues = stored && getStoredFieldValues(stored);
+  // Adding: everything is required. Editing: only what is already stored.
+  const isRequired = (field: CheckedField) =>
+    !storedValues || !!storedValues[field];
+  // A stored value the user did not touch is not judged again.
+  const isUnchanged = (field: CheckedField, value: string | Date | null) =>
+    !!storedValues &&
+    storedValues[field] ===
+      (value instanceof Date ? value.getTime() : value || null);
+
+  if (!firstName && isRequired("firstName")) {
     errors.firstName = REQUIRED_MESSAGE;
   }
 
-  if (!lastName) {
+  if (!lastName && isRequired("lastName")) {
     errors.lastName = REQUIRED_MESSAGE;
   }
 
   if (!birthday) {
-    errors.birthday = REQUIRED_MESSAGE;
-  } else if (birthday < MIN_DATE_BIRTHDAY || birthday > MAX_DATE_BIRTHDAY) {
+    if (isRequired("birthday")) errors.birthday = REQUIRED_MESSAGE;
+  } else if (
+    !isUnchanged("birthday", birthday) &&
+    (birthday < MIN_DATE_BIRTHDAY || birthday > MAX_DATE_BIRTHDAY)
+  ) {
     errors.birthday = "День народження некоректний.";
   }
 
   if (!joinedAt) {
-    errors.joinedAt = REQUIRED_MESSAGE;
-  } else if (joinedAt < MIN_DATE_JOIN) {
+    if (isRequired("joinedAt")) errors.joinedAt = REQUIRED_MESSAGE;
+  } else if (!isUnchanged("joinedAt", joinedAt) && joinedAt < MIN_DATE_JOIN) {
     errors.joinedAt = "День вступу некоректний.";
   }
 
@@ -117,20 +168,29 @@ const validateMemberForm = (
   }
 
   if (!mentorId) {
-    errors.mentorId = REQUIRED_MESSAGE;
-  } else if (!mentorsList.find(({ id }) => id === mentorId)) {
+    if (isRequired("mentorId")) errors.mentorId = REQUIRED_MESSAGE;
+  } else if (
+    !isUnchanged("mentorId", mentorId) &&
+    !mentorsList.find(({ id }) => id === mentorId)
+  ) {
     errors.mentorId = "Некоректний ментор.";
   }
 
   if (!email) {
-    errors.email = REQUIRED_MESSAGE;
-  } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    if (isRequired("email")) errors.email = REQUIRED_MESSAGE;
+  } else if (
+    !isUnchanged("email", email) &&
+    !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)
+  ) {
     errors.email = "Некоректний email.";
   }
 
   if (!phoneNumber) {
-    errors.phoneNumber = REQUIRED_MESSAGE;
-  } else if (!/^(\+380|380|0)\d{9}$/.test(phoneNumber)) {
+    if (isRequired("phoneNumber")) errors.phoneNumber = REQUIRED_MESSAGE;
+  } else if (
+    !isUnchanged("phoneNumber", phoneNumber) &&
+    !/^(\+380|380|0)\d{9}$/.test(phoneNumber)
+  ) {
     errors.phoneNumber = "Некоректний номер.";
   }
 
