@@ -35,14 +35,16 @@ interface Props {
 }
 
 const EMPTY_FILTERS: Filter[] = [];
-// Culling box: the avatar and the card below it, with room for the hover glow.
+// Culling box in world coordinates (Pixi compares cullArea with the view as
+// is): the avatar and the card below it, with room for the hover glow.
 const CULL_MARGIN = 80;
-const CULL_AREA = new Rectangle(
-  -CULL_MARGIN,
-  -CULL_MARGIN,
-  NODE_WIDTH + CULL_MARGIN * 2,
-  NODE_CARD_TOP + NODE_CARD_HEIGHT + CULL_MARGIN * 2,
-);
+const getCullArea = (x: number, y: number) =>
+  new Rectangle(
+    x - CULL_MARGIN,
+    y - CULL_MARGIN,
+    NODE_WIDTH + CULL_MARGIN * 2,
+    NODE_CARD_TOP + NODE_CARD_HEIGHT + CULL_MARGIN * 2,
+  );
 // Pointer hit areas, so the event system never walks the node's children:
 // the whole node with its card, or just the avatar while the card is hidden.
 const CARD_BOTTOM = NODE_CARD_TOP + NODE_CARD_HEIGHT;
@@ -124,6 +126,8 @@ const MemberNode = ({
     return [shadowFilter];
   }, [isHovered, isSelected, shadowFilter]);
 
+  const cullArea = useMemo(() => getCullArea(x, y), [x, y]);
+
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
   const birthdayRef = useRef<Container>(null);
 
@@ -154,7 +158,8 @@ const MemberNode = ({
         onTap={handleClick}
         filters={filters}
         cullable
-        cullArea={CULL_AREA}
+        cullableChildren={false}
+        cullArea={cullArea}
       >
         <pixiContainer
           ref={cardRef}
@@ -194,6 +199,8 @@ const MemberNode = ({
           zIndex={1001}
           eventMode="none"
           cullable
+          cullableChildren={false}
+          cullArea={cullArea}
         >
           <MemberBirthdayAnimation paused={!showBirthday} />
         </pixiContainer>

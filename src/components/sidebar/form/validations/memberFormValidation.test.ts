@@ -124,3 +124,46 @@ describe("validateMemberForm", () => {
     expect(validateMemberForm(form, mentors, [], fromApi)).toEqual({});
   });
 });
+
+describe("validateMemberForm in minimal mode", () => {
+  const minimalForm = (overrides: Partial<MemberFormData> = {}) => ({
+    ...MEMBER_FORM_DEFAULTS,
+    firstName: "Ivan",
+    joinedAt: new Date(2008, 8, 1),
+    status: MemberStatus.Alumni,
+    ...overrides,
+  });
+  const minimal = { minimal: true };
+
+  it("accepts name, status and join date only", () => {
+    expect(
+      validateMemberForm(minimalForm(), mentors, [], null, minimal),
+    ).toEqual({});
+  });
+
+  it("still requires the name, join date and status", () => {
+    const errors = validateMemberForm(
+      minimalForm({ firstName: "", joinedAt: null, status: null }),
+      mentors,
+      [],
+      null,
+      minimal,
+    );
+
+    expect(Object.keys(errors).sort()).toEqual(
+      ["firstName", "joinedAt", "status"].sort(),
+    );
+  });
+
+  it("still checks the format of what is provided", () => {
+    const errors = validateMemberForm(
+      minimalForm({ email: "nope" }),
+      mentors,
+      [],
+      null,
+      minimal,
+    );
+
+    expect(errors).toHaveProperty("email");
+  });
+});

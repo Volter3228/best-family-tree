@@ -14,6 +14,7 @@ import type {
   Member as MemberType,
 } from "@/types";
 import { MemberFormFields } from "./fields";
+import { FormCheckbox } from "./inputs";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
@@ -30,6 +31,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
     Partial<Record<keyof MemberFormData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMinimal, setIsMinimal] = useState(false);
   const formId = useId();
 
   const { addMember, getMentorsList } = useMembersActions();
@@ -53,7 +55,9 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
     event.preventDefault();
 
     setErrors({});
-    const validationErrors = validateMemberForm(form, mentorsList, teamTypes);
+    const validationErrors = validateMemberForm(form, mentorsList, teamTypes, null, {
+      minimal: isMinimal,
+    });
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -61,6 +65,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
 
     setIsSubmitting(true);
     const formData = buildMemberFormData(form);
+    if (isMinimal) formData.append("sparse", "true");
 
     try {
       const newMember = await apiAddMember(formData);
@@ -87,7 +92,16 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
       onSubmit={handleSubmit}
       noValidate
     >
+      <div className="mb-4 w-full">
+        <FormCheckbox
+          checked={isMinimal}
+          label="Мінімальний запис (старий учасник)"
+          color={color}
+          onChange={setIsMinimal}
+        />
+      </div>
       <MemberFormFields
+        minimal={isMinimal}
         form={form}
         setForm={setForm}
         errors={errors}
