@@ -24,7 +24,7 @@ export interface CanvasColors {
   accentColors: readonly [string, string, string];
   surfaceAccentColors: readonly [string, string, string];
   primaryGradient: FillGradient;
-  primaryGradientToTopRight: FillGradient;
+  primaryGradientToBottomRight: FillGradient;
   text: CanvasThemeTokens["text"];
   placeholder: CanvasThemeTokens["placeholder"];
   textStyles: CanvasTextStyles;
@@ -56,7 +56,7 @@ const buildCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
     colorStops,
   });
 
-  const primaryGradientToTopRight = new FillGradient({
+  const primaryGradientToBottomRight = new FillGradient({
     type: "linear",
     colorStops,
     start: { x: 0, y: 0 },
@@ -81,7 +81,7 @@ const buildCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
     accentColors,
     surfaceAccentColors,
     primaryGradient,
-    primaryGradientToTopRight,
+    primaryGradientToBottomRight,
     text,
     placeholder,
     textStyles,
