@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
@@ -34,6 +34,7 @@ const TeamMembersEditor = ({
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [pendingFocusId, setPendingFocusId] = useState<string | null>(null);
 
   const toggle = (id: string) =>
     setExpanded((current) => {
@@ -45,7 +46,22 @@ const TeamMembersEditor = ({
   const handleAdd = () => {
     const id = onAdd();
     setExpanded((current) => new Set(current).add(id));
+    setPendingFocusId(id);
   };
+
+  // After a new member row renders, scroll it into view (bottom) and focus its
+  // name input so the user can start typing right away.
+  useEffect(() => {
+    if (!pendingFocusId) return;
+    const input = document.getElementById(
+      `team-member-${pendingFocusId}`,
+    ) as HTMLElement | null;
+    if (input) {
+      input.scrollIntoView({ block: "end", behavior: "smooth" });
+      input.focus();
+    }
+    setPendingFocusId(null);
+  }, [pendingFocusId]);
 
   return (
     <div className="flex flex-col gap-3 w-full">
