@@ -3,7 +3,7 @@ import { PlusIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor, DropdownOption, TeamMemberRow } from "@/types";
-import { ComboboxInput } from "../inputs";
+import { ComboboxInput, DropdownSelectInput } from "../inputs";
 import PositionRowHeader from "../fields/position/PositionRowHeader";
 
 interface Props {
@@ -86,18 +86,20 @@ const TeamMembersEditor = ({
           />
           {expanded.has(row.id) && (
             <>
-              <ComboboxInput
+              <DropdownSelectInput
                 name={`team-member-${row.id}`}
                 label="Учасник"
                 options={memberOptions}
-                onSelect={(value, text) =>
+                onSelect={(value) => {
+                  const option = memberOptions.find((opt) => opt.value === value);
                   onUpdate(row.id, {
                     memberId: value || undefined,
-                    memberName: text,
-                  })
-                }
+                    memberName: option?.text ?? "",
+                  });
+                }}
                 placeholder="Імʼя"
-                initialValue={row.memberName}
+                initialValue={row.memberId}
+                autoComplete
                 color={color}
               />
               <ComboboxInput
