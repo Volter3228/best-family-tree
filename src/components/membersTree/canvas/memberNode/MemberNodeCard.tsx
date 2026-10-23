@@ -29,7 +29,7 @@ const MemberNodeCard = ({
 }: Props) => {
   const centerX = NODE_WIDTH / 2;
   const {
-    primaryGradientToTopRight,
+    primaryGradientToBottomRight,
     surfaceAccentColors,
     textStyles,
     cardStroke,
@@ -79,7 +79,7 @@ const MemberNodeCard = ({
       });
 
       if (isSelected) {
-        g.stroke({ fill: primaryGradientToTopRight, width: 3 });
+        g.stroke({ fill: primaryGradientToBottomRight, width: 3 });
       } else {
         g.stroke({
           color: cardStroke,
@@ -92,7 +92,7 @@ const MemberNodeCard = ({
       isSelected,
       placeholderColorIndex,
       surfaceAccentColors,
-      primaryGradientToTopRight,
+      primaryGradientToBottomRight,
       cardStroke,
       cardStrokeAlpha,
     ],
