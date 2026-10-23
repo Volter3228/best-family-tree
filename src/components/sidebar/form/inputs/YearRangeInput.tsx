@@ -46,14 +46,25 @@ const YearRangeInput = ({
     "disabled:cursor-not-allowed disabled:opacity-60",
   );
 
+  // While typing, propagate the raw value without cross-field validation:
+  // an in-progress entry (e.g. "2" before "2025") must not wipe the other
+  // year mid-flight. The start/end consistency check runs on blur instead.
   const handleStart = (value: string) => {
-    const year = toYear(value);
-    onChange(year, year && end && year > end ? undefined : end);
+    onChange(toYear(value), end);
   };
 
   const handleEnd = (value: string) => {
-    const year = toYear(value);
-    onChange(start && year && start > year ? undefined : start, year);
+    onChange(start, toYear(value));
+  };
+
+  // On blur, drop the *other* year if the range became inconsistent, mirroring
+  // the previous keystroke-time behaviour but only once editing is finished.
+  const validateStart = () => {
+    if (start && end && start > end) onChange(start, undefined);
+  };
+
+  const validateEnd = () => {
+    if (start && end && start > end) onChange(undefined, end);
   };
 
   const fields = [
@@ -63,6 +74,7 @@ const YearRangeInput = ({
       value: start,
       isDisabled: false,
       onChange: handleStart,
+      onBlur: validateStart,
     },
     {
       id: "end",
@@ -70,6 +82,7 @@ const YearRangeInput = ({
       value: ongoing ? undefined : end,
       isDisabled: ongoing,
       onChange: handleEnd,
+      onBlur: validateEnd,
     },
   ];
 
@@ -94,6 +107,7 @@ const YearRangeInput = ({
               placeholder={field.isDisabled ? "..." : String(max - 1)}
               disabled={field.isDisabled}
               onChange={(event) => field.onChange(event.target.value)}
+              onBlur={field.onBlur}
               className={inputClassName}
             />
           </div>
