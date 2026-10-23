@@ -1,6 +1,4 @@
 import { NODE_WIDTH, NODE_HEIGHT, NODE_CARD_HEIGHT } from "@/constants/canvas";
-import { MemberStatus } from "@/types";
-import type { Member } from "@/models";
 import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
 import { Position } from "@/types";
 import type {
@@ -194,16 +192,3 @@ export const alignLineageLayout = (
     return newPos ? { ...n, position: newPos } : n;
   });
 };
-
-/**
- * Alumni with neither a mentor nor mentees would float alone in the family
- * tree and grid. The API still returns them (they may hold team positions),
- * so every mode except team view hides them.
- */
-export const isDetachedAlumnus = (
-  member: Member,
-  childrenOf: ChildrenMap,
-): boolean =>
-  member.status === MemberStatus.Alumni &&
-  !member.mentorId &&
-  !childrenOf.get(member.id)?.length;

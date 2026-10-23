@@ -7,6 +7,7 @@ import {
   CARD_PIVOT_X,
   CARD_PIVOT_Y,
 } from "@/hooks";
+import { isCameraMoving } from "@/hooks/membersTree/cameraMotion";
 import { Member } from "@/models";
 import { useTreeStore } from "@/store/treeStore";
 import {
@@ -103,7 +104,9 @@ const MemberNode = ({
     if (isZoomedOut && isHovered) setIsTooltipMounted(true);
   }, [isZoomedOut, isHovered]);
 
-  const handlePointerEnter = useCallback(() => setIsHovered(true), []);
+  const handlePointerEnter = useCallback(() => {
+    if (!isCameraMoving()) setIsHovered(true);
+  }, []);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
 
   useEffect(() => {
@@ -195,7 +198,7 @@ const MemberNode = ({
           eventMode="none"
           cullable
         >
-          <MemberBirthdayAnimation />
+          <MemberBirthdayAnimation paused={!showBirthday} />
         </pixiContainer>
       )}
     </>

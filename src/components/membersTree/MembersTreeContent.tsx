@@ -25,6 +25,9 @@ import Sidebar, { MemberSidebarContent } from "../sidebar";
 import TeamInfoSidebar from "./TeamInfoSidebar";
 import Toolbar from "./toolbar";
 
+// Hover and drag only need events on the objects under the pointer.
+const EVENT_FEATURES = { globalMove: false } as const;
+
 const ACCENT_COLOR_MAP: AccentColor[] = ["blue", "green", "orange"];
 
 interface Props {
@@ -163,13 +166,18 @@ const MembersTreeContent = ({ members }: Props) => {
     return accentByMemberId.get(selectedId) ?? "blue";
   }, [selectedId, accentByMemberId]);
 
+  // Multisampling on top of a 2x canvas costs a lot of fill rate (phones,
+  // retina) for edges that are already smooth at that density.
+  const resolution = getRenderResolution();
+
   return (
     <div className="fixed inset-0 overflow-hidden">
       <Application
         resizeTo={window}
         backgroundAlpha={0}
-        resolution={getRenderResolution()}
-        antialias
+        resolution={resolution}
+        antialias={resolution < 2}
+        eventFeatures={EVENT_FEATURES}
         autoDensity
         extensions={[CullerPlugin]}
       >

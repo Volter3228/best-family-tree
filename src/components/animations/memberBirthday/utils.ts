@@ -1,5 +1,6 @@
 import { Texture } from "pixi.js";
 import { NODE_WIDTH, NODE_AVATAR_RADIUS } from "@/constants/canvas";
+import { BIRTHDAY_EMOJIS } from "./constants";
 
 export const createEmojiTexture = (emoji: string): Texture => {
   const canvas = document.createElement("canvas");
@@ -18,6 +19,26 @@ export const createEmojiTexture = (emoji: string): Texture => {
   ctx.fillText(emoji, size / 2, size / 2 + 5); // +5 for visual centering adjustment
 
   return Texture.from(canvas);
+};
+
+// One texture set serves every birthday on screen; it is built when the first
+// animation mounts and destroyed with the last one.
+let sharedTextures: Map<string, Texture> | null = null;
+let sharedTexturesUsers = 0;
+
+export const acquireEmojiTextures = (): Map<string, Texture> => {
+  sharedTextures ??= new Map(
+    BIRTHDAY_EMOJIS.map((emoji) => [emoji, createEmojiTexture(emoji)]),
+  );
+  sharedTexturesUsers += 1;
+  return sharedTextures;
+};
+
+export const releaseEmojiTextures = () => {
+  sharedTexturesUsers = Math.max(0, sharedTexturesUsers - 1);
+  if (sharedTexturesUsers > 0) return;
+  sharedTextures?.forEach((texture) => texture.destroy(true));
+  sharedTextures = null;
 };
 
 export const generateRandomPosition = (fixedSide?: number) => {

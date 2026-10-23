@@ -1,11 +1,21 @@
 import { useEffect, useRef } from "react";
 import { Container, Sprite, Texture } from "pixi.js";
 import gsap from "gsap";
-import { createEmojiTexture, generateRandomPosition } from "./utils";
+import {
+  acquireEmojiTextures,
+  generateRandomPosition,
+  releaseEmojiTextures,
+} from "./utils";
 import { BIRTHDAY_EMOJIS, EMOJI_COUNT } from "./constants";
 
-const MemberBirthdayAnimation = () => {
+interface Props {
+  // Hidden animations stop ticking instead of animating at alpha 0.
+  paused?: boolean;
+}
+
+const MemberBirthdayAnimation = ({ paused = false }: Props) => {
   const containerRef = useRef<Container>(null);
+  const timelinesRef = useRef<gsap.core.Timeline[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -13,20 +23,11 @@ const MemberBirthdayAnimation = () => {
     const container = containerRef.current;
     const sprites: Sprite[] = [];
     const timelines: gsap.core.Timeline[] = [];
-    const textureCache: Texture[] = [];
 
     // Clear any existing children
     container.removeChildren();
 
-    // Map to easily retrieve texture by emoji
-    const emojiTextures = new Map<string, Texture>();
-
-    // Pre-generate textures for all emojis
-    BIRTHDAY_EMOJIS.forEach((emoji) => {
-      const texture = createEmojiTexture(emoji);
-      emojiTextures.set(emoji, texture);
-      textureCache.push(texture);
-    });
+    const emojiTextures = acquireEmojiTextures();
 
     const getRandomTexture = () => {
       const emoji =
@@ -128,15 +129,21 @@ const MemberBirthdayAnimation = () => {
 
       timelines.push(timeline);
     }
+    timelinesRef.current = timelines;
 
     return () => {
       timelines.forEach((timeline) => timeline.kill());
       sprites.forEach((sprite) => sprite.destroy());
-      // Destroy the generated textures to prevent memory leaks
-      textureCache.forEach((texture) => texture.destroy(true));
+      timelinesRef.current = [];
+      releaseEmojiTextures();
       container.removeChildren();
     };
   }, []);
+
+  // Declared after the build effect, so it also applies the initial state.
+  useEffect(() => {
+    timelinesRef.current.forEach((timeline) => timeline.paused(paused));
+  }, [paused]);
 
   return <pixiContainer ref={containerRef} />;
 };
