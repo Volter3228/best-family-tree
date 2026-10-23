@@ -4,5 +4,6 @@ model PhoneNumber {
   phoneNumber String @unique
   owner       Member @relation(fields: [ownerId], references: [id])
 
+  @@index([ownerId])
   @@map("phone_numbers")
 }

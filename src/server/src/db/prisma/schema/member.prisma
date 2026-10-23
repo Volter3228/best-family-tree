@@ -27,6 +27,7 @@ model Member {
   updatedAt DateTime @updatedAt
 
   @@unique([name, status, joinedAt])
+  @@index([mentorId])
   @@map("members")
 }
 
