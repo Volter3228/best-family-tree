@@ -46,3 +46,8 @@ next-env.d.ts
 # Docker
 compose.override.yml
 Dockerfile.*override
+
+# AI
+.devin
+.windsurf
+.

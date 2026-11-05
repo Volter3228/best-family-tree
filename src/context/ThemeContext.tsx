@@ -8,7 +8,7 @@ import {
   useRef,
 } from "react";
 import { THEMES } from "@/constants/theme";
-import { useMediaQuery } from "@/hooks";
+import { useIsHydrated, useMediaQuery } from "@/hooks";
 import { useSettingsStore } from "@/store/settingsStore";
 import type {
   ThemeId,
@@ -43,6 +43,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const themePreference = useSettingsStore((s) => s.theme);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const systemDark = useMediaQuery(SYSTEM_DARK_QUERY);
+  // During hydration the store and media query report their defaults (light),
+  // so tokens must not be applied until the real values are in.
+  const hydrated = useIsHydrated();
 
   // "system" follows the OS; without matchMedia it resolves to light.
   const themeId: ThemeId =
@@ -54,6 +57,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isFirstRender = useRef(true);
   useEffect(() => {
+    if (!hydrated) return;
     const apply = () => applyCssTokens(THEMES[themeId]);
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -75,7 +79,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       apply();
     }
-  }, [themeId]);
+  }, [hydrated, themeId]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({
