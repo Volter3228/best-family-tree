@@ -1,4 +1,5 @@
 import { Member } from "@/models";
+import type { EdgeStyle } from "./settings";
 
 export enum Position {
   Left = "left",
@@ -61,6 +62,19 @@ export interface TeamEdge {
   bendY?: number;
   fanStart?: boolean;
   fanEnd?: boolean;
+  // `end` is the top of a member's avatar circle (TB); draw up to the outline.
+  endsOnAvatar?: boolean;
+  // Pairs a fan edge with the orthogonal route that replaces it, so a style
+  // switch can morph one into the other.
+  morphKey?: string;
+  // Vertex indices of `points` drawn with rounded corners (others are sharp).
+  round?: number[];
+  // Explicit polyline route (spine + stubs in LR orthogonal mode); when set,
+  // the curve fields above are ignored and the edge is drawn corner by corner.
+  points?: Point[];
+  // Which edge styles this edge belongs to (LR blocks carry both fan and
+  // spine variants); edges without it are drawn in every style.
+  styles?: EdgeStyle[];
 }
 
 export interface TeamFrame {

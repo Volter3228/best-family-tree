@@ -1,17 +1,34 @@
-## graphify
+## Stack & layout
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+- Client (repo root): Next.js 16 App Router (`src/app`), React 19, PixiJS 8 tree canvas (`src/components/membersTree`), Zustand stores (`src/store`), ELK layout in a Web Worker (`src/workers/layout`, `src/libs/elk.ts`).
+- Server (`src/server`): Express 5 + Prisma/PostgreSQL. Routes per domain in `src/server/src/routes/`.
+- Domain vocabulary: `GLOSSARY.md`. Read it before naming anything.
 
-Rules:
-- When graphify-out/graph.json exists, run `graphify query "<question>"` before your first grep, search or source-file read for a codebase question, and put this rule in every subagent prompt that explores code. Read raw files only for lines the graph or an earlier read already located. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
-- A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+## Commands
 
-## Project conventions
+- Client dev: `npm run dev`. Server: `cd src/server && npm run serve`.
+- Before finishing: `npm run typecheck`, `npm run lint`, `npm test`, `cd src/server && npx tsc --noEmit`, and `cd src/server && npm test` if you touched server code.
+- After changing the Prisma schema: `cd src/server && npm run prisma:generate`.
 
-- Read `GLOSSARY.md` for domain vocabulary (member, status, tree mode, ...) before naming things.
-- Tests: `npm test` (client, Vitest) and `cd src/server && npm test` (server). Only add tests at agreed seams: pure rules and cache logic, not rendering.
-- Checks before finishing: `npm run typecheck`, `npm run lint`, `npm test`, and `cd src/server && npx tsc --noEmit`.
-- Editing a member follows the completeness rule (see glossary): never empty a stored required field, never demand fields the record never had.
+## Do not read or edit
+
+- `graphify-out/graph.json` (2.4 MB; query it instead), `graphify-out/cache/`
+- `node_modules/`, `.next/`, `src/server/dist/`, `package-lock.json`, `*.tsbuildinfo`
+- `src/server/src/db/prisma/generated/`: generated. Edit `schema.prisma` and regenerate.
+- Existing files in `src/server/src/db/prisma/schema/migrations/`: add a new migration instead.
+- `.env*`: contains secrets. Refer to variable names only.
+
+## Graphify
+
+- For codebase questions, run `graphify query "<question>"` (or `path` / `explain`) before grep or raw source reads. Output is capped at ~2000 tokens; narrow the question or pass `--budget N` if answers are cut off.
+- Read raw files only for lines the graph already located. Read `GRAPH_REPORT.md` only for broad architecture review.
+- After code changes, run `graphify update .`. If the graph and the source disagree, trust the source.
+- Put these rules in every subagent prompt that explores code.
+- Large `graph.json` diffs in PRs are expected. Do not flag them.
+
+## Conventions
+
+- Tests: the root Vitest config picks up only `src/**/*.test.ts`, not `.tsx`. Test pure rules and cache/util logic, not rendering.
+- Editing a member follows the completeness rule in `GLOSSARY.md`: never clear a stored field, and never require fields the record never had.
+- When you edit a non-generated file over 250 lines, split it as part of that change. Do not do unrelated refactors.
+- Ask before schema or migration changes, data-changing scripts, or anything irreversible. For other doubts, ask when the answer would change the outcome; otherwise state your assumption and proceed.

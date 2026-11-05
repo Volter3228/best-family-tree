@@ -12,4 +12,6 @@ export const computeLayout = async ({
 }: LayoutMessage): Promise<LayoutResults[LayoutKind]> =>
   kind === "elk"
     ? layoutWithElk(payload as LayoutMessage<"elk">["payload"])
-    : computeTeamLayout(payload as LayoutMessage<"team">["payload"]);
+    : computeTeamLayout(
+        payload as LayoutMessage<"team">["payload"],
+      );

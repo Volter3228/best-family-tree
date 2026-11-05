@@ -1,5 +1,7 @@
 export * from "./memberNodeAvatar";
 export * from "./scale";
+export * from "./edgeGeometry";
+export * from "./edgePolyline";
 export * from "./graph";
 export * from "./membersIndex";
 export * from "./mentorsList";
@@ -15,4 +17,7 @@ export * from "./teamColor";
 export * from "./teamPacking";
 export * from "./teamRows";
 export * from "./teamEdges";
+export * from "./teamEdgePath";
 export * from "./teamRoster";
+export * from "./teamTrunk";
+export * from "./teamMorph";

@@ -12,9 +12,11 @@ import {
   useTreeLayout,
   useTeamSelection,
   useTeamInfoSidebar,
+  useResolvedDirection,
 } from "@/hooks";
 import { getMemberById } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { useTreeStore } from "@/store/treeStore";
 import type { Member as MemberType, AccentColor, TeamFrame } from "@/types";
 import { getRenderResolution } from "@/utils";
@@ -71,6 +73,11 @@ const MembersTreeContent = ({ members }: Props) => {
   // while the scene cross-fades between modes.
   const treeMode = layoutMode ?? appliedFilters.treeMode;
   const isTeamView = treeMode === "team";
+  // Edges keep their old shape while the scene cross-fades to a new direction.
+  const resolvedDirection = useResolvedDirection();
+  const layoutDirection = useTreeStore((s) => s.layoutDirection);
+  const direction = layoutDirection ?? resolvedDirection;
+  const edgeStyle = useSettingsStore((s) => s.edgeStyle);
 
   const {
     selectedTeamId,
@@ -191,6 +198,8 @@ const MembersTreeContent = ({ members }: Props) => {
           <MembersTreeScene
             sceneRef={sceneRef}
             treeMode={treeMode}
+            direction={direction}
+            edgeStyle={edgeStyle}
             scale={scale}
             nodes={nodes}
             edges={edges}

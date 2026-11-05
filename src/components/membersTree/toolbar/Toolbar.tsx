@@ -4,12 +4,14 @@ import {
   PencilSquareIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { usePanelToggle } from "@/hooks";
 import { useFiltersStore } from "@/store/filtersStore";
 import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
 import { FiltersPanel } from "./filters";
+import { SettingsPanel } from "./settings";
 import ToolbarIconButton from "./ToolbarIconButton";
 import FitViewButton from "./FitViewButton";
 
@@ -23,13 +25,27 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const search = usePanelToggle();
   const filters = usePanelToggle();
+  const settings = usePanelToggle();
   const hasActiveFilters = useFiltersStore((s) => s.isFilterActive);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const handleShowSearchClick = () => search.toggle(filters.close);
-  const handleShowFiltersClick = () => filters.toggle(search.close);
+  const handleShowSearchClick = () =>
+    search.toggle(() => {
+      filters.close();
+      settings.close();
+    });
+  const handleShowFiltersClick = () =>
+    filters.toggle(() => {
+      search.close();
+      settings.close();
+    });
+  const handleShowSettingsClick = () =>
+    settings.toggle(() => {
+      search.close();
+      filters.close();
+    });
 
   return (
     <>
@@ -52,10 +68,17 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
           />
           <FitViewButton onClick={onFitView} color="orange" />
           <ToolbarIconButton
+            title="Налаштування"
+            onClick={handleShowSettingsClick}
+            icon={Cog6ToothIcon}
+            color="blue"
+            isActive={settings.isOpen}
+          />
+          <ToolbarIconButton
             title="Керування"
             onClick={toggleSidebar}
             icon={PencilSquareIcon}
-            color="blue"
+            color="green"
             isActive={isSidebarOpen}
           />
         </div>
@@ -68,13 +91,14 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         onTeamSearch={onTeamSearch}
       />
       <FiltersPanel isOpen={filters.isOpen} isClosing={filters.isClosing} />
+      <SettingsPanel isOpen={settings.isOpen} isClosing={settings.isClosing} />
       <Sidebar
         headerTitle="Керування"
         onClose={closeSidebar}
         isOpen={isSidebarOpen}
-        color="blue"
+        color="green"
       >
-        <ManageForm onSuccess={closeSidebar} color="blue" />
+        <ManageForm onSuccess={closeSidebar} color="green" />
       </Sidebar>
     </>
   );

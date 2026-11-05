@@ -3,6 +3,7 @@ import { create } from "zustand";
 import type { Container } from "pixi.js";
 import type { Viewport } from "pixi-viewport";
 import type {
+  Direction,
   MemberNode,
   NodePositions,
   Point,
@@ -22,6 +23,8 @@ interface TreeState {
   nodePositions: NodePositions;
   // Tree mode of the nodes currently drawn (lags the filter while cross-fading).
   layoutMode: TreeMode | null;
+  // Direction of the drawn nodes; lags the setting for the same reason.
+  layoutDirection: Direction | null;
   // Root container of the drawn scene; faded when switching tree modes.
   sceneRef: RefObject<Container | null>;
   // Nodes that should show the full-size avatar texture.
@@ -37,6 +40,7 @@ interface TreeActions {
   setEdges: (next: TreeEdge[]) => void;
   setTeamFrames: (next: TeamFrame[]) => void;
   setLayoutMode: (next: TreeMode | null) => void;
+  setLayoutDirection: (next: Direction | null) => void;
   setSharpNodeIds: (next: ReadonlySet<string>) => void;
   setScale: (next: number) => void;
   setViewport: (next: Viewport | null) => void;
@@ -68,6 +72,7 @@ const initialState: TreeState = {
   teamFrames: [],
   nodePositions: EMPTY_POSITIONS,
   layoutMode: null,
+  layoutDirection: null,
   sharpNodeIds: EMPTY_IDS,
   sceneRef: createRef<Container>(),
   scale: 1,
@@ -99,6 +104,7 @@ export const useTreeStore = create<TreeState & TreeActions>((set) => ({
         : { teamFrames },
     ),
   setLayoutMode: (layoutMode) => set({ layoutMode }),
+  setLayoutDirection: (layoutDirection) => set({ layoutDirection }),
   setSharpNodeIds: (next) =>
     set((state) => {
       const prev = state.sharpNodeIds;

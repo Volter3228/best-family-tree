@@ -1,4 +1,9 @@
-import { NODE_WIDTH, NODE_HEIGHT, NODE_CARD_HEIGHT } from "@/constants/canvas";
+import {
+  NODE_WIDTH,
+  NODE_HEIGHT,
+  NODE_CARD_HEIGHT,
+  NODE_CARD_TOP,
+} from "@/constants/canvas";
 import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
 import { Position } from "@/types";
 import type {
@@ -80,12 +85,14 @@ export const applyElkPositions = (
 
 /**
  * Arrange nodes in a flat grid layout (no tree structure, no edges).
+ * `maxCols` narrows the grid on mobile layouts.
  */
 export const computeGridLayout = (
   nodes: MemberNode[],
   gapX: number = 70,
+  maxCols: number = Number.POSITIVE_INFINITY,
 ): MemberNode[] => {
-  const cols = Math.ceil(Math.sqrt(nodes.length));
+  const cols = Math.min(Math.ceil(Math.sqrt(nodes.length)), maxCols);
   return nodes.map((n, i) => ({
     ...n,
     position: {
@@ -124,32 +131,38 @@ export const reorderEdgesForLineageCentering = (
   ];
 };
 
+// The node's visual extent along the spread axis in LR layouts (avatar + card).
+const NODE_SPREAD_LR = NODE_CARD_TOP + NODE_CARD_HEIGHT;
+
 /**
  * Post-process layouted nodes to align the lineage ancestor chain above
  * the focus member, distribute siblings symmetrically, and center the graph.
+ * Works on the spread axis: x for top-down trees, y for left-to-right ones.
  */
 export const alignLineageLayout = (
   layoutedNodes: MemberNode[],
   lineageMemberId: string,
   membersMap: MembersMap,
   childrenOf: ChildrenMap,
+  direction: Direction = FLOW_VIEWPORT_DIRECTION.DESKTOP,
 ): MemberNode[] => {
   const focus = layoutedNodes.find((n) => n.id === lineageMemberId);
   if (!focus) return layoutedNodes;
 
-  const targetX = focus.position.x;
+  const axis = direction === "LR" ? "y" : "x";
+  const target = focus.position[axis];
   const posMap = new Map<string, Point>();
   for (const n of layoutedNodes) {
     posMap.set(n.id, { ...n.position });
   }
 
-  // 1. Align ancestor chain directly above the lineage member
+  // 1. Align the ancestor chain with the lineage member
   const seen = new Set<string>();
   let cur = membersMap.get(lineageMemberId);
   while (cur?.mentorId && !seen.has(cur.mentorId)) {
     seen.add(cur.mentorId);
     const pos = posMap.get(cur.mentorId);
-    if (pos) pos.x = targetX;
+    if (pos) pos[axis] = target;
     cur = membersMap.get(cur.mentorId);
   }
 
@@ -166,16 +179,18 @@ export const alignLineageLayout = (
         );
 
         if (mSiblingIds.length > 0) {
-          const spacing = NODE_WIDTH + 60;
+          const nodeExtent =
+            direction === "LR" ? NODE_SPREAD_LR : NODE_WIDTH;
+          const spacing = nodeExtent + 60;
           const leftCount = Math.ceil(mSiblingIds.length / 2);
 
           for (let i = 0; i < leftCount; i++) {
             const pos = posMap.get(mSiblingIds[i]);
-            if (pos) pos.x = targetX - (i + 1) * spacing;
+            if (pos) pos[axis] = target - (i + 1) * spacing;
           }
           for (let i = leftCount; i < mSiblingIds.length; i++) {
             const pos = posMap.get(mSiblingIds[i]);
-            if (pos) pos.x = targetX + (i - leftCount + 1) * spacing;
+            if (pos) pos[axis] = target + (i - leftCount + 1) * spacing;
           }
         }
       }
@@ -184,7 +199,7 @@ export const alignLineageLayout = (
 
   // 3. Center entire graph around the lineage member
   for (const [, pos] of posMap) {
-    pos.x -= targetX;
+    pos[axis] -= target;
   }
 
   return layoutedNodes.map((n) => {

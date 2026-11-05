@@ -3,23 +3,23 @@ import { useMembersStore } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import { useTreeStore } from "@/store/treeStore";
 import { useSceneTransition } from "./useSceneTransition";
+import { useResolvedDirection } from "./useTreeDirection";
 import { getFitViewTargetScale, useViewportAnimation } from "./animations";
-import type { MemberNode, TeamFrame, TreeEdge } from "@/types";
+import type { MemberNode, TeamFrame } from "@/types";
 import {
   applyTeamLayout,
   toTeamLayoutInputs,
-  transformMembersToFlowValues,
-  transformMembersToTeamTreeValues,
   refreshNodeMembers,
 } from "@/utils";
 import { requestLayout } from "@/libs/layoutClient";
 import {
-  reconnectEdgesToVisibleAncestors,
   computeGridLayout,
   reorderEdgesForLineageCentering,
   alignLineageLayout,
   applyElkPositions,
 } from "@/utils/membersTree/layout";
+import { buildLayoutGraph } from "@/utils/membersTree/layoutGraph";
+import { GRID_GAP_X, GRID_LR_COLUMNS } from "@/constants/canvas";
 
 /**
  * Orchestrates tree layout computation: transforms members into nodes/edges,
@@ -32,6 +32,7 @@ export const useTreeLayout = () => {
   const setEdges = useTreeStore((s) => s.setEdges);
   const setTeamFrames = useTreeStore((s) => s.setTeamFrames);
   const setLayoutMode = useTreeStore((s) => s.setLayoutMode);
+  const setLayoutDirection = useTreeStore((s) => s.setLayoutDirection);
   const setIsFitViewAnimating = useTreeStore((s) => s.setIsFitViewAnimating);
   const setFitViewTargetScale = useTreeStore((s) => s.setFitViewTargetScale);
   const structureVersion = useMembersStore((s) => s.structureVersion);
@@ -43,12 +44,14 @@ export const useTreeLayout = () => {
 
   const lineageMemberId = appliedFilters.lineageMemberId;
   const treeMode = appliedFilters.treeMode;
+  const direction = useResolvedDirection();
 
   const hasInitialFitView = useRef(false);
   const prevFilterVersionRef = useRef(filterVersion);
   const pendingFitViewRef = useRef(false);
   const layoutRequestRef = useRef(0);
   const prevTreeModeRef = useRef(treeMode);
+  const prevDirectionRef = useRef(direction);
   const transitionScene = useSceneTransition();
 
   const prepareFitView = (
@@ -80,37 +83,16 @@ export const useTreeLayout = () => {
       useMembersStore.getState();
     if (members.length === 0) return;
 
-    // Build the unfiltered graph for the selected layout mode.
-    const { nodes: allNodes, edges: allEdges }: {
-      nodes: MemberNode[];
-      edges: TreeEdge[];
-    } =
-      treeMode === "team"
-        ? {
-          nodes: transformMembersToTeamTreeValues(
-            members,
-            appliedFilters,
-          ),
-          edges: [],
-        }
-        : transformMembersToFlowValues({ byId: membersMap, childrenOf, rootIds });
-
-    let finalNodes = allNodes;
-    let finalEdges = allEdges;
-
-    // Keep only nodes matching the current filters.
-    if (filteredMemberIds) {
-      finalNodes = allNodes.filter((node) =>
-        treeMode === "team"
-          ? filteredMemberIds.has(node.data.member.id)
-          : filteredMemberIds.has(node.id),
-      );
-      // Family edges reconnect children to their nearest visible ancestor
-      // (team view has no edge list: its edges come from the frame layout).
-      if (treeMode !== "team") {
-        finalEdges = reconnectEdgesToVisibleAncestors(finalNodes, membersMap);
-      }
-    }
+    // Build the unfiltered graph for the selected layout mode, then keep
+    // only the nodes matching the current filters.
+    const { nodes: finalNodes, edges } = buildLayoutGraph({
+      treeMode,
+      members,
+      index: { byId: membersMap, childrenOf, rootIds },
+      appliedFilters,
+      filteredMemberIds,
+    });
+    let finalEdges = edges;
 
     // Edits that land while a layout is pending must not be overwritten.
     const withLatestMembers = (layoutedNodes: MemberNode[]) =>
@@ -119,14 +101,21 @@ export const useTreeLayout = () => {
     // Newer runs invalidate older (async or fading) ones.
     const requestId = ++layoutRequestRef.current;
 
-    // Switching tree mode cross-fades the scene instead of popping.
+    // Switching tree mode or direction cross-fades the scene instead of
+    // popping. The committed layoutDirection lags the setting so edges keep
+    // their old shape until the fade-out finishes (same trick as layoutMode).
+    const directionChanged =
+      hasInitialFitView.current && prevDirectionRef.current !== direction;
     const modeChanged =
-      hasInitialFitView.current && prevTreeModeRef.current !== treeMode;
+      hasInitialFitView.current &&
+      (prevTreeModeRef.current !== treeMode || directionChanged);
     prevTreeModeRef.current = treeMode;
+    prevDirectionRef.current = direction;
     const commit = (apply: () => void) => {
       const guarded = () => {
         if (requestId !== layoutRequestRef.current) return;
         setLayoutMode(treeMode);
+        setLayoutDirection(direction);
         apply();
       };
       if (modeChanged) transitionScene(guarded);
@@ -140,21 +129,27 @@ export const useTreeLayout = () => {
       setEdges([]);
       setTeamFrames([]);
       setLayoutMode(treeMode);
+      setLayoutDirection(direction);
       return;
     }
 
-    // Track filter changes for deferred fit-view
+    // Track filter and direction changes for deferred fit-view
     const filterChanged =
       hasInitialFitView.current &&
       prevFilterVersionRef.current !== filterVersion;
     prevFilterVersionRef.current = filterVersion;
-    if (filterChanged) {
+    if (filterChanged || directionChanged) {
       pendingFitViewRef.current = true;
     }
 
-    // Flat grid layout — no tree, no edges
+    // Flat grid layout — no tree, no edges. The mobile (LR) layout packs
+    // fewer columns so the grid stays narrow on portrait screens.
     if (treeMode === "grid") {
-      const layoutedNodes = computeGridLayout(finalNodes);
+      const layoutedNodes = computeGridLayout(
+        finalNodes,
+        GRID_GAP_X,
+        direction === "LR" ? GRID_LR_COLUMNS : Number.POSITIVE_INFINITY,
+      );
       commit(() => {
         prepareFitView(layoutedNodes);
         setNodes(withLatestMembers(layoutedNodes));
@@ -166,7 +161,10 @@ export const useTreeLayout = () => {
 
     // Team view: custom framed layout (packing runs in the worker), no ELK
     if (treeMode === "team") {
-      requestLayout("team", toTeamLayoutInputs(finalNodes))
+      requestLayout("team", {
+        nodes: toTeamLayoutInputs(finalNodes),
+        direction,
+      })
         .then(({ positions, frames }) => {
           if (requestId !== layoutRequestRef.current) return;
           const layoutedNodes = applyTeamLayout(finalNodes, positions);
@@ -193,17 +191,19 @@ export const useTreeLayout = () => {
     requestLayout("elk", {
       nodeIds: finalNodes.map((node) => node.id),
       edges: finalEdges.map(({ id, source, target }) => ({ id, source, target })),
+      direction,
     })
       .then((positions) => {
         if (requestId !== layoutRequestRef.current) return;
 
-        const positioned = applyElkPositions(finalNodes, positions);
+        const positioned = applyElkPositions(finalNodes, positions, direction);
         const layoutedNodes = lineageMemberId
           ? alignLineageLayout(
             positioned,
             lineageMemberId,
             membersMap,
             childrenOf,
+            direction,
           )
           : positioned;
 
@@ -221,9 +221,11 @@ export const useTreeLayout = () => {
     filterVersion,
     lineageMemberId,
     treeMode,
+    direction,
     appliedFilters,
     setTeamFrames,
     setLayoutMode,
+    setLayoutDirection,
     transitionScene,
     setFitViewTargetScale,
     setIsFitViewAnimating,

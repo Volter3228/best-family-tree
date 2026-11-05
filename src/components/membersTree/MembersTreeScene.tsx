@@ -8,6 +8,8 @@ import {
 } from "@/constants/canvas";
 import { Member } from "@/models";
 import type {
+  Direction,
+  EdgeStyle,
   MemberNode,
   NodePositions,
   TeamFrame,
@@ -27,6 +29,8 @@ import {
 interface Props {
   sceneRef: RefObject<Container | null>;
   treeMode: TreeMode;
+  direction: Direction;
+  edgeStyle: EdgeStyle;
   scale: number;
   nodes: MemberNode[];
   edges: TreeEdge[];
@@ -46,6 +50,8 @@ interface Props {
 const MembersTreeScene = ({
   sceneRef,
   treeMode,
+  direction,
+  edgeStyle,
   scale,
   nodes,
   edges,
@@ -73,7 +79,12 @@ const MembersTreeScene = ({
       )}
       {isTeamView ? (
         <ZoomFadeContainer enabled minAlpha={TEAM_OVERVIEW_EDGE_ALPHA}>
-          <TeamEdgesLayer frames={teamFrames} pixelLine={isZoomedOut} />
+          <TeamEdgesLayer
+            frames={teamFrames}
+            pixelLine={isZoomedOut}
+            direction={direction}
+            edgeStyle={edgeStyle}
+          />
         </ZoomFadeContainer>
       ) : (
         showTree && (
@@ -81,6 +92,8 @@ const MembersTreeScene = ({
             edges={edges}
             nodePositions={nodePositions}
             pixelLine={isZoomedOut}
+            direction={direction}
+            edgeStyle={edgeStyle}
           />
         )
       )}
@@ -89,6 +102,8 @@ const MembersTreeScene = ({
           selectedId={selectedId}
           nodePositions={nodePositions}
           pixelLine={isZoomedOut}
+          direction={direction}
+          edgeStyle={edgeStyle}
         />
       )}
       <ZoomFadeContainer

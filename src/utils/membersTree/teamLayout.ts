@@ -1,138 +1,13 @@
-import {
-  NODE_WIDTH,
-  TEAM_FRAME_HEADER,
-  TEAM_FRAME_MIN_WIDTH,
-  TEAM_FRAME_PADDING,
-  TEAM_LEADER_GAP,
-  TEAM_MULTI_LEADER_EXTRA_GAP,
-  TEAM_NODE_VISUAL_HEIGHT,
-  TEAM_ROW_GAP,
-} from "@/constants/canvas";
-import type { MemberNode, MemberPosition, Point, TeamFrame } from "@/types";
+import type { MemberNode, Point, TeamFrame } from "@/types";
 import type {
   TeamLayoutInput,
+  TeamLayoutRequest,
   TeamLayoutResult,
 } from "@/workers/layout/protocol";
 import { parseTeamNodeId } from "./teamNodeId";
-import { buildTeamEdges } from "./teamEdges";
+import { buildTeamBlock } from "./teamBlock";
+import type { TeamBlock } from "./teamBlock";
 import { packLanes } from "./teamPacking";
-import { centeredCenters, planMemberRows } from "./teamRows";
-
-interface TeamBlock {
-  frame: TeamFrame;
-  offsets: Map<string, Point>;
-  // Lower-cased team type ("" when the team has none) and the team's years
-  // (-Infinity when unknown, so such teams count as the oldest and come
-  // first), which decide where the frame goes.
-  teamTypeName: string;
-  startYear: number;
-  endYear: number;
-}
-
-const getTeamPosition = (nodes: TeamLayoutInput[], teamId: string) => {
-  let fallback: MemberPosition | undefined;
-  for (const node of nodes) {
-    for (const position of node.positions) {
-      if (position.teamId !== teamId || !position.team) continue;
-      if (position.role?.isLeaderPosition) return position;
-      fallback ??= position;
-    }
-  }
-  return fallback;
-};
-
-const isLeaderOf = (node: TeamLayoutInput, teamId: string) =>
-  node.positions.some(
-    (position) => position.teamId === teamId && position.role?.isLeaderPosition,
-  );
-
-// Pixi can't decode .ico; Cloudinary serves the same asset as PNG.
-const getIconUrl = (url?: string | null) =>
-  url && url.includes("res.cloudinary.com")
-    ? url.replace(/\.ico(\?.*)?$/i, ".png$1")
-    : (url ?? null);
-
-const buildTeamBlock = (
-  teamId: string,
-  nodes: TeamLayoutInput[],
-): TeamBlock => {
-  const leaders = nodes.filter((node) => isLeaderOf(node, teamId));
-  const members = nodes.filter((node) => !isLeaderOf(node, teamId));
-
-  const leaderCenters = centeredCenters(leaders.length);
-  const memberCenters = planMemberRows(members.length);
-  const half = Math.max(
-    NODE_WIDTH / 2,
-    ...[leaderCenters, ...memberCenters].flat().map((c) => Math.abs(c) + NODE_WIDTH / 2),
-  );
-  const width = Math.max(half * 2 + TEAM_FRAME_PADDING * 2, TEAM_FRAME_MIN_WIDTH);
-  const axisX = width / 2;
-
-  const offsets = new Map<string, Point>();
-  const place = (row: TeamLayoutInput[], centers: number[], y: number) =>
-    row.forEach((node, i) =>
-      offsets.set(node.id, { x: axisX + centers[i] - NODE_WIDTH / 2, y }),
-    );
-
-  let y = TEAM_FRAME_HEADER;
-  let bottom = TEAM_FRAME_HEADER;
-  if (leaders.length > 0) {
-    place(leaders, leaderCenters, y);
-    bottom = y + TEAM_NODE_VISUAL_HEIGHT;
-    // Several leaders meet at a hub point first, which needs a taller gap.
-    y =
-      bottom +
-      TEAM_LEADER_GAP +
-      (leaders.length > 1 ? TEAM_MULTI_LEADER_EXTRA_GAP : 0);
-  }
-
-  const firstRowTop = y;
-  const memberRows: TeamLayoutInput[][] = [];
-  let memberIndex = 0;
-  for (const centers of memberCenters) {
-    const row = members.slice(memberIndex, memberIndex + centers.length);
-    place(row, centers, y);
-    memberRows.push(row);
-    memberIndex += centers.length;
-    bottom = y + TEAM_NODE_VISUAL_HEIGHT;
-    y = bottom + TEAM_ROW_GAP;
-  }
-
-  const { edges } = buildTeamEdges({
-    axisX,
-    firstRowTop,
-    leaders: leaders.map((node) => offsets.get(node.id)!),
-    members: memberRows.flatMap((row, rowIndex) =>
-      row.map((node) => ({ point: offsets.get(node.id)!, row: rowIndex })),
-    ),
-  });
-
-  const position = getTeamPosition(nodes, teamId);
-  const teamType = position?.team?.teamType;
-  const team = position?.team;
-
-  return {
-    offsets,
-    teamTypeName: teamType?.name.toLowerCase() ?? "",
-    startYear: team?.startYear ?? team?.endYear ?? -Infinity,
-    endYear: team?.endYear ?? team?.startYear ?? -Infinity,
-    frame: {
-      teamId,
-      x: 0,
-      y: 0,
-      width,
-      height: bottom + TEAM_FRAME_PADDING,
-      name: team?.name ?? "",
-      teamTypeName: teamType?.name ?? "",
-      color: teamType?.color ?? null,
-      // The badge always shows the team type's logo, never the team's own photo.
-      iconUrl: getIconUrl(teamType?.iconUrl),
-      teamTypeId: position?.team?.teamTypeId ?? null,
-      nodeIds: nodes.map((node) => node.id),
-      edges,
-    },
-  };
-};
 
 const shift = (point: Point, dx: number, dy: number): Point => ({
   x: point.x + dx,
@@ -146,6 +21,7 @@ const moveEdgesToWorld = (frame: TeamFrame) => {
     start: shift(edge.start, frame.x, frame.y),
     end: shift(edge.end, frame.x, frame.y),
     bendY: edge.bendY === undefined ? undefined : edge.bendY + frame.y,
+    points: edge.points?.map((point) => shift(point, frame.x, frame.y)),
   }));
 };
 
@@ -176,9 +52,10 @@ const groupIntoLanes = (blocks: TeamBlock[]): TeamBlock[][] => {
  * below) wrapped in a frame; frames are then laid out in lanes by team type.
  * Returns the position of every node and the frames.
  */
-export const computeTeamLayout = (
-  nodes: TeamLayoutInput[],
-): TeamLayoutResult => {
+export const computeTeamLayout = ({
+  nodes,
+  direction,
+}: TeamLayoutRequest): TeamLayoutResult => {
   const nodesByTeam = new Map<string, TeamLayoutInput[]>();
   for (const node of nodes) {
     const { teamId } = parseTeamNodeId(node.id);
@@ -190,7 +67,7 @@ export const computeTeamLayout = (
 
   const lanes = groupIntoLanes(
     Array.from(nodesByTeam, ([teamId, teamNodes]) =>
-      buildTeamBlock(teamId, teamNodes),
+      buildTeamBlock(teamId, teamNodes, direction),
     ),
   );
   const blocks = lanes.flat();

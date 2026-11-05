@@ -74,14 +74,5 @@ export const computeFilteredMembers = (
   const filteredCount = isTeamView
     ? countVisibleTeams(members, filters, ids)
     : (ids?.size ?? members.length);
-
-  if (
-    previous &&
-    previous.filteredMemberIds === ids &&
-    previous.filteredCount === filteredCount &&
-    previous.isFilterActive === active
-  ) {
-    return previous;
-  }
   return { filteredMemberIds: ids, filteredCount, isFilterActive: active };
 };

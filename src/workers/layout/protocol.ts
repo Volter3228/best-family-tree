@@ -1,8 +1,9 @@
-import type { MemberPosition, Point, TeamFrame } from "@/types";
+import type { Direction, MemberPosition, Point, TeamFrame } from "@/types";
 
 export interface ElkLayoutInput {
   nodeIds: string[];
   edges: { id: string; source: string; target: string }[];
+  direction: Direction;
 }
 
 // What the team layout needs from a team-view node: its id and the member's
@@ -17,9 +18,14 @@ export interface TeamLayoutResult {
   frames: TeamFrame[];
 }
 
+export interface TeamLayoutRequest {
+  nodes: TeamLayoutInput[];
+  direction: Direction;
+}
+
 export interface LayoutRequests {
   elk: ElkLayoutInput;
-  team: TeamLayoutInput[];
+  team: TeamLayoutRequest;
 }
 
 export interface LayoutResults {

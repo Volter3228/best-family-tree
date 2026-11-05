@@ -95,3 +95,8 @@
     margin: 0;
   }
 }
+/* Theme switch cross-fade (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}

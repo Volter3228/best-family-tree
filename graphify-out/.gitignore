@@ -8,3 +8,5 @@ manifest.json
 .graphify_labels.json.sig
 .graphify_root
 .cloud-cta-shown
+.graphify_labels.pending.json
+/*

@@ -1,6 +1,14 @@
 import { buildAncestorChain, buildSegmentFromPositions } from "@/utils";
 import { MIN_ANIM_DURATION } from "@/constants/canvas/lineageEdgePath";
-import type { MembersMap, NodePositions, SegmentData, PathData } from "@/types";
+import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
+import type {
+  Direction,
+  EdgeStyle,
+  MembersMap,
+  NodePositions,
+  SegmentData,
+  PathData,
+} from "@/types";
 
 /**
  * Build path data (segments + cumulative offsets) for a member's ancestor chain.
@@ -9,6 +17,8 @@ export const buildPath = (
   memberId: string,
   membersMap: MembersMap,
   nodePositions: NodePositions,
+  direction: Direction = FLOW_VIEWPORT_DIRECTION.DESKTOP,
+  style: EdgeStyle = "bezier",
 ): PathData => {
   const fullChain = buildAncestorChain(memberId, membersMap);
   // Keep only nodes visible in the current view (filtered trees may hide ancestors)
@@ -18,7 +28,7 @@ export const buildPath = (
     const s = nodePositions.get(chain[i]);
     const t = nodePositions.get(chain[i + 1]);
     if (!s || !t) continue;
-    segments.push(buildSegmentFromPositions(s, t));
+    segments.push(buildSegmentFromPositions(s, t, direction, style));
   }
   const offsets: number[] = [0];
   for (let i = 0; i < segments.length; i++) {

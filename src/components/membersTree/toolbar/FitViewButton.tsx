@@ -38,6 +38,14 @@ const FitViewButton = ({ onClick, color }: Props) => {
         duration: 0.5,
         ease: "power2.out",
         onComplete: () => {
+          // GSAP's inline colors are resolved per theme. Once settled, drop
+          // them and restore the themed `var(--…)` background: React won't
+          // re-apply its style prop, since the value it last set is unchanged.
+          const release = () => {
+            gsap.set(iconWrap, { clearProps: "color,rotation" });
+            gsap.set(btn, { clearProps: "backgroundColor" });
+            btn.style.backgroundColor = surface;
+          };
           gsap.to(btn, {
             backgroundColor: surfaceVal,
             duration: 0.8,
@@ -48,12 +56,13 @@ const FitViewButton = ({ onClick, color }: Props) => {
             rotation: 0,
             duration: 0.9,
             ease: "power3.inOut",
+            onComplete: release,
           });
         },
       });
     }
     onClick();
-  }, [onClick, color]);
+  }, [onClick, color, surface]);
 
   return (
     <div

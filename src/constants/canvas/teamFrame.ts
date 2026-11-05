@@ -48,10 +48,11 @@ export const TEAM_HOVER_MAX_SCALE = 5;
 
 // Edges leaving one start spread under it, left to right (inside the avatar).
 export const TEAM_EDGE_SPREAD_STEP = 26;
-export const TEAM_EDGE_SPREAD_WIDTH = 120;
+export const TEAM_EDGE_SPREAD_WIDTH = 172;
 
-// Team edges: start under the leader's card, optionally via a shared hub bar.
-export const TEAM_EDGE_START_Y = NODE_CARD_TOP + 10;
+// Team edges: drop length to the trunk / hub bar.
 export const TEAM_EDGE_DROP = 40;
+// Horizontal stub between the spine and a member's avatar in LR team blocks.
+export const TEAM_EDGE_STUB = 40;
 export const TEAM_MULTI_LEADER_EXTRA_GAP = 120;
 export const TEAM_HUB_OFFSET = 60;
