@@ -8,4 +8,5 @@ export * from "./useCardHover";
 export * from "./useTapWithoutDrag";
 export * from "./useTeamSelection";
 export * from "./useSceneTransition";
+export * from "./useTreeDirection";
 export * from "./useViewportCulling";

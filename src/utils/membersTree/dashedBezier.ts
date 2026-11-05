@@ -1,91 +1,48 @@
 import { Graphics } from "pixi.js";
-import { NODE_WIDTH, NODE_HEIGHT } from "@/constants/canvas";
-import type { Point, SegmentData } from "@/types";
-
-const BEZIER_SAMPLES = 45;
-
-// Evaluate a cubic bezier at parameter t.
-const bezierEval = (
-  p0: number,
-  p1: number,
-  p2: number,
-  p3: number,
-  t: number,
-): number => {
-  const it = 1 - t;
-  return (
-    it * it * it * p0 +
-    3 * it * it * t * p1 +
-    3 * it * t * t * p2 +
-    t * t * t * p3
-  );
-};
-
-// Interpolate a point along a polyline at a given arc distance (binary search).
-const pointAtDist = (
-  points: Point[],
-  arcLengths: number[],
-  d: number,
-): Point => {
-  const totalLen = arcLengths[arcLengths.length - 1];
-  if (d <= 0) return points[0];
-  if (d >= totalLen) return points[points.length - 1];
-
-  let lo = 0;
-  let hi = arcLengths.length - 1;
-  while (lo < hi - 1) {
-    const mid = (lo + hi) >> 1;
-    if (arcLengths[mid] <= d) lo = mid;
-    else hi = mid;
-  }
-  const t =
-    arcLengths[hi] - arcLengths[lo] > 0
-      ? (d - arcLengths[lo]) / (arcLengths[hi] - arcLengths[lo])
-      : 0;
-  return {
-    x: points[lo].x + (points[hi].x - points[lo].x) * t,
-    y: points[lo].y + (points[hi].y - points[lo].y) * t,
-  };
-};
+import { sampleEdgePath } from "./edgeGeometry";
+import {
+  alignPolylines,
+  cumulativeLengths,
+  lerpPoints,
+  pointAtLength,
+} from "./edgePolyline";
+import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
+import type { Direction, EdgeStyle, Point, SegmentData } from "@/types";
 
 /**
- * Sample a bezier curve between two node positions into a polyline with arc lengths.
+ * Sample the edge path between two node positions into a polyline with arc
+ * lengths. Follows the same direction and line style as static edges —
+ * orthogonal corners come out rounded, like the drawn edges.
  */
 export const buildSegmentFromPositions = (
   source: Point,
   target: Point,
+  direction: Direction = FLOW_VIEWPORT_DIRECTION.DESKTOP,
+  style: EdgeStyle = "bezier",
 ): SegmentData => {
-  const sx = source.x + NODE_WIDTH / 2;
-  const sy = source.y + NODE_HEIGHT;
-  const ex = target.x + NODE_WIDTH / 2;
-  const ey = target.y;
+  const points = sampleEdgePath(source, target, direction, style);
+  return segmentFromPoints(points);
+};
 
-  const distY = Math.abs(ey - sy);
-  const controlOffset = distY * 0.5;
-
-  const cp1x = sx;
-  const cp1y = sy + controlOffset;
-  const cp2x = ex;
-  const cp2y = ey - controlOffset;
-
-  const points: Point[] = [];
-  for (let i = 0; i <= BEZIER_SAMPLES; i++) {
-    const t = i / BEZIER_SAMPLES;
-    points.push({
-      x: bezierEval(sx, cp1x, cp2x, ex, t),
-      y: bezierEval(sy, cp1y, cp2y, ey, t),
-    });
-  }
-
-  const arcLengths: number[] = [0];
-  for (let i = 1; i < points.length; i++) {
-    const dx = points[i].x - points[i - 1].x;
-    const dy = points[i].y - points[i - 1].y;
-    arcLengths.push(arcLengths[i - 1] + Math.sqrt(dx * dx + dy * dy));
-  }
-
+const segmentFromPoints = (points: Point[]): SegmentData => {
+  const arcLengths = cumulativeLengths(points);
   return { points, arcLengths, totalLen: arcLengths[arcLengths.length - 1] };
 };
+
+export interface SegmentMorph {
+  from: Point[];
+  to: Point[];
+}
+
+/** Aligns two routes of the same edge once, so each frame is a cheap lerp. */
+export const alignSegments = (a: SegmentData, b: SegmentData): SegmentMorph => {
+  const [from, to] = alignPolylines(a.points, b.points);
+  return { from, to };
+};
+
+/** The route between an aligned pair at `t` in [0, 1]. */
+export const lerpSegment = (morph: SegmentMorph, t: number): SegmentData =>
+  segmentFromPoints(lerpPoints(morph.from, morph.to, t));
 
 interface DashStrokeOptions {
   width: number;
@@ -128,7 +85,7 @@ export const drawDashes = (
         ((groupIdx % colors.length) + colors.length) % colors.length;
 
       g.beginPath();
-      const startPt = pointAtDist(points, arcLengths, ds);
+      const startPt = pointAtLength(points, arcLengths, ds);
       g.moveTo(startPt.x, startPt.y);
 
       let i = 0;
@@ -137,7 +94,7 @@ export const drawDashes = (
         g.lineTo(points[i].x, points[i].y);
       }
 
-      const endPt = pointAtDist(points, arcLengths, de);
+      const endPt = pointAtLength(points, arcLengths, de);
       g.lineTo(endPt.x, endPt.y);
 
       g.setStrokeStyle({ ...strokeOptions, color: colors[colorIdx] });

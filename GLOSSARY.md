@@ -77,3 +77,12 @@ _Avoid_: Team box, cluster
 **Lineage**:
 The chain of mentors above a selected member, highlighted with a dashed path in Family mode.
 _Avoid_: Ancestry, parentage
+
+**Orientation**:
+The direction a family tree grows in. Top-down (TB) is the desktop default;
+left-to-right (LR) is used on narrow screens so the tree grows vertically.
+Controlled by the Orientation setting: Auto, Down or Right.
+
+**Edge style**:
+How family-mode edges are drawn: Smooth (bezier), Straight or Cornered
+(orthogonal). Team-frame fan edges and the lineage dash are always bezier.

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useApplication } from "@pixi/react";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
-import { findCommonLen, animDuration, drawDashes } from "@/utils";
+import { findCommonLen, animDuration, drawDashes, alignSegments, lerpSegment } from "@/utils";
 import {
   DASH_LEN,
   GAP_LEN,
@@ -11,10 +11,13 @@ import {
   RETRACT_BASE,
   DRAW_IN_BASE,
 } from "@/constants/canvas/lineageEdgePath";
+import type { SegmentMorph } from "@/utils/membersTree/dashedBezier";
 import type { PathData } from "@/types";
 
 // Smallest dash movement (world units) that is worth a redraw.
 const MIN_REDRAW_OFFSET = 1.2;
+// How long the dash path takes to morph after its geometry changes.
+const MORPH_SECONDS = 0.35;
 
 interface Options {
   targetId: string | null;
@@ -44,10 +47,19 @@ export const useDashedPathAnimation = ({
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const prevIdRef = useRef<string | null>(null);
   const pathRef = useRef<PathData>(EMPTY_PATH);
+  // Geometry morph between two routes of the same chain (e.g. line style
+  // switches); each entry pairs an old segment with its new shape.
+  const morphRef = useRef<{
+    t: number;
+    pairs: SegmentMorph[];
+  } | null>(null);
+  const morphTweenRef = useRef<gsap.core.Tween | null>(null);
 
   // Handle transitions between targets
   useEffect(() => {
     timelineRef.current?.kill();
+    morphTweenRef.current?.kill();
+    morphRef.current = null;
 
     const prevId = prevIdRef.current;
     const newId = targetId;
@@ -118,7 +130,9 @@ export const useDashedPathAnimation = ({
     };
   }, [targetId, buildPath]);
 
-  // Rebuild path data if geometry changes while idle (no active transition)
+  // Rebuild path data if geometry changes while idle (no active transition).
+  // When the chain keeps its segment count (e.g. a line-style switch), the
+  // dash morphs to the new route instead of popping.
   useEffect(() => {
     const id = prevIdRef.current;
     if (!id) return;
@@ -130,8 +144,33 @@ export const useDashedPathAnimation = ({
       Math.abs(animRef.current.visibleLen - path.totalLen) < 1
     ) {
       const newPath = buildPath(id);
-      pathRef.current = newPath;
-      animRef.current.visibleLen = newPath.totalLen;
+      morphTweenRef.current?.kill();
+      morphRef.current = null;
+      if (
+        newPath.segments.length === path.segments.length &&
+        newPath.segments.length > 0
+      ) {
+        const morph = {
+          t: 0,
+          pairs: path.segments.map((from, i) =>
+            alignSegments(from, newPath.segments[i]),
+          ),
+        };
+        morphRef.current = morph;
+        morphTweenRef.current = gsap.to(morph, {
+          t: 1,
+          duration: MORPH_SECONDS,
+          ease: "power2.inOut",
+          onComplete: () => {
+            morphRef.current = null;
+            pathRef.current = newPath;
+            animRef.current.visibleLen = newPath.totalLen;
+          },
+        });
+      } else {
+        pathRef.current = newPath;
+        animRef.current.visibleLen = newPath.totalLen;
+      }
     }
   }, [buildPath]);
 
@@ -146,8 +185,19 @@ export const useDashedPathAnimation = ({
       const g = graphicsRef.current;
       if (!alive || !g || g.destroyed) return;
 
-      const { visibleLen } = animRef.current;
-      const { segments, offsets } = pathRef.current;
+      const morph = morphRef.current;
+      let { visibleLen } = animRef.current;
+      let { segments, offsets } = pathRef.current;
+      if (morph) {
+        // The path is fully drawn while morphing; rebuild the interpolated
+        // segments and their cumulative offsets for this frame.
+        segments = morph.pairs.map((pair) => lerpSegment(pair, morph.t));
+        offsets = [0];
+        for (const seg of segments) {
+          offsets.push(offsets[offsets.length - 1] + seg.totalLen);
+        }
+        visibleLen = offsets[offsets.length - 1];
+      }
 
       if (visibleLen <= 0 || segments.length === 0) {
         g.clear();
@@ -159,7 +209,8 @@ export const useDashedPathAnimation = ({
       // Rebuilding every dash is CPU-heavy, so the marching dashes redraw at
       // most about 30 times a second unless a transition is running.
       const offsetDelta = Math.abs(offsetRef.current - lastOffsetRef.current);
-      const transitionActive = timelineRef.current?.isActive() ?? false;
+      const transitionActive =
+        (timelineRef.current?.isActive() ?? false) || morphRef.current !== null;
       if (offsetDelta < MIN_REDRAW_OFFSET && !transitionActive) return;
       lastOffsetRef.current = offsetRef.current;
 
