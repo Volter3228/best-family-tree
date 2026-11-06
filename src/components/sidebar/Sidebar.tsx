@@ -82,7 +82,7 @@ const Sidebar = ({
     >
       <div
         ref={cardRef}
-        className="flex max-h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-surface/80 shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)] backdrop-blur-xl pointer-events-auto"
+        className={`flex max-h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-surface/80 backdrop-blur-xl pointer-events-auto ${isOpen ? "shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]" : "shadow-none"}`}
       >
         <div className="flex shrink-0 justify-between items-center rounded-t-2xl px-4 pt-4 pb-2">
           <h2
