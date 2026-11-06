@@ -151,6 +151,7 @@ const EdgesLayer = ({
       ease: "power2.inOut",
       onComplete: () => {
         morphRef.current = null;
+        ticker.remove(redraw);
         redraw();
       },
     });
