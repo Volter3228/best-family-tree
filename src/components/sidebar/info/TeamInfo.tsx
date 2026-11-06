@@ -5,7 +5,11 @@ import {
 } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
-import { formatYearRange, getMemberAvatar, type TeamRosterEntry } from "@/utils";
+import {
+  formatYearRange,
+  getMemberAvatar,
+  type TeamRosterEntry,
+} from "@/utils";
 import type { AccentColor, Team } from "@/types";
 import MemberInfoRow from "./MemberInfoRow";
 import TeamLogo from "./TeamLogo";

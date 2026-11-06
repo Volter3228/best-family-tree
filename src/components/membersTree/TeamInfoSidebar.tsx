@@ -14,8 +14,8 @@ interface Props {
   // the canvas), regardless of the layout type.
   canSelectMember: (memberId: string) => boolean;
   onSelectMember: (memberId: string) => void;
-  // Fits the team in view (clicking its name).
-  onTitleClick: () => void;
+  // Fits the team in view (clicking its name). Only set in team view.
+  onTitleClick?: () => void;
 }
 
 // Info / edit sidebar of the team picked through its badge or square.

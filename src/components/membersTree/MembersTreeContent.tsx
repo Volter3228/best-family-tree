@@ -249,7 +249,7 @@ const MembersTreeContent = ({ members }: Props) => {
         onFocusMemberInTeam={focusMemberInTeam}
         canSelectMember={canSelectMember}
         onSelectMember={handleSelectMember}
-        onTitleClick={handleTeamTitleClick}
+        onTitleClick={isTeamView ? handleTeamTitleClick : undefined}
       />
     </div>
   );
