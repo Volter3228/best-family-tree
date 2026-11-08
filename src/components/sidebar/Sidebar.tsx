@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { twMerge } from "tailwind-merge";
 import type { SidebarMode, AccentColor } from "@/types";
 import { useSidebarHeightAnimation, useSidebarChromeHeights } from "@/hooks";
@@ -8,6 +14,9 @@ import { SidebarFooterContext } from "./SidebarFooterContext";
 import SidebarHandle from "./SidebarHandle";
 import SidebarHeader from "./SidebarHeader";
 import "./styles/sidebar.css";
+
+// Matches the slide transition (duration-300) of the root.
+const SLIDE_MS = 350;
 
 interface Props {
   id?: string;
@@ -63,7 +72,22 @@ const Sidebar = ({
     [color],
   );
 
-  useSidebarHeightAnimation(contentOuterRef, contentInnerRef);
+  // Height animation waits until the slide-in has finished.
+  const canAnimateHeightRef = useRef(false);
+  useEffect(() => {
+    canAnimateHeightRef.current = false;
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+      canAnimateHeightRef.current = true;
+    }, SLIDE_MS);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  useSidebarHeightAnimation(
+    contentOuterRef,
+    contentInnerRef,
+    canAnimateHeightRef,
+  );
   useSidebarChromeHeights(cardElement, headerElement, footerElement);
 
   const expand = useCallback(() => onMinimizedChange?.(false), [onMinimizedChange]);

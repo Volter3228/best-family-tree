@@ -4,6 +4,9 @@ import { useEffect, useRef } from "react";
 export function useSidebarHeightAnimation(
   outerRef: React.RefObject<HTMLDivElement | null>,
   innerRef: React.RefObject<HTMLDivElement | null>,
+  // Height changes only animate while this is true (the sidebar is settled
+  // open); while it slides in or out the height follows the content instantly.
+  canAnimateRef: React.RefObject<boolean>,
 ) {
   const hasMountedRef = useRef(false);
   const heightTweenRef = useRef<gsap.core.Tween | null>(null);
@@ -37,7 +40,15 @@ export function useSidebarHeightAnimation(
         return;
       }
 
+      // Content appearing in an empty card, or any change while the sidebar
+      // slides, takes its full height at once.
+      const instant = (lastHeightRef.current ?? 0) < 1 || !canAnimateRef.current;
       lastHeightRef.current = height;
+      if (instant) {
+        heightTweenRef.current?.kill();
+        gsap.set(outer, { height });
+        return;
+      }
 
       heightTweenRef.current?.kill();
       outer.classList.add("sidebar-height-animating");
@@ -67,5 +78,5 @@ export function useSidebarHeightAnimation(
       heightTweenRef.current = null;
       outer.classList.remove("sidebar-height-animating");
     };
-  }, [innerRef, outerRef]);
+  }, [innerRef, outerRef, canAnimateRef]);
 }

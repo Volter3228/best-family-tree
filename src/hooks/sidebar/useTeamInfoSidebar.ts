@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
 
@@ -21,8 +21,12 @@ export const useTeamInfoSidebar = (
     if (selectedMember) setIsOpen(false);
   }, [selectedMember]);
 
+  const expandTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(expandTimerRef.current), []);
+
   const open = useCallback(
     (nextTeamId: string) => {
+      clearTimeout(expandTimerRef.current);
       closeMemberSidebar();
       setTeamId(nextTeamId);
       setMode("info");
@@ -32,8 +36,12 @@ export const useTeamInfoSidebar = (
     [closeMemberSidebar],
   );
 
-  // Stays minimized while sliding out; open() expands it again.
-  const close = useCallback(() => setIsOpen(false), []);
+  // Stays minimized while sliding out, then expands once off screen.
+  const close = useCallback(() => {
+    setIsOpen(false);
+    clearTimeout(expandTimerRef.current);
+    expandTimerRef.current = setTimeout(() => setIsMinimized(false), 300);
+  }, []);
 
   const startEdit = useCallback(() => setMode("edit"), []);
   const backToInfo = useCallback(() => setMode("info"), []);

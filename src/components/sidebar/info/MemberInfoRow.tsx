@@ -12,6 +12,9 @@ interface Props {
   actionIcon?: React.ReactNode;
   showCopyIcon?: boolean;
   copyValue?: string;
+  // The end of the value that stays on one line with the copy icon: when the
+  // value is too long it breaks before this part, so the icon never wraps alone.
+  valueTail?: string;
   color?: AccentColor;
 }
 
@@ -22,6 +25,7 @@ const MemberInfoRow = ({
   actionIcon: ActionIcon,
   showCopyIcon = false,
   copyValue,
+  valueTail,
   color = "blue",
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
@@ -41,14 +45,18 @@ const MemberInfoRow = ({
       <p className="info-value flex grow items-center overflow-x-hidden -m-1 p-1">
         <span>
           {value}
-          {showCopyIcon && (
-            <MemberInfoCopy
-              valueToCopy={
-                copyValue || (typeof value === "string" ? value : "")
-              }
-              color={color}
-            />
-          )}
+          {valueTail !== undefined && <wbr />}
+          <span className="whitespace-nowrap">
+            {valueTail}
+            {showCopyIcon && (
+              <MemberInfoCopy
+                valueToCopy={
+                  copyValue || (typeof value === "string" ? value : "")
+                }
+                color={color}
+              />
+            )}
+          </span>
         </span>
         {ActionIcon}
       </p>

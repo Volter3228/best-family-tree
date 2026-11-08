@@ -54,6 +54,9 @@ export const useSidebar = (
     closeTimerRef.current = setTimeout(() => {
       closeTimerRef.current = null;
       setMode("info");
+      // Expanded again only once the card is off screen, so it never grows
+      // while sliding out or in.
+      setIsMinimized(false);
       storeSelectMember(null);
     }, CLOSE_ANIMATION_MS);
   }, [storeSelectMember, cancelPendingClose]);

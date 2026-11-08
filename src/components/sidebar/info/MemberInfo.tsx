@@ -56,19 +56,10 @@ const MemberInfo = ({
   const avatar = getMemberAvatar(member);
   const colorClasses = COLOR_CLASSES[color];
 
-  let email: React.ReactNode = null;
-  if (member.email) {
-    const atIdx = member.email.indexOf("@");
-    email =
-      member.email.length > 16 && atIdx !== -1 ? (
-        <>
-          {member.email.slice(0, atIdx)}
-          <wbr />@{member.email.slice(atIdx + 1)}
-        </>
-      ) : (
-        member.email
-      );
-  }
+  // Split at the "@": the domain stays with the copy icon on one line.
+  const atIdx = member.email?.indexOf("@") ?? -1;
+  const emailHead = atIdx > 0 ? member.email!.slice(0, atIdx) : member.email;
+  const emailTail = atIdx > 0 ? member.email!.slice(atIdx) : undefined;
 
   return (
     <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
@@ -143,7 +134,8 @@ const MemberInfo = ({
           {!!member.email && (
             <MemberInfoRow
               title="Email"
-              value={email}
+              value={emailHead}
+              valueTail={emailTail}
               copyValue={member.email}
               icon={EnvelopeIcon}
               showCopyIcon
