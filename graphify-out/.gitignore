@@ -1,12 +1,9 @@
-/cache
-
-# graphify regenerable artifacts
-graph.html
-manifest.json
-.graphify_analysis.json
-.graphify_labels.json
-.graphify_labels.json.sig
-.graphify_root
-.cloud-cta-shown
-.graphify_labels.pending.json
+# Ignore everything in graphify-out/ by default...
 /*
+
+# ...except the artifacts we keep in version control
+!/.gitignore
+!/GRAPH_REPORT.md
+!/graph.json
+!/manifest.json
+!/.graphify_labels.json
