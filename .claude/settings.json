@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm test)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(cd src/server && npx tsc --noEmit)",
+      "Bash(cd src/server && npm test)",
+      "Bash(graphify:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Read(./.env*)",
+      "Read(./src/server/.env*)",
+      "Read(./graphify-out/graph.json)",
+      "Read(./graphify-out/cache/**)",
+      "Read(./node_modules/**)",
+      "Read(./src/server/node_modules/**)",
+      "Read(./.next/**)",
+      "Read(./src/server/dist/**)",
+      "Read(./package-lock.json)",
+      "Read(./src/server/src/db/prisma/generated/**)"
+    ],
+    "hooks": {
+      "PostToolUse": [
+	{
+      	  "matcher": "Edit|Write",
+      	  "hooks": [
+            {
+              "type": "command",
+              "command": "jq -r '.tool_input.file_path' | xargs -r npx prettier --write --ignore-unknown"
+            }
+          ]
+        }
+      ],  
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "graphify update . >/dev/null 2>&1 || true" }
+        ]
+      }
+    ]
+    }
+  }
+}

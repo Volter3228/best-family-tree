@@ -71,14 +71,14 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
             title="Налаштування"
             onClick={handleShowSettingsClick}
             icon={Cog6ToothIcon}
-            color="blue"
+            color="green"
             isActive={settings.isOpen}
           />
           <ToolbarIconButton
             title="Керування"
             onClick={toggleSidebar}
             icon={PencilSquareIcon}
-            color="green"
+            color="blue"
             isActive={isSidebarOpen}
           />
         </div>
@@ -96,9 +96,9 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         headerTitle="Керування"
         onClose={closeSidebar}
         isOpen={isSidebarOpen}
-        color="green"
+        color="blue"
       >
-        <ManageForm onSuccess={closeSidebar} color="green" />
+        <ManageForm onSuccess={closeSidebar} color="blue" />
       </Sidebar>
     </>
   );

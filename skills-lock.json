@@ -1,12 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "code-review": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/code-review/SKILL.md",
-      "computedHash": "57cfd4ceb011f05e58a1a4f4cad3b2e03419d371f8990f4bcb32ff0d435a039f"
-    },
     "diagnosing-bugs": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -25,18 +19,6 @@
       "skillPath": "skills/productivity/grill-me/SKILL.md",
       "computedHash": "9cdbb4b8f7a3aeaef82e6230c9e823500d4a8a1214c726cf342cf9829d34fc7d"
     },
-    "grill-with-docs": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
-      "computedHash": "35e62aa423aaeab6a414bcac273f56dfb17802ef2334b41b6a3b00f28196c8cf"
-    },
-    "grilling": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/productivity/grilling/SKILL.md",
-      "computedHash": "ef1641a2047b71b60f1942cd35efb47d3afc9d584dff5a0b01f8c7db923aaa08"
-    },
     "gsap-core": {
       "source": "greensock/gsap-skills",
       "sourceType": "github",
@@ -49,35 +31,17 @@
       "skillPath": "skills/gsap-performance/SKILL.md",
       "computedHash": "863842ac2d7aee53fd4f0025c960173d7ad3e658a5715b89b2211fa280213c1f"
     },
-    "gsap-plugins": {
-      "source": "greensock/gsap-skills",
-      "sourceType": "github",
-      "skillPath": "skills/gsap-plugins/SKILL.md",
-      "computedHash": "791bda0e6e460511fe82a78e745db519b88ffaeeab4d04a74879a03ca4f41740"
-    },
     "gsap-react": {
       "source": "greensock/gsap-skills",
       "sourceType": "github",
       "skillPath": "skills/gsap-react/SKILL.md",
       "computedHash": "7d3b52822681a4158e371f895c58fb7030ecaf33f585a534b7162f9e92c5d893"
     },
-    "gsap-scrolltrigger": {
-      "source": "greensock/gsap-skills",
-      "sourceType": "github",
-      "skillPath": "skills/gsap-scrolltrigger/SKILL.md",
-      "computedHash": "1cdc5647693783cb7a662d84a5de434c88a051ed56b4d33597c9b5782b5973e6"
-    },
     "gsap-timeline": {
       "source": "greensock/gsap-skills",
       "sourceType": "github",
       "skillPath": "skills/gsap-timeline/SKILL.md",
       "computedHash": "54981c2feec5a9c0d57988aeb32315af32bdeadd261550d5e9db7a7b1f08b487"
-    },
-    "gsap-utils": {
-      "source": "greensock/gsap-skills",
-      "sourceType": "github",
-      "skillPath": "skills/gsap-utils/SKILL.md",
-      "computedHash": "1ab2387f6e694718a4f1b5acf2a4ab16e1b884c3428adf5f6b26d830f00826cf"
     },
     "improve-codebase-architecture": {
       "source": "mattpocock/skills",
@@ -97,18 +61,6 @@
       "skillPath": "skills/pixijs-application/SKILL.md",
       "computedHash": "2ff17b8605f67f41d12e2b4f12112c91befe5a096a0a4b29f25dc65f28c4777a"
     },
-    "pixijs-assets": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-assets/SKILL.md",
-      "computedHash": "2c831499efc3b875a8f0b7d5264b4d7220e51cfeff65fc25e8ca046e74da10c3"
-    },
-    "pixijs-color": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-color/SKILL.md",
-      "computedHash": "0901667635f6348bc2642db24dfc1486840f2c8ec9aa687f3b251c25ece55c2c"
-    },
     "pixijs-core-concepts": {
       "source": "pixijs/pixijs-skills",
       "sourceType": "github",
@@ -120,18 +72,6 @@
       "sourceType": "github",
       "skillPath": "skills/pixijs-events/SKILL.md",
       "computedHash": "ced45cf4dc47caa02a3fac9ec313490d90cc6de4c16248c1984316b67cf24976"
-    },
-    "pixijs-filters": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-filters/SKILL.md",
-      "computedHash": "a144f8d96f351c1836e1635709d862feb05a69c1c95a48f86242794a114d557a"
-    },
-    "pixijs-math": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-math/SKILL.md",
-      "computedHash": "54766d37e7332d1cf7d18eef3bfa812e646c8c263c57660f785c36e525cbe03b"
     },
     "pixijs-performance": {
       "source": "pixijs/pixijs-skills",
@@ -156,24 +96,6 @@
       "sourceType": "github",
       "skillPath": "skills/pixijs-scene-graphics/SKILL.md",
       "computedHash": "423872ff78d31b77d4486b16f355e9173011fa9f0a9614902b4bb2eca35f15c6"
-    },
-    "pixijs-scene-sprite": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-scene-sprite/SKILL.md",
-      "computedHash": "b4b1a983f96a9c06fe62e4a3889938e060c924d94e3ebce4771b07cc56a9dbc4"
-    },
-    "pixijs-scene-text": {
-      "source": "pixijs/pixijs-skills",
-      "sourceType": "github",
-      "skillPath": "skills/pixijs-scene-text/SKILL.md",
-      "computedHash": "2dd70ab1dcb026a6512b321b372a4f5030fdbb2e22bf7fcfc2e67a9ce304af75"
-    },
-    "prototype": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/prototype/SKILL.md",
-      "computedHash": "d3fc74689bd993e39c44bfae510d014eecffbeec2922764b065377fd1327c0f6"
     },
     "tdd": {
       "source": "mattpocock/skills",

@@ -50,4 +50,4 @@ Dockerfile.*override
 # AI
 .devin
 .windsurf
-.
+.mcp.json

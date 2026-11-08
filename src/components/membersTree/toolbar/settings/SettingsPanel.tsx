@@ -1,11 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import SegmentedSwitch from "@/components/ui/SegmentedSwitch";
 import { useSettingsStore } from "@/store/settingsStore";
-import type {
-  EdgeStyle,
-  OrientationSetting,
-  ThemePreference,
-} from "@/types";
+import type { EdgeStyle, OrientationSetting, ThemePreference } from "@/types";
 
 interface Props {
   isOpen: boolean;
@@ -40,7 +36,11 @@ const edgeIcon = (d: string) => (
 );
 
 const EDGE_STYLE_OPTIONS = [
-  { value: "bezier", label: "Плавні", icon: edgeIcon("M1.5 11 C5 3, 11 13, 14.5 5") },
+  {
+    value: "bezier",
+    label: "Плавні",
+    icon: edgeIcon("M1.5 11 C5 3, 11 13, 14.5 5"),
+  },
   { value: "straight", label: "Прямі", icon: edgeIcon("M1.5 12.5 L14.5 3.5") },
   {
     value: "orthogonal",
@@ -91,7 +91,7 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
           <button
             type="button"
             onClick={resetSettings}
-            className="text-xs text-accent-blue transition-colors hover:opacity-70"
+            className="text-xs text-accent-green transition-colors hover:opacity-70"
           >
             Скинути
           </button>
@@ -100,7 +100,7 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
           className="overflow-y-auto overflow-x-hidden flex-1 transparent"
           style={{
             scrollbarWidth: "thin",
-            scrollbarColor: "var(--accent-blue) transparent",
+            scrollbarColor: "var(--accent-green) transparent",
           }}
         >
           <Section title="Тема">
@@ -109,7 +109,7 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
               value={theme}
               onChange={setTheme}
               ariaLabel="Тема"
-              color="blue"
+              color="green"
             />
           </Section>
           <Section title="Орієнтація">
@@ -118,7 +118,7 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
               value={orientation}
               onChange={setOrientation}
               ariaLabel="Орієнтація"
-              color="blue"
+              color="green"
             />
           </Section>
           <Section title="Стиль ліній">
@@ -127,7 +127,7 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
               value={edgeStyle}
               onChange={setEdgeStyle}
               ariaLabel="Стиль ліній"
-              color="blue"
+              color="green"
             />
           </Section>
         </div>
