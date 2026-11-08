@@ -9,7 +9,7 @@ import {
   CARD_PIVOT_Y,
 } from "@/hooks";
 import { Member } from "@/models";
-import { useTreeStore } from "@/store/treeStore";
+import { birthdayVisibleSignal, zoomedOutSignal } from "@/store/treeSignals";
 import {
   NODE_WIDTH,
   NODE_HEIGHT,
@@ -26,8 +26,6 @@ interface Props {
   member: Member;
   placeholderColorIndex: number;
   isSelected: boolean;
-  isZoomedOut: boolean;
-  showBirthday: boolean;
   teamRole?: string;
   teamId?: string;
   x: number;
@@ -58,6 +56,8 @@ const AVATAR_HIT_AREA = new Rectangle(
 );
 const CONTENT_CENTER_X = NODE_WIDTH / 2;
 const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
+const NODE_PIVOT = { x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y };
+const CARD_PIVOT = { x: CARD_PIVOT_X, y: CARD_PIVOT_Y };
 
 const MemberNode = ({
   nodeId,
@@ -66,8 +66,6 @@ const MemberNode = ({
   member,
   placeholderColorIndex,
   isSelected,
-  isZoomedOut,
-  showBirthday,
   teamRole,
   teamId,
   onClick,
@@ -81,15 +79,19 @@ const MemberNode = ({
     isHovered,
     isSelected,
   });
-  const isFitViewAnimating = useTreeStore((s) => s.isFitViewAnimating);
-  const fitViewTargetScale = useTreeStore((s) => s.fitViewTargetScale);
-  useCardAnimation({
-    cardRef,
-    isZoomedOut,
-    memberId: member.id,
-    isFitViewAnimating,
-    fitViewTargetScale,
-  });
+  // Zoom thresholds reach the node through store signals, not props: a prop
+  // would re-render every node (culled or not) in the frame it flips.
+  useCardAnimation({ cardRef, memberId: member.id });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const applyHitArea = (isZoomedOut: boolean) => {
+      container.hitArea = isZoomedOut ? AVATAR_HIT_AREA : NODE_HIT_AREA;
+    };
+    applyHitArea(zoomedOutSignal.get());
+    return zoomedOutSignal.subscribe(applyHitArea);
+  }, []);
 
   const handleSelect = useCallback(
     () => onClick(member, teamId),
@@ -101,10 +103,20 @@ const MemberNode = ({
 
   // The tooltip only exists while it is needed (and while it fades out).
   const [isTooltipMounted, setIsTooltipMounted] = useState(false);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const handleTooltipHidden = useCallback(() => setIsTooltipMounted(false), []);
+  // Only the hovered node follows the zoom state.
   useEffect(() => {
-    if (isZoomedOut && isHovered) setIsTooltipMounted(true);
-  }, [isZoomedOut, isHovered]);
+    if (!isHovered) {
+      setIsTooltipVisible(false);
+      return;
+    }
+    setIsTooltipVisible(zoomedOutSignal.get());
+    return zoomedOutSignal.subscribe(setIsTooltipVisible);
+  }, [isHovered]);
+  useEffect(() => {
+    if (isTooltipVisible) setIsTooltipMounted(true);
+  }, [isTooltipVisible]);
 
   const handlePointerEnter = useCallback(() => setIsHovered(true), []);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
@@ -131,6 +143,13 @@ const MemberNode = ({
 
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
   const birthdayRef = useRef<Container>(null);
+  const [showBirthday, setShowBirthday] = useState(birthdayVisibleSignal.get);
+  // Only birthday nodes follow the zoom state.
+  useEffect(() => {
+    if (!isBirthday) return;
+    setShowBirthday(birthdayVisibleSignal.get());
+    return birthdayVisibleSignal.subscribe(setShowBirthday);
+  }, [isBirthday]);
 
   useEffect(() => {
     if (!birthdayRef.current || !isBirthday) return;
@@ -147,11 +166,10 @@ const MemberNode = ({
         ref={containerRef}
         x={x + CONTENT_CENTER_X}
         y={y + CONTENT_CENTER_Y}
-        pivot={{ x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y }}
+        pivot={NODE_PIVOT}
         zIndex={isHovered ? 1000 : 0}
         eventMode="static"
         interactiveChildren={false}
-        hitArea={isZoomedOut ? AVATAR_HIT_AREA : NODE_HIT_AREA}
         cursor="pointer"
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
@@ -165,7 +183,7 @@ const MemberNode = ({
       >
         <pixiContainer
           ref={cardRef}
-          pivot={{ x: CARD_PIVOT_X, y: CARD_PIVOT_Y }}
+          pivot={CARD_PIVOT}
           x={CARD_PIVOT_X}
         >
           <MemberNodeCard
@@ -186,7 +204,7 @@ const MemberNode = ({
         {isTooltipMounted && (
           <MemberNodeMinimizedTooltip
             text={member.name}
-            visible={isZoomedOut && isHovered}
+            visible={isTooltipVisible}
             placeholderColorIndex={placeholderColorIndex}
             onHidden={handleTooltipHidden}
           />

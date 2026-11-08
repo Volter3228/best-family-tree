@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
+import { useLayoutEffect, useMemo, type RefObject } from "react";
 import { Container } from "pixi.js";
 import {
   NODE_WIDTH,
   NODE_AVATAR_SIZE,
   NODE_AVATAR_RADIUS,
 } from "@/constants/canvas";
+import { cardsHiddenSignal } from "@/store/treeSignals";
 import { finishCardReveal, registerCardReveal } from "./cardVisibilityDriver";
 
 // Card animation pivot: top-center of the card (where it hides behind the avatar)
@@ -42,52 +43,46 @@ const applyHidden = (card: Container): void => {
 
 interface Props {
   cardRef: RefObject<Container | null>;
-  isZoomedOut: boolean;
   memberId: string;
-  isFitViewAnimating: boolean;
-  fitViewTargetScale: number | null;
 }
 
-export const useCardAnimation = ({
-  cardRef,
-  isZoomedOut,
-  memberId,
-  isFitViewAnimating,
-  fitViewTargetScale,
-}: Props) => {
-  const appliedStateRef = useRef<"shown" | "hidden" | null>(null);
+// Hides/shows the card as the tree zooms. It listens to the store signal instead
+// of taking a prop, so crossing the zoom threshold does not re-render every node.
+export const useCardAnimation = ({ cardRef, memberId }: Props) => {
   const delay = useMemo(() => getCardAnimDelay(memberId), [memberId]);
-
-  const hideForFitView = isFitViewAnimating && fitViewTargetScale !== null;
-  const shouldBeHidden = isZoomedOut || hideForFitView;
 
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card) return;
 
-    // On first mount set initial state without animation
-    if (appliedStateRef.current === null) {
-      appliedStateRef.current = shouldBeHidden ? "hidden" : "shown";
-      if (shouldBeHidden) applyHidden(card);
-      return;
-    }
+    // On mount set the state without animation
+    let applied: "shown" | "hidden" = cardsHiddenSignal.get()
+      ? "hidden"
+      : "shown";
+    if (applied === "hidden") applyHidden(card);
+    else applyShown(card);
 
     // Only animate on actual visibility transitions
-    const targetState = shouldBeHidden ? "hidden" : "shown";
-    if (targetState === appliedStateRef.current) return;
-    appliedStateRef.current = targetState;
+    const unsubscribe = cardsHiddenSignal.subscribe((shouldBeHidden) => {
+      const targetState = shouldBeHidden ? "hidden" : "shown";
+      if (targetState === applied) return;
+      applied = targetState;
 
-    if (!shouldBeHidden) card.visible = true;
-    registerCardReveal(card, {
-      direction: shouldBeHidden ? "hide" : "show",
-      delay,
-      finalize: shouldBeHidden ? applyHidden : applyShown,
-      collapsedScaleX: COLLAPSED_SCALE_X,
-      collapsedScaleY: COLLAPSED_SCALE_Y,
-      slideStartY: SLIDE_START_Y,
-      restY: CARD_PIVOT_Y,
+      if (!shouldBeHidden) card.visible = true;
+      registerCardReveal(card, {
+        direction: shouldBeHidden ? "hide" : "show",
+        delay,
+        finalize: shouldBeHidden ? applyHidden : applyShown,
+        collapsedScaleX: COLLAPSED_SCALE_X,
+        collapsedScaleY: COLLAPSED_SCALE_Y,
+        slideStartY: SLIDE_START_Y,
+        restY: CARD_PIVOT_Y,
+      });
     });
 
-    return () => finishCardReveal(card);
-  }, [shouldBeHidden, delay, cardRef]);
+    return () => {
+      unsubscribe();
+      finishCardReveal(card);
+    };
+  }, [delay, cardRef]);
 };

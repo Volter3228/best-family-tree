@@ -2,7 +2,6 @@ import { memo, type RefObject } from "react";
 import type { Container } from "pixi.js";
 import { isZoomedOut as getIsZoomedOut } from "@/utils";
 import {
-  BIRTHDAY_ANIMATION_MIN_SCALE,
   TEAM_OVERVIEW_EDGE_ALPHA,
   TEAM_OVERVIEW_NODE_ALPHA,
 } from "@/constants/canvas";
@@ -112,8 +111,6 @@ const MembersTreeScene = ({
       >
         <NodesLayer
           nodes={nodes}
-          isZoomedOut={isZoomedOut}
-          showBirthday={scale >= BIRTHDAY_ANIMATION_MIN_SCALE}
           selectedId={selectedId}
           selectedTeamId={selectedTeamId}
           isTeamView={isTeamView}

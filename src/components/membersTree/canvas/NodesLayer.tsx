@@ -6,8 +6,6 @@ import PixiMemberNode from "./memberNode/MemberNode";
 
 interface Props {
   nodes: MemberNode[];
-  isZoomedOut: boolean;
-  showBirthday: boolean;
   selectedId: string | null;
   selectedTeamId: string | null;
   isTeamView: boolean;
@@ -16,8 +14,6 @@ interface Props {
 
 const NodesLayer = ({
   nodes,
-  isZoomedOut,
-  showBirthday,
   selectedId,
   selectedTeamId,
   isTeamView,
@@ -49,8 +45,6 @@ const NodesLayer = ({
             nodeId={node.id}
             x={node.position.x}
             y={node.position.y}
-            isZoomedOut={isZoomedOut}
-            showBirthday={showBirthday}
             member={node.data.member}
             placeholderColorIndex={node.data.placeholderColorIndex}
             isSelected={isSelected}
