@@ -7,8 +7,15 @@
 /* Only the standard scrollbar-* properties are used (no ::-webkit-scrollbar
    rules): mixing both schemes makes Chromium drop the scrollbar without
    repainting it when the stylesheet is hot-swapped in development. */
+
+/* The scroller gives up the room the card's header and footer take (published
+   by useSidebarChromeHeights) plus the root's padding: 0.5rem top and 6rem
+   bottom (room for the toolbar) on mobile, 1rem each side from md. */
 .sidebar-content {
-  max-height: calc(100dvh - 7rem - var(--sidebar-footer-height, 0px));
+  max-height: calc(
+    100dvh - 6.5rem - var(--sidebar-header-height, 0px) -
+      var(--sidebar-footer-height, 0px)
+  );
   overflow-y: auto;
   overflow-anchor: none;
   scrollbar-gutter: stable;
@@ -18,7 +25,10 @@
 
 @media (min-width: 768px) {
   .sidebar-content {
-    max-height: calc(100dvh - 6rem - var(--sidebar-footer-height, 0px));
+    max-height: calc(
+      100dvh - 2rem - var(--sidebar-header-height, 0px) -
+        var(--sidebar-footer-height, 0px)
+    );
   }
 }
 

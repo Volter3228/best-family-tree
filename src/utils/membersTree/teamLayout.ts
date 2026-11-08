@@ -73,7 +73,10 @@ export const computeTeamLayout = ({
   const blocks = lanes.flat();
   if (blocks.length === 0) return { positions: new Map(), frames: [] };
 
-  const spots = packLanes(lanes.map((lane) => lane.map(({ frame }) => frame)));
+  const spots = packLanes(
+    lanes.map((lane) => lane.map(({ frame }) => frame)),
+    direction,
+  );
   const positions = new Map<string, Point>();
   blocks.forEach(({ frame, offsets }, i) => {
     frame.x = spots[i].x;

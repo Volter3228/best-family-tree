@@ -1,4 +1,5 @@
 import { TEAM_FRAME_GAP, TEAM_PACK_ASPECT } from "@/constants/canvas";
+import type { Direction } from "@/types";
 
 // Extra space before the first frame of a new lane, on top of the usual gap.
 const LANE_GAP = TEAM_FRAME_GAP;
@@ -75,23 +76,43 @@ const computePacking = (lanes: Size[][]): { x: number; y: number }[] => {
   return best.map(({ x, y }) => ({ x, y }));
 };
 
+// Left-to-right trees flow top to bottom: pack the transposed frames (columns
+// become rows), then swap the axes of the result back.
+const computeDirectedPacking = (
+  lanes: Size[][],
+  direction: Direction,
+): { x: number; y: number }[] => {
+  if (direction === "TB") return computePacking(lanes);
+  const transposed = lanes.map((lane) =>
+    lane.map(({ width, height }) => ({ width: height, height: width })),
+  );
+  return computePacking(transposed).map(({ x, y }) => ({ x: y, y: x }));
+};
+
 let lastPacking: { key: string; positions: { x: number; y: number }[] } | null =
   null;
 
 /**
  * Place frames lane by lane in reading order, keeping the given order inside a
  * lane (so teams stay in chronological order). Positions are returned for the lanes'
- * frames in flattened order. The row width is picked so the whole layout is
- * close to a screen-like aspect.
+ * frames in flattened order. In "TB" frames go left to right and wrap into rows;
+ * in "LR" they go top to bottom and wrap into columns. The wrap size is picked
+ * so the whole layout is close to a screen-like aspect.
  */
-export const packLanes = (lanes: Size[][]): { x: number; y: number }[] => {
+export const packLanes = (
+  lanes: Size[][],
+  direction: Direction = "TB",
+): { x: number; y: number }[] => {
   // Relayouts (member edits, filter changes) usually keep every frame size, so
   // the previous packing is reused instead of searching again.
-  const key = lanes
-    .map((lane) => lane.map((s) => s.width + "x" + s.height).join(","))
-    .join("|");
+  const key =
+    direction +
+    ":" +
+    lanes
+      .map((lane) => lane.map((s) => s.width + "x" + s.height).join(","))
+      .join("|");
   if (lastPacking?.key === key) return lastPacking.positions;
-  const positions = computePacking(lanes);
+  const positions = computeDirectedPacking(lanes, direction);
   lastPacking = { key, positions };
   return positions;
 };

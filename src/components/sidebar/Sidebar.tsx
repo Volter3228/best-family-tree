@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  PencilIcon,
-  ArrowLeftIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/solid"; // Tailwind Heroicons
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { SidebarMode, AccentColor } from "@/types";
-import { useSidebarHeightAnimation } from "@/hooks";
+import { useSidebarHeightAnimation, useSidebarChromeHeights } from "@/hooks";
 import { SidebarFooterContext } from "./SidebarFooterContext";
+import SidebarHandle from "./SidebarHandle";
+import SidebarHeader from "./SidebarHeader";
 import "./styles/sidebar.css";
 
 interface Props {
@@ -22,6 +18,11 @@ interface Props {
   onClose: () => void;
   onEditClick?: () => void;
   onBackClick?: () => void;
+  // Mobile only: lets the user collapse the card to a bar above the toolbar.
+  // Without a handler (and in edit mode) the card cannot be minimized.
+  isMinimized?: boolean;
+  onMinimizedChange?: (minimized: boolean) => void;
+  minimizedSummary?: React.ReactNode;
   className?: string;
   children?: React.ReactNode;
 }
@@ -35,17 +36,24 @@ const Sidebar = ({
   onClose,
   onEditClick,
   onBackClick,
+  isMinimized: minimizedRequested = false,
+  onMinimizedChange,
+  minimizedSummary,
   className = "",
   children,
 }: Props) => {
-  const colorClasses = COLOR_CLASSES[color];
+  const canMinimize = !!onMinimizedChange && mode === "info";
+  const isMinimized = canMinimize && minimizedRequested;
 
-  const cardRef = useRef<HTMLDivElement>(null);
-  const contentOuterRef = useRef<HTMLDivElement>(null);
-  const contentInnerRef = useRef<HTMLDivElement>(null);
+  const [cardElement, setCardElement] = useState<HTMLDivElement | null>(null);
+  const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(
+    null,
+  );
   const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(
     null,
   );
+  const contentOuterRef = useRef<HTMLDivElement>(null);
+  const contentInnerRef = useRef<HTMLDivElement>(null);
 
   const contentStyle = useMemo(
     () =>
@@ -56,20 +64,9 @@ const Sidebar = ({
   );
 
   useSidebarHeightAnimation(contentOuterRef, contentInnerRef);
+  useSidebarChromeHeights(cardElement, headerElement, footerElement);
 
-  // The scrollable area gives up the room the footer takes.
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!footerElement || !card) return;
-    const observer = new ResizeObserver(() =>
-      card.style.setProperty(
-        "--sidebar-footer-height",
-        `${footerElement.offsetHeight}px`,
-      ),
-    );
-    observer.observe(footerElement);
-    return () => observer.disconnect();
-  }, [footerElement]);
+  const expand = useCallback(() => onMinimizedChange?.(false), [onMinimizedChange]);
 
   return (
     <div
@@ -81,63 +78,56 @@ const Sidebar = ({
       )}
     >
       <div
-        ref={cardRef}
+        ref={setCardElement}
         className={`flex max-h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-surface/80 backdrop-blur-xl pointer-events-auto ${isOpen ? "shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]" : "shadow-none"}`}
       >
-        <div className="flex shrink-0 justify-between items-center rounded-t-2xl px-4 pt-4 pb-2">
-          <h2
-            className={`text-xl font-bold ${colorClasses.text} flex items-center`}
-          >
-            {mode === "edit" && (
-              <button
-                onClick={onBackClick}
-                className={twMerge(
-                  colorClasses.text,
-                  "transition-transform duration-200 ease-out hover:scale-[1.3]",
-                )}
-                title="Назад"
-              >
-                <ArrowLeftIcon className="h-6 w-6" />
-              </button>
-            )}
-            <span className="ml-2 pointer-events-none">{headerTitle}</span>
-          </h2>
-          <div className="flex gap-2">
-            {mode === "info" && (
-              <button
-                onClick={onEditClick}
-                className={`${colorClasses.text} transition-transform duration-200 ease-out hover:scale-[1.3]`}
-                title="Редагувати"
-              >
-                <PencilIcon className="h-5 w-5" />
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className={`${colorClasses.text} transition-all duration-200 ease-out hover:scale-[1.3]`}
-              title="Закрити"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-          </div>
-        </div>
-        <div className="sidebar-scroll-wrapper min-h-0 flex-1 overflow-hidden">
-          <div
-            ref={contentOuterRef}
-            className="sidebar-content h-full min-h-0 overflow-y-auto"
-            style={contentStyle}
-          >
-            <SidebarFooterContext.Provider value={footerElement}>
-              <div ref={contentInnerRef} className="px-6 pb-6 pt-0">
-                {children}
-              </div>
-            </SidebarFooterContext.Provider>
-          </div>
+        <div ref={setHeaderElement} className="shrink-0">
+          {canMinimize && (
+            <SidebarHandle
+              isMinimized={isMinimized}
+              onMinimizedChange={onMinimizedChange}
+              className="pt-1"
+            />
+          )}
+          <SidebarHeader
+            mode={mode}
+            title={headerTitle}
+            color={color}
+            hasHandle={canMinimize}
+            isMinimized={isMinimized}
+            minimizedSummary={minimizedSummary}
+            onExpand={expand}
+            onClose={onClose}
+            onEditClick={onEditClick}
+            onBackClick={onBackClick}
+          />
         </div>
         <div
-          ref={setFooterElement}
-          className="flex shrink-0 flex-col items-center gap-3 px-6 py-4 empty:hidden"
-        />
+          className={twMerge(
+            "grid min-h-0 flex-1 grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out",
+            isMinimized && "max-md:grid-rows-[0fr]",
+          )}
+        >
+          <div className="flex min-h-0 flex-col overflow-hidden">
+            <div className="sidebar-scroll-wrapper min-h-0 flex-1 overflow-hidden">
+              <div
+                ref={contentOuterRef}
+                className="sidebar-content h-full min-h-0 overflow-y-auto"
+                style={contentStyle}
+              >
+                <SidebarFooterContext.Provider value={footerElement}>
+                  <div ref={contentInnerRef} className="px-6 pb-6 pt-0">
+                    {children}
+                  </div>
+                </SidebarFooterContext.Provider>
+              </div>
+            </div>
+            <div
+              ref={setFooterElement}
+              className="flex shrink-0 flex-col items-center gap-3 px-6 py-4 empty:hidden"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

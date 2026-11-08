@@ -23,7 +23,7 @@ import { getRenderResolution } from "@/utils";
 import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
 import ViewportCulling from "./ViewportCulling";
-import Sidebar, { MemberSidebarContent } from "../sidebar";
+import MemberSidebar from "./MemberSidebar";
 import TeamInfoSidebar from "./TeamInfoSidebar";
 import Toolbar from "./toolbar";
 
@@ -49,15 +49,10 @@ const MembersTreeContent = ({ members }: Props) => {
 
   const selectedMember = useSelectedMember();
   const selectedId = selectedMember?.id ?? null;
-  const { selectMember } = useMembersActions();
+  const { selectMember: selectMemberInStore } = useMembersActions();
 
-  const {
-    isSidebarOpen,
-    sidebarMode,
-    onClose: handleSidebarClose,
-    onEditClick: handleSidebarEditClick,
-    onBackToInfoClick: handleSidebarBackToInfo,
-  } = useSidebar(selectedMember, selectMember);
+  const memberSidebar = useSidebar(selectedMember, selectMemberInStore);
+  const { selectMember, onClose: handleSidebarClose } = memberSidebar;
 
   const teamInfo = useTeamInfoSidebar(selectedMember, handleSidebarClose);
 
@@ -218,31 +213,15 @@ const MembersTreeContent = ({ members }: Props) => {
         onSearch={handleSearch}
         onTeamSearch={handleFrameClick}
       />
-      <Sidebar
-        id="member-sidebar"
-        headerTitle={sidebarMode === "info" ? "Інфо" : "Редагувати"}
-        mode={sidebarMode}
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        onEditClick={handleSidebarEditClick}
-        onBackClick={handleSidebarBackToInfo}
-        className="z-10"
+      <MemberSidebar
+        state={memberSidebar}
+        member={selectedMember}
         color={sidebarColor}
-      >
-        {!!selectedMember && (
-          <MemberSidebarContent
-            member={selectedMember}
-            sidebarMode={sidebarMode}
-            onEditExit={handleSidebarBackToInfo}
-            color={sidebarColor}
-            isTeamView={isTeamView}
-            canFocusMemberInTeam={canFocusMemberInTeam}
-            onFocusMemberInTeam={focusMemberInTeam}
-            onOpenTeamInfo={teamInfo.open}
-            onDeleted={handleSidebarClose}
-          />
-        )}
-      </Sidebar>
+        isTeamView={isTeamView}
+        canFocusMemberInTeam={canFocusMemberInTeam}
+        onFocusMemberInTeam={focusMemberInTeam}
+        onOpenTeamInfo={teamInfo.open}
+      />
       <TeamInfoSidebar
         state={teamInfo}
         canFocusMemberInTeam={canFocusMemberInTeam}

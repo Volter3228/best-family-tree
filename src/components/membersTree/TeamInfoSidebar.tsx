@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { useMembersList, useTeams } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
-import { getTeamRoster } from "@/utils";
+import { formatYearRange, getTeamRoster } from "@/utils";
 import Sidebar from "../sidebar";
+import SidebarMinimizedSummary from "../sidebar/SidebarMinimizedSummary";
 import TeamForm from "../sidebar/form/team/TeamForm";
 import TeamInfo from "../sidebar/info/TeamInfo";
 
@@ -49,6 +50,20 @@ const TeamInfoSidebar = ({
       onClose={state.close}
       onEditClick={state.startEdit}
       onBackClick={state.backToInfo}
+      isMinimized={state.isMinimized}
+      onMinimizedChange={state.setMinimized}
+      minimizedSummary={
+        team && (
+          <SidebarMinimizedSummary
+            title={team.name}
+            subtitle={formatYearRange({
+              start: team.startYear,
+              end: team.endYear,
+              ongoing: team.isOngoing,
+            })}
+          />
+        )
+      }
       className="z-10"
     >
       {team &&

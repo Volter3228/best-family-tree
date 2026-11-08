@@ -3,7 +3,8 @@ import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
 import type { Direction } from "@/types";
 
-const MOBILE_QUERY = "(max-width: 768px)";
+// Just below Tailwind's `md` breakpoint (768px), so the two never both match.
+const MOBILE_QUERY = "(max-width: 767.98px)";
 
 export const useIsMobileScreen = (): boolean => useMediaQuery(MOBILE_QUERY);
 

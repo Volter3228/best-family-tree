@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "attribution": false,
     "allow": [
       "Bash(npm run typecheck)",
       "Bash(npm run lint)",
@@ -26,23 +27,26 @@
     ],
     "hooks": {
       "PostToolUse": [
-	{
-      	  "matcher": "Edit|Write",
-      	  "hooks": [
+        {
+          "matcher": "Edit|Write",
+          "hooks": [
             {
               "type": "command",
               "command": "jq -r '.tool_input.file_path' | xargs -r npx prettier --write --ignore-unknown"
             }
           ]
         }
-      ],  
-    "Stop": [
-      {
-        "hooks": [
-          { "type": "command", "command": "graphify update . >/dev/null 2>&1 || true" }
-        ]
-      }
-    ]
+      ],
+      "Stop": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "graphify update . >/dev/null 2>&1 || true"
+            }
+          ]
+        }
+      ]
     }
   }
 }

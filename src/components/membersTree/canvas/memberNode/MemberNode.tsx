@@ -1,7 +1,8 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
-import { FederatedPointerEvent, Container, Filter, Rectangle } from "pixi.js";
+import { Container, Filter, Rectangle } from "pixi.js";
 import gsap from "gsap";
 import {
+  useTapWithoutDrag,
   useHoverNodeAnimation,
   useCardAnimation,
   CARD_PIVOT_X,
@@ -90,13 +91,13 @@ const MemberNode = ({
     fitViewTargetScale,
   });
 
-  const handleClick = useCallback(
-    (e: FederatedPointerEvent) => {
-      e.stopPropagation();
-      onClick(member, teamId);
-    },
+  const handleSelect = useCallback(
+    () => onClick(member, teamId),
     [member, teamId, onClick],
   );
+  // A drag that starts on the node pans the tree; it only selects the member
+  // when it was a quick, tiny slip of a click.
+  const tap = useTapWithoutDrag(handleSelect);
 
   // The tooltip only exists while it is needed (and while it fades out).
   const [isTooltipMounted, setIsTooltipMounted] = useState(false);
@@ -154,8 +155,9 @@ const MemberNode = ({
         cursor="pointer"
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
-        onClick={handleClick}
-        onTap={handleClick}
+        onPointerDown={tap.onPointerDown}
+        onClick={tap.onClick}
+        onTap={tap.onClick}
         filters={filters}
         cullable
         cullableChildren={false}

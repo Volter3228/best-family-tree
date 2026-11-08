@@ -70,17 +70,19 @@ const MentorMenteesDropdown = ({
               const visible = isVisible(mentee.id);
 
               return (
-                <li key={mentee.id} className="mb-1 leading-7">
+                <li
+                  key={mentee.id}
+                  className="mb-1 min-w-0 break-inside-avoid leading-7"
+                  title={mentee.name}
+                >
                   {!clickable ? (
-                    <span
-                      className="overflow-hidden text-ellipsis whitespace-nowrap text-foreground"
-                    >
+                    <span className="block truncate text-foreground">
                       {mentee.name}
                     </span>
                   ) : visible ? (
                     <span
                       className={twMerge(
-                        "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap transition-colors duration-200",
+                        "block cursor-pointer truncate transition-colors duration-200",
                         colorClasses.text,
                         colorClasses.hoverTextAccent,
                       )}
@@ -89,7 +91,7 @@ const MentorMenteesDropdown = ({
                       {mentee.name}
                     </span>
                   ) : (
-                    <span className="overflow-hidden text-ellipsis whitespace-nowrap text-foreground/60">
+                    <span className="block truncate text-foreground/60">
                       {mentee.name}
                     </span>
                   )}

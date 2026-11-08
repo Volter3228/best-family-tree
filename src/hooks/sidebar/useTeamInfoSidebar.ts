@@ -14,6 +14,8 @@ export const useTeamInfoSidebar = (
   const [teamId, setTeamId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<SidebarMode>("info");
+  // Mobile only: the card is collapsed to a bar above the toolbar.
+  const [isMinimized, setIsMinimized] = useState(false);
 
   useEffect(() => {
     if (selectedMember) setIsOpen(false);
@@ -24,15 +26,27 @@ export const useTeamInfoSidebar = (
       closeMemberSidebar();
       setTeamId(nextTeamId);
       setMode("info");
+      setIsMinimized(false);
       setIsOpen(true);
     },
     [closeMemberSidebar],
   );
 
+  // Stays minimized while sliding out; open() expands it again.
   const close = useCallback(() => setIsOpen(false), []);
 
   const startEdit = useCallback(() => setMode("edit"), []);
   const backToInfo = useCallback(() => setMode("info"), []);
 
-  return { teamId, isOpen, mode, open, close, startEdit, backToInfo };
+  return {
+    teamId,
+    isOpen,
+    mode,
+    isMinimized,
+    setMinimized: setIsMinimized,
+    open,
+    close,
+    startEdit,
+    backToInfo,
+  };
 };
