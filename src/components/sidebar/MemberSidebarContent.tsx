@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   useViewportAnimation,
   useMembersActions,
-  useMemberSwitchAnimation,
+  useSidebarSwitchAnimation,
 } from "@/hooks";
 import { Member } from "@/models";
 import { getMemberById } from "@/store/membersStore";
@@ -83,7 +83,7 @@ const MemberSidebarContent = ({
     prevViewRef.current = sidebarMode;
   }, [sidebarMode]);
 
-  useMemberSwitchAnimation(containerRef, member.id, sidebarMode);
+  useSidebarSwitchAnimation(containerRef, member.id, sidebarMode);
 
   return (
     <div ref={containerRef}>

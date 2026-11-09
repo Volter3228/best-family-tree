@@ -3,23 +3,23 @@ import { useEffect, useRef } from "react";
 import type { SidebarMode } from "@/types";
 
 /**
- * Animates a staggered fade-in when the selected member changes
+ * Animates a staggered fade-in when the shown item (member, team) changes
  * while in info mode. The container's first child is expected to
  * have `.member-info-avatar`, `.member-info-header`, and
  * `.member-info-row` elements.
  */
-export function useMemberSwitchAnimation(
+export function useSidebarSwitchAnimation(
   containerRef: React.RefObject<HTMLDivElement | null>,
-  memberId: string,
+  itemId: string,
   sidebarMode: SidebarMode,
 ) {
-  const prevMemberIdRef = useRef<string>(memberId);
+  const prevItemIdRef = useRef<string>(itemId);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
-    if (prevMemberIdRef.current === memberId) return;
+    if (prevItemIdRef.current === itemId) return;
     if (sidebarMode !== "info") {
-      prevMemberIdRef.current = memberId;
+      prevItemIdRef.current = itemId;
       return;
     }
     if (!containerRef.current) return;
@@ -55,10 +55,10 @@ export function useMemberSwitchAnimation(
         0.16,
       );
 
-    prevMemberIdRef.current = memberId;
+    prevItemIdRef.current = itemId;
 
     return () => {
       tl.kill();
     };
-  }, [memberId, sidebarMode, containerRef]);
+  }, [itemId, sidebarMode, containerRef]);
 }

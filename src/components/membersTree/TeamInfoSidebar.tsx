@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useMembersList, useTeams } from "@/hooks";
+import { useMemo, useRef } from "react";
+import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
 import { formatYearRange, getTeamRoster } from "@/utils";
 import Sidebar from "../sidebar";
@@ -42,6 +42,9 @@ const TeamInfoSidebar = ({
     [teamId, flatMembersList],
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useSidebarSwitchAnimation(containerRef, teamId ?? "", mode);
+
   return (
     <Sidebar
       id="team-sidebar"
@@ -67,32 +70,34 @@ const TeamInfoSidebar = ({
       }
       className="z-10"
     >
-      {team &&
-        teamId &&
-        (mode === "info" ? (
-          <TeamInfo
-            team={team}
-            roster={roster}
-            canClickMember={(memberId) =>
-              canFocusMemberInTeam(teamId, memberId) ||
-              canSelectMember(memberId)
-            }
-            onMemberClick={(memberId) => {
-              if (canFocusMemberInTeam(teamId, memberId)) {
-                onFocusMemberInTeam(teamId, memberId);
-              } else {
-                onSelectMember(memberId);
+      <div ref={containerRef}>
+        {team &&
+          teamId &&
+          (mode === "info" ? (
+            <TeamInfo
+              team={team}
+              roster={roster}
+              canClickMember={(memberId) =>
+                canFocusMemberInTeam(teamId, memberId) ||
+                canSelectMember(memberId)
               }
-            }}
-            onTitleClick={onTitleClick}
-          />
-        ) : (
-          <TeamForm
-            teamId={teamId}
-            onSaved={state.backToInfo}
-            onDeleted={state.close}
-          />
-        ))}
+              onMemberClick={(memberId) => {
+                if (canFocusMemberInTeam(teamId, memberId)) {
+                  onFocusMemberInTeam(teamId, memberId);
+                } else {
+                  onSelectMember(memberId);
+                }
+              }}
+              onTitleClick={onTitleClick}
+            />
+          ) : (
+            <TeamForm
+              teamId={teamId}
+              onSaved={state.backToInfo}
+              onDeleted={state.close}
+            />
+          ))}
+      </div>
     </Sidebar>
   );
 };
