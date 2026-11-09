@@ -49,17 +49,21 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 z-40 backdrop-blur-md rounded-2xl animate-dock-rise">
-        <div className="flex items-end gap-1.5 rounded-2xl bg-surface/70 p-2 shadow-2xl">
+      <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/70 shadow-2xl backdrop-blur-md"
+        />
+        <div className="relative flex items-end gap-1.5 rounded-2xl p-2">
           <ToolbarIconButton
-            title="Search"
+            title="Пошук"
             onClick={handleShowSearchClick}
             icon={MagnifyingGlassIcon}
             color="blue"
             isActive={search.isOpen}
           />
           <ToolbarIconButton
-            title="Filters"
+            title="Фільтри"
             onClick={handleShowFiltersClick}
             icon={FunnelIcon}
             color="green"

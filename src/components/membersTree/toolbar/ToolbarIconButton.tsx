@@ -1,9 +1,8 @@
-import { useRef, useCallback, useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import type { AccentColor } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
-
-const TOOLTIP_DELAY = 800;
+import useHoverTooltip from "./useHoverTooltip";
+import ToolbarTooltip from "./ToolbarTooltip";
 
 interface Props {
   title: string;
@@ -26,64 +25,23 @@ const ToolbarIconButton = ({
   showBadge = false,
   className = "",
 }: Props) => {
-  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [showTooltip, setShowTooltip] = useState(false);
-
-  const clearHoverTimer = () => {
-    if (hoverTimer.current) {
-      clearTimeout(hoverTimer.current);
-      hoverTimer.current = null;
-    }
-  };
-
-  const handleMouseEnter = useCallback(() => {
-    clearHoverTimer();
-    hoverTimer.current = setTimeout(() => setShowTooltip(true), TOOLTIP_DELAY);
-  }, []);
-
-  const handleMouseMove = useCallback(() => {
-    setShowTooltip(false);
-    clearHoverTimer();
-    hoverTimer.current = setTimeout(() => setShowTooltip(true), TOOLTIP_DELAY);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    clearHoverTimer();
-    setShowTooltip(false);
-  }, []);
-
-  useEffect(() => () => clearHoverTimer(), []);
-
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
-      clearHoverTimer();
-      setShowTooltip(false);
-      onClick(e);
-    },
-    [onClick],
-  );
+  const { showTooltip, hideTooltip, handlers } = useHoverTooltip();
 
   return (
     <div
       className="group relative flex flex-col items-center justify-end"
       style={{ transformOrigin: "50% 100%" }}
-      onMouseEnter={handleMouseEnter}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      {...handlers}
     >
-      <span
-        className={twMerge(
-          "pointer-events-none absolute -top-8 z-10 whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium text-white transition-[opacity,transform] duration-200 ease-out",
-          COLOR_CLASSES[color].accentBg,
-          showTooltip ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
-        )}
-      >
-        {title}
-      </span>
+      <ToolbarTooltip title={title} color={color} visible={showTooltip} />
       <button
-        onClick={handleClick}
+        onClick={(e) => {
+          hideTooltip();
+          onClick(e);
+        }}
+        aria-label={title}
         className={twMerge(
-          "flex h-11 w-11 items-center justify-center rounded-full focus:outline-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-transform group-hover:scale-[1.15] group-hover:-translate-y-1 active:scale-95",
+          "flex h-11 w-11 items-center justify-center rounded-full focus:outline-hidden transition-[scale,translate,background-color,color] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-[scale,translate] group-hover:scale-[1.15] group-hover:-translate-y-1 active:scale-95",
           isActive
             ? `${COLOR_CLASSES[color].accentBg} text-white`
             : `${COLOR_CLASSES[color].surfaceBg} ${COLOR_CLASSES[color].text}`,
