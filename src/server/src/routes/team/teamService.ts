@@ -53,7 +53,7 @@ export const getTeamDetails = async (id: string) => {
   return team;
 };
 
-export const createTeam = (body: TeamBody, iconUrl: string | null) =>
+export const createTeam = (body: TeamBody, photoUrl: string | null) =>
   prisma.$transaction(async (tx) => {
     const teamType = await resolveTeamType(tx, body);
     const name = body.name ?? deriveTeamName(teamType, body.startYear);
@@ -65,7 +65,7 @@ export const createTeam = (body: TeamBody, iconUrl: string | null) =>
       data: {
         name,
         description: body.description ?? null,
-        iconUrl,
+        photoUrl,
         teamTypeId: teamType?.id ?? null,
         startYear: body.startYear ?? null,
         endYear: body.isOngoing ? null : (body.endYear ?? null),
@@ -123,14 +123,14 @@ export const updateTeam = (
         startYear,
         endYear,
         isOngoing,
-        ...(icon !== undefined && { iconUrl: icon }),
+        ...(icon !== undefined && { photoUrl: icon }),
       },
       include: TEAM_INCLUDE,
     });
 
     return {
       team,
-      unusedIconUrl: icon !== undefined ? existing.iconUrl : null,
+      unusedIconUrl: icon !== undefined ? existing.photoUrl : null,
     };
   });
 

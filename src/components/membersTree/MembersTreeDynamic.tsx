@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import BrandSpinner from "@/components/ui/BrandSpinner";
+import PhotoViewer from "@/components/photoViewer/PhotoViewer";
 import { useTreeStore } from "@/store/treeStore";
 import type { Member as MemberType } from "@/types";
 
@@ -45,6 +46,7 @@ const MembersTreeDynamic = ({ members }: Props) => {
   return (
     <>
       <MembersTree members={members} />
+      <PhotoViewer />
       {phase !== "done" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
           <BrandSpinner

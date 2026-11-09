@@ -20,6 +20,18 @@ export const getPhotoUrlAsAvatar = (
   return `${baseUrl}/upload/c_fill,w_${width},h_${height}/${filePath}`;
 };
 
+// Full photo for the viewer: keeps the aspect ratio, never upscales, keeps the
+// original format (no f_auto, so "Save image as" gives a jpg/png, not a jxl), and is
+// capped so the huge original is not downloaded.
+export const getPhotoUrlForViewer = (url: string, max = 2048) => {
+  const [baseUrl, filePath] = url.split("/upload/");
+  return `${baseUrl}/upload/c_limit,w_${max},h_${max}/${filePath}`;
+};
+
+// Small preview: gives the aspect ratio and a first frame before the full photo loads.
+export const getPhotoUrlForViewerPreview = (url: string) =>
+  getPhotoUrlForViewer(url, 320);
+
 // Pre-rounded logo texture for the canvas team badge (`r_` is in delivered px;
 // WebP keeps the alpha). Only Cloudinary URLs can be transformed this way.
 export const getIconUrlAsRounded = (

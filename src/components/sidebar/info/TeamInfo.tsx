@@ -92,7 +92,7 @@ const TeamInfo = ({
     end: team.endYear,
     ongoing: team.isOngoing,
   });
-  const logoUrl = team.iconUrl ?? team.teamType?.iconUrl;
+  const logoUrl = team.photoUrl ?? team.teamType?.iconUrl;
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -101,11 +101,11 @@ const TeamInfo = ({
         name={team.name}
         color={color}
         className={twMerge(
-          "min-w-48 max-w-64 min-h-48 max-h-64 drop-shadow-xl rounded-xl",
+          "member-info-avatar drop-shadow-xl rounded-xl",
           !logoUrl && `${colorClasses.dropShadow} w-48 h-48`,
         )}
       />
-      <div className="mb-3 text-center">
+      <div className="member-info-header mb-3 text-center">
         <h5
           className={twMerge(
             "cursor-pointer text-2xl transition-colors duration-200",
@@ -135,12 +135,12 @@ const TeamInfo = ({
         )}
       </div>
       {!!team.description && (
-        <p className="w-full whitespace-pre-line text-center font-light">
+        <p className="member-info-row w-full whitespace-pre-line text-center font-light">
           {team.description}
         </p>
       )}
       {roster.length > 0 && (
-        <div className="flex w-full flex-col gap-0.5 border-t border-foreground/10 pt-3">
+        <div className="member-info-row flex w-full flex-col gap-0.5 border-t border-foreground/10 pt-3">
           {roster.map((entry) => (
             <RosterRow
               key={entry.member.id}

@@ -17,7 +17,7 @@ const THEME_OPTIONS = [
 const ORIENTATION_OPTIONS = [
   { value: "auto", label: "Авто", icon: "🔄" },
   { value: "tb", label: "Вниз", icon: "⬇️" },
-  { value: "lr", label: "Вправо", icon: "➡️" },
+  { value: "lr", label: "Праворуч", icon: "➡️" },
 ] satisfies { value: OrientationSetting; label: string; icon: string }[];
 
 const edgeIcon = (d: string) => (

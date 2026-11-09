@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { loadImageAspect } from "@/components/photoViewer/imageAspect";
+import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
 
@@ -11,17 +14,44 @@ interface Props {
 
 const GROUP_ICON_URL = 'url("/images/lion-group.svg")';
 
-// Team logo shown whole (no crop, no backdrop, so white logos stay visible), or
-// the lion group icon (drawn as a mask in the accent colour) when the team and
-// its type have none. The size comes from the className prop.
+const MAX_LOGO_WIDTH = "16rem";
+const MAX_LOGO_HEIGHT = "12rem";
+
 const TeamLogo = ({ url, name, className, color = "blue" }: Props) => {
+  const [loaded, setLoaded] = useState<{ url: string; aspect: number }>();
+  useEffect(() => {
+    if (!url) return;
+    let cancelled = false;
+    void loadImageAspect(url).then((aspect) => {
+      if (!cancelled) setLoaded({ url, aspect });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
   if (url) {
+    const aspect = loaded?.url === url ? loaded.aspect : 1;
     return (
-      <img
+      <PhotoOpenButton
+        id={`team-logo:${name}`}
         src={url}
+        previewSrc={url}
         alt={name}
-        className={twMerge("shrink-0", className)}
-      />
+        fit="contain"
+        roundedClassName="rounded-xl"
+        className="shrink-0"
+      >
+        <img
+          src={url}
+          alt={name}
+          className={twMerge("shrink-0", className)}
+          style={{
+            width: `min(${MAX_LOGO_WIDTH}, calc(${MAX_LOGO_HEIGHT} * ${aspect}))`,
+            height: "auto",
+          }}
+        />
+      </PhotoOpenButton>
     );
   }
 

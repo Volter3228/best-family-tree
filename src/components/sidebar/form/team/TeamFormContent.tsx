@@ -94,8 +94,8 @@ const TeamFormContent = ({
           image={form.icon ?? null}
           label="Фото команди"
           initialImage={
-            mode === "edit" && selectedTeam?.iconUrl
-              ? selectedTeam.iconUrl
+            mode === "edit" && selectedTeam?.photoUrl
+              ? selectedTeam.photoUrl
               : null
           }
           color={color}

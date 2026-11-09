@@ -4,8 +4,8 @@ model Team {
   // or the type name (working groups) when the user gives no name.
   name        String  @unique
   description String?
-  // Own logo; falls back to the team type's icon.
-  iconUrl     String?
+  // Own photo; the team type's icon is used as the fallback logo.
+  photoUrl    String?
   teamTypeId  String?
   // The period belongs to the team, in whole years. Either end may be unknown.
   startYear   Int?

@@ -21,7 +21,7 @@ export const toTeamFormData = (team: TeamDetails): TeamFormData => ({
   startYear: team.startYear ?? undefined,
   endYear: team.endYear ?? undefined,
   isOngoing: team.isOngoing,
-  icon: team.iconUrl ?? null,
+  icon: team.photoUrl ?? null,
   members: team.positions.map(
     (position): TeamMemberRow => ({
       id: position.id,

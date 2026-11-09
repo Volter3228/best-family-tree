@@ -88,7 +88,7 @@ router.put("/teams/:id", uploadTeamIcon.single("icon"), async (req, res) => {
 router.delete("/teams/:id", async (req, res) => {
   try {
     const team = await deleteTeam(req.params.id);
-    if (team.iconUrl) await deleteCloudinaryImage(team.iconUrl);
+    if (team.photoUrl) await deleteCloudinaryImage(team.photoUrl);
     res.status(204).send();
   } catch (error) {
     sendRouteError(res, error, "Failed to delete team");

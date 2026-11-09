@@ -62,7 +62,7 @@ const isSamePosition = (a: MemberPosition, b: MemberPosition) =>
   a.endYear === b.endYear &&
   a.role?.isLeaderPosition === b.role?.isLeaderPosition &&
   a.team?.name === b.team?.name &&
-  a.team?.iconUrl === b.team?.iconUrl &&
+  a.team?.photoUrl === b.team?.photoUrl &&
   a.team?.teamTypeId === b.team?.teamTypeId &&
   a.team?.startYear === b.team?.startYear &&
   a.team?.endYear === b.team?.endYear &&

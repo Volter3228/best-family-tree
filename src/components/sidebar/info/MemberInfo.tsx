@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
@@ -19,9 +18,15 @@ import {
   getMemberAvatar,
 } from "@/utils";
 import { Member } from "@/models";
+import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
+import {
+  getPhotoUrlForViewer,
+  getPhotoUrlForViewerPreview,
+} from "@/libs/cloudinary";
 import { useMemberById, useMentees } from "@/hooks";
 import type { AccentColor, MemberPosition } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import MemberAvatarImage from "./MemberAvatarImage";
 import MemberInfoRow from "./MemberInfoRow";
 import MemberInfoSocial from "./MemberInfoSocial";
 import MemberInfoActionIcon from "./MemberInfoActionIcon";
@@ -67,15 +72,17 @@ const MemberInfo = ({
         className={`member-info-avatar relative h-48 w-48 ${colorClasses.dropShadow} drop-shadow-2xl/30`}
       >
         {photo ? (
-          <Image
-            src={avatar || photo}
-            alt="Avatar"
-            className="rounded-full shadow-lg"
-            sizes="100%"
-            quality={75}
-            priority
-            fill
-          />
+          <PhotoOpenButton
+            id={member.id}
+            src={getPhotoUrlForViewer(photo)}
+            previewSrc={getPhotoUrlForViewerPreview(photo)}
+            alt={name}
+            fit="circle"
+            roundedClassName="rounded-full"
+            className="block h-full w-full"
+          >
+            <MemberAvatarImage src={avatar || photo} />
+          </PhotoOpenButton>
         ) : (
           <div
             className={twMerge(

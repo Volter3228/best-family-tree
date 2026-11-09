@@ -19,7 +19,7 @@ export type Team = {
   id: string;
   name: string;
   description?: string | null;
-  iconUrl?: string | null;
+  photoUrl?: string | null;
   teamTypeId?: string | null;
   // The team's period in whole years; either end may be unknown, and the
   // isOngoing flag says the team still runs (no end is planned yet).
