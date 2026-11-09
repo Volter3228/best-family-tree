@@ -36,9 +36,10 @@ const TeamInfoSidebar = ({
     () => teams.find((item) => item.id === teamId) ?? null,
     [teams, teamId],
   );
+  // Kept while the sidebar slides out, so its content (and height) stay put.
   const roster = useMemo(
-    () => (isOpen && teamId ? getTeamRoster(flatMembersList, teamId) : []),
-    [isOpen, teamId, flatMembersList],
+    () => (teamId ? getTeamRoster(flatMembersList, teamId) : []),
+    [teamId, flatMembersList],
   );
 
   return (
