@@ -52,3 +52,96 @@
     transform: translateX(-50%) translateY(0);
   }
 }
+
+/* Brand gradient at 45deg: three clear colours with short blends. While
+   loading, a repeating version slides left to right (the offset --brand-o
+   animates by exactly one period, so the loop has no seam). */
+@property --brand-o {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+.brand-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--accent-blue) 10%,
+    var(--accent-green) 50%,
+    var(--accent-orange) 90%
+  );
+}
+.brand-gradient-moving {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--accent-blue) calc(var(--brand-o) + 0px),
+    var(--accent-blue) calc(var(--brand-o) + 50px),
+    var(--accent-green) calc(var(--brand-o) + 100px),
+    var(--accent-green) calc(var(--brand-o) + 150px),
+    var(--accent-orange) calc(var(--brand-o) + 200px),
+    var(--accent-orange) calc(var(--brand-o) + 250px),
+    var(--accent-blue) calc(var(--brand-o) + 300px)
+  );
+  animation: brand-gradient-shift 10s linear infinite;
+}
+@keyframes brand-gradient-shift {
+  to {
+    --brand-o: 300px;
+  }
+}
+
+/* Sign in / sign out: the page slides off the screen (class set before
+   navigating) and the next one slides in from the opposite corner, as if
+   both pages sat on one big canvas. The aurora background stays put. */
+.page-root {
+  --slide-x: 100vw;
+  --slide-y: 100vh;
+}
+html[class*="page-leaving"] .page-root,
+html[data-enter] .page-root {
+  height: 100dvh;
+}
+html.page-leaving-ne .page-root {
+  transform: translate(var(--slide-x), calc(-1 * var(--slide-y)));
+  transition: transform 550ms cubic-bezier(0.55, 0, 0.9, 0.4);
+}
+html.page-leaving-sw .page-root {
+  transform: translate(calc(-1 * var(--slide-x)), var(--slide-y));
+  transition: transform 550ms cubic-bezier(0.55, 0, 0.9, 0.4);
+}
+@keyframes slide-in-from-sw {
+  from {
+    transform: translate(calc(-1 * var(--slide-x)), var(--slide-y));
+  }
+}
+@keyframes slide-in-from-ne {
+  from {
+    transform: translate(var(--slide-x), calc(-1 * var(--slide-y)));
+  }
+}
+html[data-enter="sw"] .page-root {
+  animation: slide-in-from-sw 650ms cubic-bezier(0.1, 0.6, 0.3, 1);
+}
+html[data-enter="ne"] .page-root {
+  animation: slide-in-from-ne 650ms cubic-bezier(0.1, 0.6, 0.3, 1);
+}
+
+/* Signing in: the card lifts away and softly dissolves, then the tree settles
+   into place from slightly zoomed in. Only the sign-out uses the slide. */
+html.page-leaving-zoom .page-root {
+  opacity: 0;
+  transform: scale(1.06);
+  filter: blur(6px);
+  transition:
+    opacity 400ms ease-in,
+    transform 400ms ease-in,
+    filter 400ms ease-in;
+}
+@keyframes zoom-settle {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(8px);
+  }
+}
+html[data-enter="zoom"] .page-root {
+  animation: zoom-settle 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}

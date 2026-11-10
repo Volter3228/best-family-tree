@@ -11,6 +11,14 @@ interface Props {
   label?: string;
   required?: boolean;
   onChange: (text: string) => void;
+  type?: "text" | "email";
+  autoComplete?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  autoCapitalize?: string;
+  spellCheck?: boolean;
+  onEnter?: () => void;
+  invalid?: boolean;
+  disabled?: boolean;
   color?: AccentColor;
   icon?:
     | React.FC
@@ -27,6 +35,14 @@ const TextInput = ({
   required = false,
   value,
   onChange,
+  type = "text",
+  autoComplete = "off",
+  inputMode,
+  autoCapitalize,
+  spellCheck,
+  onEnter,
+  invalid = false,
+  disabled = false,
   color = "blue",
   icon: Icon,
 }: Props) => {
@@ -40,7 +56,7 @@ const TextInput = ({
     <>
       <InputLabel
         label={label}
-        htmlFor={name}
+        htmlFor={id || name}
         required={required}
         color={color}
       />
@@ -49,7 +65,22 @@ const TextInput = ({
         name={name}
         onChange={handleChange}
         value={value}
-        type="text"
+        type={type}
+        inputMode={inputMode}
+        autoCapitalize={autoCapitalize}
+        spellCheck={spellCheck}
+        disabled={disabled}
+        aria-invalid={invalid || undefined}
+        onKeyDown={
+          onEnter
+            ? (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  onEnter();
+                }
+              }
+            : undefined
+        }
         placeholder={placeholder}
         className={twMerge(
           "block w-full pl-3",
@@ -60,8 +91,9 @@ const TextInput = ({
           colorClasses.border,
           colorClasses.accentRing,
           colorClasses.caret,
+          invalid && "ring-2 ring-accent-orange",
         )}
-        autoComplete="off"
+        autoComplete={autoComplete}
         required={required}
       />
       {!!Icon && (

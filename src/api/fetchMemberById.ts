@@ -6,7 +6,7 @@ import type { Member as MemberType } from "@/types";
 const fetchMemberById = async (id: string): Promise<Member | null> => {
   try {
     const res = await http(ENDPOINTS.getMemberById(id), {
-      cache: "force-cache",
+      cache: "no-cache",
     });
 
     if (!res.ok) {

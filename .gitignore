@@ -51,3 +51,4 @@ Dockerfile.*override
 .devin
 .windsurf
 .mcp.json
+.playwright-mcp

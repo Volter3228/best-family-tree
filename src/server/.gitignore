@@ -7,3 +7,5 @@ node_modules
 /src/db/prisma/generated
 
 /src/db/migrateMembersFromMongodb.ts
+questions.private.json
+*.private.csv

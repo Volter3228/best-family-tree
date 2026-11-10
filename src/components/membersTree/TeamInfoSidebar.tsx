@@ -1,3 +1,4 @@
+import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useMemo, useRef } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
@@ -42,6 +43,7 @@ const TeamInfoSidebar = ({
     [teamId, flatMembersList],
   );
 
+  const editable = useSessionStore((s) => canEdit(s.session));
   const containerRef = useRef<HTMLDivElement>(null);
   useSidebarSwitchAnimation(containerRef, teamId ?? "", mode);
 
@@ -52,7 +54,7 @@ const TeamInfoSidebar = ({
       mode={mode}
       isOpen={isOpen}
       onClose={state.close}
-      onEditClick={state.startEdit}
+      onEditClick={editable ? state.startEdit : undefined}
       onBackClick={state.backToInfo}
       isMinimized={state.isMinimized}
       onMinimizedChange={state.setMinimized}

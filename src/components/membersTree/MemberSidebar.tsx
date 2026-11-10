@@ -1,3 +1,4 @@
+import { canEdit, useSessionStore } from "@/store/sessionStore";
 import type { useSidebar } from "@/hooks";
 import { formatMemberRecruitmentSeason } from "@/utils";
 import { Member } from "@/models";
@@ -24,14 +25,16 @@ const MemberSidebar = ({
   canFocusMemberInTeam,
   onFocusMemberInTeam,
   onOpenTeamInfo,
-}: Props) => (
+}: Props) => {
+  const editable = useSessionStore((s) => canEdit(s.session, member?.id));
+  return (
   <Sidebar
     id="member-sidebar"
     headerTitle={state.sidebarMode === "info" ? "Інфо" : "Редагувати"}
     mode={state.sidebarMode}
     isOpen={state.isSidebarOpen}
     onClose={state.onClose}
-    onEditClick={state.onEditClick}
+    onEditClick={editable ? state.onEditClick : undefined}
     onBackClick={state.onBackToInfoClick}
     isMinimized={state.isSidebarMinimized}
     onMinimizedChange={state.onMinimizedChange}
@@ -60,6 +63,7 @@ const MemberSidebar = ({
       />
     )}
   </Sidebar>
-);
+  );
+};
 
 export default MemberSidebar;

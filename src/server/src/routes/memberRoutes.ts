@@ -14,10 +14,12 @@ import {
 } from "./member/memberPayload.js";
 import { MEMBER_INCLUDE, serializeMember } from "./member/memberQueries.js";
 import {
+  assertCanEditMember,
   createMember,
   deleteMember,
   updateMember,
 } from "./member/memberService.js";
+import { toMemberResponse } from "../auth/reducedView.js";
 
 const router = Router();
 const uploadMemberPhoto = uploadMiddleware("best-family-tree/members");
@@ -34,7 +36,7 @@ router.get("/member/:id", async (req, res) => {
       return;
     }
 
-    res.status(200).json(serializeMember(member));
+    res.status(200).json(toMemberResponse(serializeMember(member), req.session!));
   } catch (error) {
     console.error("Failed to fetch member:", error);
     res.status(500).json({ error: "Failed to fetch member" });
@@ -81,7 +83,7 @@ router.post(
         uploadedPhoto || null,
         sparse,
       );
-      res.status(201).json(serializeMember(newMember));
+      res.status(201).json(toMemberResponse(serializeMember(newMember), req.session!));
     } catch (error) {
       await discardUpload();
       sendRouteError(res, error, "Failed to create member");
@@ -111,6 +113,14 @@ router.put(
 
       if (!existingMember) {
         await reject(404, "Member not found");
+        return;
+      }
+
+      try {
+        await assertCanEditMember(req.session!, id);
+      } catch (error) {
+        await discardUpload();
+        sendRouteError(res, error, "Failed to update member");
         return;
       }
 
@@ -159,7 +169,7 @@ router.put(
       if (oldPhotoUrl && photoUrl !== oldPhotoUrl) {
         await deleteCloudinaryImage(oldPhotoUrl);
       }
-      res.status(200).json(serializeMember(updatedMember));
+      res.status(200).json(toMemberResponse(serializeMember(updatedMember), req.session!));
     } catch (error) {
       sendRouteError(res, error, "Failed to update member");
     }
@@ -168,6 +178,7 @@ router.put(
 
 router.delete("/members/:id", async (req, res) => {
   try {
+    await assertCanEditMember(req.session!, req.params.id);
     const photoUrl = await deleteMember(req.params.id);
     if (photoUrl) await deleteCloudinaryImage(photoUrl);
     res.status(204).send();

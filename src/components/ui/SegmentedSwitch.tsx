@@ -8,6 +8,8 @@ export interface SegmentedOption<T extends string> {
   label: string;
   icon?: ReactNode;
   disabled?: boolean;
+  // Overrides the switch color while this option is selected.
+  color?: AccentColor;
 }
 
 interface Props<T extends string> {
@@ -26,15 +28,34 @@ const SegmentedSwitch = <T extends string>({
   ariaLabel,
   color = "green",
   disabled = false,
-}: Props<T>) => (
+}: Props<T>) => {
+  const activeIndex = Math.max(
+    0,
+    options.findIndex((o) => o.value === value),
+  );
+  const activeColor = options[activeIndex]?.color ?? color;
+
+  return (
   <div
     role="radiogroup"
     aria-label={ariaLabel}
     className={twMerge(
-      "flex rounded-xl bg-foreground/5 p-0.5",
+      "relative flex rounded-xl bg-foreground/5 p-0.5",
       disabled && "opacity-50",
     )}
   >
+    {/* Sliding thumb: moves and changes color between options. */}
+    <span
+      aria-hidden
+      className={twMerge(
+        "pointer-events-none absolute inset-y-0.5 left-0.5 rounded-lg shadow-sm transition-[transform,background-color] duration-300 ease-out",
+        COLOR_CLASSES[activeColor].accentBg,
+      )}
+      style={{
+        width: `calc((100% - 4px) / ${options.length})`,
+        transform: `translateX(${activeIndex * 100}%)`,
+      }}
+    />
     {options.map((option) => {
       const optionDisabled = disabled || option.disabled;
       return (
@@ -46,11 +67,11 @@ const SegmentedSwitch = <T extends string>({
           disabled={optionDisabled}
           onClick={() => onChange(option.value)}
           className={twMerge(
-            "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all duration-200",
+            "relative flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-colors duration-300",
             "focus:outline-none focus-visible:ring-1",
-            COLOR_CLASSES[color].focusVisibleRing,
+            COLOR_CLASSES[option.color ?? color].focusVisibleRing,
             value === option.value
-              ? `${COLOR_CLASSES[color].accentBg} text-white shadow-sm`
+              ? "text-white"
               : "text-foreground/60 hover:text-foreground",
             optionDisabled && "cursor-not-allowed hover:text-foreground/60",
           )}
@@ -61,6 +82,7 @@ const SegmentedSwitch = <T extends string>({
       );
     })}
   </div>
-);
+  );
+};
 
 export default SegmentedSwitch;

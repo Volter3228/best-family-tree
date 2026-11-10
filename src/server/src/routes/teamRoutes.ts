@@ -103,7 +103,7 @@ router.put("/teams/:id/members", async (req, res) => {
   }
 
   try {
-    await syncTeamMembers(req.params.id, body.data);
+    await syncTeamMembers(req.params.id, body.data, req.session!);
     res.status(200).json(await getTeamDetails(req.params.id));
   } catch (error) {
     sendRouteError(res, error, "Failed to update team members");

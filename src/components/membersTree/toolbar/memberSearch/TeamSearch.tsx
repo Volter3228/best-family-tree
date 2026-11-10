@@ -26,16 +26,22 @@ const getSubtitle = (frame: TeamFrame) =>
 const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
   const teamFrames = useTreeStore((s) => s.teamFrames);
 
-  const { query, setQuery, suggestions, activeIndex, handleSelect, handleKeyDown } =
-    useSearchSuggestions({
-      items: teamFrames,
-      getSearchable,
-      compare,
-      onSelect: (frame) => {
-        onSearch(frame);
-        onClose();
-      },
-    });
+  const {
+    query,
+    setQuery,
+    suggestions,
+    activeIndex,
+    handleSelect,
+    handleKeyDown,
+  } = useSearchSuggestions({
+    items: teamFrames,
+    getSearchable,
+    compare,
+    onSelect: (frame) => {
+      onSearch(frame);
+      onClose();
+    },
+  });
 
   const displayed = useMemo(() => [...suggestions].reverse(), [suggestions]);
 

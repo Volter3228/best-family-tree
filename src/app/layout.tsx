@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
 import AuroraBackground from "@/components/ui/AuroraBackground";
 import { themeInitScript } from "@/utils/themeInitScript";
+import { slideInScript } from "@/utils/navigateWithSlide";
 import "./globals.css";
 import "../styles/background.css";
 import "../styles/animations.css";
@@ -38,9 +39,10 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: slideInScript }} />
         <AuroraBackground />
         <ThemeProvider>
-          <div className="relative z-1">{children}</div>
+          <div className="page-root relative z-1">{children}</div>
           <div id="datepicker-portal" />
         </ThemeProvider>
       </body>

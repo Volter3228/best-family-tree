@@ -12,6 +12,9 @@ import { getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
 import type { MemberFormData, AccentColor } from "@/types";
 import { MemberFormFields } from "./fields";
+import FormError from "./FormError";
+import { describeSubmitError } from "./describeSubmitError";
+import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
@@ -66,6 +69,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
     Partial<Record<keyof MemberFormData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const formId = useId();
 
@@ -89,6 +93,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
     event.preventDefault();
 
     setErrors({});
+    setFormError(null);
     const validationErrors = validateMemberForm(form, mentorsList, teamTypes, member);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -114,7 +119,12 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
         onExit();
       }
     } catch (error) {
-      console.error("Form submission error:", error);
+      const { field, message } = describeSubmitError(
+        error,
+        Object.keys(MEMBER_FORM_DEFAULTS),
+      );
+      if (field) setErrors({ [field]: message });
+      else setFormError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -124,6 +134,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
   // that showed the member (tree, mentor list, team rosters).
   const handleDelete = async () => {
     setIsSubmitting(true);
+    setFormError(null);
     try {
       await apiDeleteMember(member.id);
       await reloadMembers();
@@ -131,7 +142,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
       reloadTeams();
       (onDeleted ?? onExit)();
     } catch (error) {
-      console.error("Failed to delete member:", error);
+      setFormError(describeSubmitError(error, []).message);
     } finally {
       setIsSubmitting(false);
       setIsConfirmingDelete(false);
@@ -155,6 +166,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
         initialAvatar={getMemberAvatar(member)}
         color={color}
       />
+      <FormError message={formError} color={color} />
       <FormFooter>
         <div className="flex w-4/5 flex-row justify-center gap-3">
           <ClearButton

@@ -108,8 +108,8 @@ const TeamInfo = ({
       <div className="member-info-header mb-3 text-center">
         <h5
           className={twMerge(
-            "cursor-pointer text-2xl transition-colors duration-200",
-            colorClasses.hoverTextAccent,
+            "text-2xl transition-colors duration-200",
+            onTitleClick && `${colorClasses.hoverTextAccent} cursor-pointer`,
           )}
           onClick={onTitleClick}
         >

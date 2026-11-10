@@ -1,12 +1,16 @@
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import Sidebar, { ManageForm } from "@/components/sidebar";
 import {
   PencilSquareIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
   Cog6ToothIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { usePanelToggle } from "@/hooks";
+import { authStrings as t } from "@/components/auth/strings";
+import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
@@ -14,6 +18,7 @@ import { FiltersPanel } from "./filters";
 import { SettingsPanel } from "./settings";
 import ToolbarIconButton from "./ToolbarIconButton";
 import FitViewButton from "./FitViewButton";
+import AccountPanel from "./AccountPanel";
 
 interface Props {
   onFitView: () => void;
@@ -26,7 +31,15 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const search = usePanelToggle();
   const filters = usePanelToggle();
   const settings = usePanelToggle();
+  const account = usePanelToggle();
   const hasActiveFilters = useFiltersStore((s) => s.isFilterActive);
+
+  const session = useSessionStore((s) => s.session);
+  const loadSession = useSessionStore((s) => s.load);
+  useEffect(() => {
+    void loadSession();
+  }, [loadSession]);
+  const editable = canEdit(session);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -35,16 +48,25 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
     search.toggle(() => {
       filters.close();
       settings.close();
+      account.close();
     });
   const handleShowFiltersClick = () =>
     filters.toggle(() => {
       search.close();
       settings.close();
+      account.close();
     });
   const handleShowSettingsClick = () =>
     settings.toggle(() => {
       search.close();
       filters.close();
+      account.close();
+    });
+  const handleShowAccountClick = () =>
+    account.toggle(() => {
+      search.close();
+      filters.close();
+      settings.close();
     });
 
   return (
@@ -78,13 +100,28 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
             color="green"
             isActive={settings.isOpen}
           />
-          <ToolbarIconButton
-            title="Керування"
-            onClick={toggleSidebar}
-            icon={PencilSquareIcon}
-            color="blue"
-            isActive={isSidebarOpen}
-          />
+          {editable && (
+            <ToolbarIconButton
+              title="Керування"
+              onClick={toggleSidebar}
+              icon={PencilSquareIcon}
+              color="blue"
+              isActive={isSidebarOpen}
+            />
+          )}
+          {session && !session.demo && (
+            <ToolbarIconButton
+              title={t.logout}
+              onClick={handleShowAccountClick}
+              icon={
+                session.method === "QUESTIONS"
+                  ? ArrowRightOnRectangleIcon
+                  : UserCircleIcon
+              }
+              color="blue"
+              isActive={account.isOpen}
+            />
+          )}
         </div>
       </div>
       <SearchBar
@@ -96,14 +133,21 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
       />
       <FiltersPanel isOpen={filters.isOpen} isClosing={filters.isClosing} />
       <SettingsPanel isOpen={settings.isOpen} isClosing={settings.isClosing} />
-      <Sidebar
-        headerTitle="Керування"
-        onClose={closeSidebar}
-        isOpen={isSidebarOpen}
-        color="blue"
-      >
-        <ManageForm onSuccess={closeSidebar} color="blue" />
-      </Sidebar>
+      <AccountPanel
+        isOpen={account.isOpen}
+        isClosing={account.isClosing}
+        onClose={account.close}
+      />
+      {editable && (
+        <Sidebar
+          headerTitle="Керування"
+          onClose={closeSidebar}
+          isOpen={isSidebarOpen}
+          color="blue"
+        >
+          <ManageForm onSuccess={closeSidebar} color="blue" />
+        </Sidebar>
+      )}
     </>
   );
 };

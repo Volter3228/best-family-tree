@@ -17,8 +17,24 @@ export class ValidationError extends HttpError {
   }
 }
 
+export class UnauthorizedError extends HttpError {
+  constructor(message = "Sign in required") {
+    super(401, message);
+  }
+}
+
+export class ForbiddenError extends HttpError {
+  constructor(message = "Not allowed") {
+    super(403, message);
+  }
+}
+
 export class ConflictError extends HttpError {
-  constructor(message: string) {
+  constructor(
+    message: string,
+    // Form field the conflict belongs to, so the client can show it there.
+    readonly field?: string,
+  ) {
     super(409, message);
   }
 }
@@ -41,7 +57,8 @@ export const sendRouteError = (
   fallbackMessage: string,
 ) => {
   if (error instanceof HttpError) {
-    res.status(error.status).json({ error: error.message });
+    const field = error instanceof ConflictError ? error.field : undefined;
+    res.status(error.status).json({ error: error.message, field });
     return;
   }
 

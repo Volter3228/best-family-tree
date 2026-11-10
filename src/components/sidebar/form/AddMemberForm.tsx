@@ -14,6 +14,8 @@ import type {
   Member as MemberType,
 } from "@/types";
 import { MemberFormFields } from "./fields";
+import FormError from "./FormError";
+import { describeSubmitError } from "./describeSubmitError";
 import { FormCheckbox } from "./inputs";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
@@ -31,6 +33,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
     Partial<Record<keyof MemberFormData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isMinimal, setIsMinimal] = useState(false);
   const formId = useId();
 
@@ -63,6 +66,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
       return;
     }
 
+    setFormError(null);
     setIsSubmitting(true);
     const formData = buildMemberFormData(form);
     if (isMinimal) formData.append("sparse", "true");
@@ -79,7 +83,12 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
         onSuccess?.(newMember);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
+      const { field, message } = describeSubmitError(
+        error,
+        Object.keys(MEMBER_FORM_DEFAULTS),
+      );
+      if (field) setErrors({ [field]: message });
+      else setFormError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -107,6 +116,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
         errors={errors}
         color={color}
       />
+      <FormError message={formError} color={color} />
       <FormFooter>
         <div className="flex w-4/5 flex-row justify-center gap-3">
           <ClearButton

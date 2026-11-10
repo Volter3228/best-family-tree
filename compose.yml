@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: best-family-tree-backend
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
       - "51212:51212"
     environment:
       - NODE_ENV=development
@@ -62,6 +62,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./public:/app/public
+      - ./next.config.mjs:/app/next.config.mjs
       - /app/src/server
       - /app/node_modules
       - /app/.next

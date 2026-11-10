@@ -12,6 +12,8 @@ import {
   resolveTeamType,
 } from "../shared/catalogResolvers.js";
 import type { MemberTransaction } from "../member/memberQueries.js";
+import { assertCanEditMembers } from "../member/memberService.js";
+import type { Session } from "../../auth/types.js";
 
 export const TEAM_INCLUDE = {
   teamType: true,
@@ -149,7 +151,11 @@ export const deleteTeam = (id: string) =>
  * Make the team's roster match `body`: one position per (member, role) pair.
  * Unchanged positions are kept; a member's positions elsewhere are untouched.
  */
-export const syncTeamMembers = (id: string, body: TeamMembersBody) =>
+export const syncTeamMembers = (
+  id: string,
+  body: TeamMembersBody,
+  session: Session,
+) =>
   prisma.$transaction(async (tx) => {
     const team = await tx.team.findUnique({ where: { id } });
     if (!team) throw new NotFoundError("Team not found");
@@ -174,17 +180,23 @@ export const syncTeamMembers = (id: string, body: TeamMembersBody) =>
       existing.map((row) => `${row.memberId}|${row.roleId}`),
     );
 
+    const removed = existing.filter(
+      (row) => !desired.has(`${row.memberId}|${row.roleId}`),
+    );
+    const created = [...desired].filter(([key]) => !existingKeys.has(key));
+
+    // A roster change edits each affected member's positions.
+    await assertCanEditMembers(session, [
+      ...new Set([
+        ...removed.map((row) => row.memberId),
+        ...created.map(([, row]) => row.memberId),
+      ]),
+    ]);
+
     await tx.memberPosition.deleteMany({
-      where: {
-        id: {
-          in: existing
-            .filter((row) => !desired.has(`${row.memberId}|${row.roleId}`))
-            .map((row) => row.id),
-        },
-      },
+      where: { id: { in: removed.map((row) => row.id) } },
     });
 
-    const created = [...desired].filter(([key]) => !existingKeys.has(key));
     if (created.length > 0) {
       await tx.memberPosition.createMany({
         data: created.map(([, row]) => ({ ...row, teamId: id })),

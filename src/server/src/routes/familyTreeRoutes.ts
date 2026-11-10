@@ -7,6 +7,7 @@ import {
 } from "../utils/index.js";
 import type { MemberWithPhoneNumberRecords } from "../utils/index.js";
 import { createVersionedCache } from "../utils/readCache.js";
+import { toMemberResponse } from "../auth/reducedView.js";
 
 const router = Router();
 
@@ -32,15 +33,26 @@ const loadFamilyTree = createVersionedCache(async () => {
   return JSON.stringify(transformMembersToTree(members));
 });
 
-// Flat, ordered list: each member once, mentors before their mentees. The
-// client rebuilds the tree from `mentorId` and the order of the list.
+// The same list without contacts, for Questions sessions.
+const loadReducedFamilyTree = createVersionedCache(async () => {
+  const { value } = await loadFamilyTree();
+  const members = JSON.parse(value) as (MemberType & Record<string, unknown>)[];
+  return JSON.stringify(
+    members.map((m) => toMemberResponse(m, { method: "QUESTIONS" })),
+  );
+});
+
 // Served from memory until any write happens; clients always revalidate
 // (`no-cache`) and get a 304 while the data version is unchanged.
 router.get("/family-tree", async (req, res) => {
   try {
-    const { value, version } = await loadFamilyTree();
-    res.set("Cache-Control", "no-cache");
-    res.set("ETag", `W/"ft-${version}-${value.length}"`);
+    const reduced = req.session?.method === "QUESTIONS";
+    const { value, version } = await (reduced
+      ? loadReducedFamilyTree()
+      : loadFamilyTree());
+    res.set("Cache-Control", "private, no-cache");
+    res.set("Vary", "Cookie");
+    res.set("ETag", `W/"ft-${reduced ? "r" : "f"}${version}-${value.length}"`);
     if (req.fresh) {
       res.status(304).end();
       return;

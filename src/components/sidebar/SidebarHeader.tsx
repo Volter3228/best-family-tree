@@ -86,7 +86,7 @@ const SidebarHeader = ({
             <ChevronUpIcon className="h-6 w-6" />
           </button>
         )}
-        {mode === "info" && (
+        {mode === "info" && onEditClick && (
           <button
             onClick={onEditClick}
             className={twMerge(

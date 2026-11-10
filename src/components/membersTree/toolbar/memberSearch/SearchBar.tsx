@@ -13,7 +13,9 @@ interface Props {
 
 // Searches members, or teams while the team layout is selected.
 const SearchBar = ({ onSearch, onTeamSearch, ...panelProps }: Props) => {
-  const isTeamView = useFiltersStore((s) => s.appliedFilters.treeMode === "team");
+  const isTeamView = useFiltersStore(
+    (s) => s.appliedFilters.treeMode === "team",
+  );
 
   return isTeamView ? (
     <TeamSearch {...panelProps} onSearch={onTeamSearch} />

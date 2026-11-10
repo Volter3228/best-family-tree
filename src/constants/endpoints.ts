@@ -1,4 +1,10 @@
 export const ENDPOINTS = {
+  authMe: "/auth/me",
+  authLogout: "/auth/logout",
+  questionsChallenge: "/auth/questions/challenge",
+  questionsSwap: (id: string) => `/auth/questions/challenge/${id}/swap`,
+  questionsVerify: "/auth/questions/verify",
+
   getFamilyTree: "/family-tree",
   getMentorsList: "/mentors-list",
   getMemberById: (id: string) => `/member/${id}`,

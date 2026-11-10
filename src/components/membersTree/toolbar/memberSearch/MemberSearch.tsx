@@ -28,16 +28,22 @@ const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
     [flatMembersList, filteredMemberIds],
   );
 
-  const { query, setQuery, suggestions, activeIndex, handleSelect, handleKeyDown } =
-    useSearchSuggestions({
-      items,
-      getSearchable,
-      compare,
-      onSelect: (member) => {
-        onSearch(member.id);
-        onClose();
-      },
-    });
+  const {
+    query,
+    setQuery,
+    suggestions,
+    activeIndex,
+    handleSelect,
+    handleKeyDown,
+  } = useSearchSuggestions({
+    items,
+    getSearchable,
+    compare,
+    onSelect: (member) => {
+      onSearch(member.id);
+      onClose();
+    },
+  });
 
   // First match should sit closest to the input at the bottom.
   const displayed = useMemo(() => [...suggestions].reverse(), [suggestions]);

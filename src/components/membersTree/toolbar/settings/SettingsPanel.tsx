@@ -41,7 +41,6 @@ const EDGE_STYLE_OPTIONS = [
     label: "Плавні",
     icon: edgeIcon("M1.5 11 C5 3, 11 13, 14.5 5"),
   },
-  { value: "straight", label: "Прямі", icon: edgeIcon("M1.5 12.5 L14.5 3.5") },
   {
     value: "orthogonal",
     label: "Кутові",
@@ -49,6 +48,7 @@ const EDGE_STYLE_OPTIONS = [
       "M1.5 12.5 L6.5 12.5 Q8.5 12.5 8.5 10.5 L8.5 5.5 Q8.5 3.5 10.5 3.5 L14.5 3.5",
     ),
   },
+  { value: "straight", label: "Прямі", icon: edgeIcon("M1.5 12.5 L14.5 3.5") },
 ] satisfies { value: EdgeStyle; label: string; icon: React.ReactNode }[];
 
 interface SectionProps {

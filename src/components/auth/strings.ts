@@ -1,0 +1,35 @@
+// All sign-in copy lives here so English can be added later.
+export const authStrings = {
+  brand: "BEST Tree",
+  methodLabel: "Спосіб входу",
+  methodQuestions: "Питання",
+  methodAccount: "Акаунт",
+  questionsIntro: "Дай відповіді на три питання про BEST!",
+  answerPlaceholder: "Твоя відповідь",
+  dontRemember: "Не пам'ятаю",
+  submit: "Увійти",
+  welcome: "Вітаємо!",
+  checking: "Перевіряю…",
+  wrongAnswer: "Ех, зараз би ГДЗ по бесту...",
+  fillAll: "Дай відповідь на всі питання",
+  solved: "Є!",
+  struggle: "Пам'ять вже не та? Заходь через акаунт!",
+  locked: (seconds: number) =>
+    `Забагато спроб. Спробуй за ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`,
+  expired: "Час вийшов. Питання оновлено",
+  loadFailed: "Не вдалося завантажити питання. Спробуй пізніше",
+  accountSoon: "Вхід через пошту скоро з'явиться",
+  expiredSession: "Сесія закінчилась. Увійди ще раз",
+  theme: "Тема",
+  logout: "Вийти",
+  logoutConfirm: "Вийти з BEST Tree?",
+  cancel: "Скасувати",
+  viewMethod: {
+    QUESTIONS: "Питання",
+    EMAIL: "Пошта",
+    GOOGLE: "Google",
+    TELEGRAM: "Telegram",
+  },
+  limitedAccess:
+    "Вхід через питання не дає доступу до особистої інформації: контакти та дні народження приховані. Увійди через акаунт, щоб отримати повний доступ.",
+} as const;

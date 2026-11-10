@@ -1,8 +1,4 @@
-import {
-  PARTICIPANT_FORMS,
-  TEAM_FORMS,
-  formatCount,
-} from "@/utils";
+import { PARTICIPANT_FORMS, TEAM_FORMS, formatCount } from "@/utils";
 
 interface Props {
   count: number;

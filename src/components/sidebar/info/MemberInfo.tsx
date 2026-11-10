@@ -23,6 +23,7 @@ import {
   getPhotoUrlForViewer,
   getPhotoUrlForViewerPreview,
 } from "@/libs/cloudinary";
+import { isReducedView, useSessionStore } from "@/store/sessionStore";
 import { useMemberById, useMentees } from "@/hooks";
 import type { AccentColor, MemberPosition } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
@@ -54,6 +55,7 @@ const MemberInfo = ({
   canClickPosition,
   color = "blue",
 }: Props) => {
+  const reduced = useSessionStore((s) => isReducedView(s.session));
   const mentor = useMemberById(member.mentorId);
   const mentees = useMentees(member.id);
   const isVisible = (id: string) =>
@@ -207,7 +209,7 @@ const MemberInfo = ({
               color={color}
             />
           )}
-          <MemberInfoSocial member={member} color={color} />
+          {!reduced && <MemberInfoSocial member={member} color={color} />}
         </div>
       </div>
     </div>

@@ -39,8 +39,8 @@ export const useBadgeInputState = (
     () =>
       inputValue.trim()
         ? availableOptions.filter((option) =>
-          option.text.toLowerCase().includes(inputValue.toLowerCase()),
-        )
+            option.text.toLowerCase().includes(inputValue.toLowerCase()),
+          )
         : availableOptions,
     [availableOptions, inputValue],
   );

@@ -1,0 +1,81 @@
+enum AuthMethod {
+  QUESTIONS
+  EMAIL
+  GOOGLE
+  TELEGRAM
+}
+
+enum AccessLevel {
+  EDITOR
+  ADMIN
+}
+
+enum AllowedEmailSource {
+  GOOGLE_GROUP
+  MANUAL
+}
+
+model AuthSession {
+  id         String     @id @default(cuid())
+  tokenHash  String     @unique
+  method     AuthMethod
+  memberId   String?
+  email      String?
+  expiresAt  DateTime
+  lastSeenAt DateTime   @default(now())
+  userAgent  String?
+  createdAt  DateTime   @default(now())
+
+  @@index([memberId])
+  @@index([method])
+  @@map("auth_sessions")
+}
+
+model SignInQuestion {
+  id              String   @id @default(cuid())
+  prompt          String
+  acceptedAnswers String[]
+  isActive        Boolean  @default(true)
+
+  @@map("sign_in_questions")
+}
+
+model SignInChallenge {
+  id                String   @id @default(cuid())
+  questionIds       String[]
+  solvedQuestionIds String[]
+  swapsLeft         Int      @default(1)
+  expiresAt         DateTime
+  createdAt         DateTime @default(now())
+
+  @@map("sign_in_challenges")
+}
+
+model AllowedEmail {
+  id     String             @id @default(cuid())
+  email  String             @unique
+  source AllowedEmailSource
+
+  @@map("allowed_emails")
+}
+
+model EmailSignInCode {
+  id         String    @id @default(cuid())
+  email      String
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email])
+  @@map("email_sign_in_codes")
+}
+
+model AccessGrant {
+  id       String      @id @default(cuid())
+  memberId String      @unique
+  level    AccessLevel
+
+  @@map("access_grants")
+}

@@ -1,6 +1,18 @@
 import type { MemberBody } from "../../utils/validation.js";
 import prisma from "../../db/prisma/clientInstance.js";
-import { NotFoundError, ValidationError } from "../../utils/httpErrors.js";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  ValidationError,
+} from "../../utils/httpErrors.js";
+import { canEditMember } from "../../auth/access.js";
+import type { Session } from "../../auth/types.js";
+import {
+  contactField,
+  contactLabel,
+  findContactCollision,
+} from "../../utils/contactKeys.js";
 import {
   buildMemberFields,
   buildMemberUpdateFields,
@@ -55,6 +67,52 @@ const assertMentorExists = async (tx: MemberTransaction, mentorId: string) => {
   if (!mentor) throw new ValidationError("Mentor not found");
 };
 
+/** Email and social links must belong to at most one member. */
+const assertUniqueContacts = async (
+  tx: MemberTransaction,
+  data: Parameters<typeof findContactCollision>[0],
+  excludeId?: string,
+) => {
+  const others = await tx.member.findMany({
+    where: excludeId ? { id: { not: excludeId } } : {},
+    select: {
+      email: true,
+      telegramLink: true,
+      instagramLink: true,
+      facebookLink: true,
+      linkedinLink: true,
+    },
+  });
+  const platform = findContactCollision(data, others);
+  if (platform) {
+    throw new ConflictError(
+      `${contactLabel(platform)} належить іншому учаснику`,
+      contactField(platform),
+    );
+  }
+};
+
+/** Members with an access grant are editable only by Admins and themselves. */
+export const assertCanEditMembers = async (
+  session: Session,
+  memberIds: string[],
+) => {
+  if (memberIds.length === 0) return;
+  const grants = await prisma.accessGrant.findMany({
+    where: { memberId: { in: memberIds } },
+    select: { memberId: true },
+  });
+  const granted = new Set(grants.map((g) => g.memberId));
+  for (const id of memberIds) {
+    if (!canEditMember(session, { id, hasGrant: granted.has(id) })) {
+      throw new ForbiddenError("Only an admin can edit this member");
+    }
+  }
+};
+
+export const assertCanEditMember = (session: Session, memberId: string) =>
+  assertCanEditMembers(session, [memberId]);
+
 export const createMember = async (
   body: MemberBody | MemberUpdateBody,
   phoneNumbers: string[],
@@ -67,6 +125,7 @@ export const createMember = async (
       ? buildSparseMemberFields(body as MemberUpdateBody, photoUrl)
       : buildMemberFields(body as MemberBody, photoUrl);
     if (data.mentorId) await assertMentorExists(tx, data.mentorId);
+    await assertUniqueContacts(tx, data);
     const member = await tx.member.create({ data });
 
     await savePhoneNumbers(tx, member.id, phoneNumbers);
@@ -87,10 +146,9 @@ export const updateMember = async (
 ) =>
   prisma.$transaction(async (tx) => {
     if (body.mentorId) await assertNoMentorCycle(tx, memberId, body.mentorId);
-    await tx.member.update({
-      where: { id: memberId },
-      data: buildMemberUpdateFields(body, photoUrl),
-    });
+    const data = buildMemberUpdateFields(body, photoUrl);
+    await assertUniqueContacts(tx, data, memberId);
+    await tx.member.update({ where: { id: memberId }, data });
 
     await tx.phoneNumber.deleteMany({ where: { ownerId: memberId } });
     await savePhoneNumbers(tx, memberId, phoneNumbers);
@@ -123,6 +181,8 @@ export const deleteMember = (memberId: string) =>
     });
     await tx.memberPosition.deleteMany({ where: { memberId } });
     await tx.phoneNumber.deleteMany({ where: { ownerId: memberId } });
+    await tx.authSession.deleteMany({ where: { memberId } });
+    await tx.accessGrant.deleteMany({ where: { memberId } });
     await tx.member.delete({ where: { id: memberId } });
 
     return member.photo;
