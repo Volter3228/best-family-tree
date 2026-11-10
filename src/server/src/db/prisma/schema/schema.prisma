@@ -2,6 +2,8 @@ generator client {
   provider   = "prisma-client"
   output     = "../generated"
   engineType = "client"
+  // Compiled output runs on plain Node ESM, which needs explicit .js extensions.
+  importFileExtension = "js"
 }
 
 datasource db {

@@ -7,6 +7,10 @@ const apiOrigin = (
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Self-contained server bundle for the Docker image (`node server.js`).
+  output: "standalone",
+  // The Express server has its own node_modules; never trace it into the bundle.
+  outputFileTracingExcludes: { "*": ["src/server/**"] },
   images: {
     remotePatterns: [
       {

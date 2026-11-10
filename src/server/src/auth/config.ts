@@ -14,3 +14,6 @@ export const MIN_ACTIVE_QUESTIONS = QUESTIONS_SHOWN + 1;
 
 export const isProduction = () => process.env.NODE_ENV === "production";
 export const isDemoMode = () => process.env.DEMO_MODE === "true";
+/** Secure cookies need https; COOKIE_SECURE=false allows a local http check of the production build. */
+export const useSecureCookie = () =>
+  isProduction() && process.env.COOKIE_SECURE !== "false";

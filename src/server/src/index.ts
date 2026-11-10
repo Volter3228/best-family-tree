@@ -18,10 +18,16 @@ import { checkOrigin } from "./middleware/checkOrigin.js";
 import { isDemoMode } from "./auth/config.js";
 import { trackWrites } from "./utils/readCache.js";
 import { HttpError } from "./utils/httpErrors.js";
+import { assertConfig } from "./auth/checkConfig.js";
+
+assertConfig();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 3001;
+// 0.0.0.0 keeps docker-compose dev working; production binds 127.0.0.1 so only
+// the Next rewrite in the same container can reach Express.
+const HOST = process.env.HOST || "0.0.0.0";
 
 // Hops between the internet and Express whose X-Forwarded-For we trust: the
 // Next rewrite is one; a platform load balancer in front of Next makes two.
@@ -43,6 +49,11 @@ app.use(
 );
 app.use(compression());
 app.use(express.json());
+// Health check for the host's pings: no session and no database access, so
+// pings let a serverless database suspend.
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true });
+});
 app.use("/api", checkOrigin);
 // Auth routes come first: sign-in must not invalidate the read cache.
 app.use("/api", sessionRoutes);
@@ -84,6 +95,6 @@ app.use(
   },
 );
 
-app.listen(PORT, () => {
-  console.log(`Running on Port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Running on ${HOST}:${PORT}`);
 });

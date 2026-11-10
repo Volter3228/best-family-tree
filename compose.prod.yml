@@ -1,0 +1,32 @@
+# Local check of the production image against the dev Postgres:
+#   docker compose -f compose.yml -f compose.prod.yml up --build app
+# Catching packaging mistakes here takes seconds; a host build takes minutes.
+name: best-family-tree
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: best-family-tree-prod
+    # Same cap as the smallest hosting tier; watch it with `docker stats`.
+    mem_limit: 512m
+    ports:
+      - "3100:3000"   # 3000 is the dev frontend
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/best_family_tree?schema=public
+      CLIENT_ORIGIN: http://localhost:3100
+      # http://localhost cannot carry Secure cookies; production never sets this.
+      COOKIE_SECURE: "false"
+      # Local-only secret, long enough to pass checkConfig.
+      AUTH_SECRET: local-prod-check-secret-0123456789abcdef
+      TRUST_PROXY_HOPS: "1"
+    env_file:
+      # Cloudinary variables only; DATABASE_URL above wins over this file.
+      - ./src/server/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network

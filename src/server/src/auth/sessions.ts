@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import type { AuthMethod } from "../db/prisma/generated/client.js";
 import prisma from "../db/prisma/clientInstance.js";
-import { SESSION_COOKIE, SESSION_TTL_MS, isProduction } from "./config.js";
+import { SESSION_COOKIE, SESSION_TTL_MS, useSecureCookie } from "./config.js";
 import type { AccessRank, Session } from "./types.js";
 
 export const hashToken = (token: string) =>
@@ -28,7 +28,7 @@ export const setSessionCookie = (
   res.cookie(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: isProduction(),
+    secure: useSecureCookie(),
     maxAge: ttlFor(method),
     path: "/",
   });
@@ -38,7 +38,7 @@ export const clearSessionCookie = (res: Response) => {
   res.clearCookie(SESSION_COOKIE, {
     httpOnly: true,
     sameSite: "lax",
-    secure: isProduction(),
+    secure: useSecureCookie(),
     path: "/",
   });
 };
