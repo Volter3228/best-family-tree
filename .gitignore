@@ -52,3 +52,5 @@ Dockerfile.*override
 .windsurf
 .mcp.json
 .playwright-mcp
+# private data
+*.private.csv

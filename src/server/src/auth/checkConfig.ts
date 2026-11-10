@@ -13,6 +13,26 @@ export const configProblems = (env: Env): string[] => {
   if (env.COOKIE_SECURE !== "false" && !env.CLIENT_ORIGIN?.startsWith("https://")) {
     problems.push("CLIENT_ORIGIN must be an https:// origin");
   }
+
+  const transport = env.MAIL_TRANSPORT || "console";
+  if (transport === "gmail") {
+    for (const name of [
+      "MAIL_FROM",
+      "GMAIL_CLIENT_ID",
+      "GMAIL_CLIENT_SECRET",
+      "GMAIL_REFRESH_TOKEN",
+    ]) {
+      if (!env[name]) problems.push(`${name} is required when MAIL_TRANSPORT=gmail`);
+    }
+  } else if (transport === "console") {
+    // Codes only go to the log: fine for the demo (no sign-in) and for the
+    // local http check, never for a real deployment.
+    if (env.DEMO_MODE !== "true" && env.COOKIE_SECURE !== "false") {
+      problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use gmail");
+    }
+  } else {
+    problems.push(`MAIL_TRANSPORT must be console or gmail, got "${transport}"`);
+  }
   return problems;
 };
 

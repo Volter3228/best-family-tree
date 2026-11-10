@@ -16,7 +16,10 @@
     "prisma:generate": "npx prisma generate",
     "prisma:migrate-dev": "npx prisma migrate dev",
     "auth:grant": "tsx src/scripts/grantAccess.ts",
-    "auth:seed-questions": "tsx src/scripts/seedQuestions.ts"
+    "auth:seed-questions": "tsx src/scripts/seedQuestions.ts",
+    "auth:import-emails": "tsx src/scripts/importAllowedEmails.ts",
+    "auth:report-duplicate-contacts": "tsx src/scripts/reportDuplicateContacts.ts",
+    "auth:preview-email": "tsx src/scripts/previewSignInEmail.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",

@@ -86,3 +86,33 @@ Controlled by the Orientation setting: Auto, Down or Right.
 **Edge style**:
 How family-mode edges are drawn: Smooth (bezier), Straight or Cornered
 (orthogonal). Team-frame fan edges and the lineage dash are always bezier.
+
+## Sign-in
+
+**Sign-in method**:
+How a visitor proves they may enter. Questions: answer three secret questions about the organisation, no account needed. Personal: a one-time code sent to the visitor's email.
+_Avoid_: Login type, auth mode
+
+**Session**:
+A signed-in browser, held by one cookie. It slides: each visit extends it (30 days for Questions, 90 for Personal). Signing out, or excluding the member, ends it.
+_Avoid_: Token, login
+
+**Access level**:
+What a session may do: Viewer (read only), Editor (edit members and teams, except other grant holders), Admin (edit everyone). Only a Personal sign-in of a member with a grant is above Viewer.
+_Avoid_: Role (that means a position in a team), permission
+
+**Allowed email**:
+An address on the allowlist that may sign in by email without being a member, as a Viewer. It comes from the Google Group export or is added by hand; the import never touches the hand-added ones.
+_Avoid_: Whitelist, guest
+
+**Contacts**:
+A member's email, social links and phone numbers. Hidden in the Reduced view; no two members may share one.
+_Avoid_: Personal info
+
+**Reduced view**:
+What a Questions session sees: the tree without contacts and birthdays.
+_Avoid_: Guest mode, limited mode
+
+**Sign-in code**:
+The six digits emailed for a Personal sign-in. Valid for 10 minutes, usable once, and locked after five wrong guesses. Only a keyed hash is stored.
+_Avoid_: OTP, PIN, token

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import prisma from "../../db/prisma/clientInstance.js";
 import { isDemoMode } from "../../auth/config.js";
 import {
   clearSessionCookie,
@@ -9,6 +8,7 @@ import {
   setSessionCookie,
 } from "../../auth/sessions.js";
 import { SESSION_COOKIE } from "../../auth/config.js";
+import { buildSessionInfo } from "../../auth/sessionInfo.js";
 import { sendRouteError } from "../../utils/httpErrors.js";
 
 const router = Router();
@@ -28,29 +28,7 @@ router.get("/auth/me", async (req, res) => {
     const token = readCookie(req.headers.cookie, SESSION_COOKIE);
     if (token) setSessionCookie(res, token, session.method);
 
-    const member = session.memberId
-      ? await prisma.member.findUnique({
-          where: { id: session.memberId },
-          select: { id: true, name: true, photo: true },
-        })
-      : null;
-    // Editors can not edit other grant holders, so the client hides those
-    // controls; Admins edit everyone and need no list.
-    const lockedMemberIds =
-      session.level === "EDITOR"
-        ? (
-            await prisma.accessGrant.findMany({ select: { memberId: true } })
-          ).map((g) => g.memberId)
-        : [];
-    res.json({
-      demo: false,
-      lockedMemberIds,
-      method: session.method,
-      level: session.level,
-      memberId: session.memberId,
-      email: session.email,
-      member,
-    });
+    res.json(await buildSessionInfo(session));
   } catch (error) {
     sendRouteError(res, error, "Failed to load session");
   }

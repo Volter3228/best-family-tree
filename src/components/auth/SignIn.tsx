@@ -105,7 +105,10 @@ const SignInCard = ({ expired }: Props) => {
                   </button>
                 )}
               </div>
-              {method === "account" && <AccountForm />}
+              {/* Mounted too, so a half-entered code survives a tab switch. */}
+              <div hidden={method !== "account"}>
+                <AccountForm onSuccess={handleSuccess} />
+              </div>
             </div>
           </div>
         </div>

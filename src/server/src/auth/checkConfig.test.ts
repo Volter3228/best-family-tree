@@ -6,6 +6,11 @@ const good = {
   DATABASE_URL: "postgresql://x",
   AUTH_SECRET: "a".repeat(32),
   CLIENT_ORIGIN: "https://best.example.com",
+  MAIL_TRANSPORT: "gmail",
+  MAIL_FROM: "BEST Tree <a@x.com>",
+  GMAIL_CLIENT_ID: "id",
+  GMAIL_CLIENT_SECRET: "secret",
+  GMAIL_REFRESH_TOKEN: "token",
 };
 
 describe("configProblems", () => {
@@ -39,6 +44,36 @@ describe("configProblems", () => {
         COOKIE_SECURE: "false",
       }),
     ).toEqual([]);
+  });
+});
+
+describe("configProblems: mail", () => {
+  it("requires every Gmail variable", () => {
+    expect(configProblems({ ...good, GMAIL_REFRESH_TOKEN: undefined })).toHaveLength(1);
+    expect(configProblems({ ...good, MAIL_FROM: "" })).toHaveLength(1);
+  });
+
+  it("refuses the console mailer in a real deployment, including by default", () => {
+    expect(configProblems({ ...good, MAIL_TRANSPORT: "console" })).toHaveLength(1);
+    expect(configProblems({ ...good, MAIL_TRANSPORT: undefined })).toHaveLength(1);
+  });
+
+  it("allows the console mailer in demo mode and the local http check", () => {
+    expect(
+      configProblems({ ...good, MAIL_TRANSPORT: "console", DEMO_MODE: "true" }),
+    ).toEqual([]);
+    expect(
+      configProblems({
+        ...good,
+        MAIL_TRANSPORT: "console",
+        COOKIE_SECURE: "false",
+        CLIENT_ORIGIN: "http://localhost:3100",
+      }),
+    ).toEqual([]);
+  });
+
+  it("refuses an unknown transport", () => {
+    expect(configProblems({ ...good, MAIL_TRANSPORT: "smtp" })).toHaveLength(1);
   });
 });
 

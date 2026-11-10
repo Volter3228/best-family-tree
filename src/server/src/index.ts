@@ -11,6 +11,7 @@ import teamTypeRoutes from "./routes/teamTypeRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import questionRoutes from "./routes/auth/questionRoutes.js";
+import emailRoutes from "./routes/auth/emailRoutes.js";
 import sessionRoutes from "./routes/auth/sessionRoutes.js";
 import { requireSession } from "./middleware/requireSession.js";
 import { requireEditorForWrites } from "./middleware/requireAccess.js";
@@ -58,6 +59,7 @@ app.use("/api", checkOrigin);
 // Auth routes come first: sign-in must not invalidate the read cache.
 app.use("/api", sessionRoutes);
 app.use("/api", questionRoutes);
+app.use("/api", emailRoutes);
 
 app.use("/api", requireSession);
 // Demo mode: sessions are synthetic and the database stays read-only.

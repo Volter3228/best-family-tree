@@ -80,3 +80,26 @@ export const verifyAnswers = async (
 };
 
 export const logout = () => post(ENDPOINTS.authLogout);
+
+export type RequestCodeOutcome = "sent" | "limited";
+
+/** The server answers the same for every address, so "sent" means "asked". */
+export const requestEmailCode = async (
+  email: string,
+): Promise<RequestCodeOutcome> => {
+  const res = await post(ENDPOINTS.emailRequest, { email });
+  if (res.status === 429) return "limited";
+  if (!res.ok) throw new Error(String(res.status));
+  return "sent";
+};
+
+/** The new session, or null when the code is wrong, expired or used up. */
+export const verifyEmailCode = async (
+  email: string,
+  code: string,
+): Promise<SessionInfo | null> => {
+  const res = await post(ENDPOINTS.emailVerify, { email, code });
+  if (res.status === 401) return null;
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+};

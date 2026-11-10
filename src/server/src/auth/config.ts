@@ -17,3 +17,7 @@ export const isDemoMode = () => process.env.DEMO_MODE === "true";
 /** Secure cookies need https; COOKIE_SECURE=false allows a local http check of the production build. */
 export const useSecureCookie = () =>
   isProduction() && process.env.COOKIE_SECURE !== "false";
+
+/** HMAC key for sign-in codes. Production requires a real one (checkConfig). */
+export const authSecret = () =>
+  process.env.AUTH_SECRET ?? "dev-only-auth-secret-never-used-in-production";

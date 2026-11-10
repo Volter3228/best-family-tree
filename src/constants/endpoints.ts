@@ -4,6 +4,8 @@ export const ENDPOINTS = {
   questionsChallenge: "/auth/questions/challenge",
   questionsSwap: (id: string) => `/auth/questions/challenge/${id}/swap`,
   questionsVerify: "/auth/questions/verify",
+  emailRequest: "/auth/email/request",
+  emailVerify: "/auth/email/verify",
 
   getFamilyTree: "/family-tree",
   getMentorsList: "/mentors-list",

@@ -1,0 +1,4 @@
+Email address,Member name,Role,Status
+alice.sample@example.com,Alice Sample,MEMBER,ACTIVE
+bob.sample@example.com,"Sample, Bob",MEMBER,ACTIVE
+carol.sample@example.com,Carol Sample,MANAGER,ACTIVE
