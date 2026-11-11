@@ -1,0 +1,11 @@
+# Local demo mode: the same stack, pointed at the anonymized demo database.
+#   docker compose -f compose.yml -f compose.demo.yml up -d     # demo
+#   docker compose up -d                                         # real data again
+services:
+  backend:
+    environment:
+      - DEMO_MODE=true
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/best_family_tree_demo?schema=public
+  frontend:
+    environment:
+      - DEMO_MODE=true
