@@ -38,10 +38,13 @@ const limiter = (
 const ipKey = (req: Request) => ipKeyGenerator(req.ip ?? "unknown");
 const emailKey = (req: Request) => bodyEmail(req) || ipKey(req);
 
+// The public demo sends a code to any address, so its daily cap per IP is lower.
+const DAILY_PER_IP = isDemoMode() ? 6 : 10;
+
 // Every request counts, eligible or not, so the limits reveal nothing.
 const requestLimits = [
   limiter(3, 15 * MINUTE, ipKey),
-  limiter(10, 24 * 60 * MINUTE, ipKey),
+  limiter(DAILY_PER_IP, 24 * 60 * MINUTE, ipKey),
   limiter(3, 15 * MINUTE, emailKey),
   limiter(10, 24 * 60 * MINUTE, emailKey),
 ];
