@@ -5,7 +5,7 @@ export type MailMessage = {
   text: string;
 };
 
-/** One file per provider; a domain-based sender can be added later. */
+/** One file per provider (console, resend, gmail); chosen by MAIL_TRANSPORT. */
 export interface Mailer {
   send(message: MailMessage): Promise<void>;
 }

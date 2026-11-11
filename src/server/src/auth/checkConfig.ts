@@ -15,7 +15,11 @@ export const configProblems = (env: Env): string[] => {
   }
 
   const transport = env.MAIL_TRANSPORT || "console";
-  if (transport === "gmail") {
+  if (transport === "resend") {
+    for (const name of ["MAIL_FROM", "RESEND_API_KEY"]) {
+      if (!env[name]) problems.push(`${name} is required when MAIL_TRANSPORT=resend`);
+    }
+  } else if (transport === "gmail") {
     for (const name of [
       "MAIL_FROM",
       "GMAIL_CLIENT_ID",
@@ -28,10 +32,10 @@ export const configProblems = (env: Env): string[] => {
     // Codes only go to the log: fine for the demo (no sign-in) and for the
     // local http check, never for a real deployment.
     if (env.DEMO_MODE !== "true" && env.COOKIE_SECURE !== "false") {
-      problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use gmail");
+      problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use resend");
     }
   } else {
-    problems.push(`MAIL_TRANSPORT must be console or gmail, got "${transport}"`);
+    problems.push(`MAIL_TRANSPORT must be console, resend or gmail, got "${transport}"`);
   }
   return problems;
 };

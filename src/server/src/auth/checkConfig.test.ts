@@ -72,6 +72,20 @@ describe("configProblems: mail", () => {
     ).toEqual([]);
   });
 
+  it("requires MAIL_FROM and RESEND_API_KEY for resend", () => {
+    const resend = {
+      ...good,
+      MAIL_TRANSPORT: "resend",
+      GMAIL_CLIENT_ID: undefined,
+      GMAIL_CLIENT_SECRET: undefined,
+      GMAIL_REFRESH_TOKEN: undefined,
+      RESEND_API_KEY: "re_key",
+    };
+    expect(configProblems(resend)).toEqual([]);
+    expect(configProblems({ ...resend, RESEND_API_KEY: undefined })).toHaveLength(1);
+    expect(configProblems({ ...resend, MAIL_FROM: undefined })).toHaveLength(1);
+  });
+
   it("refuses an unknown transport", () => {
     expect(configProblems({ ...good, MAIL_TRANSPORT: "smtp" })).toHaveLength(1);
   });
