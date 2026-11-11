@@ -65,7 +65,7 @@ app.use("/api", requireSession);
 // Demo mode: sessions are synthetic and the database stays read-only.
 app.use("/api", (req, res, next) => {
   if (isDemoMode() && req.method !== "GET" && req.method !== "HEAD") {
-    res.status(403).json({ error: "Demo mode is read-only" });
+    res.status(403).json({ error: "У демо зміни не зберігаються" });
     return;
   }
   next();

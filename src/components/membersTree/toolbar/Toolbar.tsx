@@ -19,6 +19,7 @@ import { SettingsPanel } from "./settings";
 import ToolbarIconButton from "./ToolbarIconButton";
 import FitViewButton from "./FitViewButton";
 import AccountPanel from "./AccountPanel";
+import DemoBadge from "./DemoBadge";
 
 interface Props {
   onFitView: () => void;
@@ -71,6 +72,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
 
   return (
     <>
+      {session?.demo && <DemoBadge />}
       <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
         <div
           aria-hidden

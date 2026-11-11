@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertConfig, configProblems } from "./checkConfig.js";
+import { assertConfig, configProblems, databaseName } from "./checkConfig.js";
 
 const good = {
   NODE_ENV: "production",
@@ -60,7 +60,12 @@ describe("configProblems: mail", () => {
 
   it("allows the console mailer in demo mode and the local http check", () => {
     expect(
-      configProblems({ ...good, MAIL_TRANSPORT: "console", DEMO_MODE: "true" }),
+      configProblems({
+        ...good,
+        MAIL_TRANSPORT: "console",
+        DEMO_MODE: "true",
+        DATABASE_URL: "postgresql://x/best_family_tree_demo",
+      }),
     ).toEqual([]);
     expect(
       configProblems({
@@ -88,6 +93,42 @@ describe("configProblems: mail", () => {
 
   it("refuses an unknown transport", () => {
     expect(configProblems({ ...good, MAIL_TRANSPORT: "smtp" })).toHaveLength(1);
+  });
+});
+
+describe("configProblems: demo", () => {
+  const demo = { ...good, MAIL_TRANSPORT: "console", DEMO_MODE: "true" };
+
+  it("accepts a demo database", () => {
+    expect(
+      configProblems({ ...demo, DATABASE_URL: "postgresql://u:p@h/best_family_tree_demo?x=1" }),
+    ).toEqual([]);
+  });
+
+  it("refuses demo mode on a database not named demo", () => {
+    expect(
+      configProblems({ ...demo, DATABASE_URL: "postgresql://u:p@h/best_family_tree" }),
+    ).toHaveLength(1);
+  });
+
+  it("refuses demo mode outside production too", () => {
+    expect(
+      configProblems({
+        NODE_ENV: "development",
+        DEMO_MODE: "true",
+        DATABASE_URL: "postgresql://u:p@localhost/best_family_tree",
+      }),
+    ).toHaveLength(1);
+  });
+
+  it("refuses an unreadable DATABASE_URL", () => {
+    expect(configProblems({ DEMO_MODE: "true", DATABASE_URL: "nonsense" })).toHaveLength(1);
+  });
+});
+
+describe("databaseName", () => {
+  it("reads the name and ignores the query string", () => {
+    expect(databaseName("postgresql://u:p@h:5432/neon_demo?sslmode=require")).toBe("neon_demo");
   });
 });
 
