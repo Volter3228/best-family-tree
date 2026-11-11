@@ -53,8 +53,11 @@ const verifySchema = z.object({
 });
 
 const sendCode = async (rawEmail: string) => {
-  const identity = await loadEmailIdentity(rawEmail);
-  if (identity.kind === "refused") return;
+  // The demo has no members to check against: any address gets a code.
+  if (!isDemoMode()) {
+    const identity = await loadEmailIdentity(rawEmail);
+    if (identity.kind === "refused") return;
+  }
   const email = normalizeEmail(rawEmail);
   const code = await issueCode(prismaCodeStore, authSecret(), email);
   const message = renderSignInCodeEmail(code, process.env.CLIENT_ORIGIN ?? "");
@@ -62,10 +65,6 @@ const sendCode = async (rawEmail: string) => {
 };
 
 router.post("/auth/email/request", ...requestLimits, (req: Request, res: Response) => {
-  if (isDemoMode()) {
-    res.status(403).json({ error: "Demo mode" });
-    return;
-  }
   const body = requestSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: "Invalid email" });
@@ -81,10 +80,6 @@ router.post("/auth/email/request", ...requestLimits, (req: Request, res: Respons
 
 router.post("/auth/email/verify", async (req: Request, res: Response) => {
   const fail = () => res.status(401).json({ error: "Invalid or expired code" });
-  if (isDemoMode()) {
-    res.status(403).json({ error: "Demo mode" });
-    return;
-  }
   const body = verifySchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: "Invalid body" });
@@ -93,14 +88,19 @@ router.post("/auth/email/verify", async (req: Request, res: Response) => {
   try {
     const email = normalizeEmail(body.data.email);
     // Eligibility again: the member may have been excluded after the request.
-    const identity = await loadEmailIdentity(email);
-    if (identity.kind === "refused") return void fail();
+    // (The demo accepts any address and ties the session to no member.)
+    let memberId: string | null = null;
+    if (!isDemoMode()) {
+      const identity = await loadEmailIdentity(email);
+      if (identity.kind === "refused") return void fail();
+      memberId = identity.kind === "member" ? identity.memberId : null;
+    }
     if (!(await verifyCode(prismaCodeStore, authSecret(), email, body.data.code))) {
       return void fail();
     }
     const token = await createSession({
       method: "EMAIL",
-      memberId: identity.kind === "member" ? identity.memberId : null,
+      memberId,
       email,
       userAgent: req.headers["user-agent"],
     });

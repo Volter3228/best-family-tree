@@ -2,7 +2,12 @@ import { createHash, randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import type { AuthMethod } from "../db/prisma/generated/client.js";
 import prisma from "../db/prisma/clientInstance.js";
-import { SESSION_COOKIE, SESSION_TTL_MS, useSecureCookie } from "./config.js";
+import {
+  SESSION_COOKIE,
+  SESSION_TTL_MS,
+  isDemoMode,
+  useSecureCookie,
+} from "./config.js";
 import type { AccessRank, Session } from "./types.js";
 
 export const hashToken = (token: string) =>
@@ -77,7 +82,10 @@ export const findSession = async (token: string): Promise<Session | null> => {
 
   // Only personal sessions of non-excluded members can carry a grant.
   let level: AccessRank = "VIEWER";
-  if (row.method !== "QUESTIONS" && row.memberId) {
+  if (isDemoMode() && row.method !== "QUESTIONS") {
+    // The demo has no grants: whoever signs in by email may open the (read-only) forms.
+    level = "EDITOR";
+  } else if (row.method !== "QUESTIONS" && row.memberId) {
     const member = await prisma.member.findUnique({
       where: { id: row.memberId },
       select: { activityState: true },

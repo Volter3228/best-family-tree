@@ -1,4 +1,5 @@
 import prisma from "../db/prisma/clientInstance.js";
+import { isDemoMode } from "./config.js";
 import type { Session } from "./types.js";
 
 /** The `/auth/me` payload, also returned right after a successful sign-in. */
@@ -18,7 +19,7 @@ export const buildSessionInfo = async (session: Session) => {
         )
       : [];
   return {
-    demo: false,
+    demo: isDemoMode(),
     lockedMemberIds,
     method: session.method,
     level: session.level,

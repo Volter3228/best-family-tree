@@ -49,9 +49,9 @@ export const configProblems = (env: Env): string[] => {
       if (!env[name]) problems.push(`${name} is required when MAIL_TRANSPORT=gmail`);
     }
   } else if (transport === "console") {
-    // Codes only go to the log: fine for the demo (no sign-in) and for the
-    // local http check, never for a real deployment.
-    if (env.DEMO_MODE !== "true" && env.COOKIE_SECURE !== "false") {
+    // Codes only go to the log: fine for the local http check, never for a
+    // real deployment (the demo sends real codes too).
+    if (env.COOKIE_SECURE !== "false") {
       problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use resend");
     }
   } else {

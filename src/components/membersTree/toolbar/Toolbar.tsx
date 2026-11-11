@@ -111,7 +111,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
               isActive={isSidebarOpen}
             />
           )}
-          {session && !session.demo && (
+          {session && (
             <ToolbarIconButton
               title={t.logout}
               onClick={handleShowAccountClick}

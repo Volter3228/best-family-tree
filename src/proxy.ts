@@ -4,8 +4,6 @@ const SESSION_COOKIE = "bft_session";
 
 // Cheap gate: no cookie means no session. The API still validates the token.
 export function proxy(request: NextRequest) {
-  if (process.env.DEMO_MODE === "true") return NextResponse.next();
-
   const hasCookie = request.cookies.has(SESSION_COOKIE);
   const { pathname, searchParams } = request.nextUrl;
   const isLogin = pathname === "/login";

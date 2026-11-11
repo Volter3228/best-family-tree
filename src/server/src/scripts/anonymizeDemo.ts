@@ -2,6 +2,8 @@ import "dotenv/config";
 import { contactKey } from "../utils/contactKeys.js";
 import { checkAnonymizeAllowed } from "./demo/guard.js";
 import { createIdentityFactory } from "./demo/fakeIdentity.js";
+import { DEMO_QUESTIONS } from "./demo/demoQuestions.js";
+import { hasDemoPhoto } from "./demo/photoShare.js";
 import {
   findLeaks,
   lowerSet,
@@ -14,13 +16,15 @@ import {
 //
 // Whitelist approach: a column survives only if it is listed as kept below.
 //   members:    kept id, mentorId, familyGroupId, status, activityState, joinedAt, course
+//               (photos: two of three get a generated avatar, the rest none)
 //   teams:      kept name, years, isOngoing, teamTypeId
 //   kept whole: team types, roles, positions (apart from `organization`)
-//   everything else is replaced (or nulled), and all sign-in data is deleted.
+//   everything else is replaced (or nulled). All sign-in data is deleted, then
+//   harmless demo questions are added so the login page works.
 // Repeatable: the seed is fixed. All-or-nothing: one transaction, and the
 // leak check runs inside it.
 const SEED = 20260101;
-const GROUP_NAMES = ["Лисиці", "Борсуки", "Бобри", "Сови", "Вовки", "Ведмеді", "Олені", "Зубри"];
+const GROUP_NAMES = ["Прем'єр-міністри", "Китайці", "Котики", "Чорнобривці", "Конструкторсім'я"];
 const SOCIALS = [
   ["telegramLink", "telegram", (h: string) => `@${h}`],
   ["instagramLink", "instagram", (h: string) => `https://instagram.com/${h}`],
@@ -86,11 +90,15 @@ const track = (url: string | null, wanted: boolean) => {
   return url;
 };
 
-const memberPhotos = await mapLimit(members, 5, async (m) =>
-  track(
-    await photoOf(m.photo, () => uploadFromUrl(avatarUrl(m.id), "demo/members", m.id)),
-    Boolean(m.photo),
-  ),
+// By position, not by who had a real photo: that would reveal who did.
+const memberPhotos = await mapLimit(
+  members.map((m, index) => ({ m, wanted: hasDemoPhoto(index) })),
+  5,
+  async ({ m, wanted }) =>
+    track(
+      wanted && !skipPhotos ? await uploadFromUrl(avatarUrl(m.id), "demo/members", m.id) : null,
+      wanted,
+    ),
 );
 const teamPhotos = await mapLimit(teams, 5, async (t) =>
   track(
@@ -153,6 +161,9 @@ await prisma.$transaction(
     await tx.allowedEmail.deleteMany();
     await tx.emailSignInCode.deleteMany();
     await tx.accessGrant.deleteMany();
+    await tx.signInQuestion.createMany({
+      data: DEMO_QUESTIONS.map((q) => ({ ...q, isActive: true })),
+    });
 
     // The proof: nothing real is left. Throwing here rolls everything back.
     const [m2, ph2, t2, g2] = await Promise.all([
@@ -178,9 +189,9 @@ await prisma.$transaction(
     }
     const leftovers = await Promise.all([
       tx.authSession.count(),
-      tx.signInQuestion.count(),
       tx.allowedEmail.count(),
       tx.accessGrant.count(),
+      tx.signInQuestion.count({ where: { prompt: { notIn: DEMO_QUESTIONS.map((q) => q.prompt) } } }),
     ]);
     if (leftovers.some((n) => n > 0)) throw new Error("Sign-in data still present, rolled back");
   },

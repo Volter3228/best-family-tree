@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { isDemoMode } from "../../auth/config.js";
 import {
   clearSessionCookie,
   deleteSession,
@@ -15,10 +14,6 @@ const router = Router();
 
 router.get("/auth/me", async (req, res) => {
   try {
-    if (isDemoMode()) {
-      res.json({ demo: true, method: "EMAIL", level: "EDITOR", member: null });
-      return;
-    }
     const session = await sessionFromRequest(req);
     if (!session) {
       res.status(401).json({ error: "Sign in required" });

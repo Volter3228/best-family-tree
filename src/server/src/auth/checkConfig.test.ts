@@ -58,15 +58,7 @@ describe("configProblems: mail", () => {
     expect(configProblems({ ...good, MAIL_TRANSPORT: undefined })).toHaveLength(1);
   });
 
-  it("allows the console mailer in demo mode and the local http check", () => {
-    expect(
-      configProblems({
-        ...good,
-        MAIL_TRANSPORT: "console",
-        DEMO_MODE: "true",
-        DATABASE_URL: "postgresql://x/best_family_tree_demo",
-      }),
-    ).toEqual([]);
+  it("allows the console mailer only for the local http check", () => {
     expect(
       configProblems({
         ...good,
@@ -75,6 +67,17 @@ describe("configProblems: mail", () => {
         CLIENT_ORIGIN: "http://localhost:3100",
       }),
     ).toEqual([]);
+  });
+
+  it("refuses the console mailer in demo mode too: the demo sends real codes", () => {
+    expect(
+      configProblems({
+        ...good,
+        MAIL_TRANSPORT: "console",
+        DEMO_MODE: "true",
+        DATABASE_URL: "postgresql://x/best_family_tree_demo",
+      }),
+    ).toHaveLength(1);
   });
 
   it("requires MAIL_FROM and RESEND_API_KEY for resend", () => {
@@ -97,7 +100,7 @@ describe("configProblems: mail", () => {
 });
 
 describe("configProblems: demo", () => {
-  const demo = { ...good, MAIL_TRANSPORT: "console", DEMO_MODE: "true" };
+  const demo = { ...good, DEMO_MODE: "true" };
 
   it("accepts a demo database", () => {
     expect(

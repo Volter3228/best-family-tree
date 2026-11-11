@@ -16,9 +16,10 @@ type Method = "questions" | "account";
 
 interface Props {
   expired: boolean;
+  demo?: boolean;
 }
 
-const SignInCard = ({ expired }: Props) => {
+const SignInCard = ({ expired, demo = false }: Props) => {
   const [method, setMethod] = useState<Method>("account");
   const [struggled, setStruggled] = useState(false);
   const [showExpired] = useState(expired);
@@ -68,6 +69,13 @@ const SignInCard = ({ expired }: Props) => {
           </div>
           <h1 className="text-2xl font-bold">{t.brand}</h1>
         </div>
+        {demo && (
+          <div className="mb-3">
+            <AuthMessage tone="info">
+              Демо: питання прості, а на пошту можна вказати будь-яку адресу.
+            </AuthMessage>
+          </div>
+        )}
         {showExpired && (
           <div className="mb-3">
             <AuthMessage tone="info">{t.expiredSession}</AuthMessage>
