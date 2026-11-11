@@ -1,12 +1,37 @@
 import cloudinary from "../../db/cloudinaryConfig.js";
 
-// Lorelei by Lisa Wischofsky, CC0 1.0 (https://www.dicebear.com/styles/lorelei/).
-export const avatarUrl = (seed: string) =>
-  `https://api.dicebear.com/9.x/lorelei/png?seed=${encodeURIComponent(seed)}&size=512`;
-
 // Stock photos stand in for team and group pictures, which show real people.
 export const stockPhotoUrl = (seed: string) =>
   `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600.jpg`;
+
+/**
+ * Uploads face bytes as a square avatar. The crop drops the 3% bottom strip
+ * that carries the generator's caption, and the size keeps storage small.
+ */
+export const uploadFace = (
+  bytes: Buffer,
+  folder: string,
+  publicId: string,
+): Promise<string | null> =>
+  new Promise((resolve) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder,
+          public_id: publicId,
+          overwrite: true,
+          invalidate: true,
+          transformation: [
+            { width: 960, height: 960, x: 32, y: 0, crop: "crop", gravity: "north_west" },
+            { width: 512, height: 512, crop: "scale" },
+          ],
+          format: "jpg",
+          quality: "auto",
+        },
+        (error, result) => resolve(error || !result ? null : result.secure_url),
+      )
+      .end(bytes);
+  });
 
 /**
  * Cloudinary fetches `sourceUrl` itself. The public id is fixed, so a re-run

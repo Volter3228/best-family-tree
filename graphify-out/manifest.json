@@ -2052,9 +2052,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1794263315.635121,
-    "seen": 1794263408.5576363,
-    "ast_hash": "0e624fbad612b53f8cbd7885ecf856d7",
+    "mtime": 1794416798.58997,
+    "seen": 1794417348.1312718,
+    "ast_hash": "6f1b3b2c5a8e9411d38919a9e15c9767",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/cardVisibilityDriver.ts": {
@@ -2766,9 +2766,9 @@
     "semantic_hash": ""
   },
   "src/server/src/routes/auth/emailRoutes.ts": {
-    "mtime": 1794413025.960864,
-    "seen": 1794413087.8665543,
-    "ast_hash": "93c8cd3d767db5451d671c0a2f53020b",
+    "mtime": 1794416633.452925,
+    "seen": 1794417348.1250813,
+    "ast_hash": "af5119470998d04e1208ee8970e03376",
     "semantic_hash": ""
   },
   "src/server/src/scripts/importAllowedEmails.ts": {
@@ -2820,15 +2820,15 @@
     "semantic_hash": ""
   },
   "src/server/src/scripts/anonymizeDemo.ts": {
-    "mtime": 1794413068.6058567,
-    "seen": 1794413087.8670905,
-    "ast_hash": "652e3c661e2fda611aecda5724e8362a",
+    "mtime": 1794417294.269719,
+    "seen": 1794417348.1256208,
+    "ast_hash": "182b261c5ef5cb1e7ef05f4dae478c95",
     "semantic_hash": ""
   },
   "src/server/src/scripts/demo/demoPhotos.ts": {
-    "mtime": 1794412160.4176939,
-    "seen": 1794412187.1419668,
-    "ast_hash": "463bc1f9d34b421c91eb12d9fd258e4b",
+    "mtime": 1794417294.269414,
+    "seen": 1794417348.1256237,
+    "ast_hash": "9e2248764c157246a9d6d6ca8a348f3a",
     "semantic_hash": ""
   },
   "src/server/src/scripts/demo/fakeIdentity.test.ts": {
@@ -2901,6 +2901,24 @@
     "mtime": 1794413060.5880053,
     "seen": 1794413087.8672874,
     "ast_hash": "dd9c3579ec35b21f3ebb33217d0d7e5c",
+    "semantic_hash": ""
+  },
+  "src/server/src/scripts/demo/aiFaces.test.ts": {
+    "mtime": 1794417294.2415748,
+    "seen": 1794417348.125622,
+    "ast_hash": "63761c59f019fbda863ab1f769c271a7",
+    "semantic_hash": ""
+  },
+  "src/server/src/scripts/demo/aiFaces.ts": {
+    "mtime": 1794417294.2406156,
+    "seen": 1794417348.1256227,
+    "ast_hash": "36a2ebe46da00e47c0d89adcf296ef02",
+    "semantic_hash": ""
+  },
+  "compose.demo.yml": {
+    "mtime": 1794417060.753796,
+    "seen": 1794417348.1313412,
+    "ast_hash": "f4bd6acb80d0b43488af1e6e96db6d38",
     "semantic_hash": ""
   }
 }

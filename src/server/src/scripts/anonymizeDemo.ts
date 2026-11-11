@@ -16,7 +16,7 @@ import {
 //
 // Whitelist approach: a column survives only if it is listed as kept below.
 //   members:    kept id, mentorId, familyGroupId, status, activityState, joinedAt, course
-//               (photos: two of three get a generated avatar, the rest none)
+//               (photos: two of three get an AI-generated face, the rest none)
 //   teams:      kept name, years, isOngoing, teamTypeId
 //   kept whole: team types, roles, positions (apart from `organization`)
 //   everything else is replaced (or nulled). All sign-in data is deleted, then
@@ -44,7 +44,8 @@ console.log(`Anonymizing "${allowed.database}"${skipPhotos ? " (photos removed, 
 
 // Loaded only after the guard, so a refused run never opens a connection.
 const { default: prisma } = await import("../db/prisma/clientInstance.js");
-const { avatarUrl, stockPhotoUrl, uploadFromUrl, mapLimit } = await import("./demo/demoPhotos.js");
+const { stockPhotoUrl, uploadFace, uploadFromUrl, mapLimit } = await import("./demo/demoPhotos.js");
+const { createFaceSource } = await import("./demo/aiFaces.js");
 
 const byId = { orderBy: { id: "asc" } } as const;
 const [members, phones, teams, groups, positions] = await Promise.all([
@@ -91,15 +92,21 @@ const track = (url: string | null, wanted: boolean) => {
 };
 
 // By position, not by who had a real photo: that would reveal who did.
-const memberPhotos = await mapLimit(
-  members.map((m, index) => ({ m, wanted: hasDemoPhoto(index) })),
-  5,
-  async ({ m, wanted }) =>
-    track(
-      wanted && !skipPhotos ? await uploadFromUrl(avatarUrl(m.id), "demo/members", m.id) : null,
-      wanted,
-    ),
-);
+// One at a time: the face source spaces its own requests.
+const nextFace = createFaceSource();
+const memberPhotos: (string | null)[] = [];
+for (const [index, m] of members.entries()) {
+  const wanted = hasDemoPhoto(index);
+  const face = wanted && !skipPhotos ? await nextFace() : null;
+  memberPhotos.push(track(face ? await uploadFace(face, "demo/members", m.id) : null, wanted));
+  if ((index + 1) % 100 === 0) console.log(`  photos: ${index + 1}/${members.length} members done`);
+}
+// Photos come first and the database is untouched until here: stop now if they mostly failed.
+const wantedCount = members.filter((_, i) => hasDemoPhoto(i)).length;
+if (!skipPhotos && failedPhotos > wantedCount * 0.1) {
+  console.error(`${failedPhotos} of ${wantedCount} member photos failed; nothing was changed. Try again later.`);
+  process.exit(1);
+}
 const teamPhotos = await mapLimit(teams, 5, async (t) =>
   track(
     await photoOf(t.photoUrl, () => uploadFromUrl(stockPhotoUrl(t.id), "demo/teams", t.id)),
