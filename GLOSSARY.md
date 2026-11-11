@@ -116,3 +116,7 @@ _Avoid_: Guest mode, limited mode
 **Sign-in code**:
 The six digits emailed for a Personal sign-in. Valid for 10 minutes, usable once, and locked after five wrong guesses. Only a keyed hash is stored.
 _Avoid_: OTP, PIN, token
+
+**Demo mode**:
+A deployment switch (`DEMO_MODE=true`) for the public showcase, run on an anonymized copy of the data. Anyone can sign in: the questions are easy and any email address gets a code, which makes them an Editor. Every edit is refused ("У демо зміни не зберігаються"), so nothing changes.
+_Avoid_: Sandbox (edits are refused, not kept in the browser), test mode

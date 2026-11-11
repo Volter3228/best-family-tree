@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1794162930.6392367,
-    "seen": 1794168192.2740097,
-    "ast_hash": "e10503d1610137e517de83d9d5a26fa4",
+    "mtime": 1794417485.5322552,
+    "seen": 1794417526.8573759,
+    "ast_hash": "26cb9d3dc4a7d173485fe21c1a950896",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -2046,9 +2046,9 @@
     "semantic_hash": ""
   },
   "GLOSSARY.md": {
-    "mtime": 1794397980.178594,
-    "seen": 1794404269.5902593,
-    "ast_hash": "344250914953ed802c499ce1644e8917",
+    "mtime": 1794417519.4643528,
+    "seen": 1794417526.8742723,
+    "ast_hash": "0fec2d73ee39044b324a726a090a6a89",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -2919,6 +2919,18 @@
     "mtime": 1794417060.753796,
     "seen": 1794417348.1313412,
     "ast_hash": "f4bd6acb80d0b43488af1e6e96db6d38",
+    "semantic_hash": ""
+  },
+  "scripts/backup-prod.sh": {
+    "mtime": 1794417485.5155709,
+    "seen": 1794417526.857403,
+    "ast_hash": "3745c5967f516c118521bbc48dc007e1",
+    "semantic_hash": ""
+  },
+  "scripts/restore-local.sh": {
+    "mtime": 1794417485.52041,
+    "seen": 1794417526.8574042,
+    "ast_hash": "fd81aa57cee14ffd30227f03b5d09aa4",
     "semantic_hash": ""
   }
 }
