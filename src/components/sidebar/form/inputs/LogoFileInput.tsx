@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "@/utils/uploadLimit";
 
 interface Props {
   onImageSelect: (file: File | null) => void;
@@ -27,6 +28,7 @@ const LogoFileInput = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImage,
   );
+  const [tooLarge, setTooLarge] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
 
@@ -57,6 +59,12 @@ const LogoFileInput = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       const file = e.target.files[0];
+      if (exceedsUploadLimit(file)) {
+        e.target.value = "";
+        setTooLarge(true);
+        return;
+      }
+      setTooLarge(false);
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
       const imageUrl = URL.createObjectURL(file);
       objectUrlRef.current = imageUrl;
@@ -66,6 +74,7 @@ const LogoFileInput = ({
   };
 
   const handleRemoveImage = () => {
+    setTooLarge(false);
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
@@ -135,6 +144,9 @@ const LogoFileInput = ({
           </button>
         )}
       </div>
+      {tooLarge && (
+        <p role="alert" className="max-w-48 text-center text-sm text-red-500">{UPLOAD_TOO_LARGE_MESSAGE}</p>
+      )}
     </div >
   );
 };
