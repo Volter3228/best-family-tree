@@ -120,6 +120,8 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/best_family_tree_dem
 
 The last step takes about 20 minutes, because it downloads AI-generated faces one at a time
 and uploads them to Cloudinary. Add `--skip-photos` to skip them (members get no photo).
+Restart the backend afterwards (`docker compose restart backend`): it caches the tree in
+memory and does not notice changes made directly to the database.
 The script refuses any database whose name does not contain `demo`, and it rolls back if
 any real name, email, phone, handle or photo URL is left. To start over, drop the demo
 database (`dropdb -U postgres best_family_tree_demo --force` inside the container) and repeat.
