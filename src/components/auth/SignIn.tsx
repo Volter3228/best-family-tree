@@ -71,9 +71,7 @@ const SignInCard = ({ expired, demo = false }: Props) => {
         </div>
         {demo && (
           <div className="mb-3">
-            <AuthMessage tone="info">
-              Демо: питання прості, а на пошту можна вказати будь-яку адресу.
-            </AuthMessage>
+            <AuthMessage tone="info">{t.demoNotice}</AuthMessage>
           </div>
         )}
         {showExpired && (

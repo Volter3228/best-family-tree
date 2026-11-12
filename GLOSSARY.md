@@ -94,7 +94,7 @@ How a visitor proves they may enter. Questions: answer three secret questions ab
 _Avoid_: Login type, auth mode
 
 **Session**:
-A signed-in browser, held by one cookie. It slides: each visit extends it (30 days for Questions, 90 for Personal). Signing out, or excluding the member, ends it.
+A signed-in browser, held by one cookie. It slides: each visit extends it (30 days for Questions, 90 for Personal). Signing out, excluding the member, or taking an allowed email off the allowlist ends it.
 _Avoid_: Token, login
 
 **Access level**:

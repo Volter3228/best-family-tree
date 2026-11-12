@@ -32,7 +32,7 @@ const AccountForm = ({ onSuccess }: Props) => {
       setCooldown(RESEND_COOLDOWN_SECONDS);
       return null;
     } catch {
-      return t.loadFailed;
+      return t.requestFailed;
     }
   };
 

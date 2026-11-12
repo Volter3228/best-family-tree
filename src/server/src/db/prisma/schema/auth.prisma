@@ -60,15 +60,17 @@ model AllowedEmail {
 }
 
 model EmailSignInCode {
-  id         String    @id @default(cuid())
-  email      String
-  codeHash   String
-  attempts   Int       @default(0)
-  expiresAt  DateTime
-  consumedAt DateTime?
-  createdAt  DateTime  @default(now())
+  id          String    @id @default(cuid())
+  email       String
+  /// sha256 of the requesting browser's sign-in cookie: the code works only there.
+  browserHash String
+  codeHash    String
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
 
-  @@index([email])
+  @@index([email, browserHash])
   @@map("email_sign_in_codes")
 }
 

@@ -13,19 +13,21 @@ const firstFree = (base: string, taken: Set<string>) => {
 
 /**
  * Fake, repeatable identities. The seed makes every run give the same result,
- * and nothing handed out equals a value in `avoid` (the real data).
+ * and nothing handed out equals a value in `avoid` (the real data). Names and
+ * handles are compared lowercased, the way the final leak check compares them.
  */
 export const createIdentityFactory = (
   seed: number,
-  avoid: { names: Set<string>; phones: Set<string> },
+  avoid: { names: Set<string>; phones: Set<string>; handles?: Set<string> },
 ) => {
   // Its own instance, so two factories never disturb each other's sequence.
   const faker = new Faker({ locale: [uk, en] });
   faker.seed(seed);
-  const names = new Set(avoid.names);
+  const lower = (values: Iterable<string>) => new Set([...values].map((v) => v.toLowerCase()));
+  const names = lower(avoid.names);
   const phones = new Set(avoid.phones);
   const emails = new Set<string>();
-  const handles = new Set<string>();
+  const handles = lower(avoid.handles ?? []);
 
   const person = () => {
     const sex = faker.person.sexType();
@@ -33,8 +35,8 @@ export const createIdentityFactory = (
       const firstName = faker.person.firstName(sex);
       const lastName = faker.person.lastName(sex);
       const name = `${firstName} ${lastName}`;
-      if (!names.has(name)) {
-        names.add(name);
+      if (!names.has(name.toLowerCase())) {
+        names.add(name.toLowerCase());
         return { firstName, lastName, name };
       }
     }

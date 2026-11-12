@@ -3,9 +3,15 @@ import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 export const CODE_TTL_MS = 10 * 60 * 1000;
 export const MAX_CODE_ATTEMPTS = 5;
 
-export type StoredCode = {
+/**
+ * Who a code belongs to: the address and the browser that asked for it (a
+ * hash of its sign-in cookie). Requests and guesses from another browser
+ * never touch the code, so nobody can spoil someone else's sign-in.
+ */
+export type CodeOwner = { email: string; browserHash: string };
+
+export type StoredCode = CodeOwner & {
   id: string;
-  email: string;
   codeHash: string;
   attempts: number;
   expiresAt: Date;
@@ -13,10 +19,10 @@ export type StoredCode = {
 
 /** Persistence for codes; Prisma in production, a Map in tests. */
 export interface CodeStore {
-  /** Deletes unused codes of the email and stores the new one. */
+  /** Deletes unused codes of the same owner and stores the new one. */
   replace(code: Omit<StoredCode, "id" | "attempts">): Promise<void>;
-  /** Newest unused, unexpired code of the email. */
-  findActive(email: string, now: Date): Promise<StoredCode | null>;
+  /** Newest unused, unexpired code of the owner. */
+  findActive(owner: CodeOwner, now: Date): Promise<StoredCode | null>;
   /** Counts one guess; false when the attempts are already used up. */
   tryAttempt(id: string, maxAttempts: number): Promise<boolean>;
   /** Marks the code used; false when someone else used it first. */
@@ -40,17 +46,17 @@ const sameHash = (a: string, b: string) => {
   return left.length === right.length && timingSafeEqual(left, right);
 };
 
-/** Creates a code for the email, replacing older unused ones. */
+/** Creates a code for the owner, replacing their older unused ones. */
 export const issueCode = async (
   store: CodeStore,
   secret: string,
-  email: string,
+  owner: CodeOwner,
   now = new Date(),
 ) => {
   const code = generateCode();
   await store.replace({
-    email,
-    codeHash: hashCode(secret, email, code),
+    ...owner,
+    codeHash: hashCode(secret, owner.email, code),
     expiresAt: new Date(now.getTime() + CODE_TTL_MS),
   });
   return code;
@@ -60,14 +66,14 @@ export const issueCode = async (
 export const verifyCode = async (
   store: CodeStore,
   secret: string,
-  email: string,
+  owner: CodeOwner,
   code: string,
   now = new Date(),
 ) => {
-  const record = await store.findActive(email, now);
+  const record = await store.findActive(owner, now);
   if (!record) return false;
   // Count the guess before comparing, so parallel guesses can not exceed the cap.
   if (!(await store.tryAttempt(record.id, MAX_CODE_ATTEMPTS))) return false;
-  if (!sameHash(record.codeHash, hashCode(secret, email, code))) return false;
+  if (!sameHash(record.codeHash, hashCode(secret, owner.email, code))) return false;
   return store.consume(record.id);
 };

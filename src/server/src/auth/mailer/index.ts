@@ -1,33 +1,27 @@
 import { consoleMailer } from "./consoleMailer.js";
 import { createGmailMailer } from "./gmailMailer.js";
 import { createResendMailer } from "./resendMailer.js";
+import { readMailTransport } from "./transports.js";
 import type { Mailer } from "./types.js";
 
 let mailer: Mailer | null = null;
 
-/** MAIL_TRANSPORT=console (default, dev) | resend | gmail. */
+/** MAIL_TRANSPORT=console (default, dev) | resend | gmail. A typo or a missing variable throws. */
 export const getMailer = (): Mailer => {
   if (mailer) return mailer;
-  if (process.env.MAIL_TRANSPORT === "resend") {
-    const { MAIL_FROM, RESEND_API_KEY } = process.env;
-    if (!MAIL_FROM || !RESEND_API_KEY) {
-      throw new Error("MAIL_TRANSPORT=resend needs MAIL_FROM and RESEND_API_KEY");
-    }
-    mailer = createResendMailer({ from: MAIL_FROM, apiKey: RESEND_API_KEY });
-  } else if (process.env.MAIL_TRANSPORT === "gmail") {
-    const { MAIL_FROM, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN } =
-      process.env;
-    if (!MAIL_FROM || !GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET || !GMAIL_REFRESH_TOKEN) {
-      throw new Error("MAIL_TRANSPORT=gmail needs MAIL_FROM and the GMAIL_* variables");
-    }
-    mailer = createGmailMailer({
-      from: MAIL_FROM,
-      clientId: GMAIL_CLIENT_ID,
-      clientSecret: GMAIL_CLIENT_SECRET,
-      refreshToken: GMAIL_REFRESH_TOKEN,
-    });
-  } else {
-    mailer = consoleMailer;
-  }
+  const { transport, problems } = readMailTransport(process.env);
+  if (!transport || problems.length) throw new Error(problems.join("; "));
+  const env = process.env as Record<string, string>;
+  mailer =
+    transport === "resend"
+      ? createResendMailer({ from: env.MAIL_FROM, apiKey: env.RESEND_API_KEY })
+      : transport === "gmail"
+        ? createGmailMailer({
+            from: env.MAIL_FROM,
+            clientId: env.GMAIL_CLIENT_ID,
+            clientSecret: env.GMAIL_CLIENT_SECRET,
+            refreshToken: env.GMAIL_REFRESH_TOKEN,
+          })
+        : consoleMailer;
   return mailer;
 };

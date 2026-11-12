@@ -1,4 +1,6 @@
 export const SESSION_COOKIE = "bft_session";
+/** Ties an email sign-in code to the browser that asked for it. */
+export const SIGN_IN_COOKIE = "bft_signin";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

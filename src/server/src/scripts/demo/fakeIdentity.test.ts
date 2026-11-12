@@ -31,6 +31,22 @@ describe("createIdentityFactory", () => {
     expect(factory.person().name).not.toBe(first);
   });
 
+  it("compares real names without regard to case", () => {
+    const first = createIdentityFactory(3, none).person().name;
+    const factory = createIdentityFactory(3, {
+      names: new Set([first.toLowerCase()]),
+      phones: new Set(),
+    });
+    expect(factory.person().name).not.toBe(first);
+  });
+
+  it("avoids the real handles it was given", () => {
+    const sample = createIdentityFactory(4, none);
+    const taken = sample.handle(sample.person());
+    const factory = createIdentityFactory(4, { ...none, handles: new Set([taken]) });
+    expect(factory.handle(factory.person())).toBe(`${taken}2`);
+  });
+
   it("makes ascii emails and handles", () => {
     const factory = createIdentityFactory(2, none);
     const p = factory.person();

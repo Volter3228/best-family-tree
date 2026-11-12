@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
-import { applyDigits, backspaceAt, OTP_LENGTH } from "./otpDigits";
+import { applyDigits, backspaceAt, CODE_LENGTH } from "./codeDigits";
 import { authStrings as t } from "./strings";
 
 // Two boxes per brand colour, like the pairs in the email.
@@ -17,7 +17,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const OtpInput = ({ digits, onChange, onEnter, disabled }: Props) => {
+const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
   const focus = (index: number) => refs.current[index]?.focus();
@@ -41,7 +41,7 @@ const OtpInput = ({ digits, onChange, onEnter, disabled }: Props) => {
               ref={(el) => {
                 refs.current[i] = el;
               }}
-              id={`otp-${i}`}
+              id={`code-digit-${i}`}
               value={digit}
               disabled={disabled}
               aria-label={t.codeDigit(i + 1)}
@@ -61,7 +61,7 @@ const OtpInput = ({ digits, onChange, onEnter, disabled }: Props) => {
                 } else if (e.key === "ArrowLeft" && i > 0) {
                   e.preventDefault();
                   focus(i - 1);
-                } else if (e.key === "ArrowRight" && i < OTP_LENGTH - 1) {
+                } else if (e.key === "ArrowRight" && i < CODE_LENGTH - 1) {
                   e.preventDefault();
                   focus(i + 1);
                 } else if (e.key === "Enter") {
@@ -77,7 +77,7 @@ const OtpInput = ({ digits, onChange, onEnter, disabled }: Props) => {
                 color.caret,
               )}
             />
-            {i % 2 === 1 && i < OTP_LENGTH - 1 && (
+            {i % 2 === 1 && i < CODE_LENGTH - 1 && (
               <span aria-hidden className="text-foreground/30">
                 ·
               </span>
@@ -89,4 +89,4 @@ const OtpInput = ({ digits, onChange, onEnter, disabled }: Props) => {
   );
 };
 
-export default OtpInput;
+export default CodeInput;

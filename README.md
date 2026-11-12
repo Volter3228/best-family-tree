@@ -139,6 +139,36 @@ Locally no mail is sent: the code is printed in the backend log (`docker compose
 **Deploy it:** the same image, with `DEMO_MODE=true` and `DATABASE_URL` pointing at a
 database whose name contains `demo`. Sign-in codes then need the Resend variables.
 
+## Deployment
+
+One Docker image (root `Dockerfile`) runs Next.js on `$PORT` and Express on `127.0.0.1:3001`;
+Next proxies `/api/*` to Express, so the browser sees one origin. Current setup, all free tiers:
+Render (Docker, Frankfurt, auto-deploy from `master`, health check `/api/health`), Neon Postgres 17
+(direct connection string), Cloudinary for photos, Resend for sign-in emails on `mail.best-tree.app`
+(Render blocks SMTP, so mail goes over HTTPS). The app is served on `best-tree.app`.
+
+Required environment variables (names only; values live in Render and your local `.env`):
+
+| Variable | Notes |
+|---|---|
+| `NODE_ENV=production`, `HOST=127.0.0.1`, `TRUST_PROXY_HOPS=2` | proxy chain: Render's load balancer plus the Next rewrite |
+| `DATABASE_URL` | Neon direct string, `sslmode=require` |
+| `AUTH_SECRET` | 32+ chars, unique per service (`openssl rand -base64 32`) |
+| `CLIENT_ORIGIN` | `https://best-tree.app`; the API rejects other origins |
+| `MAIL_TRANSPORT`, `MAIL_FROM`, `RESEND_API_KEY` | `console` (log only, local), `resend` or `gmail` |
+| `CLOUDINARY_*` | photo storage |
+| `DEMO_MODE=true` | optional, see above |
+
+The server refuses to start in production with a missing or invalid value (`checkConfig`).
+Migrations run on start (`prisma migrate deploy`). Free instances sleep after 15 minutes idle.
+
+Admin scripts run from your laptop with the production URL passed inline, never stored in `.env`:
+`DATABASE_URL="$(cat ~/.config/best-tree/neon-prod.url)" npm run auth:grant -- <memberId|name> <editor|admin|none>`
+(also `auth:seed-questions`, `auth:import-emails`). Back up with `npm run db:backup-prod` weekly and
+before any deploy that contains a migration (Neon free keeps only about 6 hours of history).
+
+To make a demo of the same service, set `DATABASE_URL` to the demo database and `DEMO_MODE=true`.
+
 ## Backups
 
 ```bash

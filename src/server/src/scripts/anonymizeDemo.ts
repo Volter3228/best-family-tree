@@ -79,6 +79,8 @@ const real: RealValues = {
 const factory = createIdentityFactory(SEED, {
   names: real.names,
   phones: real.phones,
+  // "instagram:handle" -> "handle": a fake handle is reused on every platform.
+  handles: new Set([...real.socials].map((key) => key.slice(key.indexOf(":") + 1))),
 });
 
 // Photos first (network): nothing in the database changes until they are done.

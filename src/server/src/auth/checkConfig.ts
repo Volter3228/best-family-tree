@@ -1,3 +1,5 @@
+import { readMailTransport } from "./mailer/transports.js";
+
 type Env = Record<string, string | undefined>;
 
 /** The database name from a postgres URL, or null when it can not be read. */
@@ -34,28 +36,12 @@ export const configProblems = (env: Env): string[] => {
     problems.push("CLIENT_ORIGIN must be an https:// origin");
   }
 
-  const transport = env.MAIL_TRANSPORT || "console";
-  if (transport === "resend") {
-    for (const name of ["MAIL_FROM", "RESEND_API_KEY"]) {
-      if (!env[name]) problems.push(`${name} is required when MAIL_TRANSPORT=resend`);
-    }
-  } else if (transport === "gmail") {
-    for (const name of [
-      "MAIL_FROM",
-      "GMAIL_CLIENT_ID",
-      "GMAIL_CLIENT_SECRET",
-      "GMAIL_REFRESH_TOKEN",
-    ]) {
-      if (!env[name]) problems.push(`${name} is required when MAIL_TRANSPORT=gmail`);
-    }
-  } else if (transport === "console") {
-    // Codes only go to the log: fine for the local http check, never for a
-    // real deployment (the demo sends real codes too).
-    if (env.COOKIE_SECURE !== "false") {
-      problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use resend");
-    }
-  } else {
-    problems.push(`MAIL_TRANSPORT must be console, resend or gmail, got "${transport}"`);
+  const mail = readMailTransport(env);
+  problems.push(...mail.problems);
+  // Codes only go to the log: fine for the local http check, never for a
+  // real deployment (the demo sends real codes too).
+  if (mail.transport === "console" && env.COOKIE_SECURE !== "false") {
+    problems.push("MAIL_TRANSPORT=console would never deliver sign-in codes; use resend");
   }
   return problems;
 };

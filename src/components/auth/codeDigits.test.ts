@@ -4,7 +4,7 @@ import {
   backspaceAt,
   emptyDigits,
   isComplete,
-} from "./otpDigits";
+} from "./codeDigits";
 
 describe("applyDigits", () => {
   it("types one digit and moves on", () => {

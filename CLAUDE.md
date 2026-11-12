@@ -40,3 +40,10 @@
 - Browser MCPs (`.mcp.json`: `playwright`, `chrome-devtools`) attach over CDP to Windows Chrome at `127.0.0.1:9222`. Their wrappers (`~/.local/bin/*-mcp-win.sh`) run `~/.local/bin/ensure-win-chrome.sh`, which launches Chrome through `powershell.exe` (profile `C:\temp\chrome-debug`) when the port is down. The MCP tools may be deferred or still connecting: load them with ToolSearch. Never launch a Linux browser.
 - If the browser is unreachable: `curl -s 127.0.0.1:9222/json/version` should return JSON; otherwise run `~/.local/bin/ensure-win-chrome.sh`.
 - Mobile checks: emulate Pixel 10 (~412px wide, DPR 2.6) in the browser's emulate/resize tool.
+
+## Deployment & data
+
+- Production: Render (one Docker image) + Neon + Cloudinary + Resend; see README "Deployment". Local `.env` must never point at production: pass the Neon URL inline for admin scripts (`~/.config/best-tree/*.url`, never print them).
+- Demo: `DEMO_MODE=true` on a database whose name contains `demo`; build it with `npm run db:anonymize-demo` (README). The backend caches the tree in memory: restart it after changing the database directly.
+- Ask before writing to Neon or running scripts that change data. The backend container keeps its own `node_modules` volume: after adding a server dependency run `docker compose up -d --build -V --no-deps backend`.
+- `pkill -f` in a shell command can kill that shell; find the pid with `ss -ltnp` instead.

@@ -13,7 +13,7 @@ export const prismaCodeStore: CodeStore = {
       prisma.emailSignInCode.deleteMany({
         where: {
           OR: [
-            { email: code.email, consumedAt: null },
+            { email: code.email, browserHash: code.browserHash, consumedAt: null },
             { expiresAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
           ],
         },
@@ -21,9 +21,9 @@ export const prismaCodeStore: CodeStore = {
       prisma.emailSignInCode.create({ data: code }),
     ]);
   },
-  async findActive(email, now) {
+  async findActive({ email, browserHash }, now) {
     return prisma.emailSignInCode.findFirst({
-      where: { email, consumedAt: null, expiresAt: { gt: now } },
+      where: { email, browserHash, consumedAt: null, expiresAt: { gt: now } },
       orderBy: { createdAt: "desc" },
     });
   },
@@ -47,7 +47,8 @@ export const prismaCodeStore: CodeStore = {
 export const loadEmailIdentity = async (rawEmail: string): Promise<EmailIdentity> => {
   const email = normalizeEmail(rawEmail);
   // Member emails are stored as typed, so compare after normalising; the
-  // table is small (hundreds of rows) and this runs only on rate-limited calls.
+  // table is small (hundreds of rows) and this runs only on rate-limited
+  // requests and after a correct code.
   const [members, grants, allowedEmails] = await Promise.all([
     prisma.member.findMany({
       where: { email: { not: null } },

@@ -1,6 +1,6 @@
-export const OTP_LENGTH = 6;
+export const CODE_LENGTH = 6;
 
-export const emptyDigits = () => Array<string>(OTP_LENGTH).fill("");
+export const emptyDigits = () => Array<string>(CODE_LENGTH).fill("");
 
 type Edit = { digits: string[]; focusIndex: number };
 
@@ -20,20 +20,20 @@ export const applyDigits = (
     next[index] = "";
     return { digits: next, focusIndex: index };
   }
-  if (cleaned.length >= OTP_LENGTH) {
+  if (cleaned.length >= CODE_LENGTH) {
     return {
-      digits: cleaned.slice(0, OTP_LENGTH).split(""),
-      focusIndex: OTP_LENGTH - 1,
+      digits: cleaned.slice(0, CODE_LENGTH).split(""),
+      focusIndex: CODE_LENGTH - 1,
     };
   }
   // A short paste fills forward from the box it landed in.
   let last = index;
   for (const [offset, digit] of [...cleaned].entries()) {
-    if (index + offset >= OTP_LENGTH) break;
+    if (index + offset >= CODE_LENGTH) break;
     next[index + offset] = digit;
     last = index + offset;
   }
-  return { digits: next, focusIndex: Math.min(last + 1, OTP_LENGTH - 1) };
+  return { digits: next, focusIndex: Math.min(last + 1, CODE_LENGTH - 1) };
 };
 
 /** Backspace: clears the box, or steps back and clears the previous one. */
@@ -48,4 +48,4 @@ export const backspaceAt = (digits: string[], index: number): Edit => {
 };
 
 export const isComplete = (digits: string[]) =>
-  digits.length === OTP_LENGTH && digits.every((d) => /^\d$/.test(d));
+  digits.length === CODE_LENGTH && digits.every((d) => /^\d$/.test(d));

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import SubmitButton from "@/components/sidebar/form/buttons/SubmitButton";
 import { verifyEmailCode } from "@/api/auth";
 import AuthMessage from "./AuthMessage";
-import OtpInput from "./OtpInput";
-import { emptyDigits, isComplete } from "./otpDigits";
+import CodeInput from "./CodeInput";
+import { emptyDigits, isComplete } from "./codeDigits";
 import { authStrings as t } from "./strings";
 
 interface Props {
@@ -24,13 +24,13 @@ const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props
 
   // The code arrives by mail, so the first box is ready as the form appears.
   useEffect(() => {
-    document.getElementById("otp-0")?.focus();
+    document.getElementById("code-digit-0")?.focus();
   }, []);
 
   const handleSubmit = async () => {
     if (busy || done) return;
     if (!isComplete(digits)) {
-      setMessage(t.fillAll);
+      setMessage(t.incompleteCode);
       return;
     }
     setBusy(true);
@@ -47,9 +47,9 @@ const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props
       setDigits(emptyDigits());
       setBusy(false);
       // Inputs are disabled while busy; focus once they are enabled again.
-      window.setTimeout(() => document.getElementById("otp-0")?.focus(), 0);
+      window.setTimeout(() => document.getElementById("code-digit-0")?.focus(), 0);
     } catch {
-      setMessage(t.loadFailed);
+      setMessage(t.requestFailed);
       setBusy(false);
     }
   };
@@ -69,7 +69,7 @@ const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props
       }}
     >
       <p className="text-sm text-foreground/70">{t.codeSentTo(email)}</p>
-      <OtpInput
+      <CodeInput
         digits={digits}
         onChange={setDigits}
         onEnter={() => void handleSubmit()}
