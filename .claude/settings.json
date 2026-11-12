@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "attribution": false,
+    "includeCoAuthoredBy": false,
     "allow": [
       "Bash(npm run typecheck)",
       "Bash(npm run lint)",

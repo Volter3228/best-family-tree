@@ -40,3 +40,13 @@
 - Browser MCPs (`.mcp.json`: `playwright`, `chrome-devtools`) attach over CDP to Windows Chrome at `127.0.0.1:9222`. Their wrappers (`~/.local/bin/*-mcp-win.sh`) run `~/.local/bin/ensure-win-chrome.sh`, which launches Chrome through `powershell.exe` (profile `C:\temp\chrome-debug`) when the port is down. The MCP tools may be deferred or still connecting: load them with ToolSearch. Never launch a Linux browser.
 - If the browser is unreachable: `curl -s 127.0.0.1:9222/json/version` should return JSON; otherwise run `~/.local/bin/ensure-win-chrome.sh`.
 - Mobile checks: emulate Pixel 10 (~412px wide, DPR 2.6) in the browser's emulate/resize tool.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
