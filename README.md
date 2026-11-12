@@ -103,6 +103,47 @@ docker compose exec backend npm run prisma:studio
 docker compose exec backend npm run migrate:mongodb
 ```
 
+## Demo mode (anonymized data)
+
+A public-safe copy of the app: fake names, contacts and photos, easy sign-in
+questions, and every edit refused. The tree structure is kept.
+
+**Build the demo database** (once, or to refresh it; needs the dev Postgres running):
+
+```bash
+docker compose up -d postgres
+docker exec best-family-tree-db createdb -U postgres best_family_tree_demo
+docker exec best-family-tree-db pg_dump -U postgres -Fc best_family_tree | docker exec -i best-family-tree-db pg_restore -U postgres -d best_family_tree_demo --no-owner
+cd src/server
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/best_family_tree_demo" npm run db:anonymize-demo -- --yes
+```
+
+The last step takes about 20 minutes, because it downloads AI-generated faces one at a time
+and uploads them to Cloudinary. Add `--skip-photos` to skip them (members get no photo).
+The script refuses any database whose name does not contain `demo`, and it rolls back if
+any real name, email, phone, handle or photo URL is left. To start over, drop the demo
+database (`dropdb -U postgres best_family_tree_demo --force` inside the container) and repeat.
+
+**Run the app on it:**
+
+```bash
+docker compose -f compose.yml -f compose.demo.yml up -d   # demo
+docker compose up -d                                      # real data again
+```
+
+Sign in with the demo questions (capital of Ukraine, 2 + 2, ...) or with any email address.
+Locally no mail is sent: the code is printed in the backend log (`docker compose logs -f backend`).
+
+**Deploy it:** the same image, with `DEMO_MODE=true` and `DATABASE_URL` pointing at a
+database whose name contains `demo`. Sign-in codes then need the Resend variables.
+
+## Backups
+
+```bash
+npm run db:backup-prod                              # dated dump of production in ~/backups/best-tree
+npm run db:restore-local -- <file.dump> --yes       # replaces your LOCAL best_family_tree with it
+```
+
 ## Project Structure
 
 ```
