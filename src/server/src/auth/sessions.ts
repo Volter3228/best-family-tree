@@ -98,7 +98,7 @@ export const findSession = async (token: string): Promise<Session | null> => {
       where: { memberId: row.memberId },
     });
     if (grant) level = grant.level;
-  } else if (row.method === "EMAIL" && !row.memberId) {
+  } else if (row.method !== "QUESTIONS" && !row.memberId) {
     // An allowed email: taking the address off the allowlist ends the session.
     const allowed = row.email
       ? await prisma.allowedEmail.findUnique({ where: { email: row.email } })

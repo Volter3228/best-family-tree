@@ -21,9 +21,15 @@ const demoProblems = (env: Env): string[] => {
     : ["DEMO_MODE=true needs a DATABASE_URL whose database name contains \"demo\""];
 };
 
+// Google sign-in needs both values; half a pair is always a mistake.
+const googleProblems = (env: Env): string[] =>
+  Boolean(env.GOOGLE_CLIENT_ID) === Boolean(env.GOOGLE_CLIENT_SECRET)
+    ? []
+    : ["GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set together"];
+
 /** Lists what is wrong with the environment (empty = fine). */
 export const configProblems = (env: Env): string[] => {
-  const demo = demoProblems(env);
+  const demo = [...demoProblems(env), ...googleProblems(env)];
   if (env.NODE_ENV !== "production") return demo;
   const problems: string[] = [...demo];
 

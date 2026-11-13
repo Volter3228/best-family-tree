@@ -16,13 +16,20 @@ type Method = "questions" | "account";
 
 interface Props {
   expired: boolean;
+  error?: string;
   demo?: boolean;
+  googleEnabled?: boolean;
 }
 
-const SignInCard = ({ expired, demo = false }: Props) => {
+const SignInCard = ({ expired, error, demo = false, googleEnabled = false }: Props) => {
   const [method, setMethod] = useState<Method>("account");
   const [struggled, setStruggled] = useState(false);
   const [showExpired] = useState(expired);
+  const [errorText] = useState(() =>
+    error && error in t.googleErrors
+      ? t.googleErrors[error as keyof typeof t.googleErrors]
+      : null,
+  );
 
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +60,12 @@ const SignInCard = ({ expired, demo = false }: Props) => {
     window.history.replaceState(null, "", "/login");
   }, [expired]);
 
+  // Same for a failed Google sign-in: show the message once, then tidy the URL.
+  useEffect(() => {
+    if (error === undefined) return;
+    window.history.replaceState(null, "", "/login");
+  }, [error]);
+
   // A full navigation so the server component sees the new cookie.
   const handleSuccess = () => navigateWithSlide("/", "zoom");
 
@@ -77,6 +90,11 @@ const SignInCard = ({ expired, demo = false }: Props) => {
         {showExpired && (
           <div className="mb-3">
             <AuthMessage tone="info">{t.expiredSession}</AuthMessage>
+          </div>
+        )}
+        {errorText && (
+          <div className="mb-3">
+            <AuthMessage tone="error">{errorText}</AuthMessage>
           </div>
         )}
         <div>
@@ -113,7 +131,7 @@ const SignInCard = ({ expired, demo = false }: Props) => {
               </div>
               {/* Mounted too, so a half-entered code survives a tab switch. */}
               <div hidden={method !== "account"}>
-                <AccountForm onSuccess={handleSuccess} />
+                <AccountForm onSuccess={handleSuccess} googleEnabled={googleEnabled} />
               </div>
             </div>
           </div>

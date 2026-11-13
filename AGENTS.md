@@ -8,6 +8,7 @@
 
 - Client dev: `npm run dev`. Server: `cd src/server && npm run serve`.
 - Before finishing: `npm run typecheck`, `npm run lint`, `npm test`, `cd src/server && npx tsc --noEmit`, and `cd src/server && npm test` if you touched server code.
+- **Every time you add or change a server dependency** (`npm install` in `src/server`), in the same turn run `docker compose up -d --build -V --no-deps backend` (the container has its own `node_modules` volume), then check `docker compose logs --tail 20 backend` for errors. Never hand the user a backend that can't start.
 - After changing the Prisma schema: `cd src/server && npm run prisma:generate`.
 
 ## Do not read or edit

@@ -157,6 +157,7 @@ Required environment variables (names only; values live in Render and your local
 | `CLIENT_ORIGIN` | `https://best-tree.app`; the API rejects other origins |
 | `MAIL_TRANSPORT`, `MAIL_FROM`, `RESEND_API_KEY` | `console` (log only, local), `resend` or `gmail` |
 | `CLOUDINARY_*` | photo storage |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional, set together: shows "Увійти через Google" (OAuth client, redirect `/api/auth/google/callback`) |
 | `DEMO_MODE=true` | optional, see above |
 
 The server refuses to start in production with a missing or invalid value (`checkConfig`).

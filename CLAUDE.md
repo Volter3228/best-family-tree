@@ -8,6 +8,7 @@
 
 - Client dev: `npm run dev`. Server: `cd src/server && npm run serve`.
 - Before finishing: `npm run typecheck`, `npm run lint`, `npm test`, `cd src/server && npx tsc --noEmit`, and `cd src/server && npm test` if you touched server code.
+- **Every time you add or change a server dependency** (`npm install` in `src/server`), in the same turn run `docker compose up -d --build -V --no-deps backend` (the container has its own `node_modules` volume), then check `docker compose logs --tail 20 backend` for errors. Never hand the user a backend that can't start.
 - After changing the Prisma schema: `cd src/server && npm run prisma:generate`.
 
 ## Do not read or edit
@@ -45,5 +46,5 @@
 
 - Production: Render (one Docker image) + Neon + Cloudinary + Resend; see README "Deployment". Local `.env` must never point at production: pass the Neon URL inline for admin scripts (`~/.config/best-tree/*.url`, never print them).
 - Demo: `DEMO_MODE=true` on a database whose name contains `demo`; build it with `npm run db:anonymize-demo` (README). The backend caches the tree in memory: restart it after changing the database directly.
-- Ask before writing to Neon or running scripts that change data. The backend container keeps its own `node_modules` volume: after adding a server dependency run `docker compose up -d --build -V --no-deps backend`.
+- Ask before writing to Neon or running scripts that change data.
 - `pkill -f` in a shell command can kill that shell; find the pid with `ss -ltnp` instead.

@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import { requestEmailCode } from "@/api/auth";
 import CodeForm from "./CodeForm";
 import EmailForm from "./EmailForm";
+import GoogleButton from "./GoogleButton";
 import { authStrings as t } from "./strings";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
 interface Props {
   onSuccess: () => void;
+  googleEnabled?: boolean;
 }
 
-const AccountForm = ({ onSuccess }: Props) => {
+const AccountForm = ({ onSuccess, googleEnabled = false }: Props) => {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [cooldown, setCooldown] = useState(0);
@@ -38,17 +40,32 @@ const AccountForm = ({ onSuccess }: Props) => {
 
   if (step === "email") {
     return (
-      <EmailForm
-        initialEmail={email}
-        onSubmit={async (address) => {
-          const error = await ask(address);
-          if (!error) {
-            setEmail(address);
-            setStep("code");
-          }
-          return error;
-        }}
-      />
+      <>
+        {googleEnabled && (
+          <>
+            <GoogleButton />
+            <div
+              aria-hidden
+              className="my-4 flex items-center gap-3 text-xs text-foreground/50"
+            >
+              <span className="h-px flex-1 bg-foreground/10" />
+              {t.or}
+              <span className="h-px flex-1 bg-foreground/10" />
+            </div>
+          </>
+        )}
+        <EmailForm
+          initialEmail={email}
+          onSubmit={async (address) => {
+            const error = await ask(address);
+            if (!error) {
+              setEmail(address);
+              setStep("code");
+            }
+            return error;
+          }}
+        />
+      </>
     );
   }
 

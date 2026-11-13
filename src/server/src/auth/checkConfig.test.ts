@@ -129,6 +129,22 @@ describe("configProblems: demo", () => {
   });
 });
 
+describe("configProblems: google", () => {
+  it("accepts both variables or neither", () => {
+    expect(
+      configProblems({ ...good, GOOGLE_CLIENT_ID: "id", GOOGLE_CLIENT_SECRET: "secret" }),
+    ).toEqual([]);
+    expect(configProblems(good)).toEqual([]);
+  });
+
+  it("flags half a pair, in every environment", () => {
+    expect(configProblems({ ...good, GOOGLE_CLIENT_ID: "id" })).toHaveLength(1);
+    expect(
+      configProblems({ NODE_ENV: "development", GOOGLE_CLIENT_SECRET: "secret" }),
+    ).toHaveLength(1);
+  });
+});
+
 describe("databaseName", () => {
   it("reads the name and ignores the query string", () => {
     expect(databaseName("postgresql://u:p@h:5432/neon_demo?sslmode=require")).toBe("neon_demo");

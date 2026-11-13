@@ -16,6 +16,7 @@
     "prisma:generate": "npx prisma generate",
     "prisma:migrate-dev": "npx prisma migrate dev",
     "auth:grant": "tsx src/scripts/grantAccess.ts",
+    "auth:seed-grants": "tsx src/scripts/seedGrants.ts",
     "auth:seed-questions": "tsx src/scripts/seedQuestions.ts",
     "auth:import-emails": "tsx src/scripts/importAllowedEmails.ts",
     "auth:report-duplicate-contacts": "tsx src/scripts/reportDuplicateContacts.ts",
@@ -36,6 +37,7 @@
     "mongodb": "^6.17.0",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "openid-client": "^6.8.9",
     "prisma": "^7.2.0",
     "zod": "^4.3.6"
   },
