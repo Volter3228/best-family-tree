@@ -27,9 +27,14 @@ const googleProblems = (env: Env): string[] =>
     ? []
     : ["GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set together"];
 
+const telegramProblems = (env: Env): string[] =>
+  Boolean(env.TELEGRAM_CLIENT_ID) === Boolean(env.TELEGRAM_CLIENT_SECRET)
+    ? []
+    : ["TELEGRAM_CLIENT_ID and TELEGRAM_CLIENT_SECRET must be set together"];
+
 /** Lists what is wrong with the environment (empty = fine). */
 export const configProblems = (env: Env): string[] => {
-  const demo = [...demoProblems(env), ...googleProblems(env)];
+  const demo = [...demoProblems(env), ...googleProblems(env), ...telegramProblems(env)];
   if (env.NODE_ENV !== "production") return demo;
   const problems: string[] = [...demo];
 

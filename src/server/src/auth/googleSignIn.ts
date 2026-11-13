@@ -7,9 +7,12 @@ export type GoogleDecision =
   | { ok: false; code: "not_verified" | "not_member" | "ambiguous" };
 
 /** Maps the provider's `error` query value to the page to land on. */
-export const callbackErrorRedirect = (error: string | undefined) => {
+export const callbackErrorRedirect = (
+  error: string | undefined,
+  provider: "google" | "telegram" = "google",
+) => {
   if (error === undefined) return null;
-  return error === "access_denied" ? "/login" : "/login?error=google_failed";
+  return error === "access_denied" ? "/login" : `/login?error=${provider}_failed`;
 };
 
 /**

@@ -90,7 +90,7 @@ How family-mode edges are drawn: Smooth (bezier), Straight or Cornered
 ## Sign-in
 
 **Sign-in method**:
-How a visitor proves they may enter. Questions: answer three secret questions about the organisation, no account needed. Personal: a one-time code sent to the visitor's email, or Google sign-in (the verified Google address is matched like an email; same 90-day session).
+How a visitor proves they may enter. Questions: answer three secret questions about the organisation, no account needed. Personal: a one-time code sent to the visitor's email, or Google sign-in (the verified Google address is matched like an email; same 90-day session), or Telegram sign-in (Telegram confirms the visitor's phone, matched against members' phone numbers only, never usernames; same 90-day session). When a grant holder changes phone, remove the old number: a reissued number would otherwise sign a stranger in as them.
 _Avoid_: Login type, auth mode
 
 **Session**:

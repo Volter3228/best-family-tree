@@ -1284,9 +1284,9 @@
     "semantic_hash": "26235758c7aa814bf637a59e21d30613"
   },
   "src/server/src/index.ts": {
-    "mtime": 1794522041.782689,
-    "seen": 1794522100.7999723,
-    "ast_hash": "ec19baf06363edb49f7229f864764bfc",
+    "mtime": 1794576250.0716724,
+    "seen": 1794576314.9046645,
+    "ast_hash": "79f73237846ef2827c77e1e51aec5c5a",
     "semantic_hash": ""
   },
   "src/server/src/libs/cloudinary.ts": {
@@ -1944,9 +1944,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794522081.7108154,
-    "seen": 1794522100.8051581,
-    "ast_hash": "71b91d13a19a9269772e052d3d56da11",
+    "mtime": 1794576280.2721264,
+    "seen": 1794576314.91044,
+    "ast_hash": "3a5b7d449b8c31d5d468bb4bb00e78ab",
     "semantic_hash": ""
   },
   "compose.yml": {
@@ -2046,9 +2046,9 @@
     "semantic_hash": ""
   },
   "GLOSSARY.md": {
-    "mtime": 1794522081.7109709,
-    "seen": 1794522100.8051574,
-    "ast_hash": "1cff50994361dbce659f1c5399597217",
+    "mtime": 1794576294.153387,
+    "seen": 1794576314.9104393,
+    "ast_hash": "769e569b4151b83406f89d6f2b76b0f7",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -2352,15 +2352,15 @@
     "semantic_hash": ""
   },
   "src/app/login/page.tsx": {
-    "mtime": 1794522081.7102528,
-    "seen": 1794522100.790721,
-    "ast_hash": "89c0675186471b530a2e872a172df8a1",
+    "mtime": 1794576271.0114396,
+    "seen": 1794576314.894323,
+    "ast_hash": "82297d2c54b1fda9a013562e30f37cf1",
     "semantic_hash": ""
   },
   "src/components/auth/AccountForm.tsx": {
-    "mtime": 1794575375.2457058,
-    "seen": 1794575764.4956846,
-    "ast_hash": "92df3a29b9435bb97126492040d3252e",
+    "mtime": 1794576271.0116777,
+    "seen": 1794576314.8944905,
+    "ast_hash": "ed4e2c1e3842ddb131a1d036f828b9b4",
     "semantic_hash": ""
   },
   "src/components/auth/AuthMessage.tsx": {
@@ -2382,9 +2382,9 @@
     "semantic_hash": ""
   },
   "src/components/auth/strings.ts": {
-    "mtime": 1794574811.7371216,
-    "seen": 1794575764.4960778,
-    "ast_hash": "bac80a1505dcecd4bb7c084406e38f5d",
+    "mtime": 1794576271.0111341,
+    "seen": 1794576314.895018,
+    "ast_hash": "ff273498ece99661d12125c55ea328a8",
     "semantic_hash": ""
   },
   "src/components/photoViewer/PhotoOpenButton.tsx": {
@@ -2580,9 +2580,9 @@
     "semantic_hash": ""
   },
   "src/components/auth/SignIn.tsx": {
-    "mtime": 1794522081.710389,
-    "seen": 1794522100.7910225,
-    "ast_hash": "306694df33a143b6a9f1d1df6581522b",
+    "mtime": 1794576271.0115635,
+    "seen": 1794576314.8948612,
+    "ast_hash": "3340da54d014f32e7d8e8b0251b0710e",
     "semantic_hash": ""
   },
   "src/components/ui/InfoBubble.tsx": {
@@ -2622,15 +2622,15 @@
     "semantic_hash": ""
   },
   "src/server/src/auth/checkConfig.test.ts": {
-    "mtime": 1794522053.224411,
-    "seen": 1794522100.799353,
-    "ast_hash": "da46e83ea9b72d7721f364d6fdffed19",
+    "mtime": 1794576245.959999,
+    "seen": 1794576314.9037645,
+    "ast_hash": "c2656359a16d7eb0106de159f85cc3b5",
     "semantic_hash": ""
   },
   "src/server/src/auth/checkConfig.ts": {
-    "mtime": 1794522041.7828481,
-    "seen": 1794522100.799354,
-    "ast_hash": "8ab841316c2ed4f22599a6aeab443b70",
+    "mtime": 1794576245.9598653,
+    "seen": 1794576314.9037654,
+    "ast_hash": "cf9dec14139d5e75674387e40fdd84f6",
     "semantic_hash": ""
   },
   "compose.prod.yml": {
@@ -2664,15 +2664,15 @@
     "semantic_hash": ""
   },
   "src/server/src/auth/eligibility.test.ts": {
-    "mtime": 1794397980.1845136,
-    "seen": 1794404269.5846217,
+    "mtime": 1794576271.0117989,
+    "seen": 1794576314.9038012,
     "ast_hash": "28a4343218b8d1c5a44760f185c9325e",
     "semantic_hash": ""
   },
   "src/server/src/auth/eligibility.ts": {
-    "mtime": 1794397980.1845136,
-    "seen": 1794404269.5846226,
-    "ast_hash": "331fb3b0ae440c24e9cf1f6c6e54b318",
+    "mtime": 1794576245.959703,
+    "seen": 1794576314.9038024,
+    "ast_hash": "8746dae334f742a09c507c61250966e6",
     "semantic_hash": ""
   },
   "src/server/src/auth/emailCodes.test.ts": {
@@ -2958,15 +2958,15 @@
     "semantic_hash": ""
   },
   "src/server/src/auth/googleSignIn.ts": {
-    "mtime": 1794522058.1919053,
-    "seen": 1794522100.7994564,
-    "ast_hash": "8066a7fd6d65ff64b8248947634b5c70",
+    "mtime": 1794576245.9595218,
+    "seen": 1794576314.9039357,
+    "ast_hash": "bce6ff28576da06a004ac3767c14f9b6",
     "semantic_hash": ""
   },
   "src/server/src/auth/oidc.ts": {
-    "mtime": 1794566227.0640228,
-    "seen": 1794575764.514389,
-    "ast_hash": "39686641cf854c262170fd992cdf3bc6",
+    "mtime": 1794576245.9593253,
+    "seen": 1794576314.9043264,
+    "ast_hash": "5fa68497f99e6081b7af321b03661327",
     "semantic_hash": ""
   },
   "src/server/src/auth/sessions.test.ts": {
@@ -2985,6 +2985,36 @@
     "mtime": 1794575571.607423,
     "seen": 1794575764.5163543,
     "ast_hash": "cdaf5dbd6a36713c846a2d4b70b0c278",
+    "semantic_hash": ""
+  },
+  "src/components/auth/TelegramButton.tsx": {
+    "mtime": 1794576271.0112824,
+    "seen": 1794576314.894863,
+    "ast_hash": "891864475aeb89c0aa9da27494d19662",
+    "semantic_hash": ""
+  },
+  "src/server/src/auth/telegramEligibility.test.ts": {
+    "mtime": 1794576271.014251,
+    "seen": 1794576314.9045215,
+    "ast_hash": "bc14dce7d340d01d45025f04e91f10ff",
+    "semantic_hash": ""
+  },
+  "src/server/src/auth/telegramEligibility.ts": {
+    "mtime": 1794576245.962876,
+    "seen": 1794576314.9045224,
+    "ast_hash": "c7e5d33c1129a1037656f0bd6f705434",
+    "semantic_hash": ""
+  },
+  "src/server/src/auth/telegramSignIn.ts": {
+    "mtime": 1794576245.9638808,
+    "seen": 1794576314.9045234,
+    "ast_hash": "6788704021c41f5815a991fbea7a833d",
+    "semantic_hash": ""
+  },
+  "src/server/src/routes/auth/telegramRoutes.ts": {
+    "mtime": 1794576271.0110042,
+    "seen": 1794576314.9049754,
+    "ast_hash": "0821f0a96297d92fa9e00097ad87ddbb",
     "semantic_hash": ""
   }
 }

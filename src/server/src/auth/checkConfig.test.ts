@@ -145,6 +145,21 @@ describe("configProblems: google", () => {
   });
 });
 
+describe("configProblems: telegram", () => {
+  it("accepts both variables or neither", () => {
+    expect(
+      configProblems({ ...good, TELEGRAM_CLIENT_ID: "id", TELEGRAM_CLIENT_SECRET: "secret" }),
+    ).toEqual([]);
+  });
+
+  it("flags half a pair", () => {
+    expect(configProblems({ ...good, TELEGRAM_CLIENT_ID: "id" })).toHaveLength(1);
+    expect(
+      configProblems({ NODE_ENV: "development", TELEGRAM_CLIENT_SECRET: "s" }),
+    ).toHaveLength(1);
+  });
+});
+
 describe("databaseName", () => {
   it("reads the name and ignores the query string", () => {
     expect(databaseName("postgresql://u:p@h:5432/neon_demo?sslmode=require")).toBe("neon_demo");

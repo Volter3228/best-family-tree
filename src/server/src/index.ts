@@ -13,6 +13,7 @@ import teamRoutes from "./routes/teamRoutes.js";
 import questionRoutes from "./routes/auth/questionRoutes.js";
 import emailRoutes from "./routes/auth/emailRoutes.js";
 import googleRoutes from "./routes/auth/googleRoutes.js";
+import telegramRoutes from "./routes/auth/telegramRoutes.js";
 import sessionRoutes from "./routes/auth/sessionRoutes.js";
 import { requireSession } from "./middleware/requireSession.js";
 import { requireEditorForWrites } from "./middleware/requireAccess.js";
@@ -62,6 +63,7 @@ app.use("/api", sessionRoutes);
 app.use("/api", questionRoutes);
 app.use("/api", emailRoutes);
 app.use("/api", googleRoutes);
+app.use("/api", telegramRoutes);
 
 app.use("/api", requireSession);
 // Demo mode: sessions are synthetic and the database stays read-only.

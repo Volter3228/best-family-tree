@@ -158,6 +158,7 @@ Required environment variables (names only; values live in Render and your local
 | `MAIL_TRANSPORT`, `MAIL_FROM`, `RESEND_API_KEY` | `console` (log only, local), `resend` or `gmail` |
 | `CLOUDINARY_*` | photo storage |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional, set together: shows "Увійти через Google" (OAuth client, redirect `/api/auth/google/callback`) |
+| `TELEGRAM_CLIENT_ID`, `TELEGRAM_CLIENT_SECRET` | optional, set together (bot ID and secret from BotFather → Bot Settings → Login Widget, OpenID Connect): shows "Увійти через Telegram"; redirect `/api/auth/telegram/callback`. Members are matched by the confirmed phone only; hidden in the demo |
 | `DEMO_MODE=true` | optional, see above |
 
 The server refuses to start in production with a missing or invalid value (`checkConfig`).

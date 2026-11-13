@@ -35,18 +35,8 @@ export const resolveEmailIdentity = (
     (m) => m.email !== null && normalizeEmail(m.email) === wanted,
   );
 
-  if (matches.some((m) => m.activityState === "EXCLUDED")) {
-    return { kind: "refused", reason: "excluded" };
-  }
-  if (matches.length > 1) return { kind: "refused", reason: "ambiguous" };
-  if (matches.length === 1) {
-    const [member] = matches;
-    return {
-      kind: "member",
-      memberId: member.id,
-      level: member.grantLevel ?? "VIEWER",
-    };
-  }
+  const found = resolveMemberMatch(matches);
+  if (found.kind !== "unknown") return found;
 
   const allowed = rows.allowedEmails.some(
     (a) => normalizeEmail(a.email) === wanted,
@@ -54,4 +44,22 @@ export const resolveEmailIdentity = (
   return allowed
     ? { kind: "allowlisted", level: "VIEWER" }
     : { kind: "refused", reason: "unknown" };
+};
+
+export type MemberMatch =
+  | { kind: "member"; memberId: string; level: AccessRank }
+  | { kind: "refused"; reason: "excluded" | "ambiguous" }
+  | { kind: "unknown" };
+
+/** Shared decision once the members that match an identifier are known. */
+export const resolveMemberMatch = (matches: EligibilityMember[]): MemberMatch => {
+  if (matches.some((m) => m.activityState === "EXCLUDED")) {
+    return { kind: "refused", reason: "excluded" };
+  }
+  if (matches.length > 1) return { kind: "refused", reason: "ambiguous" };
+  if (matches.length === 1) {
+    const [member] = matches;
+    return { kind: "member", memberId: member.id, level: member.grantLevel ?? "VIEWER" };
+  }
+  return { kind: "unknown" };
 };

@@ -19,9 +19,10 @@ interface Props {
   error?: string;
   demo?: boolean;
   googleEnabled?: boolean;
+  telegramEnabled?: boolean;
 }
 
-const SignInCard = ({ expired, error, demo = false, googleEnabled = false }: Props) => {
+const SignInCard = ({ expired, error, demo = false, googleEnabled = false, telegramEnabled = false }: Props) => {
   const [method, setMethod] = useState<Method>("account");
   const [struggled, setStruggled] = useState(false);
   const [showExpired] = useState(expired);
@@ -131,7 +132,7 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false }: Pro
               </div>
               {/* Mounted too, so a half-entered code survives a tab switch. */}
               <div hidden={method !== "account"}>
-                <AccountForm onSuccess={handleSuccess} googleEnabled={googleEnabled} />
+                <AccountForm onSuccess={handleSuccess} googleEnabled={googleEnabled} telegramEnabled={telegramEnabled} />
               </div>
             </div>
           </div>

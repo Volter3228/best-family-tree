@@ -5,6 +5,7 @@ import { requestEmailCode } from "@/api/auth";
 import CodeForm from "./CodeForm";
 import EmailForm from "./EmailForm";
 import GoogleButton from "./GoogleButton";
+import TelegramButton from "./TelegramButton";
 import { authStrings as t } from "./strings";
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -12,9 +13,10 @@ const RESEND_COOLDOWN_SECONDS = 60;
 interface Props {
   onSuccess: () => void;
   googleEnabled?: boolean;
+  telegramEnabled?: boolean;
 }
 
-const AccountForm = ({ onSuccess, googleEnabled = false }: Props) => {
+const AccountForm = ({ onSuccess, googleEnabled = false, telegramEnabled = false }: Props) => {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [cooldown, setCooldown] = useState(0);
@@ -41,9 +43,12 @@ const AccountForm = ({ onSuccess, googleEnabled = false }: Props) => {
   if (step === "email") {
     return (
       <>
-        {googleEnabled && (
+        {(googleEnabled || telegramEnabled) && (
           <>
-            <GoogleButton />
+            <div className="flex flex-col gap-2">
+              {googleEnabled && <GoogleButton />}
+              {telegramEnabled && <TelegramButton />}
+            </div>
             <div
               aria-hidden
               className="my-4 flex items-center gap-3 text-xs text-foreground/50"
