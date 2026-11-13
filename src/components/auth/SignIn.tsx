@@ -27,8 +27,8 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
   const [struggled, setStruggled] = useState(false);
   const [showExpired] = useState(expired);
   const [errorText] = useState(() =>
-    error && error in t.googleErrors
-      ? t.googleErrors[error as keyof typeof t.googleErrors]
+    error && Object.hasOwn(t.signInErrors, error)
+      ? t.signInErrors[error as keyof typeof t.signInErrors]
       : null,
   );
 

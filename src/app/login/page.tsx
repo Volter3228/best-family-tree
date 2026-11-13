@@ -12,7 +12,7 @@ export default async function LoginPage({
       error={error}
       demo={process.env.DEMO_MODE === "true"}
       googleEnabled={!!process.env.GOOGLE_CLIENT_ID}
-      telegramEnabled={!!process.env.TELEGRAM_CLIENT_ID && process.env.DEMO_MODE !== "true"}
+      telegramEnabled={!!process.env.TELEGRAM_CLIENT_ID}
     />
   );
 }

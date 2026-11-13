@@ -5,13 +5,19 @@ export type TelegramIdentity =
   | { kind: "refused"; reason: "excluded" | "ambiguous" | "unknown" };
 
 /**
- * Comparison key for a phone number: digits only, and a national number
- * (`0` plus 9 digits) becomes `380…`, so `+380 50 111 22 33`, `380501112233`
- * and `0501112233` are the same number. Empty when there are no digits.
+ * Comparison key for a phone number: digits only, normalised to the `380…`
+ * form Telegram sends. Handles a national number (`0` plus 9 digits), the
+ * same number behind an old trunk prefix (`8` plus that), and the 9-digit
+ * number alone, so `+380 50 111 22 33`, `380501112233`, `0501112233`,
+ * `8 0501112233` and `50 111 22 33` are all the same number. Empty when
+ * there are no digits.
  */
 export const phoneKey = (raw: string) => {
-  const digits = raw.replace(/\D/g, "");
-  return /^0\d{9}$/.test(digits) ? `38${digits}` : digits;
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("8")) digits = digits.slice(1);
+  if (/^0\d{9}$/.test(digits)) return `38${digits}`;
+  if (/^\d{9}$/.test(digits)) return `380${digits}`;
+  return digits;
 };
 
 /**

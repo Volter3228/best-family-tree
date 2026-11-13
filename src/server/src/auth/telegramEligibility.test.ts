@@ -13,6 +13,12 @@ describe("phoneKey", () => {
     expect(phoneKey("380501112233")).toBe("380501112233");
     expect(phoneKey("0501112233")).toBe("380501112233");
   });
+  it("handles the old trunk-prefix form", () => {
+    expect(phoneKey("8 050 111 22 33")).toBe("380501112233");
+  });
+  it("handles the bare 9-digit number", () => {
+    expect(phoneKey("50 111 22 33")).toBe("380501112233");
+  });
   it("is empty without digits", () => {
     expect(phoneKey("  ")).toBe("");
   });

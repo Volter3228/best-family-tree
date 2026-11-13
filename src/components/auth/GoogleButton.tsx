@@ -1,4 +1,5 @@
 import { authStrings as t } from "./strings";
+import ProviderButton from "./ProviderButton";
 
 // Google's four-colour "G" mark; the button follows their light and dark variants (the app themes via data-theme).
 const GoogleMark = () => (
@@ -10,15 +11,8 @@ const GoogleMark = () => (
   </svg>
 );
 
-// A plain link, so the browser leaves for Google with a full navigation.
 const GoogleButton = () => (
-  <a
-    href="/api/auth/google/start"
-    className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#dadce0] bg-white px-4 text-sm font-medium text-[#1f1f1f] transition-colors hover:bg-[#f8f9fa] [[data-theme=dark]_&]:border-[#8e918f] [[data-theme=dark]_&]:bg-[#131314] [[data-theme=dark]_&]:text-[#e3e3e3] [[data-theme=dark]_&]:hover:bg-[#1f1f20]"
-  >
-    <GoogleMark />
-    {t.googleSignIn}
-  </a>
+  <ProviderButton href="/api/auth/google/start" label={t.googleSignIn} icon={<GoogleMark />} />
 );
 
 export default GoogleButton;

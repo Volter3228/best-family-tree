@@ -87,7 +87,7 @@ export const getProviderConfig = (provider: OidcProvider) => {
     : config;
   configs.set(provider, ready);
   ready.catch(() => configs.delete(provider));
-  return config;
+  return ready;
 };
 
 const origin = () => process.env.CLIENT_ORIGIN ?? "http://localhost:3000";

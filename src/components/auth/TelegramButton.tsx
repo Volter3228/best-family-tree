@@ -1,4 +1,5 @@
 import { authStrings as t } from "./strings";
+import ProviderButton from "./ProviderButton";
 
 // Telegram's paper-plane mark on their brand blue.
 const TelegramMark = () => (
@@ -11,15 +12,8 @@ const TelegramMark = () => (
   </svg>
 );
 
-// A plain link, so the browser leaves for Telegram with a full navigation.
 const TelegramButton = () => (
-  <a
-    href="/api/auth/telegram/start"
-    className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#dadce0] bg-white px-4 text-sm font-medium text-[#1f1f1f] transition-colors hover:bg-[#f8f9fa] [[data-theme=dark]_&]:border-[#8e918f] [[data-theme=dark]_&]:bg-[#131314] [[data-theme=dark]_&]:text-[#e3e3e3] [[data-theme=dark]_&]:hover:bg-[#1f1f20]"
-  >
-    <TelegramMark />
-    {t.telegramSignIn}
-  </a>
+  <ProviderButton href="/api/auth/telegram/start" label={t.telegramSignIn} icon={<TelegramMark />} />
 );
 
 export default TelegramButton;

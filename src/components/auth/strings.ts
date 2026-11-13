@@ -39,7 +39,7 @@ export const authStrings = {
   or: "або",
   googleSignIn: "Увійти через Google",
   telegramSignIn: "Увійти через Telegram",
-  googleErrors: {
+  signInErrors: {
     google_failed: "Не вдалося увійти через Google. Спробуй ще раз",
     not_verified: "Google не підтвердив цю пошту. Спробуй інший акаунт або вхід за кодом",
     not_member:

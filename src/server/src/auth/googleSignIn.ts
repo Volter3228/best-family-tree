@@ -1,4 +1,4 @@
-import type { EmailIdentity } from "./eligibility.js";
+import { normalizeEmail, type EmailIdentity } from "./eligibility.js";
 
 export type GoogleClaims = { email?: unknown; email_verified?: unknown; [claim: string]: unknown };
 
@@ -26,7 +26,7 @@ export const decideGoogleSignIn = async (
   if (typeof claims.email !== "string" || claims.email_verified !== true) {
     return { ok: false, code: "not_verified" };
   }
-  const email = claims.email.trim().toLowerCase();
+  const email = normalizeEmail(claims.email);
   const identity = await identityOf(email);
   if (identity.kind === "member") return { ok: true, memberId: identity.memberId, email };
   if (identity.kind === "allowlisted") return { ok: true, memberId: null, email };
