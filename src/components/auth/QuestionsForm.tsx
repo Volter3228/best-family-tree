@@ -10,6 +10,7 @@ import {
   type Challenge,
 } from "@/api/auth";
 import type { AccentColor } from "@/types";
+import { focusAboveKeyboard } from "@/utils/focusAboveKeyboard";
 import AuthMessage from "./AuthMessage";
 import QuestionCard from "./QuestionCard";
 import { authStrings as t } from "./strings";
@@ -59,7 +60,7 @@ const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
   // Apply the pending focus once the form is idle and the inputs are enabled.
   useEffect(() => {
     if (busy || !focusAfterBusyRef.current) return;
-    document.getElementById(focusAfterBusyRef.current)?.focus();
+    focusAboveKeyboard(focusAfterBusyRef.current);
     focusAfterBusyRef.current = null;
   }, [busy]);
 

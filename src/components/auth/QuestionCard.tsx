@@ -41,6 +41,7 @@ const QuestionCard = ({
   onSwap,
 }: Props) => (
   <div
+    data-question-card
     className={twMerge(
       "rounded-xl border-l-4 bg-foreground/5 p-3 transition-colors",
       COLOR_CLASSES[color].border,
