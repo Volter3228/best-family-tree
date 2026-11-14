@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
@@ -27,6 +27,9 @@ const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
     focus(edit.focusIndex);
   };
 
+  // Inputs and separators are direct children of one row, so every input
+  // gets the same flex-1 share. A separator inside an input's wrapper would
+  // steal width from that input only.
   return (
     <div
       role="group"
@@ -36,7 +39,7 @@ const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
       {digits.map((digit, i) => {
         const color = COLOR_CLASSES[PAIR_COLORS[Math.floor(i / 2)]];
         return (
-          <div key={i} className="flex min-w-0 flex-1 items-center gap-1.5">
+          <Fragment key={i}>
             <input
               ref={(el) => {
                 refs.current[i] = el;
@@ -70,7 +73,7 @@ const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
                 }
               }}
               className={twMerge(
-                "h-12 w-full min-w-0 rounded-xl border-b-2 bg-surface text-center text-xl font-semibold shadow-inner",
+                "h-12 min-w-0 flex-1 rounded-xl border-b-2 bg-surface text-center text-xl font-semibold shadow-inner",
                 "transition-all duration-200 ease-out focus:outline-hidden focus:ring-2",
                 color.border,
                 color.accentRing,
@@ -82,7 +85,7 @@ const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
                 ·
               </span>
             )}
-          </div>
+          </Fragment>
         );
       })}
     </div>
