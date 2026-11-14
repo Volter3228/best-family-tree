@@ -43,7 +43,6 @@ const MembersTreeContent = ({ members }: Props) => {
   const layoutMode = useTreeStore((s) => s.layoutMode);
   const sceneRef = useTreeStore((s) => s.sceneRef);
   const nodePositions = useTreeStore((s) => s.nodePositions);
-  const scale = useTreeStore((s) => s.scale);
   const setScale = useTreeStore((s) => s.setScale);
   const setViewport = useTreeStore((s) => s.setViewport);
 
@@ -203,7 +202,6 @@ const MembersTreeContent = ({ members }: Props) => {
             treeMode={treeMode}
             direction={direction}
             edgeStyle={edgeStyle}
-            scale={scale}
             nodes={nodes}
             edges={edges}
             teamFrames={teamFrames}

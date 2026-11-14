@@ -174,9 +174,9 @@
     "semantic_hash": "05d13fe807eb7a18992290ab808bcc0a"
   },
   "src/components/membersTree/MembersTreeContent.tsx": {
-    "mtime": 1794675489.0835729,
-    "seen": 1794676664.297704,
-    "ast_hash": "eb10e9aadd6cb4c9da7e224a32a7b63c",
+    "mtime": 1794682808.8741286,
+    "seen": 1794682836.8508973,
+    "ast_hash": "e26ec81691c95550eee55410adbae422",
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeDynamic.tsx": {
@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeScene.tsx": {
-    "mtime": 1794172212.62424,
-    "seen": 1794172290.8184924,
-    "ast_hash": "597faaf2a47f539507982d2d7db08a95",
+    "mtime": 1794682811.504726,
+    "seen": 1794682836.8509305,
+    "ast_hash": "85ca76a62b1aa669d57ae61070050aed",
     "semantic_hash": ""
   },
   "src/components/membersTree/TeamInfoSidebar.tsx": {
@@ -2256,9 +2256,9 @@
     "semantic_hash": ""
   },
   ".claude/settings.json": {
-    "mtime": 1794496293.1248317,
-    "seen": 1794522100.790094,
-    "ast_hash": "e2944acf8bdbdbd359475d407feeb4b7",
+    "mtime": 1794676974.4466808,
+    "seen": 1794682836.849248,
+    "ast_hash": "43c06a5ce10681dc552011d26df71f41",
     "semantic_hash": ""
   },
   "src/components/membersTree/MemberSidebar.tsx": {

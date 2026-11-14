@@ -1,17 +1,17 @@
 # Graph Report - best-family-tree  (2026-11-14)
 
 ## Corpus Check
-- 515 files · ~172,546 words
+- 515 files · ~172,562 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 28 file(s) not represented in the graph (top: .prisma 9, (none) 6, .css 6)
+- Unclassified: 29 file(s) not represented in the graph (top: .prisma 9, (none) 7, .css 6)
 
 ## Summary
-- 2603 nodes · 6573 edges · 124 communities (118 shown, 6 thin omitted)
+- 2603 nodes · 6576 edges · 124 communities (118 shown, 6 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 68 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1a28cab5`
+- Built from commit: `bf48a4d2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -150,7 +150,7 @@
 7. `pixi.js` - 33 edges
 8. `FilterState` - 31 edges
 9. `http()` - 29 edges
-10. `@heroicons/react` - 28 edges
+10. `useTreeStore` - 29 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `pixijs-scene-container` --references--> `getBounds()`  [INFERRED]

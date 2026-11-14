@@ -1,6 +1,7 @@
 import { memo, type RefObject } from "react";
 import type { Container } from "pixi.js";
 import { isZoomedOut as getIsZoomedOut } from "@/utils";
+import { useTreeStore } from "@/store/treeStore";
 import {
   TEAM_OVERVIEW_EDGE_ALPHA,
   TEAM_OVERVIEW_NODE_ALPHA,
@@ -30,7 +31,6 @@ interface Props {
   treeMode: TreeMode;
   direction: Direction;
   edgeStyle: EdgeStyle;
-  scale: number;
   nodes: MemberNode[];
   edges: TreeEdge[];
   teamFrames: TeamFrame[];
@@ -51,7 +51,6 @@ const MembersTreeScene = ({
   treeMode,
   direction,
   edgeStyle,
-  scale,
   nodes,
   edges,
   teamFrames,
@@ -62,7 +61,8 @@ const MembersTreeScene = ({
   onBadgeClick,
   onFrameClick,
 }: Props) => {
-  const isZoomedOut = getIsZoomedOut(scale);
+  // Only a threshold flip re-renders the scene, not every scale change.
+  const isZoomedOut = useTreeStore((s) => getIsZoomedOut(s.scale));
   const showTree = treeMode !== "grid";
   const isTeamView = treeMode === "team";
 
