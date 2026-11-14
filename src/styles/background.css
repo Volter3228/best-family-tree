@@ -150,6 +150,20 @@
   backface-visibility: hidden;
 }
 
+/* Baked layers: useBakedAurora draws each blurred conic layer once into an
+   image, so the drifting layers need no live blur filter. */
+.aurora-bg.aurora-baked::before {
+  inset: calc(-50% - var(--aurora-pad, 0px));
+  background: var(--aurora-baked-1) center / 100% 100% no-repeat;
+  filter: none;
+}
+
+.aurora-bg.aurora-baked::after {
+  inset: calc(-50% - var(--aurora-pad, 0px));
+  background: var(--aurora-baked-2) center / 100% 100% no-repeat;
+  filter: none;
+}
+
 /* ── Keyframes ── */
 
 /* Breathing: opacity + scale pulse, staggered per bloom via delay */

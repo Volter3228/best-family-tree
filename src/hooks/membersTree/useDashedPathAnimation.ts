@@ -180,6 +180,9 @@ export const useDashedPathAnimation = ({
     if (!ticker) return;
 
     let alive = true;
+    // `clear()` marks the Graphics as changed even when it is already empty,
+    // which keeps Pixi re-processing the scene every frame; clear it once.
+    let isCleared = false;
 
     const onTick = () => {
       const g = graphicsRef.current;
@@ -200,7 +203,10 @@ export const useDashedPathAnimation = ({
       }
 
       if (visibleLen <= 0 || segments.length === 0) {
-        g.clear();
+        if (!isCleared) {
+          g.clear();
+          isCleared = true;
+        }
         return;
       }
 
@@ -214,6 +220,7 @@ export const useDashedPathAnimation = ({
       if (offsetDelta < MIN_REDRAW_OFFSET && !transitionActive) return;
       lastOffsetRef.current = offsetRef.current;
 
+      isCleared = false;
       g.clear();
 
       let remainingLen = visibleLen;

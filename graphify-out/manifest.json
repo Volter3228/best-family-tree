@@ -876,10 +876,10 @@
     "semantic_hash": "2905f3bd7858a8c8dcb144451f66f369"
   },
   "src/components/ui/AuroraBackground.tsx": {
-    "mtime": 1791554290.0942433,
-    "seen": 1792609757.1323805,
-    "ast_hash": "cb77108e96fd688a4434a22d6e5106bf",
-    "semantic_hash": "cb77108e96fd688a4434a22d6e5106bf"
+    "mtime": 1794688262.1149275,
+    "seen": 1794688386.737959,
+    "ast_hash": "e991e7d8200802f439de4a6f9a1455a4",
+    "semantic_hash": ""
   },
   "src/components/ui/MaskIcon.tsx": {
     "mtime": 1791554290.095092,
@@ -1104,9 +1104,9 @@
     "semantic_hash": "31b371bf6d6dabaf6e570aa0829e64e2"
   },
   "src/hooks/membersTree/useDashedPathAnimation.ts": {
-    "mtime": 1793879581.360935,
-    "seen": 1793879616.567146,
-    "ast_hash": "ba874326a56263917fcf8a5a1419885b",
+    "mtime": 1794686794.7910657,
+    "seen": 1794686842.164535,
+    "ast_hash": "26dcb09fe61db4f632869b8040e63d50",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/useSceneTransition.ts": {
@@ -2088,8 +2088,8 @@
     "semantic_hash": ""
   },
   "src/hooks/membersTree/useViewportCulling.ts": {
-    "mtime": 1792782328.5243535,
-    "seen": 1792782389.635898,
+    "mtime": 1794687284.6288095,
+    "seen": 1794688231.00154,
     "ast_hash": "a8e1916389af5994a5d8aef7dc49d56d",
     "semantic_hash": ""
   },
@@ -2370,15 +2370,15 @@
     "semantic_hash": ""
   },
   "src/components/auth/QuestionCard.tsx": {
-    "mtime": 1794305713.0351877,
-    "seen": 1794305796.0895138,
-    "ast_hash": "249203ea2da5ff6318d70b3a8827a63f",
+    "mtime": 1794688215.8689568,
+    "seen": 1794688230.9942136,
+    "ast_hash": "17c55fa8624465c3a60d4d75e68b30df",
     "semantic_hash": ""
   },
   "src/components/auth/QuestionsForm.tsx": {
-    "mtime": 1794676034.3780715,
-    "seen": 1794676664.2972176,
-    "ast_hash": "0472a809c5bad88bf8fc7650d19ac121",
+    "mtime": 1794688216.1130512,
+    "seen": 1794688230.994215,
+    "ast_hash": "d72b82d8035e9237b8394b4c39c77b70",
     "semantic_hash": ""
   },
   "src/components/auth/strings.ts": {
@@ -3051,6 +3051,42 @@
     "mtime": 1794676877.4075677,
     "seen": 1794676892.767225,
     "ast_hash": "da9c6befc67cc5d8dd22d806ba618dba",
+    "semantic_hash": ""
+  },
+  "src/utils/focusAboveKeyboard.ts": {
+    "mtime": 1794688215.6819263,
+    "seen": 1794688231.0073667,
+    "ast_hash": "83840e2f9c738a6065b4e2fa5909c326",
+    "semantic_hash": ""
+  },
+  "src/hooks/ui/useBakedAurora.ts": {
+    "mtime": 1794688306.1113012,
+    "seen": 1794688386.7399945,
+    "ast_hash": "24b674a7a6613d5761667652c98f363d",
+    "semantic_hash": ""
+  },
+  "src/utils/aurora/bakeAurora.ts": {
+    "mtime": 1794688306.111085,
+    "seen": 1794688386.7452147,
+    "ast_hash": "1f708cc5e6c9ee4f5ae0f244327bff0c",
+    "semantic_hash": ""
+  },
+  "src/utils/aurora/bakeParams.test.ts": {
+    "mtime": 1794688306.111203,
+    "seen": 1794688386.7452157,
+    "ast_hash": "90c4524c78f13ed16529f583fb5521c5",
+    "semantic_hash": ""
+  },
+  "src/utils/aurora/bakeParams.ts": {
+    "mtime": 1794688306.1109378,
+    "seen": 1794688386.7452166,
+    "ast_hash": "baf8691777a5e99a7f5b2abf93bc0ea6",
+    "semantic_hash": ""
+  },
+  "src/utils/aurora/index.ts": {
+    "mtime": 1794688262.1128383,
+    "seen": 1794688386.7452176,
+    "ast_hash": "17d1266e74e9fa0c13bd89ab6dc1ae22",
     "semantic_hash": ""
   }
 }
