@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import BrandSpinner from "@/components/ui/BrandSpinner";
 import PhotoViewer from "@/components/photoViewer/PhotoViewer";
 import { useTreeStore } from "@/store/treeStore";
+import { useSessionStore } from "@/store/sessionStore";
 import type { Member as MemberType } from "@/types";
 
 const MembersTree = dynamic(() => import("@/components/membersTree/MembersTree"), {
@@ -23,6 +24,9 @@ type TreeState = ReturnType<typeof useTreeStore.getState>;
 const isTreeReady = (s: TreeState) => s.layoutMode !== null || s.nodes.length > 0;
 
 const MembersTreeDynamic = ({ members }: Props) => {
+  useEffect(() => {
+    void useSessionStore.getState().load();
+  }, []);
   const [phase, setPhase] = useState<"loading" | "exiting" | "done">(() =>
     members.length === 0 || isTreeReady(useTreeStore.getState()) ? "done" : "loading",
   );

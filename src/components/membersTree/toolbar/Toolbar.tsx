@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, memo } from "react";
 import Sidebar, { ManageForm } from "@/components/sidebar";
 import {
   PencilSquareIcon,
@@ -36,10 +36,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const hasActiveFilters = useFiltersStore((s) => s.isFilterActive);
 
   const session = useSessionStore((s) => s.session);
-  const loadSession = useSessionStore((s) => s.load);
-  useEffect(() => {
-    void loadSession();
-  }, [loadSession]);
+  const sessionLoaded = useSessionStore((s) => s.loaded);
   const editable = canEdit(session);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -73,65 +70,67 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   return (
     <>
       {session?.demo && <DemoBadge />}
-      <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/70 shadow-2xl backdrop-blur-md"
-        />
-        <div className="relative flex items-end gap-1.5 rounded-2xl p-2">
-          <ToolbarIconButton
-            title="Пошук"
-            onClick={handleShowSearchClick}
-            icon={MagnifyingGlassIcon}
-            color="blue"
-            isActive={search.isOpen}
+      {sessionLoaded && (
+        <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/70 shadow-2xl backdrop-blur-md"
           />
-          <ToolbarIconButton
-            title="Фільтри"
-            onClick={handleShowFiltersClick}
-            icon={FunnelIcon}
-            color="green"
-            isActive={filters.isOpen}
-            showBadge={hasActiveFilters && !filters.isOpen}
-          />
-          <FitViewButton onClick={onFitView} color="orange" />
-          <ToolbarIconButton
-            title="Налаштування"
-            onClick={handleShowSettingsClick}
-            icon={Cog6ToothIcon}
-            color="green"
-            isActive={settings.isOpen}
-          />
-          {session && (
+          <div className="relative flex items-end gap-1.5 rounded-2xl p-2">
             <ToolbarIconButton
-              title={t.logout}
-              onClick={handleShowAccountClick}
-              icon={
-                session.method === "QUESTIONS"
-                  ? ArrowRightOnRectangleIcon
-                  : UserCircleIcon
-              }
+              title="Пошук"
+              onClick={handleShowSearchClick}
+              icon={MagnifyingGlassIcon}
               color="blue"
-              isActive={account.isOpen}
+              isActive={search.isOpen}
             />
-          )}
-          {editable && (
-            <>
-              <div
-                aria-hidden
-                className="mx-0.5 h-6 w-px self-center rounded-full bg-foreground/15"
-              />
+            <ToolbarIconButton
+              title="Фільтри"
+              onClick={handleShowFiltersClick}
+              icon={FunnelIcon}
+              color="green"
+              isActive={filters.isOpen}
+              showBadge={hasActiveFilters && !filters.isOpen}
+            />
+            <FitViewButton onClick={onFitView} color="orange" />
+            <ToolbarIconButton
+              title="Налаштування"
+              onClick={handleShowSettingsClick}
+              icon={Cog6ToothIcon}
+              color="green"
+              isActive={settings.isOpen}
+            />
+            {session && (
               <ToolbarIconButton
-                title="Керування"
-                onClick={toggleSidebar}
-                icon={PencilSquareIcon}
+                title={t.logout}
+                onClick={handleShowAccountClick}
+                icon={
+                  session.method === "QUESTIONS"
+                    ? ArrowRightOnRectangleIcon
+                    : UserCircleIcon
+                }
                 color="blue"
-                isActive={isSidebarOpen}
+                isActive={account.isOpen}
               />
-            </>
-          )}
+            )}
+            {editable && (
+              <>
+                <div
+                  aria-hidden
+                  className="mx-0.5 h-6 w-px self-center rounded-full bg-foreground/15"
+                />
+                <ToolbarIconButton
+                  title="Керування"
+                  onClick={toggleSidebar}
+                  icon={PencilSquareIcon}
+                  color="blue"
+                  isActive={isSidebarOpen}
+                />
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <SearchBar
         isOpen={search.isOpen}
         isClosing={search.isClosing}
