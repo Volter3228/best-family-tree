@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 
 // Vertical travel (px) after which a press on the handle counts as a swipe.
-const SWIPE_DISTANCE = 28;
+const SWIPE_DISTANCE = 10;
 
 /**
  * Pointer handlers for the sidebar's minimize handle: a tap toggles, a swipe
@@ -26,9 +26,7 @@ export const useSidebarSwipe = (
       const delta = event.clientY - startY;
       if (delta >= SWIPE_DISTANCE) onMinimizedChange(true);
       else if (delta <= -SWIPE_DISTANCE) onMinimizedChange(false);
-      else if (Math.abs(delta) < SWIPE_DISTANCE / 2) {
-        onMinimizedChange(!isMinimized);
-      }
+      else onMinimizedChange(!isMinimized);
     },
     [isMinimized, onMinimizedChange],
   );

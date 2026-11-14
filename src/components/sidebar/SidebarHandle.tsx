@@ -16,12 +16,12 @@ const SidebarHandle = ({ isMinimized, onMinimizedChange, className }: Props) => 
       role="button"
       aria-label={isMinimized ? "Розгорнути" : "Згорнути"}
       className={twMerge(
-        "flex h-5 shrink-0 cursor-pointer touch-none items-center justify-center md:hidden",
+        "flex h-9 shrink-0 cursor-pointer touch-none items-center justify-center md:hidden",
         className,
       )}
       {...swipe}
     >
-      <span className="h-1 w-10 rounded-full bg-foreground/25" />
+      <span className="h-1.5 w-12 rounded-full bg-foreground/25" />
     </div>
   );
 };
