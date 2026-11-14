@@ -197,21 +197,25 @@ const MembersTreeContent = ({ members }: Props) => {
         >
           <ViewportCulling />
           <SharpAvatarTracker />
-          <MembersTreeScene
-            sceneRef={sceneRef}
-            treeMode={treeMode}
-            direction={direction}
-            edgeStyle={edgeStyle}
-            nodes={nodes}
-            edges={edges}
-            teamFrames={teamFrames}
-            nodePositions={nodePositions}
-            selectedId={selectedId}
-            selectedTeamId={highlightedTeamId}
-            onNodeClick={handleNodeClick}
-            onBadgeClick={handleBadgeClick}
-            onFrameClick={handleFrameClick}
-          />
+          {/* A render group of its own: panning the viewport then moves one
+              transform instead of recomputing every node's world transform. */}
+          <pixiContainer isRenderGroup label="tree-render-group">
+            <MembersTreeScene
+              sceneRef={sceneRef}
+              treeMode={treeMode}
+              direction={direction}
+              edgeStyle={edgeStyle}
+              nodes={nodes}
+              edges={edges}
+              teamFrames={teamFrames}
+              nodePositions={nodePositions}
+              selectedId={selectedId}
+              selectedTeamId={highlightedTeamId}
+              onNodeClick={handleNodeClick}
+              onBadgeClick={handleBadgeClick}
+              onFrameClick={handleFrameClick}
+            />
+          </pixiContainer>
         </Viewport>
       </Application>
       <Toolbar

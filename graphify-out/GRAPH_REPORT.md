@@ -1,7 +1,7 @@
 # Graph Report - best-family-tree  (2026-11-14)
 
 ## Corpus Check
-- 521 files · ~173,819 words
+- 521 files · ~173,845 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 29 file(s) not represented in the graph (top: .prisma 9, (none) 7, .css 6)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fc8a8f01`
+- Built from commit: `78a18da4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -650,10 +650,10 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `memberService.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07474747474747474 - nodes in this community are weakly interconnected._
 - **Why does `react` connect `react` to `TeamMembersEditor.tsx`, `colorClasses.ts`, `Toolbar.tsx`, `TeamInfoSidebar.tsx`, `PositionFormFields.tsx`, `TeamSearch.tsx`, `PhotoViewer.tsx`, `useDashedPathAnimation.ts`, `MembersTreeScene.tsx`, `useCardAnimation.ts`, `scale.ts`, `pixi.js`, `Member`, `src/utils/index.ts`, `package.json`, `layout.tsx`, `AccentColor`, `utils/membersTree/index.ts`, `MembersTreeContent.tsx`, `useTreeDirection.ts`, `TeamFormContent.tsx`, `http`, `tailwind-merge`, `AvatarFileInput.tsx`, `src/types/index.ts`, `ThemeContext.tsx`, `useTreeLayout.ts`, `FiltersPanel.tsx`, `MemberBirthdayAnimation.tsx`, `constants/canvas/index.ts`, `LineageMemberSearch.tsx`, `pixi.js`, `TeamSearch.tsx`, `filterSearchParams.ts`, `Toolbar.tsx`, `useCanvasTheme.ts`?**
-  _High betweenness centrality (0.108) - this node is a cross-community bridge._
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **Should `src/index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.11076923076923077 - nodes in this community are weakly interconnected._
 - **Why does `Point` connect `utils/membersTree/index.ts` to `Skill router`, `teamLayout.ts`, `useTreeLayout.ts`, `teamFrame.ts`, `MembersTreeScene.tsx`, `Foundations`?**
-  _High betweenness centrality (0.105) - this node is a cross-community bridge._
+  _High betweenness centrality (0.106) - this node is a cross-community bridge._
 - **Should `emailRoutes.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.08215488215488216 - nodes in this community are weakly interconnected._
