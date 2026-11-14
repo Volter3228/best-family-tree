@@ -102,15 +102,6 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
             color="green"
             isActive={settings.isOpen}
           />
-          {editable && (
-            <ToolbarIconButton
-              title="Керування"
-              onClick={toggleSidebar}
-              icon={PencilSquareIcon}
-              color="blue"
-              isActive={isSidebarOpen}
-            />
-          )}
           {session && (
             <ToolbarIconButton
               title={t.logout}
@@ -123,6 +114,21 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
               color="blue"
               isActive={account.isOpen}
             />
+          )}
+          {editable && (
+            <>
+              <div
+                aria-hidden
+                className="mx-0.5 h-6 w-px self-center rounded-full bg-foreground/15"
+              />
+              <ToolbarIconButton
+                title="Керування"
+                onClick={toggleSidebar}
+                icon={PencilSquareIcon}
+                color="blue"
+                isActive={isSidebarOpen}
+              />
+            </>
           )}
         </div>
       </div>
