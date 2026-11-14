@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
-import { Container, Filter, Rectangle } from "pixi.js";
+import { Container, Filter, FederatedPointerEvent, Rectangle } from "pixi.js";
 import gsap from "gsap";
 import {
   useTapWithoutDrag,
@@ -99,7 +99,9 @@ const MemberNode = ({
   );
   // A drag that starts on the node pans the tree; it only selects the member
   // when it was a quick, tiny slip of a click.
-  const tap = useTapWithoutDrag(handleSelect);
+  // A touch held still shows the hover state instead (and selects nothing).
+  const handleLongPress = useCallback(() => setIsHovered(true), []);
+  const tap = useTapWithoutDrag(handleSelect, handleLongPress);
 
   // The tooltip only exists while it is needed (and while it fades out).
   const [isTooltipMounted, setIsTooltipMounted] = useState(false);
@@ -118,7 +120,13 @@ const MemberNode = ({
     if (isTooltipVisible) setIsTooltipMounted(true);
   }, [isTooltipVisible]);
 
-  const handlePointerEnter = useCallback(() => setIsHovered(true), []);
+  // A tap makes the browser report pointer enter, but the matching leave is not
+  // reliably delivered for touch, so the node stayed hovered until another tap.
+  // Touch does not hover on enter: a tap selects, a long press hovers (below).
+  const handlePointerEnter = useCallback((event: FederatedPointerEvent) => {
+    if (event.pointerType === "touch") return;
+    setIsHovered(true);
+  }, []);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
 
   useEffect(() => {
@@ -130,8 +138,17 @@ const MemberNode = ({
       }
     };
 
+    // A long-press hover has no pointer leave: the next touch ends it.
+    const handlePointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "touch") setIsHovered(false);
+    };
+
     window.addEventListener("pointermove", handlePointerMove);
-    return () => window.removeEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
   }, [isHovered]);
 
   const filters = useMemo(() => {

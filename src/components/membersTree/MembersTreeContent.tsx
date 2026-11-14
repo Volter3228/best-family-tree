@@ -173,7 +173,15 @@ const MembersTreeContent = ({ members }: Props) => {
   const resolution = getRenderResolution();
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
+    <div
+      className="fixed inset-0 overflow-hidden"
+      // A long touch on a node would open the browser's context menu.
+      onContextMenu={(e) => {
+        if ((e.nativeEvent as PointerEvent).pointerType === "touch") {
+          e.preventDefault();
+        }
+      }}
+    >
       <Application
         resizeTo={window}
         backgroundAlpha={0}
