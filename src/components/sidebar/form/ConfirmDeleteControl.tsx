@@ -5,6 +5,9 @@ interface Props {
   message: string;
   isConfirming: boolean;
   isSubmitting: boolean;
+  // When set, deletion is not allowed yet: the button is disabled and this
+  // text explains what has to happen first.
+  blockedReason?: string | null;
   onAsk: (isConfirming: boolean) => void;
   onConfirm: () => void;
 }
@@ -16,10 +19,23 @@ const ConfirmDeleteControl = ({
   message,
   isConfirming,
   isSubmitting,
+  blockedReason,
   onAsk,
   onConfirm,
 }: Props) =>
-  isConfirming ? (
+  blockedReason ? (
+    <div className="flex w-full flex-col items-center gap-2">
+      <button
+        type="button"
+        disabled
+        className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-red-500/20 text-sm font-medium text-red-500 opacity-50"
+      >
+        <TrashIcon className="h-4 w-4" />
+        {label}
+      </button>
+      <p className="text-center text-xs text-foreground/60">{blockedReason}</p>
+    </div>
+  ) : isConfirming ? (
     <div className="flex w-full flex-col items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-3">
       <p className="text-center text-sm text-foreground/80">{message}</p>
       <div className="flex w-full gap-2">

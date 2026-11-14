@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from "../../utils/httpErrors.js";
 import { canEditMember } from "../../auth/access.js";
+import { assertNoMentees } from "../../utils/memberDeletion.js";
 import type { Session } from "../../auth/types.js";
 import {
   contactField,
@@ -171,10 +172,8 @@ export const deleteMember = (memberId: string) =>
     const member = await tx.member.findUnique({ where: { id: memberId } });
     if (!member) throw new NotFoundError("Member not found");
 
-    await tx.member.updateMany({
-      where: { mentorId: memberId },
-      data: { mentorId: member.mentorId },
-    });
+    assertNoMentees(await tx.member.count({ where: { mentorId: memberId } }));
+
     await tx.familyGroup.updateMany({
       where: { founderId: memberId },
       data: { founderId: null },

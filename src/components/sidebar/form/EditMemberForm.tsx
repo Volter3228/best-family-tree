@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useId, useState, useMemo } from "react";
 import {
   useMembersActions,
+  useMentees,
   useMentorsList,
   useTeamTypes,
   useRoles,
@@ -73,6 +74,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const formId = useId();
 
+  const mentees = useMentees(member.id);
   const { updateMember, reloadMembers, getMentorsList } = useMembersActions();
   const mentorsList = useMentorsList();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
@@ -130,8 +132,14 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
     }
   };
 
-  // Mentees move up to this member's mentor on the server; refresh everything
-  // that showed the member (tree, mentor list, team rosters).
+  // The server refuses deletion while mentees remain, so the button is blocked
+  // here with the same rule. Refresh everything that showed the member (tree,
+  // mentor list, team rosters) after a successful delete.
+  const deleteBlockedReason =
+    mentees.length > 0
+      ? `Спочатку перепризначте або видаліть менті (${mentees.length})`
+      : null;
+
   const handleDelete = async () => {
     setIsSubmitting(true);
     setFormError(null);
@@ -182,9 +190,10 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
         </div>
         <ConfirmDeleteControl
           label="Видалити учасника"
-          message={`Учасника «${member.name}» буде видалено разом з його посадами. Його менті перейдуть до ${member.mentorId ? "його ментора" : "верхнього рівня"}.`}
+          message={`Учасника «${member.name}» буде видалено разом з його посадами.`}
           isConfirming={isConfirmingDelete}
           isSubmitting={isSubmitting}
+          blockedReason={deleteBlockedReason}
           onAsk={setIsConfirmingDelete}
           onConfirm={handleDelete}
         />

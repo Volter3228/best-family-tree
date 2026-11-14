@@ -58,9 +58,13 @@ const Sidebar = ({
   const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(
     null,
   );
+  // The footer wrapper animates its height; the slot inside it receives the
+  // portaled form actions.
   const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(
     null,
   );
+  const [footerSlotElement, setFooterSlotElement] =
+    useState<HTMLDivElement | null>(null);
   const contentOuterRef = useRef<HTMLDivElement>(null);
   const contentInnerRef = useRef<HTMLDivElement>(null);
 
@@ -139,17 +143,25 @@ const Sidebar = ({
                 className="sidebar-content h-full min-h-0 overflow-y-auto"
                 style={contentStyle}
               >
-                <SidebarFooterContext.Provider value={footerElement}>
+                <SidebarFooterContext.Provider value={footerSlotElement}>
                   <div ref={contentInnerRef} className="px-6 pb-6 pt-0">
                     {children}
                   </div>
                 </SidebarFooterContext.Provider>
               </div>
             </div>
+            {/* Collapsed to 0 while the slot is empty; animates like the content. */}
             <div
               ref={setFooterElement}
-              className="flex shrink-0 flex-col items-center gap-3 px-6 py-4 empty:hidden"
-            />
+              className="grid shrink-0 grid-rows-[0fr] transition-[grid-template-rows] duration-[400ms] ease-out has-[.sidebar-footer-slot:not(:empty)]:grid-rows-[1fr]"
+            >
+              <div className="min-h-0 overflow-hidden">
+                <div
+                  ref={setFooterSlotElement}
+                  className="sidebar-footer-slot flex flex-col items-center gap-3 px-6 py-4"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
