@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { differenceInYears, format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
 import {
@@ -16,6 +16,8 @@ import {
   generateGoogleCalendarLink,
   formatMemberRecruitmentSeason,
   getMemberAvatar,
+  formatCount,
+  YEAR_FORMS,
 } from "@/utils";
 import { Member } from "@/models";
 import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
@@ -44,6 +46,21 @@ interface Props {
   canClickPosition?: (position: MemberPosition) => boolean;
   color?: AccentColor;
 }
+
+// "12.03.2020 [5 років]": the date plus a small chip with the full years elapsed.
+const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => (
+  <>
+    {format(date, "dd.LL.yyyy")}
+    <span
+      className={twMerge(
+        "ml-2 whitespace-nowrap rounded-full bg-current/10 px-2 py-0.5 align-middle text-sm font-medium",
+        COLOR_CLASSES[color].text,
+      )}
+    >
+      {formatCount(differenceInYears(new Date(), date), YEAR_FORMS)}
+    </span>
+  </>
+);
 
 const MemberInfo = ({
   member,
@@ -170,14 +187,14 @@ const MemberInfo = ({
           )}
           <MemberInfoRow
             title="Член з"
-            value={format(joinedAt, "dd.LL.yyyy")}
+            value={<DateWithYears date={joinedAt} color={color} />}
             icon={UserPlusIcon}
             color={color}
           />
           {!!birthday && (
             <MemberInfoRow
               title="ДН"
-              value={format(birthday, "dd.LL.yyyy")}
+              value={<DateWithYears date={birthday} color={color} />}
               icon={GiftIcon}
               actionIcon={
                 <MemberInfoActionIcon

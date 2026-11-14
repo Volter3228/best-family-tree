@@ -810,9 +810,9 @@
     "semantic_hash": "f440952e856fc57bed63a99f4b40a47e"
   },
   "src/components/sidebar/info/MemberInfo.tsx": {
-    "mtime": 1794305743.500374,
-    "seen": 1794305796.0946245,
-    "ast_hash": "e7eebf668b896dac0d92dfea2cd5b473",
+    "mtime": 1794695780.9998512,
+    "seen": 1794695803.30798,
+    "ast_hash": "f75c0ebd7a6f2c64abd4d8b433752dbb",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoActionIcon.tsx": {
@@ -1698,10 +1698,10 @@
     "semantic_hash": "fa4f39f27e7890c0c7f42a3fd1e3a011"
   },
   "src/utils/strings.ts": {
-    "mtime": 1791554290.1141403,
-    "seen": 1792609757.1324692,
-    "ast_hash": "35b7b7a2dd283fc64edf48cd6e4f3d95",
-    "semantic_hash": "35b7b7a2dd283fc64edf48cd6e4f3d95"
+    "mtime": 1794695780.556564,
+    "seen": 1794695803.31706,
+    "ast_hash": "d16f3b634f88e34ef612edfbf4b1da63",
+    "semantic_hash": ""
   },
   "src/utils/themeInitScript.ts": {
     "mtime": 1793879581.3634467,

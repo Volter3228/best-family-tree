@@ -22,6 +22,7 @@ type PluralForms = readonly [one: string, few: string, many: string];
 
 export const PARTICIPANT_FORMS: PluralForms = ["учасник", "учасники", "учасників"];
 export const TEAM_FORMS: PluralForms = ["команда", "команди", "команд"];
+export const YEAR_FORMS: PluralForms = ["рік", "роки", "років"];
 
 // Ukrainian plural: 1 учасник, 2-4 учасники, 5+ учасників (11-14 are "many").
 export const pluralizeUk = (count: number, [one, few, many]: PluralForms) => {
