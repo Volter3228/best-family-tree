@@ -40,6 +40,7 @@
 - Start servers yourself in the background (`npm run dev`; `cd src/server && npm run serve` if the API is needed) and wait until `curl -s localhost:3000` answers. Don't ask the user to start anything.
 - Browser MCPs (`.mcp.json`: `playwright`, `chrome-devtools`) attach over CDP to Windows Chrome at `127.0.0.1:9222`. Their wrappers (`~/.local/bin/*-mcp-win.sh`) run `~/.local/bin/ensure-win-chrome.sh`, which launches Chrome through `powershell.exe` (profile `C:\temp\chrome-debug`) when the port is down. The MCP tools may be deferred or still connecting: load them with ToolSearch. Never launch a Linux browser.
 - If the browser is unreachable: `curl -s 127.0.0.1:9222/json/version` should return JSON; otherwise run `~/.local/bin/ensure-win-chrome.sh`.
+- Sign-in bypass for testing: with the local docker backend (`compose.yml` sets `DEV_LOGIN=true`), navigate the browser to `http://localhost:3000/api/auth/dev-login?level=ADMIN` (or `EDITOR`, `VIEWER`; optional `&next=/path`). It sets the session cookie and redirects. It refuses production and any non-local `DATABASE_URL` (also at boot, via `checkConfig`). Never set `DEV_LOGIN` in `compose.prod.yml`/Render.
 - Mobile checks: emulate Pixel 10 (~412px wide, DPR 2.6) in the browser's emulate/resize tool.
 
 ## Deployment & data

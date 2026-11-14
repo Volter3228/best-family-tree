@@ -15,6 +15,7 @@ import emailRoutes from "./routes/auth/emailRoutes.js";
 import googleRoutes from "./routes/auth/googleRoutes.js";
 import telegramRoutes from "./routes/auth/telegramRoutes.js";
 import sessionRoutes from "./routes/auth/sessionRoutes.js";
+import devLoginRoutes from "./routes/auth/devLoginRoutes.js";
 import { requireSession } from "./middleware/requireSession.js";
 import { requireEditorForWrites } from "./middleware/requireAccess.js";
 import { checkOrigin } from "./middleware/checkOrigin.js";
@@ -60,6 +61,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", checkOrigin);
 // Auth routes come first: sign-in must not invalidate the read cache.
 app.use("/api", sessionRoutes);
+app.use("/api", devLoginRoutes);
 app.use("/api", questionRoutes);
 app.use("/api", emailRoutes);
 app.use("/api", googleRoutes);

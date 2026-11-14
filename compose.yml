@@ -30,6 +30,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3001
+      # Local testing only: enables GET /api/auth/dev-login (see README).
+      - DEV_LOGIN=true
     env_file:
       - ./src/server/.env
     # The server sources are bind-mounted, so regenerate the Prisma client and

@@ -1,3 +1,4 @@
+import { devLoginProblems } from "./devLogin.js";
 import { readMailTransport } from "./mailer/transports.js";
 
 type Env = Record<string, string | undefined>;
@@ -34,7 +35,7 @@ const telegramProblems = (env: Env): string[] =>
 
 /** Lists what is wrong with the environment (empty = fine). */
 export const configProblems = (env: Env): string[] => {
-  const demo = [...demoProblems(env), ...googleProblems(env), ...telegramProblems(env)];
+  const demo = [...demoProblems(env), ...googleProblems(env), ...telegramProblems(env), ...devLoginProblems(env)];
   if (env.NODE_ENV !== "production") return demo;
   const problems: string[] = [...demo];
 
