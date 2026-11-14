@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useTick } from "@pixi/react";
 import { useTreeStore } from "@/store/treeStore";
-import { needsSharpAvatars } from "@/utils";
+import { shouldKeepSharpAvatars, shouldUpgradeAvatars } from "@/utils";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 import type { NodePositions } from "@/types";
 
@@ -57,9 +57,15 @@ const SharpAvatarTracker = () => {
       return;
     }
 
-    if (!needsSharpAvatars(scale)) {
+    if (!shouldKeepSharpAvatars(scale)) {
       isSettledRef.current = true;
-      setSharpNodeIds(EMPTY_IDS);
+      if (sharpNodeIds.size > 0) setSharpNodeIds(EMPTY_IDS);
+      return;
+    }
+    // Between the keep and upgrade thresholds: existing sharp avatars stay,
+    // but new ones would not look sharper than the small texture.
+    if (!shouldUpgradeAvatars(scale)) {
+      isSettledRef.current = true;
       return;
     }
     // Everything visible is already upgraded.
