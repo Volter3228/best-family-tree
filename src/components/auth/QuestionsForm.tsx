@@ -17,13 +17,11 @@ import { authStrings as t } from "./strings";
 const CARD_COLORS: AccentColor[] = ["blue", "green", "orange"];
 
 interface Props {
-  // The challenge is created on first show, not on every /login visit.
-  active: boolean;
   onStruggle: () => void;
   onSuccess: () => void;
 }
 
-const QuestionsForm = ({ active, onStruggle, onSuccess }: Props) => {
+const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
@@ -41,13 +39,15 @@ const QuestionsForm = ({ active, onStruggle, onSuccess }: Props) => {
     }
   }, []);
 
+  // Prefetched on mount so the cards are ready when the tab is opened.
+  // The ref keeps StrictMode's double effect from creating two challenges.
   const startedRef = useRef(false);
   useEffect(() => {
-    if (!active || startedRef.current) return;
+    if (startedRef.current) return;
     startedRef.current = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
-  }, [active, load]);
+  }, [load]);
 
   useEffect(() => {
     if (lockSeconds <= 0) return;
@@ -144,6 +144,26 @@ const QuestionsForm = ({ active, onStruggle, onSuccess }: Props) => {
         {t.questionsIntro}
         <InfoBubble>{t.limitedAccess}</InfoBubble>
       </p>
+      {!challenge && !message && (
+        // Same cards as the real ones, so the height does not jump on load.
+        <div aria-hidden className="flex animate-pulse flex-col gap-3">
+          {CARD_COLORS.map((color, i) => (
+            <QuestionCard
+              key={color}
+              index={i}
+              prompt={"\u00a0"}
+              value=""
+              color={color}
+              solved={false}
+              disabled
+              canSwap={false}
+              onChange={() => undefined}
+              onEnter={() => undefined}
+              onSwap={() => undefined}
+            />
+          ))}
+        </div>
+      )}
       {challenge && (
         <>
           {challenge.questions.map((q, i) => (

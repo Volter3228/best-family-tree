@@ -116,7 +116,6 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
               {/* Keep the questions mounted so answers survive a tab switch. */}
               <div hidden={method !== "questions"}>
                 <QuestionsForm
-                  active={method === "questions"}
                   onStruggle={() => setStruggled(true)}
                   onSuccess={handleSuccess}
                 />
