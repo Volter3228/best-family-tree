@@ -2082,9 +2082,9 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/settings/SettingsPanel.tsx": {
-    "mtime": 1794769597.67345,
-    "seen": 1794769604.5669565,
-    "ast_hash": "e7f331c0451a0e590dbf2272842f4730",
+    "mtime": 1794769941.620637,
+    "seen": 1794770913.4488623,
+    "ast_hash": "10b9703abae036c33ab13644045ea796",
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/settings/index.ts": {
@@ -2118,15 +2118,15 @@
     "semantic_hash": ""
   },
   "src/store/settingsStore.test.ts": {
-    "mtime": 1793814105.5481334,
-    "seen": 1793814513.2179844,
-    "ast_hash": "d6487763e987642ac13c97a244586124",
+    "mtime": 1794769950.9852364,
+    "seen": 1794770913.4589803,
+    "ast_hash": "72d65e6b5075b8fc26726c4ff909db9a",
     "semantic_hash": ""
   },
   "src/store/settingsStore.ts": {
-    "mtime": 1793814198.0562775,
-    "seen": 1793814513.2179866,
-    "ast_hash": "b85de61dc0987db04862a856c6e9f758",
+    "mtime": 1794769942.3934588,
+    "seen": 1794770913.4589813,
+    "ast_hash": "27f30eb5189ad366fefcd5054feb0f20",
     "semantic_hash": ""
   },
   "src/types/settings.ts": {
@@ -2238,9 +2238,9 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/MemberSidebar.tsx": {
-    "mtime": 1794750639.8576093,
-    "seen": 1794750673.9743578,
-    "ast_hash": "d91a888749e02c46256a45fcd6bdd829",
+    "mtime": 1794770890.0552597,
+    "seen": 1794770913.446513,
+    "ast_hash": "88aea767d3b612752ee00be29ac7277a",
     "semantic_hash": ""
   },
   "src/components/sidebar/SidebarHandle.tsx": {
@@ -3132,9 +3132,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoCover.tsx": {
-    "mtime": 1794749262.0366158,
-    "seen": 1794749278.8530264,
-    "ast_hash": "08f9c1efdd365184d3a9f44dfd4da7b1",
+    "mtime": 1794770889.760537,
+    "seen": 1794770913.4515831,
+    "ast_hash": "731439fa9f6240312ca75407cd20e17c",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoFacts.tsx": {

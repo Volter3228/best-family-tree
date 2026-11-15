@@ -6,7 +6,6 @@ import { Member } from "@/models";
 import type { AccentColor } from "@/types";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
 import HeaderChip from "../sidebar/HeaderChip";
-import SeasonChip from "../sidebar/info/SeasonChip";
 import SidebarMinimizedSummary from "../sidebar/SidebarMinimizedSummary";
 
 interface Props {
@@ -36,15 +35,14 @@ const MemberSidebar = ({
   return (
     <Sidebar
       id="member-sidebar"
+      // The info card's season chip sits in its cover, so it scrolls away.
       headerTitle={
         member &&
-        (isInfo ? (
-          <SeasonChip member={member} color={color} />
-        ) : (
+        !isInfo && (
           <HeaderChip icon={PencilIcon} color={color}>
             Редагувати: {member.name}
           </HeaderChip>
-        ))
+        )
       }
       floatingHeader={isInfo}
       mode={state.sidebarMode}
