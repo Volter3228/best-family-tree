@@ -2,12 +2,6 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import {
-  ArrowsPointingInIcon,
-  MagnifyingGlassMinusIcon,
-  MagnifyingGlassPlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/16/solid";
 import DropdownPortal from "@/components/common/DropdownPortal";
 import { useMediaQuery } from "@/hooks/ui";
 import {
@@ -22,13 +16,9 @@ import {
   type Size,
 } from "./photoViewerMath";
 import { usePhotoGestures } from "./usePhotoGestures";
+import { ViewerHeader, ViewerToolbar } from "./PhotoViewerControls";
 
 const PADDING = 16;
-// Theme tokens: dark glass on dark themes, light glass with dark text on light ones.
-const GLASS =
-  "bg-surface/75 backdrop-blur-xl ring-1 ring-foreground/15 text-foreground shadow-lg shadow-black/20";
-const BUTTON =
-  "flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-foreground/60 cursor-pointer";
 
 const viewportRect = (size: Size): Rect => ({
   left: (window.innerWidth - size.w) / 2,
@@ -50,6 +40,9 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
   const closing = useRef(false);
   const [scale, setScale] = useState(1);
   const [ready, setReady] = useState(false);
+  // Turned off on close: gestures and toolbar must not touch the box while the
+  // close morph runs, or their tweens (killTweensOf / overwrite) would cancel it.
+  const [interactive, setInteractive] = useState(true);
 
   const setBoxSize = (size: Size) => {
     sizeRef.current = size;
@@ -121,6 +114,7 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
   const requestClose = useCallback(() => {
     if (closing.current) return;
     closing.current = true;
+    setInteractive(false);
     const finish = () => {
       closeStore();
       if (photo.originEl.isConnected)
@@ -159,14 +153,14 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
       ease: "power2.in",
     });
     gsap.to(toolbarRef.current?.children ?? [], { opacity: 0, duration: 0.15 });
-  }, [closeStore, photo.originEl, reduced]);
+  }, [closeStore, photo.originEl, photo.fit, reduced]);
 
   const { stepZoom, reset } = usePhotoGestures({
     stageRef,
     boxRef,
     backdropRef,
     sizeRef,
-    enabled: true,
+    enabled: interactive,
     onRequestClose: requestClose,
     onScaleChange: setScale,
   });
@@ -229,60 +223,19 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
           {/* eslint-enable @next/next/no-img-element */}
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))]">
-        <span className={`rounded-full px-3 py-1.5 text-sm ${GLASS}`}>
-          {photo.alt}
-        </span>
-        <div className="pointer-events-auto">
-          <button
-            ref={closeBtnRef}
-            type="button"
-            aria-label="Закрити"
-            onClick={requestClose}
-            className={`${BUTTON} ${GLASS}`}
-          >
-            <XMarkIcon className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-      <div
-        ref={toolbarRef}
-        className="pointer-events-none absolute inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] flex justify-center"
-      >
-        <div
-          className={`pointer-events-auto flex items-center gap-1 rounded-full p-1 ${GLASS}`}
-        >
-          <button
-            type="button"
-            aria-label="Зменшити"
-            onClick={() => stepZoom(-1)}
-            className={BUTTON}
-          >
-            <MagnifyingGlassMinusIcon className="h-5 w-5" />
-          </button>
-          <span className="min-w-12 text-center text-sm tabular-nums">
-            {Math.round(scale * 100)}%
-          </span>
-          <button
-            type="button"
-            aria-label="Збільшити"
-            onClick={() => stepZoom(1)}
-            className={BUTTON}
-          >
-            <MagnifyingGlassPlusIcon className="h-5 w-5" />
-          </button>
-          {scaled && (
-            <button
-              type="button"
-              aria-label="Скинути масштаб"
-              onClick={reset}
-              className={BUTTON}
-            >
-              <ArrowsPointingInIcon className="h-5 w-5" />
-            </button>
-          )}
-        </div>
-      </div>
+      <ViewerHeader
+        alt={photo.alt}
+        closeBtnRef={closeBtnRef}
+        onClose={requestClose}
+      />
+      <ViewerToolbar
+        toolbarRef={toolbarRef}
+        scale={scale}
+        scaled={scaled}
+        interactive={interactive}
+        onStep={stepZoom}
+        onReset={reset}
+      />
     </div>
   );
 };

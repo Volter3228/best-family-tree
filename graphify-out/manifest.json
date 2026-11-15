@@ -810,9 +810,9 @@
     "semantic_hash": "f440952e856fc57bed63a99f4b40a47e"
   },
   "src/components/sidebar/info/MemberInfo.tsx": {
-    "mtime": 1794695780.9998512,
-    "seen": 1794695803.30798,
-    "ast_hash": "f75c0ebd7a6f2c64abd4d8b433752dbb",
+    "mtime": 1794695916.1247764,
+    "seen": 1794745454.526874,
+    "ast_hash": "ee7bc87b187b9ea9843ddf38aa16364b",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoActionIcon.tsx": {
@@ -1818,9 +1818,9 @@
     "semantic_hash": ""
   },
   ".agents/skills/pixijs-core-concepts/SKILL.md": {
-    "mtime": 1792679011.1043758,
-    "seen": 1792689460.867554,
-    "ast_hash": "10f387a4f89ab0a91bb38e1a623f4a30",
+    "mtime": 1794743450.3151944,
+    "seen": 1794745454.536548,
+    "ast_hash": "b3e11f26f11171958f41518a7a55bb20",
     "semantic_hash": ""
   },
   ".agents/skills/pixijs-core-concepts/references/render-loop.md": {
@@ -1842,9 +1842,9 @@
     "semantic_hash": ""
   },
   ".agents/skills/pixijs-performance/SKILL.md": {
-    "mtime": 1792679011.1791139,
-    "seen": 1792689460.867558,
-    "ast_hash": "34bc9982f0ba8c0680920d8a97e5ab3b",
+    "mtime": 1794743450.3151944,
+    "seen": 1794745454.5366437,
+    "ast_hash": "3cd7571fe4e4db94f3eed276052f5ef6",
     "semantic_hash": ""
   },
   ".agents/skills/pixijs-scene-container/SKILL.md": {
@@ -1908,21 +1908,21 @@
     "semantic_hash": ""
   },
   ".agents/skills/pixijs/SKILL.md": {
-    "mtime": 1792679010.851616,
-    "seen": 1792689460.8675778,
-    "ast_hash": "498dbd7b536efd53ec8d04b6d9e6383a",
+    "mtime": 1794743450.3152738,
+    "seen": 1794745454.5369618,
+    "ast_hash": "43a903d3cd27ac6ca4dfae960ce515f0",
     "semantic_hash": ""
   },
   ".agents/skills/pixijs/references/index.md": {
-    "mtime": 1792679010.8520684,
-    "seen": 1792689460.8675783,
-    "ast_hash": "041d703073fdbe3d21c8c1d8f53d3bbd",
+    "mtime": 1794743450.3152738,
+    "seen": 1794745454.5369625,
+    "ast_hash": "bce0c3c200130ae5f893763b772300f4",
     "semantic_hash": ""
   },
   ".agents/skills/tdd/SKILL.md": {
-    "mtime": 1792611991.270743,
-    "seen": 1792689460.8675814,
-    "ast_hash": "4aa4d7d7199e8b964932a6567bf325fe",
+    "mtime": 1794743450.3152738,
+    "seen": 1794745454.5369632,
+    "ast_hash": "5c4e6cd387eb0c34bd13d1ba4eeaf567",
     "semantic_hash": ""
   },
   ".agents/skills/tdd/agents/openai.yaml": {
@@ -2052,9 +2052,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1794571497.0736609,
-    "seen": 1794575764.520995,
-    "ast_hash": "0ee407cc75c2d90959146f5aab5c89a3",
+    "mtime": 1794743450.3152738,
+    "seen": 1794745454.5370896,
+    "ast_hash": "6d14d49c2cdfb89e034a4601a518ce94",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/cardVisibilityDriver.ts": {
@@ -2064,27 +2064,27 @@
     "semantic_hash": ""
   },
   ".agents/skills/gsap-core/SKILL.md": {
-    "mtime": 1792759731.6184473,
-    "seen": 1792759986.305203,
-    "ast_hash": "e14974bb48ddfe9e0da3406562b8f18f",
+    "mtime": 1794743450.3147798,
+    "seen": 1794745454.5364451,
+    "ast_hash": "e0075b7a0e0d7001d5e5288e5f9a2c85",
     "semantic_hash": ""
   },
   ".agents/skills/gsap-performance/SKILL.md": {
-    "mtime": 1792759731.7620876,
-    "seen": 1792759986.3052042,
-    "ast_hash": "f6b97aae273b24930d77e634dcf1c62e",
+    "mtime": 1794743450.3147798,
+    "seen": 1794745454.5364459,
+    "ast_hash": "f199551acea525cafe0f2f0a804d4a79",
     "semantic_hash": ""
   },
   ".agents/skills/gsap-react/SKILL.md": {
-    "mtime": 1792759731.6892602,
-    "seen": 1792759986.3052056,
-    "ast_hash": "9fc3789feebbe444032cee2ade44f5b4",
+    "mtime": 1794743450.3147798,
+    "seen": 1794745454.536447,
+    "ast_hash": "1fd50f619ee58335f807f26392176c03",
     "semantic_hash": ""
   },
   ".agents/skills/gsap-timeline/SKILL.md": {
-    "mtime": 1792759731.653106,
-    "seen": 1792759986.3052068,
-    "ast_hash": "3dfefe09dc41a59f2322734a7694b810",
+    "mtime": 1794743450.3150506,
+    "seen": 1794745454.5364478,
+    "ast_hash": "622e2e9677ca6c490af50f0ce676327b",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/useViewportCulling.ts": {
@@ -2232,15 +2232,15 @@
     "semantic_hash": ""
   },
   ".agents/skills/improve-codebase-architecture/HTML-REPORT.md": {
-    "mtime": 1793898980.6685731,
-    "seen": 1793900087.1248014,
-    "ast_hash": "2ee5137278168f65fa79115c8c3faa43",
+    "mtime": 1794743450.3150506,
+    "seen": 1794745454.5364485,
+    "ast_hash": "3c5c5041fcf5bdbc7fea9363de464091",
     "semantic_hash": ""
   },
   ".agents/skills/improve-codebase-architecture/SKILL.md": {
-    "mtime": 1793898980.668651,
-    "seen": 1793900087.124802,
-    "ast_hash": "5985cfe04d73ee4917b4c42050827420",
+    "mtime": 1794743450.3151584,
+    "seen": 1794745454.5364492,
+    "ast_hash": "1ae641e9784b197a73781969ea8394f8",
     "semantic_hash": ""
   },
   ".agents/skills/improve-codebase-architecture/agents/openai.yaml": {
@@ -2322,9 +2322,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794675017.252366,
-    "seen": 1794675021.0196407,
-    "ast_hash": "29f2517db1f647b36d1b7295a9ac8fa3",
+    "mtime": 1794743450.3152738,
+    "seen": 1794745454.5370903,
+    "ast_hash": "90766a17a568da5f568147c3ebb047b6",
     "semantic_hash": ""
   },
   "src/store/treeSignals.ts": {
@@ -2394,9 +2394,9 @@
     "semantic_hash": ""
   },
   "src/components/photoViewer/PhotoViewer.tsx": {
-    "mtime": 1794227130.9380715,
-    "seen": 1794263408.5477805,
-    "ast_hash": "9c9289cdae77ea72a9f71c667ff9994a",
+    "mtime": 1794745531.9933589,
+    "seen": 1794745541.10677,
+    "ast_hash": "dae183fb7a06f2ba32dcadd1462e02cd",
     "semantic_hash": ""
   },
   "src/components/photoViewer/imageAspect.ts": {
@@ -3099,6 +3099,18 @@
     "mtime": 1794694869.8697217,
     "seen": 1794694914.9700067,
     "ast_hash": "1db3d8a56801070b55826dccbd8e38cf",
+    "semantic_hash": ""
+  },
+  ".agents/skills/grilling/SKILL.md": {
+    "mtime": 1794743450.3147798,
+    "seen": 1794745454.536444,
+    "ast_hash": "374541b9b9113c54a9f50961cdff9c63",
+    "semantic_hash": ""
+  },
+  "src/components/photoViewer/PhotoViewerControls.tsx": {
+    "mtime": 1794745442.186837,
+    "seen": 1794745541.1067715,
+    "ast_hash": "b1853abe21a50ca8cb4eadb23d6d45f1",
     "semantic_hash": ""
   }
 }
