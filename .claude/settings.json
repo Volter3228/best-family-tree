@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "includeCoAuthoredBy": false,
     "allow": [
       "Bash(npm run typecheck)",
       "Bash(npm run lint)",
@@ -28,6 +27,7 @@
       "Read(./package-lock.json)",
       "Read(./src/server/src/db/prisma/generated/**)"
     ],
+    "includeCoAuthoredBy": false,
     "hooks": {
       "PostToolUse": [
         {
@@ -51,5 +51,8 @@
         }
       ]
     }
+  },
+  "enabledPlugins": {
+    "frontend-design@anthropic-plugin-directory": true
   }
 }

@@ -7,9 +7,7 @@ import ToolbarTooltip from "./ToolbarTooltip";
 interface Props {
   title: string;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
-  icon: React.ForwardRefExoticComponent<
-    React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>
-  >;
+  icon: React.ComponentType<{ className?: string }>;
   color: AccentColor;
   isActive?: boolean;
   showBadge?: boolean;

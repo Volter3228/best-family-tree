@@ -126,10 +126,10 @@
     "semantic_hash": "a9091e70ba0eb106931c5ce2fce81f92"
   },
   "src/components/icons/Lion.tsx": {
-    "mtime": 1791554290.0850086,
-    "seen": 1792609757.132302,
-    "ast_hash": "4e1dc581416a7079134d4c95c98b3b29",
-    "semantic_hash": "4e1dc581416a7079134d4c95c98b3b29"
+    "mtime": 1794767890.1722438,
+    "seen": 1794768495.624293,
+    "ast_hash": "8298bdbceb20ac33f41f0f4df126eb34",
+    "semantic_hash": ""
   },
   "src/components/icons/index.ts": {
     "mtime": 1794746743.4960942,
@@ -312,15 +312,15 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/Toolbar.tsx": {
-    "mtime": 1794693919.560723,
-    "seen": 1794694914.9599595,
-    "ast_hash": "a22f78ec00dbf503247b1a5163266f4f",
+    "mtime": 1794768473.155124,
+    "seen": 1794768495.625745,
+    "ast_hash": "99dd511e625249825e74a9841c6224fd",
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/ToolbarIconButton.tsx": {
-    "mtime": 1794213593.3360958,
-    "seen": 1794263408.546252,
-    "ast_hash": "49e570a8c508fdb82f27eacb53784f65",
+    "mtime": 1794767890.94696,
+    "seen": 1794768495.6257463,
+    "ast_hash": "202202f0c93cce6ffebd02df61ece30e",
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/filters/FilterCategory.tsx": {
@@ -486,10 +486,10 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/memberSearch/SearchPanel.tsx": {
-    "mtime": 1791554290.089551,
-    "seen": 1792609757.1323404,
-    "ast_hash": "f4011ef50fe433823f6458e76864a1f6",
-    "semantic_hash": "f4011ef50fe433823f6458e76864a1f6"
+    "mtime": 1794768472.8311203,
+    "seen": 1794768495.6269517,
+    "ast_hash": "8d77acc3f871502585a2cd5d5aaabf8e",
+    "semantic_hash": ""
   },
   "src/components/membersTree/toolbar/memberSearch/SearchSuggestionItem.tsx": {
     "mtime": 1791554290.089551,
@@ -1146,9 +1146,9 @@
     "semantic_hash": ""
   },
   "src/hooks/ui/index.ts": {
-    "mtime": 1793901614.964561,
-    "seen": 1793901682.2168682,
-    "ast_hash": "c5e7074a56a8670c86b73291a7b2fa1f",
+    "mtime": 1794768472.6759202,
+    "seen": 1794768495.632685,
+    "ast_hash": "7ace6547915629648ed0c51e57f3e215",
     "semantic_hash": ""
   },
   "src/hooks/ui/useDropdown.ts": {
@@ -2232,9 +2232,9 @@
     "semantic_hash": ""
   },
   ".claude/settings.json": {
-    "mtime": 1794746802.1741374,
-    "seen": 1794746840.0704148,
-    "ast_hash": "43c06a5ce10681dc552011d26df71f41",
+    "mtime": 1794767446.6469424,
+    "seen": 1794768495.6227984,
+    "ast_hash": "83b25b39f11cad7a948fd511b5488a69",
     "semantic_hash": ""
   },
   "src/components/membersTree/MemberSidebar.tsx": {
@@ -3201,6 +3201,24 @@
     "mtime": 1794766670.6340344,
     "seen": 1794766680.5325832,
     "ast_hash": "0af1aa001952f867ec82558ca8487a8c",
+    "semantic_hash": ""
+  },
+  "src/hooks/ui/searchShortcut.test.ts": {
+    "mtime": 1794768660.9173946,
+    "seen": 1794768671.0819523,
+    "ast_hash": "5f433914ce4c654faa7ea70a6c9deed9",
+    "semantic_hash": ""
+  },
+  "src/hooks/ui/searchShortcut.ts": {
+    "mtime": 1794768660.8823686,
+    "seen": 1794768671.0819538,
+    "ast_hash": "13448f96a12c0be9f4079820b8e118a2",
+    "semantic_hash": ""
+  },
+  "src/hooks/ui/useSearchShortcut.ts": {
+    "mtime": 1794768463.8306289,
+    "seen": 1794768495.6329067,
+    "ast_hash": "c3993136af11ff4486debafb5729cee5",
     "semantic_hash": ""
   }
 }

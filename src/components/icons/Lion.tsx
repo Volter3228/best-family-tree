@@ -9,12 +9,12 @@ const LionIcon = ({ className = "" }: Props) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 1839.000000 2043.000000"
       preserveAspectRatio="xMidYMid meet"
+      fill="currentColor"
+      className={className}
     >
       <g
         transform="translate(0.000000,2043.000000) scale(0.100000,-0.100000)"
-        fill="#000000"
         stroke="none"
-        className={className}
       >
         <path
           d="M6349 20399 c-12 -31 -6 -44 260 -576 150 -300 270 -548 267 -550 -3

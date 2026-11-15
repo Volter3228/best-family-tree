@@ -55,6 +55,7 @@ const SearchPanel = ({
         <div className="flex items-center gap-2 px-3 py-2 h-10">
           <input
             ref={inputRef}
+            data-search-input
             type="text"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}

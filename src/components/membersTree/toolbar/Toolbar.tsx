@@ -5,10 +5,9 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
   Cog6ToothIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { usePanelToggle } from "@/hooks";
+import { LionIcon } from "@/components/icons";
+import { usePanelToggle, useSearchShortcut } from "@/hooks";
 import { authStrings as t } from "@/components/auth/strings";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useFiltersStore } from "@/store/filtersStore";
@@ -26,6 +25,13 @@ interface Props {
   onSearch: (memberId: string) => void;
   onTeamSearch: (frame: TeamFrame) => void;
 }
+
+// Ctrl+F while search is already open: refocus its input and select the query.
+const focusSearchInput = () => {
+  const input = document.querySelector<HTMLInputElement>("[data-search-input]");
+  input?.focus();
+  input?.select();
+};
 
 const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,6 +54,11 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
       settings.close();
       account.close();
     });
+  useSearchShortcut(() => {
+    if (search.isOpen) focusSearchInput();
+    else handleShowSearchClick();
+  });
+
   const handleShowFiltersClick = () =>
     filters.toggle(() => {
       search.close();
@@ -104,11 +115,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
               <ToolbarIconButton
                 title={t.logout}
                 onClick={handleShowAccountClick}
-                icon={
-                  session.method === "QUESTIONS"
-                    ? ArrowRightOnRectangleIcon
-                    : UserCircleIcon
-                }
+                icon={LionIcon}
                 color="blue"
                 isActive={account.isOpen}
               />
