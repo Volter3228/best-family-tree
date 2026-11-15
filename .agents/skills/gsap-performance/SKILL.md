@@ -10,7 +10,7 @@ license: MIT
 
 Apply when optimizing GSAP animations for smooth 60fps, reducing layout/paint cost, or when the user asks about performance, jank, or best practices for fast animations.
 
-**Related skills:** Build animations with **gsap-core** (transforms, autoAlpha) and **gsap-timeline**; for ScrollTrigger performance see **gsap-scrolltrigger**.
+**Related skills:** Build animations with **gsap-core** (transforms, autoAlpha) and **gsap-timeline**.
 
 ## Prefer Transform and Opacity
 

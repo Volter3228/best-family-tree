@@ -22,7 +22,7 @@
 ## Graphify
 
 - For codebase questions, run `graphify query "<question>"` (or `path` / `explain`) before grep or raw source reads. Output is capped at ~2000 tokens; narrow the question or pass `--budget N` if answers are cut off.
-- Read raw files only for lines the graph already located. Read `GRAPH_REPORT.md` only for broad architecture review.
+- Read raw files only for lines the graph already located. Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review.
 - After code changes, run `graphify update .`. If the graph and the source disagree, trust the source.
 - Put these rules in every subagent prompt that explores code.
 - Large `graph.json` diffs in PRs are expected. Do not flag them.

@@ -22,7 +22,7 @@
 ## Graphify
 
 - For codebase questions, run `graphify query "<question>"` (or `path` / `explain`) before grep or raw source reads. Output is capped at ~2000 tokens; narrow the question or pass `--budget N` if answers are cut off.
-- Read raw files only for lines the graph already located. Read `GRAPH_REPORT.md` only for broad architecture review.
+- Read raw files only for lines the graph already located. Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review.
 - After code changes, run `graphify update .`. If the graph and the source disagree, trust the source.
 - Put these rules in every subagent prompt that explores code.
 - Large `graph.json` diffs in PRs are expected. Do not flag them.
@@ -46,6 +46,6 @@
 ## Deployment & data
 
 - Production: Render (one Docker image) + Neon + Cloudinary + Resend; see README "Deployment". Local `.env` must never point at production: pass the Neon URL inline for admin scripts (`~/.config/best-tree/*.url`, never print them).
-- Demo: `DEMO_MODE=true` on a database whose name contains `demo`; build it with `npm run db:anonymize-demo` (README). The backend caches the tree in memory: restart it after changing the database directly.
+- Demo: `DEMO_MODE=true` on a database whose name contains `demo`; build it with `cd src/server && npm run db:anonymize-demo` (README). The backend caches the tree in memory: restart it after changing the database directly.
 - Ask before writing to Neon or running scripts that change data.
 - `pkill -f` in a shell command can kill that shell; find the pid with `ss -ltnp` instead.

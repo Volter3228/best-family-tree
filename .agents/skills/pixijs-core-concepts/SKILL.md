@@ -31,18 +31,18 @@ app.renderer.render({ container: app.stage });
 | Choosing a backend  | [references/renderers.md](references/renderers.md)     | Preference forms, per-renderer options, systems and pipes |
 | Per-frame execution | [references/render-loop.md](references/render-loop.md) | Priority order, time units, manual rendering              |
 
-For deep dives into any single topic, open the corresponding reference file. Non-browser targets (`DOMAdapter`, `WebWorkerAdapter`, custom adapters, strict CSP) are covered in the `pixijs-environments` skill.
+For deep dives into any single topic, open the corresponding reference file. For non-browser targets (`DOMAdapter`, `WebWorkerAdapter`, custom adapters, strict CSP), see the PixiJS docs index (`https://pixijs.download/release/docs/llms.txt`).
 
 ## Decision guide
 
 - **Setting up an Application?** Start with `pixijs-application`. This skill explains what the renderer does under the hood.
 - **Choosing between WebGL and WebGPU?** Use `['webgpu', 'webgl']` as your preference array. WebGPU is fastest where available; WebGL is the reliable fallback. See `references/renderers.md`.
-- **Running in a Web Worker?** Set `DOMAdapter.set(WebWorkerAdapter)` before `app.init`. See the `pixijs-environments` skill for complete setup.
+- **Running in a Web Worker?** Set `DOMAdapter.set(WebWorkerAdapter)` before `app.init`.
 - **Need manual control over when rendering happens?** Set `autoStart: false` and call `app.renderer.render(app.stage)` from your own loop. See `references/render-loop.md`.
 - **Integrating with a physics library?** Add your update at `UPDATE_PRIORITY.HIGH` so physics runs before the render at `LOW`. See `references/render-loop.md`.
-- **Writing a custom renderable?** Implement a `RenderPipe`. See `pixijs-custom-rendering` skill.
+- **Writing a custom renderable?** Implement a `RenderPipe`.
 - **Rendering into a texture or a custom render target?** Pass `target` to `renderer.render()`, or build a `RenderTarget` with explicit color and depth attachments. See `references/renderers.md`.
-- **Running under strict CSP?** Import `'pixi.js/unsafe-eval'`. See the `pixijs-environments` skill.
+- **Running under strict CSP?** Import `'pixi.js/unsafe-eval'`.
 
 ## Quick concepts
 
