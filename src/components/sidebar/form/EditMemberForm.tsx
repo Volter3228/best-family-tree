@@ -19,8 +19,8 @@ import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
-import ConfirmDeleteControl from "./ConfirmDeleteControl";
 import FormFooter from "./FormFooter";
+import { DeleteMemberButton, DeleteMemberPrompt } from "./MemberDeleteControls";
 
 interface Props {
   member: Member;
@@ -62,7 +62,12 @@ const getInitialFormData = (member: Member): MemberFormData => {
   };
 };
 
-const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) => {
+const EditMemberForm = ({
+  member,
+  onExit,
+  onDeleted,
+  color = "blue",
+}: Props) => {
   const initialFormData = useMemo(() => getInitialFormData(member), [member]);
 
   const [form, setForm] = useState<MemberFormData>(initialFormData);
@@ -71,7 +76,10 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  // "confirm": asking before deleting. "blocked": explaining why deleting is not possible.
+  const [deletePrompt, setDeletePrompt] = useState<
+    "confirm" | "blocked" | null
+  >(null);
   const formId = useId();
 
   const mentees = useMentees(member.id);
@@ -96,7 +104,12 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
 
     setErrors({});
     setFormError(null);
-    const validationErrors = validateMemberForm(form, mentorsList, teamTypes, member);
+    const validationErrors = validateMemberForm(
+      form,
+      mentorsList,
+      teamTypes,
+      member,
+    );
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -137,7 +150,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
   // mentor list, team rosters) after a successful delete.
   const deleteBlockedReason =
     mentees.length > 0
-      ? `Спочатку перепризначте або видаліть менті (${mentees.length})`
+      ? `Не можна видалити: перепризначте або видаліть менті (${mentees.length})`
       : null;
 
   const handleDelete = async () => {
@@ -153,7 +166,7 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
       setFormError(describeSubmitError(error, []).message);
     } finally {
       setIsSubmitting(false);
-      setIsConfirmingDelete(false);
+      setDeletePrompt(null);
     }
   };
 
@@ -176,27 +189,44 @@ const EditMemberForm = ({ member, onExit, onDeleted, color = "blue" }: Props) =>
       />
       <FormError message={formError} color={color} />
       <FormFooter>
-        <div className="flex w-4/5 flex-row justify-center gap-3">
-          <ClearButton
+        {deletePrompt ? (
+          <DeleteMemberPrompt
+            message={
+              deletePrompt === "blocked"
+                ? (deleteBlockedReason ?? "")
+                : `Учасника «${member.name}» буде видалено разом з його посадами.`
+            }
             isSubmitting={isSubmitting}
-            onClick={onExit}
-            color={color}
-          >
-            Скасувати
-          </ClearButton>
-          <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
-            {submitLabel}
-          </SubmitButton>
-        </div>
-        <ConfirmDeleteControl
-          label="Видалити учасника"
-          message={`Учасника «${member.name}» буде видалено разом з його посадами.`}
-          isConfirming={isConfirmingDelete}
-          isSubmitting={isSubmitting}
-          blockedReason={deleteBlockedReason}
-          onAsk={setIsConfirmingDelete}
-          onConfirm={handleDelete}
-        />
+            onDismiss={() => setDeletePrompt(null)}
+            onConfirm={deletePrompt === "confirm" ? handleDelete : undefined}
+          />
+        ) : (
+          <div className="flex w-full flex-row items-center gap-3">
+            <DeleteMemberButton
+              blocked={deleteBlockedReason !== null}
+              isSubmitting={isSubmitting}
+              onClick={() =>
+                setDeletePrompt(deleteBlockedReason ? "blocked" : "confirm")
+              }
+            />
+            <div className="flex flex-1 flex-row gap-3">
+              <ClearButton
+                isSubmitting={isSubmitting}
+                onClick={onExit}
+                color={color}
+              >
+                Скасувати
+              </ClearButton>
+              <SubmitButton
+                isSubmitting={isSubmitting}
+                form={formId}
+                color={color}
+              >
+                {submitLabel}
+              </SubmitButton>
+            </div>
+          </div>
+        )}
       </FormFooter>
     </form>
   );
