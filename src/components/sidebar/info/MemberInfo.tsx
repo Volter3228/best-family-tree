@@ -1,24 +1,6 @@
-import { differenceInYears, format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
-import {
-  EnvelopeIcon,
-  PhoneIcon,
-  AcademicCapIcon,
-  GiftIcon,
-  UserPlusIcon,
-  StarIcon,
-  PhoneArrowUpRightIcon,
-  CalendarDateRangeIcon,
-} from "@heroicons/react/16/solid";
-import {
-  capitalizeOnlyFirstLetter,
-  generateGoogleCalendarLink,
-  formatMemberRecruitmentSeason,
-  getMemberAvatar,
-  formatCount,
-  YEAR_FORMS,
-} from "@/utils";
+import { capitalizeOnlyFirstLetter, getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
 import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
 import {
@@ -29,42 +11,29 @@ import { isReducedView, useSessionStore } from "@/store/sessionStore";
 import { useMemberById, useMentees } from "@/hooks";
 import type { AccentColor, MemberPosition } from "@/types";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { STATUS_ICONS } from "@/constants/memberStatusIcons";
 import MemberAvatarImage from "./MemberAvatarImage";
-import MemberInfoRow from "./MemberInfoRow";
-import MemberInfoSocial from "./MemberInfoSocial";
-import MemberInfoActionIcon from "./MemberInfoActionIcon";
-import MentorMenteesDropdown from "./MentorMenteesDropdown";
-import PositionsDropdown from "./PositionsDropdown";
+import MemberActivityPill from "./MemberActivityPill";
+import MemberInfoActions from "./MemberInfoActions";
+import MemberInfoCover from "./MemberInfoCover";
+import MemberInfoFacts from "./MemberInfoFacts";
+import MemberPositions from "./MemberPositions";
+import MenteesGrid from "./MenteesGrid";
 
 interface Props {
   member: Member;
   onMemberNameClick?: (memberId: string) => void;
   filteredMemberIds?: Set<string> | null;
-  // Team view: children are shown as plain text, badges jump to their team.
+  // Team view: children are shown as plain cards, badges jump to their team.
   menteesClickable?: boolean;
   onPositionClick?: (position: MemberPosition) => void;
   canClickPosition?: (position: MemberPosition) => boolean;
   color?: AccentColor;
 }
 
-// "12.03.2020 [5 років]": the date plus a small chip with the full years elapsed.
-const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => (
-  <>
-    {format(date, "dd.LL.yyyy")}
-    <span
-      className={twMerge(
-        "ml-2 whitespace-nowrap rounded-full bg-current/10 px-2 py-0.5 align-middle text-sm font-medium",
-        COLOR_CLASSES[color].text,
-      )}
-    >
-      {formatCount(differenceInYears(new Date(), date), YEAR_FORMS)}
-    </span>
-  </>
-);
-
 const MemberInfo = ({
   member,
-  member: { name, photo, birthday, joinedAt, phoneNumbers, status },
+  member: { name, photo, status, activityState },
   onMemberNameClick,
   filteredMemberIds,
   menteesClickable = true,
@@ -79,155 +48,95 @@ const MemberInfo = ({
     !filteredMemberIds || filteredMemberIds.has(id);
   const avatar = getMemberAvatar(member);
   const colorClasses = COLOR_CLASSES[color];
-
-  // Split at the "@": the domain stays with the copy icon on one line.
-  const atIdx = member.email?.indexOf("@") ?? -1;
-  const emailHead = atIdx > 0 ? member.email!.slice(0, atIdx) : member.email;
-  const emailTail = atIdx > 0 ? member.email!.slice(atIdx) : undefined;
+  const StatusIcon = STATUS_ICONS[status];
 
   return (
-    <div className="flex flex-col items-center gap-3 transition-opacity duration-300">
-      <div
-        className={`member-info-avatar relative h-48 w-48 ${colorClasses.dropShadow} drop-shadow-2xl/30`}
-      >
-        {photo ? (
-          <PhotoOpenButton
-            id={member.id}
-            src={getPhotoUrlForViewer(photo)}
-            previewSrc={getPhotoUrlForViewerPreview(photo)}
-            alt={name}
-            fit="circle"
-            roundedClassName="rounded-full"
-            className="block h-full w-full"
-          >
-            <MemberAvatarImage src={avatar || photo} />
-          </PhotoOpenButton>
-        ) : (
-          <div
-            className={twMerge(
-              "flex items-center justify-center w-full h-full rounded-full text-center p-8 shadow-inner",
-              colorClasses.accentBg,
-            )}
-          >
-            <LionIcon className="fill-surface" />
-          </div>
-        )}
-      </div>
-      <div className="member-info-header text-center mb-3">
-        <h5
+    <div className="flex flex-col transition-opacity duration-300">
+      <MemberInfoCover member={member} color={color} />
+      <div className="-mt-16 flex flex-col items-center gap-3">
+        <div
           className={twMerge(
-            "text-2xl cursor-pointer transition-colors duration-200",
-            colorClasses.hoverTextAccent,
+            "member-info-avatar relative h-44 w-44 lg:w-52 lg:h-52 p-1",
+            "drop-shadow-2xl/30 rounded-full",
+            colorClasses.accentBg,
+            colorClasses.dropShadow,
           )}
-          onClick={() => onMemberNameClick?.(member.id)}
         >
-          {name}
-        </h5>
-        <h6 className="text-lg font-light">
-          {formatMemberRecruitmentSeason(member, true)}
-        </h6>
-      </div>
-      <div className="flex flex-row w-full justify-center">
-        <div className="flex flex-col gap-4 max-w-full">
-          <MemberInfoRow
-            title="Статус"
-            value={capitalizeOnlyFirstLetter(status)}
-            icon={AcademicCapIcon}
-            color={color}
-          />
-          {!!mentor && (
-            <MemberInfoRow
-              title="Ментор"
-              value={
-                isVisible(mentor.id) ? (
-                  <span
-                    className={twMerge(
-                      "cursor-pointer transition-colors duration-200",
-                      colorClasses.hoverTextAccent,
-                    )}
-                    onClick={() => onMemberNameClick?.(mentor.id)}
-                  >
-                    {mentor.name}
-                  </span>
-                ) : (
-                  <span>{mentor.name}</span>
-                )
-              }
-              icon={StarIcon}
-              color={color}
-            />
-          )}
-          {!!member.email && (
-            <MemberInfoRow
-              title="Email"
-              value={emailHead}
-              valueTail={emailTail}
-              copyValue={member.email}
-              icon={EnvelopeIcon}
-              showCopyIcon
-              color={color}
-            />
-          )}
-          {phoneNumbers.length > 0 && (
-            <MemberInfoRow
-              title="Номер"
-              value={phoneNumbers[0]}
-              icon={PhoneIcon}
-              actionIcon={
-                <MemberInfoActionIcon
-                  href={`tel: ${phoneNumbers[0]}`}
-                  icon={PhoneArrowUpRightIcon}
-                  hint="Зателефонувати"
-                  color={color}
-                />
-              }
-              showCopyIcon
-              color={color}
-            />
-          )}
-          <MemberInfoRow
-            title="Член з"
-            value={<DateWithYears date={joinedAt} color={color} />}
-            icon={UserPlusIcon}
-            color={color}
-          />
-          {!!birthday && (
-            <MemberInfoRow
-              title="ДН"
-              value={<DateWithYears date={birthday} color={color} />}
-              icon={GiftIcon}
-              actionIcon={
-                <MemberInfoActionIcon
-                  href={generateGoogleCalendarLink(member)}
-                  icon={CalendarDateRangeIcon}
-                  hint="Додати до календаря"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  color={color}
-                />
-              }
-              color={color}
-            />
-          )}
-          {member.positions.length > 0 && (
-            <PositionsDropdown
-              positions={member.positions}
-              onPositionClick={onPositionClick}
-              canClickPosition={canClickPosition}
-              color={color}
-            />
-          )}
-          {mentees.length > 0 && (
-            <MentorMenteesDropdown
-              mentees={mentees}
-              clickable={menteesClickable}
-              onMemberNameClick={onMemberNameClick}
-              isVisible={isVisible}
-              color={color}
-            />
-          )}
-          {!reduced && <MemberInfoSocial member={member} color={color} />}
+          <div className="relative h-full w-full rounded-full ring-4 ring-surface">
+            {photo ? (
+              <PhotoOpenButton
+                id={member.id}
+                src={getPhotoUrlForViewer(photo)}
+                previewSrc={getPhotoUrlForViewerPreview(photo)}
+                alt={name}
+                fit="circle"
+                roundedClassName="rounded-full"
+                className="block h-full w-full"
+              >
+                <MemberAvatarImage src={avatar || photo} />
+              </PhotoOpenButton>
+            ) : (
+              <div
+                className={twMerge(
+                  "flex h-full w-full items-center justify-center rounded-full p-8 shadow-inner",
+                  colorClasses.accentBg,
+                )}
+              >
+                <LionIcon className="fill-surface" />
+              </div>
+            )}
+          </div>
         </div>
+        <div className="member-info-header flex flex-col items-center gap-2 text-center">
+          <h5
+            className={twMerge(
+              "cursor-pointer text-2xl font-bold transition-colors duration-200",
+              colorClasses.hoverTextAccent,
+            )}
+            onClick={() => onMemberNameClick?.(member.id)}
+          >
+            {name}
+          </h5>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span
+              className={twMerge(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium text-white",
+                colorClasses.accentBg,
+              )}
+            >
+              <StatusIcon className="h-4 w-4" />
+              {capitalizeOnlyFirstLetter(status)}
+            </span>
+            <MemberActivityPill state={activityState} color={color} />
+          </div>
+        </div>
+      </div>
+      <div className="mt-5 flex flex-col gap-6">
+        <MemberInfoActions member={member} hideSocial={reduced} color={color} />
+        <MemberInfoFacts
+          member={member}
+          mentor={mentor}
+          mentorClickable={!!mentor && isVisible(mentor.id)}
+          onMemberNameClick={onMemberNameClick}
+          color={color}
+        />
+        {member.positions.length > 0 && (
+          <MemberPositions
+            positions={member.positions}
+            onPositionClick={onPositionClick}
+            canClickPosition={canClickPosition}
+            color={color}
+          />
+        )}
+        {mentees.length > 0 && (
+          <MenteesGrid
+            mentees={mentees}
+            clickable={menteesClickable}
+            onMemberNameClick={onMemberNameClick}
+            isVisible={isVisible}
+            color={color}
+          />
+        )}
       </div>
     </div>
   );

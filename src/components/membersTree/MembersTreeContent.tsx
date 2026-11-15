@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { Application } from "@pixi/react";
 import {
   useMembersActions,
@@ -18,7 +18,7 @@ import { getMemberById } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useTreeStore } from "@/store/treeStore";
-import type { Member as MemberType, AccentColor, TeamFrame } from "@/types";
+import type { Member as MemberType, TeamFrame } from "@/types";
 import { getRenderResolution } from "@/utils";
 import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
@@ -29,8 +29,6 @@ import Toolbar from "./toolbar";
 
 // Hover and drag only need events on the objects under the pointer.
 const EVENT_FEATURES = { globalMove: false } as const;
-
-const ACCENT_COLOR_MAP: AccentColor[] = ["blue", "green", "orange"];
 
 interface Props {
   members: MemberType[];
@@ -137,20 +135,6 @@ const MembersTreeContent = ({ members }: Props) => {
 
   const handleFitView = useCallback(() => fitView(), [fitView]);
 
-  // Accent colour by member id (the first node of a member wins in team view).
-  const accentByMemberId = useMemo(() => {
-    const map = new Map<string, AccentColor>();
-    for (const node of nodes) {
-      if (!map.has(node.data.member.id)) {
-        map.set(
-          node.data.member.id,
-          ACCENT_COLOR_MAP[node.data.placeholderColorIndex],
-        );
-      }
-    }
-    return map;
-  }, [nodes]);
-
   const handleSearch = useCallback(
     (memberId: string) => {
       if (!getMemberById(memberId)) return;
@@ -161,11 +145,6 @@ const MembersTreeContent = ({ members }: Props) => {
     },
     [selectMember, focusNode, filteredMemberIds, rememberTeamFor],
   );
-
-  const sidebarColor = useMemo<AccentColor>(() => {
-    if (!selectedId) return "blue";
-    return accentByMemberId.get(selectedId) ?? "blue";
-  }, [selectedId, accentByMemberId]);
 
   // Multisampling on top of a 2x canvas costs a lot of fill rate (phones,
   // retina) for edges that are already smooth at that density.
@@ -226,7 +205,6 @@ const MembersTreeContent = ({ members }: Props) => {
       <MemberSidebar
         state={memberSidebar}
         member={selectedMember}
-        color={sidebarColor}
         isTeamView={isTeamView}
         canFocusMemberInTeam={canFocusMemberInTeam}
         onFocusMemberInTeam={focusMemberInTeam}

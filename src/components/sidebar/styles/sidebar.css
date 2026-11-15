@@ -32,6 +32,17 @@
   }
 }
 
+/* A floating header overlays the content, so it takes no room of its own. */
+.sidebar-content.sidebar-content--under-header {
+  max-height: calc(100dvh - 6.5rem - var(--sidebar-footer-height, 0px));
+}
+
+@media (min-width: 768px) {
+  .sidebar-content.sidebar-content--under-header {
+    max-height: calc(100dvh - 2rem - var(--sidebar-footer-height, 0px));
+  }
+}
+
 .sidebar-content.sidebar-height-animating {
   scrollbar-color: transparent transparent;
 }

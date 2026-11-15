@@ -26,6 +26,10 @@ _Avoid_: Active member
 A full member who retired from the organisation.
 _Avoid_: Former member, ex-member
 
+**Activity state**:
+Whether a member is currently involved: Active, Inactive, or Excluded. Independent of status. Changing it never removes a member's history from the tree, so an inactive or excluded member stays visible, shown with a gray label.
+_Avoid_: Membership state, availability
+
 **Mentor**:
 A full member (or alumnus) who guides newer members. Mentorship forms the family tree.
 _Avoid_: Parent, supervisor

@@ -9,6 +9,8 @@ interface ColorClasses {
   surfaceBg: string;
   hoverAccentBg: string;
   hoverSurfaceBg: string;
+  softBg: string;
+  softBgHover: string;
   border: string;
   accentRing: string;
   focusVisibleRing: string;
@@ -31,6 +33,8 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     accentBg: "bg-accent-blue",
     hoverAccentBg: "hover:bg-accent-blue/50",
     hoverSurfaceBg: "hover:bg-accent-blue/10",
+    softBg: "bg-accent-blue/10",
+    softBgHover: "hover:bg-accent-blue/15",
     border: "border-accent-blue",
     surfaceBg: "bg-surface-blue",
     accentRing: "focus:ring-accent-blue",
@@ -48,6 +52,8 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     accentBg: "bg-accent-green",
     hoverAccentBg: "hover:bg-accent-green/50",
     hoverSurfaceBg: "hover:bg-accent-green/10",
+    softBg: "bg-accent-green/10",
+    softBgHover: "hover:bg-accent-green/15",
     border: "border-accent-green",
     surfaceBg: "bg-surface-green",
     accentRing: "focus:ring-accent-green",
@@ -65,6 +71,8 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     accentBg: "bg-accent-orange",
     hoverAccentBg: "hover:bg-accent-orange/50",
     hoverSurfaceBg: "hover:bg-accent-orange/10",
+    softBg: "bg-accent-orange/10",
+    softBgHover: "hover:bg-accent-orange/15",
     border: "border-accent-orange",
     surfaceBg: "bg-surface-orange",
     accentRing: "focus:ring-accent-orange",

@@ -23,7 +23,9 @@ interface Props {
   onBackClick?: () => void;
 }
 
-const iconButton = "transition-transform duration-200 ease-out hover:scale-[1.3]";
+// Soft round chip: stays readable over a cover image and the plain card alike.
+const iconButton =
+  "pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-surface/70 backdrop-blur transition-colors duration-200 hover:bg-surface";
 
 const SidebarHeader = ({
   mode,
@@ -50,7 +52,7 @@ const SidebarHeader = ({
     >
       <h2
         className={twMerge(
-          "flex min-w-0 items-center text-xl font-bold",
+          "flex min-w-0 items-center gap-2 text-xl font-bold",
           colorClasses.text,
           isMinimized && "max-md:hidden",
         )}
@@ -61,10 +63,18 @@ const SidebarHeader = ({
             className={twMerge(colorClasses.text, iconButton)}
             title="Назад"
           >
-            <ArrowLeftIcon className="h-6 w-6" />
+            <ArrowLeftIcon className="h-5 w-5" />
           </button>
         )}
-        <span className="ml-2 pointer-events-none">{title}</span>
+        <span
+          className={twMerge(
+            "pointer-events-none flex min-w-0",
+            // The back button's gap already spaces it.
+            typeof title === "string" && mode !== "edit" && "ml-2",
+          )}
+        >
+          {title}
+        </span>
       </h2>
       {isMinimized && (
         <button
@@ -83,7 +93,7 @@ const SidebarHeader = ({
             className={twMerge(colorClasses.text, iconButton, "md:hidden")}
             title="Розгорнути"
           >
-            <ChevronUpIcon className="h-6 w-6" />
+            <ChevronUpIcon className="h-5 w-5" />
           </button>
         )}
         {mode === "info" && onEditClick && (
@@ -101,10 +111,10 @@ const SidebarHeader = ({
         )}
         <button
           onClick={onClose}
-          className={twMerge(colorClasses.text, "transition-all duration-200 ease-out hover:scale-[1.3]")}
+          className={twMerge(colorClasses.text, iconButton)}
           title="Закрити"
         >
-          <XMarkIcon className="h-6 w-6" />
+          <XMarkIcon className="h-5 w-5" />
         </button>
       </div>
     </div>

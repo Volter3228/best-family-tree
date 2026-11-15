@@ -8,8 +8,7 @@ import {
   MemberStatus,
 } from "@/types";
 
-const getRecruitmentTerm = (joinedAt: Date | null): RecruitmentTerm | null => {
-  if (!joinedAt) return null;
+const getRecruitmentTerm = (joinedAt: Date): RecruitmentTerm => {
   const month = getMonth(joinedAt);
   const year = getYear(joinedAt);
 
@@ -56,7 +55,7 @@ export default class Member {
   createdAt: Date;
   updatedAt: Date;
   positions: MemberPosition[];
-  private readonly recruitmentTerm: RecruitmentTerm | null;
+  private readonly recruitmentTerm: RecruitmentTerm;
   private readonly birthdayToday: boolean;
 
   constructor({
@@ -99,11 +98,11 @@ export default class Member {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.positions = positions || [];
-    this.recruitmentTerm = joinedAt ? getRecruitmentTerm(joinedAt) : null;
+    this.recruitmentTerm = getRecruitmentTerm(joinedAt);
     this.birthdayToday = isBirthdayToday(name, this.birthday);
   }
 
-  getRecruitmentTerm(): RecruitmentTerm | null {
+  getRecruitmentTerm(): RecruitmentTerm {
     return this.recruitmentTerm;
   }
 

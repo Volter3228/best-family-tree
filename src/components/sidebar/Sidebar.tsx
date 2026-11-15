@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { SidebarMode, AccentColor } from "@/types";
 import { useSidebarHeightAnimation, useSidebarChromeHeights } from "@/hooks";
 import { SidebarFooterContext } from "./SidebarFooterContext";
@@ -22,6 +23,9 @@ interface Props {
   id?: string;
   mode?: SidebarMode;
   headerTitle?: React.ReactNode;
+  // The header overlays the top of the content (e.g. a cover) instead of
+  // taking its own row. Ignored while the mobile card is minimized.
+  floatingHeader?: boolean;
   isOpen: boolean;
   color?: AccentColor;
   onClose: () => void;
@@ -41,6 +45,7 @@ const Sidebar = ({
   mode,
   isOpen,
   headerTitle = "Sidebar Header",
+  floatingHeader = false,
   color = "blue",
   onClose,
   onEditClick,
@@ -53,6 +58,7 @@ const Sidebar = ({
 }: Props) => {
   const canMinimize = !!onMinimizedChange && mode === "info";
   const isMinimized = canMinimize && minimizedRequested;
+  const headerFloats = floatingHeader && !isMinimized;
 
   const [cardElement, setCardElement] = useState<HTMLDivElement | null>(null);
   const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(
@@ -67,6 +73,14 @@ const Sidebar = ({
     useState<HTMLDivElement | null>(null);
   const contentOuterRef = useRef<HTMLDivElement>(null);
   const contentInnerRef = useRef<HTMLDivElement>(null);
+  const coverTintRef = useRef<HTMLDivElement | null>(null);
+  // Starts at the current scroll offset, so a remounted tint does not jump to the top.
+  const setCoverTint = useCallback((el: HTMLDivElement | null) => {
+    coverTintRef.current = el;
+    if (el) {
+      el.style.transform = `translateY(${-(contentOuterRef.current?.scrollTop ?? 0)}px)`;
+    }
+  }, []);
 
   const contentStyle = useMemo(
     () =>
@@ -107,14 +121,35 @@ const Sidebar = ({
     >
       <div
         ref={setCardElement}
-        className={`flex max-h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-surface/80 backdrop-blur-xl pointer-events-auto ${isOpen ? "shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]" : "shadow-none"}`}
+        className={`relative flex max-h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-surface/80 backdrop-blur-xl pointer-events-auto ${isOpen ? "shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]" : "shadow-none"}`}
       >
-        <div ref={setHeaderElement} className="shrink-0">
+        {headerFloats && (
+          // The cover's tint, painted here rather than inside the scroller:
+          // content cannot paint under the scrollbar gutter, which left a
+          // seam at the right edge. Follows the scroll like the content.
+          <div
+            ref={setCoverTint}
+            aria-hidden
+            className={twMerge(
+              "pointer-events-none absolute inset-x-0 top-0 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] bg-linear-to-b from-current/20 to-transparent [mask-image:linear-gradient(to_bottom,black_60%,transparent)]",
+              COLOR_CLASSES[color].text,
+            )}
+          />
+        )}
+        <div
+          ref={setHeaderElement}
+          className={twMerge(
+            "shrink-0",
+            // Only the buttons catch the pointer, so the scroller below
+            // keeps the wheel and the scrollbar.
+            headerFloats && "pointer-events-none absolute inset-x-0 top-0 z-10",
+          )}
+        >
           {canMinimize && (
             <SidebarHandle
               isMinimized={isMinimized}
               onMinimizedChange={onMinimizedChange}
-              className="pt-1"
+              className="pointer-events-auto pt-1"
             />
           )}
           <SidebarHeader
@@ -137,11 +172,19 @@ const Sidebar = ({
           )}
         >
           <div className="flex min-h-0 flex-col overflow-hidden">
-            <div className="sidebar-scroll-wrapper min-h-0 flex-1 overflow-hidden">
+            <div className="sidebar-scroll-wrapper relative z-[1] min-h-0 flex-1 overflow-hidden">
               <div
                 ref={contentOuterRef}
-                className="sidebar-content h-full min-h-0 overflow-y-auto"
+                className={twMerge(
+                  "sidebar-content h-full min-h-0 overflow-y-auto",
+                  headerFloats && "sidebar-content--under-header",
+                )}
                 style={contentStyle}
+                onScroll={(e) => {
+                  if (coverTintRef.current) {
+                    coverTintRef.current.style.transform = `translateY(${-e.currentTarget.scrollTop}px)`;
+                  }
+                }}
               >
                 <SidebarFooterContext.Provider value={footerSlotElement}>
                   <div ref={contentInnerRef} className="px-6 pb-6 pt-0">

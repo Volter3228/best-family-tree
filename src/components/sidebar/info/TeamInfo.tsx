@@ -7,11 +7,11 @@ import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import {
   formatYearRange,
-  getMemberAvatar,
   type TeamRosterEntry,
 } from "@/utils";
 import type { AccentColor, Team } from "@/types";
 import MemberInfoRow from "./MemberInfoRow";
+import MemberMiniAvatar from "./MemberMiniAvatar";
 import TeamLogo from "./TeamLogo";
 
 interface Props {
@@ -36,7 +36,6 @@ const RosterRow = ({
   color: AccentColor;
 }) => {
   const colorClasses = COLOR_CLASSES[color];
-  const avatar = getMemberAvatar(entry.member, { width: 72, height: 72 });
 
   return (
     <button
@@ -48,22 +47,7 @@ const RosterRow = ({
         isClickable ? colorClasses.hoverSurfaceBg : "cursor-default",
       )}
     >
-      {avatar ? (
-        <img
-          src={avatar}
-          alt="team-avatar"
-          className="h-9 w-9 shrink-0 rounded-full object-cover"
-        />
-      ) : (
-        <span
-          className={twMerge(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white",
-            colorClasses.accentBg,
-          )}
-        >
-          {entry.member.name.slice(0, 1)}
-        </span>
-      )}
+      <MemberMiniAvatar member={entry.member} size={36} color={color} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate font-medium">{entry.member.name}</span>
         <span className="truncate text-sm font-light text-foreground/70">
