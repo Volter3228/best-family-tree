@@ -119,10 +119,9 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
       </div>
       <div
         className="overflow-y-auto overflow-x-hidden flex-1 transparent"
-        style={{
-          scrollbarWidth: "thin",
-          scrollbarColor: "var(--accent-green) transparent",
-        }}
+        style={
+          { "--scroll-color": "var(--accent-green)" } as React.CSSProperties
+        }
       >
         <Section title="Тема">
           <SegmentedSwitch

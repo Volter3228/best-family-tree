@@ -89,8 +89,16 @@
 .react-datepicker__year-dropdown {
   @apply bg-surface shadow-md text-foreground scroll-p-0;
   border-color: var(--datepicker-accent, var(--foreground));
-  scrollbar-width: none;
-  scrollbar-color: transparent transparent;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar {
+  display: none;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .react-datepicker__year-dropdown {
+    scrollbar-width: none;
+  }
 }
 
 .react-datepicker__year-option {

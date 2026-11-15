@@ -1,7 +1,7 @@
 # Graph Report - best-family-tree  (2026-11-15)
 
 ## Corpus Check
-- 544 files · ~177,058 words
+- 544 files · ~177,063 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 29 file(s) not represented in the graph (top: .prisma 9, (none) 7, .css 6)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9739bcbd`
+- Built from commit: `d7b4f908`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -740,16 +740,16 @@ Nodes (4): matchesQuery(), Options, useSearchSuggestions(), normalize()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `react` to `TeamInfoSidebar.tsx`, `Sidebar.tsx`, `filterSearchParams.ts`, `hooks/index.ts`, `FilterState`, `MemberNodeCard.tsx`, `TeamFrame`, `MembersTreeContent.tsx`, `TeamFormContent.tsx`, `searchShortcut.ts`, `ui/index.ts`, `dimensions.ts`, `PhotoViewer.tsx`, `useSearchSuggestions.ts`, `TeamSearch.tsx`, `useDashedPathAnimation.ts`, `MembersTreeScene.tsx`, `MemberInfo.tsx`, `useCardAnimation.ts`, `pixi.js`, `Member`, `EditMemberForm.tsx`, `ManageForm.tsx`, `package.json`, `ThemeContext.tsx`, `Direction`, `TeamFormContent.tsx`, `http`, `pixi.js`, `AvatarFileInput.tsx`, `treeStore.ts`, `FitViewButton.tsx`, `useHoverNodeAnimation.ts`, `src/utils/index.ts`, `MemberFilterCategory.tsx`, `edgeGeometry.ts`, `Toolbar.tsx`, `src/types/index.ts`, `Toolbar.tsx`, `photoViewerMath.ts`, `MemberNode.tsx`, `elk.ts`, `constants/canvas/index.ts`, `layout.tsx`, `Toolbar.tsx`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+  _High betweenness centrality (0.099) - this node is a cross-community bridge._
 - **What connects `@prisma/client`, `dotenv`, `lodash` to the rest of the system?**
   _42 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `emailRoutes.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.12012012012012012 - nodes in this community are weakly interconnected._
 - **Why does `getBounds()` connect `Core Patterns` to `Foundations`, `treeStore.ts`, `Common Mistakes`?**
-  _High betweenness centrality (0.091) - this node is a cross-community bridge._
+  _High betweenness centrality (0.093) - this node is a cross-community bridge._
 - **Should `TeamFormContent.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.14795008912655971 - nodes in this community are weakly interconnected._
-- **Why does `origin()` connect `oidc.ts` to `Core Patterns`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `Core Patterns` connect `Core Patterns` to `Foundations`, `Common Mistakes`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `ApplicationOptions reference` be split into smaller, more focused modules?**
   _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._

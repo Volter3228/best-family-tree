@@ -74,9 +74,6 @@
     color: var(--foreground);
     background-color: var(--background-base);
     scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--foreground) transparent;
-    scrollbar-arrow-color: transparent;
     overflow: hidden;
   }
 
@@ -97,6 +94,40 @@
     margin: 0;
   }
 }
+
+/* Scrollbars: thin, colored thumb, transparent track, no arrow buttons.
+   Chromium and Safari read only ::-webkit-scrollbar rules and Firefox reads
+   only the standard scrollbar-* properties, so each engine gets one scheme and
+   the two never mix on one element. Set --scroll-color on a scroller to
+   recolor its thumb; a transparent value hides it. */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-color, var(--foreground));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-color, var(--foreground)) transparent;
+  }
+}
+
 /* Theme switch cross-fade (View Transitions API) */
 ::view-transition-old(root),
 ::view-transition-new(root) {

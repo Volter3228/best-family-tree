@@ -78,10 +78,9 @@ const SearchPanel = ({
             ? "opacity-100 translate-y-0 scale-y-100 max-h-10/12"
             : "opacity-0 translate-y-1 scale-y-95 pointer-events-none max-h-0",
         )}
-        style={{
-          scrollbarWidth: "thin",
-          scrollbarColor: "var(--accent-blue) transparent",
-        }}
+        style={
+          { "--scroll-color": "var(--accent-blue)" } as React.CSSProperties
+        }
       >
         {children}
       </ul>

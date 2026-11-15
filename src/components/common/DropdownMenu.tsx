@@ -46,11 +46,12 @@ const DropdownMenu = ({
           isClosing ? "animate-fade-slide-up" : "animate-fade-slide-down",
           listClassName,
         )}
-        style={{
-          ...position,
-          scrollbarWidth: "thin",
-          scrollbarColor: `var(--accent-${color}) transparent`,
-        }}
+        style={
+          {
+            ...position,
+            "--scroll-color": `var(--accent-${color})`,
+          } as CSSProperties
+        }
         tabIndex={-1}
       >
         {options.map((option, index) => {

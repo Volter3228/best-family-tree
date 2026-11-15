@@ -157,11 +157,12 @@ const LineageMemberSearch = ({
               ? "opacity-100 translate-y-0 scale-y-100"
               : "opacity-0 translate-y-1 scale-y-95 pointer-events-none",
           )}
-          style={{
-            ...dropdownPos,
-            scrollbarWidth: "thin",
-            scrollbarColor: "var(--accent-green) transparent",
-          }}
+          style={
+            {
+              ...dropdownPos,
+              "--scroll-color": "var(--accent-green)",
+            } as React.CSSProperties
+          }
         >
           {filtered.map((member, index) => (
             <li
