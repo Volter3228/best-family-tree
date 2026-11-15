@@ -27,7 +27,7 @@ interface SettingsActions {
 export const DEFAULT_SETTINGS: SettingsState = {
   theme: "system",
   orientation: "auto",
-  edgeStyle: "bezier",
+  edgeStyle: "orthogonal",
 };
 
 const readLegacyTheme = (): ThemePreference | null => {

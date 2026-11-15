@@ -60,7 +60,7 @@ describe("settingsStore", () => {
     const state = useSettingsStore.getState();
     expect(state.theme).toBe("system");
     expect(state.orientation).toBe("auto");
-    expect(state.edgeStyle).toBe("bezier");
+    expect(state.edgeStyle).toBe("orthogonal");
   });
 
   it("persists settings to localStorage", () => {

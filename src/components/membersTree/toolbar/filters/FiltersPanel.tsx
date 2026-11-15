@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
-import { twMerge } from "tailwind-merge";
 import type { FilterState, FilterSectionKey } from "@/types";
 import { useFiltersStore } from "@/store/filtersStore";
 import { isFilterActive } from "@/utils/filters";
+import ToolbarPanel from "../ToolbarPanel";
 import FiltersHeader from "./FiltersHeader";
 import MemberFilterCategory from "./MemberFilterCategory";
 import TeamFilterCategory from "./TeamFilterCategory";
@@ -66,37 +66,29 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
   };
 
   return (
-    <div
-      className={twMerge(
-        "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-80 max-h-[60vh]",
-        "backdrop-blur-lg rounded-2xl",
-        isClosing ? "animate-sidebar-slide-out" : "animate-sidebar-slide-in",
-      )}
-    >
-      <div className="rounded-2xl bg-surface/70 shadow-2xl flex flex-col max-h-[60vh]">
-        <FiltersHeader
-          count={filteredCount}
-          isTeamMode={appliedFilters.treeMode === "team"}
-          canReset={canReset}
-          onApply={applyFilters}
-          onReset={resetFilters}
-        />
-        <ViewModeSwitch
-          value={draftFilters.treeMode}
-          onChange={(treeMode) => handleChange({ treeMode })}
-        />
-        <div
-          className="overflow-y-auto overflow-x-hidden flex-1 transparent"
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "var(--accent-green) transparent",
-          }}
-        >
-          <MemberFilterCategory {...groupProps} />
-          <TeamFilterCategory {...groupProps} />
-        </div>
+    <ToolbarPanel isClosing={isClosing} className="flex flex-col max-h-[60vh]">
+      <FiltersHeader
+        count={filteredCount}
+        isTeamMode={appliedFilters.treeMode === "team"}
+        canReset={canReset}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
+      <ViewModeSwitch
+        value={draftFilters.treeMode}
+        onChange={(treeMode) => handleChange({ treeMode })}
+      />
+      <div
+        className="overflow-y-auto overflow-x-hidden flex-1 transparent"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "var(--accent-green) transparent",
+        }}
+      >
+        <MemberFilterCategory {...groupProps} />
+        <TeamFilterCategory {...groupProps} />
       </div>
-    </div>
+    </ToolbarPanel>
   );
 };
 

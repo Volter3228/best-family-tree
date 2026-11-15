@@ -85,7 +85,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/70 shadow-2xl backdrop-blur-md"
+            className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/80 shadow-2xl backdrop-blur-xl"
           />
           <div className="relative flex items-end gap-1.5 rounded-2xl p-2">
             <ToolbarIconButton

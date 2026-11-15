@@ -1,8 +1,8 @@
 import { navigateWithSlide } from "@/utils/navigateWithSlide";
-import { twMerge } from "tailwind-merge";
 import { logout } from "@/api/auth";
 import { authStrings as t } from "@/components/auth/strings";
 import { useSessionStore } from "@/store/sessionStore";
+import ToolbarPanel from "./ToolbarPanel";
 
 interface Props {
   isOpen: boolean;
@@ -29,38 +29,30 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
   };
 
   return (
-    <div
-      className={twMerge(
-        "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-80",
-        "backdrop-blur-lg rounded-2xl",
-        isClosing ? "animate-sidebar-slide-out" : "animate-sidebar-slide-in",
+    <ToolbarPanel isClosing={isClosing} className="px-3 py-2.5">
+      {name && (
+        <p className="mb-1 truncate text-xs text-foreground/60">{name}</p>
       )}
-    >
-      <div className="rounded-2xl bg-surface/70 shadow-2xl px-3 py-2.5">
-        {name && (
-          <p className="mb-1 truncate text-xs text-foreground/60">{name}</p>
-        )}
-        <p className="mb-2.5 text-sm font-semibold text-foreground">
-          {t.logoutConfirm}
-        </p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="flex-1 rounded-lg bg-accent-blue py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
-          >
-            {t.logout}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-lg bg-foreground/5 py-1.5 text-sm transition-colors hover:bg-foreground/10"
-          >
-            {t.cancel}
-          </button>
-        </div>
+      <p className="mb-2.5 text-sm font-semibold text-foreground">
+        {t.logoutConfirm}
+      </p>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => void signOut()}
+          className="flex-1 rounded-lg bg-accent-blue py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
+        >
+          {t.logout}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 rounded-lg bg-foreground/5 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+        >
+          {t.cancel}
+        </button>
       </div>
-    </div>
+    </ToolbarPanel>
   );
 };
 
