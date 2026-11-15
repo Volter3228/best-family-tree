@@ -8,15 +8,22 @@ interface Props {
   src: string;
 }
 
+interface SkeletonProps {
+  done: boolean;
+  // Corner radius of the placeholder; the avatar is a disc.
+  roundedClassName?: string;
+}
+
 // Placeholder while the photo loads: a muted disc with a slow highlight sweep
-const AvatarSkeleton = ({ done }: { done: boolean }) => (
+export const AvatarSkeleton = ({ done, roundedClassName = "rounded-full" }: SkeletonProps) => (
   <div
     aria-hidden
     className="motion-safe:animate-avatar-fade-in absolute inset-0"
   >
     <div
       className={twMerge(
-        "relative h-full w-full overflow-hidden rounded-full bg-foreground/10 shadow-lg transition-opacity duration-300 ease-out",
+        "relative h-full w-full overflow-hidden bg-foreground/10 shadow-lg transition-opacity duration-300 ease-out",
+        roundedClassName,
         done && "opacity-0",
       )}
     >

@@ -26,6 +26,13 @@ const viewportRect = (size: Size): Rect => ({
   ...size,
 });
 
+// Corner radius of the thumbnail as rendered. "rounded-full" computes to a
+// huge length (or an unparsable calc); coverMorph caps either to a circle.
+const thumbRadius = (el: HTMLElement) => {
+  const radius = parseFloat(getComputedStyle(el).borderTopLeftRadius);
+  return Number.isNaN(radius) ? Infinity : radius;
+};
+
 const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
   const closeStore = usePhotoViewerStore((s) => s.close);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -68,7 +75,7 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
       const from = coverMorph(
         photo.originEl.getBoundingClientRect(),
         viewportRect(sizeRef.current),
-        photo.fit,
+        thumbRadius(photo.originEl),
       );
       const tl = gsap.timeline();
       tl.fromTo(
@@ -131,7 +138,7 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
     const to = coverMorph(
       photo.originEl.getBoundingClientRect(),
       viewportRect(sizeRef.current),
-      photo.fit,
+      thumbRadius(photo.originEl),
     );
     gsap.fromTo(
       boxRef.current,
@@ -153,7 +160,7 @@ const Viewer = ({ photo }: { photo: ViewerPhoto }) => {
       ease: "power2.in",
     });
     gsap.to(toolbarRef.current?.children ?? [], { opacity: 0, duration: 0.15 });
-  }, [closeStore, photo.originEl, photo.fit, reduced]);
+  }, [closeStore, photo.originEl, reduced]);
 
   const { stepZoom, reset } = usePhotoGestures({
     stageRef,

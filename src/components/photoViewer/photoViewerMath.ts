@@ -94,35 +94,27 @@ export interface CoverMorph {
 }
 
 /**
- * Start (or end) state that makes the final rect look like the cropped
- * circular thumbnail: scaled so the short side matches the thumbnail, and
- * clipped to the centered square circle.
+ * Start (or end) state that makes the final rect look like the thumbnail: the
+ * photo is scaled until it covers the thumbnail, then clipped to the
+ * thumbnail's centered crop with its corner radius (a circle when the radius
+ * is at least half the short side).
  */
 export const coverMorph = (
   thumb: Pick<DOMRect, "left" | "top" | "width" | "height">,
   final: Rect,
-  fit: "circle" | "contain" = "circle",
+  thumbRadius: number,
 ): CoverMorph => {
   const x = thumb.left + thumb.width / 2 - (final.left + final.w / 2);
   const y = thumb.top + thumb.height / 2 - (final.top + final.h / 2);
-  if (fit === "contain") {
-    const k = thumb.width / final.w;
-    return {
-      x,
-      y,
-      scale: k,
-      clipPath: `inset(0px 0px 0px 0px round ${12 / k}px)`,
-    };
-  }
-  const side = Math.min(final.w, final.h);
-  const thumbSide = Math.min(thumb.width, thumb.height);
-  const insetX = (final.w - side) / 2;
-  const insetY = (final.h - side) / 2;
+  const scale = Math.max(thumb.width / final.w, thumb.height / final.h);
+  const insetX = (final.w - thumb.width / scale) / 2;
+  const insetY = (final.h - thumb.height / scale) / 2;
+  const radius = Math.min(thumbRadius, thumb.width / 2, thumb.height / 2);
   return {
     x,
     y,
-    scale: thumbSide / side,
-    clipPath: `inset(${insetY}px ${insetX}px ${insetY}px ${insetX}px round ${side / 2}px)`,
+    scale,
+    clipPath: `inset(${insetY}px ${insetX}px ${insetY}px ${insetX}px round ${radius / scale}px)`,
   };
 };
 

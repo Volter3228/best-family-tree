@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
@@ -30,13 +30,25 @@ const InfoSection = ({
   color = "blue",
 }: Props) => {
   const [open, setOpen] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const colorClasses = COLOR_CLASSES[color];
   const head = items.slice(0, visibleCount);
   const tail = items.slice(visibleCount);
+  const toggleOpen = () => {
+    const opening = !open;
+    setOpen(opening);
+    // Once the list has grown, bring all of it into view.
+    if (opening) {
+      setTimeout(
+        () => sectionRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }),
+        200,
+      );
+    }
+  };
   const toggleLabel = open ? "Згорнути" : (expandLabel ?? `+${tail.length}`);
 
   return (
-    <section className="member-info-row flex flex-col gap-2">
+    <section ref={sectionRef} className="member-info-row flex scroll-mb-4 flex-col gap-2">
       <h3 className="text-base">
         <span className={twMerge("font-semibold", colorClasses.text)}>{title}</span>
         <span className="text-foreground/50"> · {items.length}</span>
@@ -47,7 +59,7 @@ const InfoSection = ({
         {toggle === "pill" && tail.length > 0 && (
           <button
             type="button"
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={toggleOpen}
             aria-expanded={open}
             className={twMerge(
               "h-7 rounded-full px-3 text-xs font-medium transition-colors duration-200",
@@ -80,7 +92,7 @@ const InfoSection = ({
       {toggle === "bar" && tail.length > 0 && (
         <button
           type="button"
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={toggleOpen}
           aria-expanded={open}
           className={twMerge(
             "flex h-9 w-full items-center justify-center gap-1 rounded-xl text-sm font-medium transition-colors duration-200",

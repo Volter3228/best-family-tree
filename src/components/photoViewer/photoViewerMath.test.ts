@@ -78,11 +78,23 @@ describe("coverMorph", () => {
     const m = coverMorph(
       { left: 0, top: 0, width: 100, height: 100 },
       { left: 200, top: 100, w: 400, h: 200 },
+      Infinity,
     );
     expect(m.scale).toBe(0.5);
     expect(m.x).toBe(50 - 400);
     expect(m.y).toBe(50 - 200);
     expect(m.clipPath).toBe("inset(0px 100px 0px 100px round 100px)");
+  });
+
+  it("crops a wide photo to a rounded rectangle thumbnail", () => {
+    // 16:10 thumbnail over a 4:3 photo: widths match, height is cropped.
+    const m = coverMorph(
+      { left: 0, top: 0, width: 160, height: 100 },
+      { left: 0, top: 0, w: 800, h: 600 },
+      20,
+    );
+    expect(m.scale).toBe(0.2);
+    expect(m.clipPath).toBe("inset(50px 0px 50px 0px round 100px)");
   });
 });
 

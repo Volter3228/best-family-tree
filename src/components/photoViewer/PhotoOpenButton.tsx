@@ -3,10 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { ArrowsPointingOutIcon } from "@heroicons/react/16/solid";
-import {
-  usePhotoViewerStore,
-  type ViewerPhoto,
-} from "@/store/photoViewerStore";
+import { usePhotoViewerStore } from "@/store/photoViewerStore";
 import { loadImageAspect } from "./imageAspect";
 
 interface Props {
@@ -15,27 +12,32 @@ interface Props {
   // Small version of `src`: gives the aspect ratio and the blurry first frame.
   previewSrc: string;
   alt: string;
-  fit: ViewerPhoto["fit"];
-  // Corner radius of the thumbnail, also used for the hover overlay.
+  // Corner radius of the thumbnail and the hover overlay. The morph reads the
+  // computed radius, so the photo lands on the exact thumbnail shape.
   roundedClassName: string;
   className?: string;
   children: ReactNode;
 }
 
-// Wraps a thumbnail: click opens it in the photo viewer. The thumbnail hides
-// while its photo is open, so the morph looks like one object moving.
+// True while the photo `id` is open in the viewer. A thumbnail's frame (rim,
+// glow) uses it to hide with the thumbnail, so no empty slot is left behind.
+export const useIsPhotoOpen = (id: string) =>
+  usePhotoViewerStore((s) => s.photo?.id === id);
+
+// Wraps a thumbnail: click opens it in the photo viewer. The thumbnail must
+// fill the button (cover): the morph crops the photo to the button's rect.
+// It hides while its photo is open, so the morph looks like one object moving.
 const PhotoOpenButton = ({
   id,
   src,
   previewSrc,
   alt,
-  fit,
   roundedClassName,
   className,
   children,
 }: Props) => {
   const open = usePhotoViewerStore((s) => s.open);
-  const isOpen = usePhotoViewerStore((s) => s.photo?.id === id);
+  const isOpen = useIsPhotoOpen(id);
 
   // Warm the aspect ratio so the viewer opens at the right shape immediately.
   useEffect(() => {
@@ -61,7 +63,6 @@ const PhotoOpenButton = ({
           placeholderSrc: previewSrc,
           aspect,
           alt,
-          fit,
           originEl,
         });
       }}

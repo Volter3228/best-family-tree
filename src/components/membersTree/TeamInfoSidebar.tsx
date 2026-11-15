@@ -1,9 +1,11 @@
+import { UserGroupIcon } from "@heroicons/react/16/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useMemo, useRef } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
 import { formatYearRange, getTeamRoster } from "@/utils";
 import Sidebar from "../sidebar";
+import HeaderChip from "../sidebar/HeaderChip";
 import SidebarMinimizedSummary from "../sidebar/SidebarMinimizedSummary";
 import TeamForm from "../sidebar/form/team/TeamForm";
 import TeamInfo from "../sidebar/info/TeamInfo";
@@ -50,7 +52,16 @@ const TeamInfoSidebar = ({
   return (
     <Sidebar
       id="team-sidebar"
-      headerTitle={mode === "info" ? "Команда" : "Редагувати"}
+      headerTitle={
+        mode === "info" ? (
+          <HeaderChip icon={UserGroupIcon} color="blue">
+            {team?.teamType?.name ?? "Команда"}
+          </HeaderChip>
+        ) : (
+          "Редагувати"
+        )
+      }
+      floatingHeader={mode === "info"}
       mode={mode}
       isOpen={isOpen}
       onClose={state.close}

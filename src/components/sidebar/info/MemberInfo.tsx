@@ -2,7 +2,9 @@ import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
 import { capitalizeOnlyFirstLetter, getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
-import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
+import PhotoOpenButton, {
+  useIsPhotoOpen,
+} from "@/components/photoViewer/PhotoOpenButton";
 import {
   getPhotoUrlForViewer,
   getPhotoUrlForViewerPreview,
@@ -49,6 +51,7 @@ const MemberInfo = ({
   const avatar = getMemberAvatar(member);
   const colorClasses = COLOR_CLASSES[color];
   const StatusIcon = STATUS_ICONS[status];
+  const photoOpen = useIsPhotoOpen(member.id);
 
   return (
     <div className="flex flex-col transition-opacity duration-300">
@@ -60,6 +63,9 @@ const MemberInfo = ({
             "drop-shadow-2xl/30 rounded-full",
             colorClasses.accentBg,
             colorClasses.dropShadow,
+            // `invisible`, not opacity: the sidebar switch animation leaves
+            // an inline opacity on this element.
+            photoOpen && "invisible",
           )}
         >
           <div className="relative h-full w-full rounded-full ring-4 ring-surface">
@@ -69,7 +75,6 @@ const MemberInfo = ({
                 src={getPhotoUrlForViewer(photo)}
                 previewSrc={getPhotoUrlForViewerPreview(photo)}
                 alt={name}
-                fit="circle"
                 roundedClassName="rounded-full"
                 className="block h-full w-full"
               >

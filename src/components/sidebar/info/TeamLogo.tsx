@@ -1,81 +1,113 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { loadImageAspect } from "@/components/photoViewer/imageAspect";
-import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
+import PhotoOpenButton, {
+  useIsPhotoOpen,
+} from "@/components/photoViewer/PhotoOpenButton";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { AvatarSkeleton } from "./MemberAvatarImage";
 
 interface Props {
-  url?: string | null;
+  // The team's own photo: fills the frame and opens in the photo viewer.
+  photoUrl?: string | null;
+  // Fallback logo of the team type: shown whole, never cropped.
+  iconUrl?: string | null;
   name: string;
-  className?: string;
   color?: AccentColor;
 }
 
 const GROUP_ICON_URL = 'url("/images/lion-group.svg")';
+const INNER = "relative h-full w-full overflow-hidden rounded-[1.25rem] ring-4 ring-surface";
 
-const MAX_LOGO_WIDTH = "16rem";
-const MAX_LOGO_HEIGHT = "12rem";
+const LoadingImage = ({ url, name, className }: { url: string; name: string; className: string }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
-const TeamLogo = ({ url, name, className, color = "blue" }: Props) => {
-  const [loaded, setLoaded] = useState<{ url: string; aspect: number }>();
-  useEffect(() => {
-    if (!url) return;
-    let cancelled = false;
-    void loadImageAspect(url).then((aspect) => {
-      if (!cancelled) setLoaded({ url, aspect });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  if (url) {
-    const aspect = loaded?.url === url ? loaded.aspect : 1;
-    return (
-      <PhotoOpenButton
-        id={`team-logo:${name}`}
+  return (
+    <>
+      <AvatarSkeleton done={loaded || failed} roundedClassName="rounded-[inherit]" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={(img) => {
+          // Cached images can finish before React attaches onLoad.
+          if (img?.complete && img.naturalWidth) setLoaded(true);
+        }}
         src={url}
-        previewSrc={url}
         alt={name}
-        fit="contain"
-        roundedClassName="rounded-xl"
-        className="shrink-0"
+        className={twMerge(
+          "absolute inset-0 h-full w-full transition-[opacity,transform] duration-300 ease-out",
+          loaded ? "scale-100 opacity-100" : "scale-[0.98] opacity-0",
+          className,
+        )}
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+      />
+    </>
+  );
+};
+
+// Counterpart of the member avatar: the same accent rim and white ring, as a
+// wide rounded frame. Group photos are mostly landscape, so a 16:10 cover crop
+// loses little, and the photo viewer shows the whole thing.
+const TeamLogo = ({ photoUrl, iconUrl, name, color = "blue" }: Props) => {
+  const colorClasses = COLOR_CLASSES[color];
+  const viewerId = `team-photo:${name}`;
+  const photoOpen = useIsPhotoOpen(viewerId);
+
+  let content: React.ReactNode;
+  if (photoUrl) {
+    content = (
+      <PhotoOpenButton
+        id={viewerId}
+        src={photoUrl}
+        previewSrc={photoUrl}
+        alt={name}
+        roundedClassName="rounded-[1.25rem]"
+        className={twMerge(INNER, "block bg-surface")}
       >
-        <img
-          src={url}
-          alt={name}
-          className={twMerge("shrink-0", className)}
+        <LoadingImage key={photoUrl} url={photoUrl} name={name} className="object-cover" />
+      </PhotoOpenButton>
+    );
+  } else if (iconUrl) {
+    content = (
+      <div className={twMerge(INNER, "bg-surface")}>
+        <LoadingImage key={iconUrl} url={iconUrl} name={name} className="object-contain p-6" />
+      </div>
+    );
+  } else {
+    content = (
+      <div className={twMerge(INNER, "flex items-center justify-center p-8 shadow-inner", colorClasses.accentBg)}>
+        <div
+          className="h-full w-full bg-white"
           style={{
-            width: `min(${MAX_LOGO_WIDTH}, calc(${MAX_LOGO_HEIGHT} * ${aspect}))`,
-            height: "auto",
+            WebkitMaskImage: GROUP_ICON_URL,
+            maskImage: GROUP_ICON_URL,
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
           }}
         />
-      </PhotoOpenButton>
+      </div>
     );
   }
 
   return (
     <div
       className={twMerge(
-        "flex shrink-0 items-center justify-center rounded-full p-4",
-        COLOR_CLASSES[color].accentBg,
-        className,
+        "member-info-avatar relative aspect-[16/10] w-full max-w-80 rounded-3xl p-1 drop-shadow-2xl/30",
+        colorClasses.accentBg,
+        colorClasses.dropShadow,
+        // `invisible`, not opacity: the sidebar switch animation leaves an
+        // inline opacity on this element.
+        photoOpen && "invisible",
       )}
     >
-      <div
-        className="h-full w-full bg-white"
-        style={{
-          WebkitMaskImage: GROUP_ICON_URL,
-          maskImage: GROUP_ICON_URL,
-          WebkitMaskSize: "contain",
-          maskSize: "contain",
-          WebkitMaskRepeat: "no-repeat",
-          maskRepeat: "no-repeat",
-          WebkitMaskPosition: "center",
-          maskPosition: "center",
-        }}
-      />
+      {content}
     </div>
   );
 };

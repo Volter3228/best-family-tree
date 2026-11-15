@@ -1,18 +1,13 @@
-import {
-  CalendarDateRangeIcon,
-  StarIcon,
-  UserGroupIcon,
-} from "@heroicons/react/16/solid";
+import { CalendarDateRangeIcon, InformationCircleIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
-import {
-  formatYearRange,
-  type TeamRosterEntry,
-} from "@/utils";
-import type { AccentColor, Team } from "@/types";
-import MemberInfoRow from "./MemberInfoRow";
-import MemberMiniAvatar from "./MemberMiniAvatar";
+import { formatYearRange, type TeamRosterEntry } from "@/utils";
+import { ActivityState, type AccentColor, type Team } from "@/types";
+import InfoSection from "./InfoSection";
+import MemberActivityPill from "./MemberActivityPill";
+import MemberFactTile from "./MemberFactTile";
 import TeamLogo from "./TeamLogo";
+import TeamRosterRow from "./TeamRosterRow";
 
 interface Props {
   team: Team;
@@ -24,44 +19,8 @@ interface Props {
   color?: AccentColor;
 }
 
-const RosterRow = ({
-  entry,
-  isClickable,
-  onClick,
-  color,
-}: {
-  entry: TeamRosterEntry;
-  isClickable: boolean;
-  onClick: () => void;
-  color: AccentColor;
-}) => {
-  const colorClasses = COLOR_CLASSES[color];
-
-  return (
-    <button
-      type="button"
-      disabled={!isClickable}
-      onClick={onClick}
-      className={twMerge(
-        "flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors duration-200",
-        isClickable ? colorClasses.hoverSurfaceBg : "cursor-default",
-      )}
-    >
-      <MemberMiniAvatar member={entry.member} size={36} color={color} />
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate font-medium">{entry.member.name}</span>
-        <span className="truncate text-sm font-light text-foreground/70">
-          {entry.roles}
-        </span>
-      </span>
-      {entry.isLeader && (
-        <StarIcon className={twMerge("h-4 w-4 shrink-0", colorClasses.text)} />
-      )}
-    </button>
-  );
-};
-
-// Sidebar view of one team: logo, description, period, leaders and members.
+// Sidebar view of one team, styled like the member card: a cover under the
+// floating header, the photo, name and pills, fact tiles, then the roster.
 const TeamInfo = ({
   team,
   roster,
@@ -76,66 +35,79 @@ const TeamInfo = ({
     end: team.endYear,
     ongoing: team.isOngoing,
   });
-  const logoUrl = team.photoUrl ?? team.teamType?.iconUrl;
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <TeamLogo
-        url={logoUrl}
-        name={team.name}
-        color={color}
-        className={twMerge(
-          "member-info-avatar drop-shadow-xl rounded-xl",
-          !logoUrl && `${colorClasses.dropShadow} w-48 h-48`,
-        )}
+    <div className="flex flex-col transition-opacity duration-300">
+      {/* Room for the floating header and its tint (painted by the Sidebar). */}
+      <div
+        aria-hidden
+        className="-mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0"
       />
-      <div className="member-info-header mb-3 text-center">
-        <h5
-          className={twMerge(
-            "text-2xl transition-colors duration-200",
-            onTitleClick && `${colorClasses.hoverTextAccent} cursor-pointer`,
-          )}
-          onClick={onTitleClick}
-        >
-          {team.name}
-        </h5>
-      </div>
-      <div className="flex max-w-full flex-col gap-4">
-        {!!years && (
-          <MemberInfoRow
-            title="Період"
-            value={years}
-            icon={CalendarDateRangeIcon}
-            color={color}
-          />
-        )}
-        {roster.length > 0 && (
-          <MemberInfoRow
-            title="Учасників"
-            value={roster.length}
-            icon={UserGroupIcon}
-            color={color}
-          />
-        )}
-      </div>
-      {!!team.description && (
-        <p className="member-info-row w-full whitespace-pre-line text-center font-light">
-          {team.description}
-        </p>
-      )}
-      {roster.length > 0 && (
-        <div className="member-info-row flex w-full flex-col gap-0.5 border-t border-foreground/10 pt-3">
-          {roster.map((entry) => (
-            <RosterRow
-              key={entry.member.id}
-              entry={entry}
-              isClickable={canClickMember(entry.member.id)}
-              onClick={() => onMemberClick(entry.member.id)}
+      <div className="-mt-16 flex flex-col items-center gap-3">
+        <TeamLogo
+          photoUrl={team.photoUrl}
+          iconUrl={team.teamType?.iconUrl}
+          name={team.name}
+          color={color}
+        />
+        <div className="member-info-header flex flex-col items-center gap-2 text-center">
+          <h5
+            className={twMerge(
+              "text-2xl font-bold transition-colors duration-200",
+              onTitleClick &&
+                twMerge("cursor-pointer", colorClasses.hoverTextAccent),
+            )}
+            onClick={onTitleClick}
+          >
+            {team.name}
+          </h5>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {!!years && (
+              <span
+                className={twMerge(
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium text-white",
+                  colorClasses.accentBg,
+                )}
+              >
+                <CalendarDateRangeIcon className="h-4 w-4" />
+                {years}
+              </span>
+            )}
+            <MemberActivityPill
+              state={team.isOngoing ? ActivityState.Active : ActivityState.Inactive}
               color={color}
             />
-          ))}
+          </div>
         </div>
-      )}
+      </div>
+      <div className="mt-5 flex flex-col gap-6">
+        {!!team.description && (
+          <div className="grid grid-cols-1 gap-3">
+            <MemberFactTile label="Про команду" icon={InformationCircleIcon} color={color}>
+              <span className="whitespace-pre-line font-normal">{team.description}</span>
+            </MemberFactTile>
+          </div>
+        )}
+        {roster.length > 0 && (
+          <InfoSection
+            title="Учасники"
+            color={color}
+            visibleCount={5}
+            toggle="bar"
+            expandLabel="Показати всіх"
+            listClassName="flex flex-col gap-0.5"
+            items={roster.map((entry) => (
+              <TeamRosterRow
+                key={entry.member.id}
+                entry={entry}
+                isClickable={canClickMember(entry.member.id)}
+                onClick={() => onMemberClick(entry.member.id)}
+                color={color}
+              />
+            ))}
+          />
+        )}
+      </div>
     </div>
   );
 };
