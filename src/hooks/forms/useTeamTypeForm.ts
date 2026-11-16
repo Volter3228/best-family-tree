@@ -1,7 +1,10 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createTeamType, updateTeamType } from "@/api";
 import { useTeamTypes } from "../data/useMeta";
 import type { TeamType, TeamTypeFormData } from "@/types";
+import { NO_CHANGES_MESSAGE } from "@/constants/form";
+import { isSameFormData } from "@/utils/formDataEquals";
+import { useTransientMessage } from "./useTransientMessage";
 
 export type TeamTypeFormMode = "create" | "edit";
 
@@ -19,6 +22,31 @@ const toFormData = (teamType: TeamType): TeamTypeFormData => ({
   icon: teamType.iconUrl || null,
 });
 
+// Multipart body of a create/update request. On edit an empty value clears
+// the field on the server.
+const buildTeamTypeFormData = (
+  form: TeamTypeFormData,
+  mode: TeamTypeFormMode,
+): FormData => {
+  const formData = new FormData();
+  formData.append("name", form.name.trim());
+  formData.append("isEvent", String(form.isEvent));
+
+  if (form.icon instanceof File) {
+    formData.append("icon", form.icon);
+  } else if (mode === "edit" && form.icon === null) {
+    formData.append("icon", "");
+  }
+
+  if (form.color) {
+    formData.append("color", form.color);
+  } else if (mode === "edit") {
+    formData.append("color", "");
+  }
+
+  return formData;
+};
+
 export const useTeamTypeForm = () => {
   const [mode, setMode] = useState<TeamTypeFormMode>("create");
   const [teamTypes, setTeamTypes] = useTeamTypes();
@@ -26,13 +54,9 @@ export const useTeamTypeForm = () => {
   const [form, setForm] = useState<TeamTypeFormData>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!success) return;
-    const timeoutId = window.setTimeout(() => setSuccess(null), 2000);
-    return () => window.clearTimeout(timeoutId);
-  }, [success]);
+  const [success, showSuccess, hideSuccess] = useTransientMessage();
+  // The type as the server last returned it; edits that match it are not sent.
+  const savedFormRef = useRef<TeamTypeFormData | null>(null);
 
   const eventOptions = useMemo(
     () =>
@@ -59,36 +83,23 @@ export const useTeamTypeForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, selectedEventId]);
 
+  // Keep the baseline in step with the server copy of the selected type, which
+  // can change from elsewhere, without touching the user's in-progress edits.
+  useEffect(() => {
+    savedFormRef.current =
+      mode === "edit" && selectedEvent ? toFormData(selectedEvent) : null;
+  }, [mode, selectedEvent]);
+
   const resetForm = () => {
     setForm(EMPTY_FORM);
     setError(null);
-    setSuccess(null);
+    hideSuccess();
   };
 
   const changeMode = (nextMode: TeamTypeFormMode) => {
     setMode(nextMode);
     setSelectedEventId("");
     resetForm();
-  };
-
-  const buildFormData = () => {
-    const formData = new FormData();
-    formData.append("name", form.name.trim());
-    formData.append("isEvent", String(form.isEvent));
-
-    if (form.icon instanceof File) {
-      formData.append("icon", form.icon);
-    } else if (mode === "edit" && form.icon === null) {
-      formData.append("icon", "");
-    }
-
-    if (form.color) {
-      formData.append("color", form.color);
-    } else if (mode === "edit") {
-      formData.append("color", "");
-    }
-
-    return formData;
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -99,12 +110,26 @@ export const useTeamTypeForm = () => {
       return;
     }
 
+    const saved = savedFormRef.current;
+    if (
+      mode === "edit" &&
+      saved &&
+      isSameFormData(
+        buildTeamTypeFormData(form, mode),
+        buildTeamTypeFormData(saved, mode),
+      )
+    ) {
+      setError(null);
+      showSuccess(NO_CHANGES_MESSAGE);
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
-    setSuccess(null);
+    hideSuccess();
 
     try {
-      const formData = buildFormData();
+      const formData = buildTeamTypeFormData(form, mode);
 
       if (mode === "edit" && selectedEventId) {
         const updatedEvent = await updateTeamType(selectedEventId, formData);
@@ -115,7 +140,9 @@ export const useTeamTypeForm = () => {
             )
             .sort((a, b) => a.name.localeCompare(b.name, "uk")),
         );
-        setForm(toFormData(updatedEvent));
+        savedFormRef.current = toFormData(updatedEvent);
+        setForm(savedFormRef.current);
+        showSuccess("Збережено");
       } else {
         const createdEvent = await createTeamType(formData);
         setTeamTypes(
@@ -124,7 +151,7 @@ export const useTeamTypeForm = () => {
           ),
         );
         resetForm();
-        setSuccess(`Створено: ${createdEvent.name}`);
+        showSuccess(`Створено: ${createdEvent.name}`);
       }
     } catch (err) {
       setError(

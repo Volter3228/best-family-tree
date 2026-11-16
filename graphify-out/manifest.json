@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/Sidebar.tsx": {
-    "mtime": 1794762166.9792616,
-    "seen": 1794764186.5435169,
-    "ast_hash": "403d20a720304ecc984351762dae8d1b",
+    "mtime": 1794856067.1244795,
+    "seen": 1794856080.5795364,
+    "ast_hash": "f38933a0400062a63c361dd8375b1fdc",
     "semantic_hash": ""
   },
   "src/components/sidebar/SidebarFooterContext.ts": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/form/EditMemberForm.tsx": {
-    "mtime": 1794829642.5198658,
-    "seen": 1794829679.0247743,
-    "ast_hash": "763785dd50040d913dc247cb468400d2",
+    "mtime": 1794856067.1251147,
+    "seen": 1794856080.5797396,
+    "ast_hash": "21cf9fa24799902f031e9201df2c229f",
     "semantic_hash": ""
   },
   "src/components/sidebar/form/FormFooter.tsx": {
@@ -486,10 +486,10 @@
     "semantic_hash": "2330c30441ce718e0b30073fe1732bed"
   },
   "src/components/sidebar/form/FormMessages.tsx": {
-    "mtime": 1791554290.0904422,
-    "seen": 1792609757.132349,
-    "ast_hash": "3fcd168887ad6e37ffa7790ad6562955",
-    "semantic_hash": "3fcd168887ad6e37ffa7790ad6562955"
+    "mtime": 1794856067.1255662,
+    "seen": 1794856080.5798104,
+    "ast_hash": "ceede42f45ec95c5e0f5e87827c763e5",
+    "semantic_hash": ""
   },
   "src/components/sidebar/form/ManageForm.tsx": {
     "mtime": 1791554290.0904422,
@@ -522,9 +522,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/form/buttons/SubmitButton.tsx": {
-    "mtime": 1794315511.0993044,
-    "seen": 1794317877.2383082,
-    "ast_hash": "a3e97d62b37b792643b0b46d9d332c60",
+    "mtime": 1794856067.1262734,
+    "seen": 1794856080.5800304,
+    "ast_hash": "a230bb1ac3d0d46c0c8a73188bf0b08a",
     "semantic_hash": ""
   },
   "src/components/sidebar/form/buttons/index.ts": {
@@ -690,9 +690,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/form/team/TeamFormContent.tsx": {
-    "mtime": 1794227070.6100318,
-    "seen": 1794263408.5496647,
-    "ast_hash": "6cd808153d3446826849c29c625c94c2",
+    "mtime": 1794856067.1266494,
+    "seen": 1794856080.5811694,
+    "ast_hash": "6063f1a667287dadd1fae61bae8901cc",
     "semantic_hash": ""
   },
   "src/components/sidebar/form/team/TeamMembersEditor.tsx": {
@@ -714,10 +714,10 @@
     "semantic_hash": "0999f7bd663913b44b12e62ca0f521b5"
   },
   "src/components/sidebar/form/teamType/TeamTypeFormContent.tsx": {
-    "mtime": 1791554290.0935473,
-    "seen": 1792609757.1323717,
-    "ast_hash": "d73c320d413895788e84b5ecf9b516ca",
-    "semantic_hash": "d73c320d413895788e84b5ecf9b516ca"
+    "mtime": 1794856067.1270444,
+    "seen": 1794856080.5812845,
+    "ast_hash": "0e08d7ae5690a2573c88c10083cc9e6f",
+    "semantic_hash": ""
   },
   "src/components/sidebar/form/validations/memberFormValidation.ts": {
     "mtime": 1792781644.4910793,
@@ -852,9 +852,9 @@
     "semantic_hash": ""
   },
   "src/constants/form.ts": {
-    "mtime": 1794833446.498878,
-    "seen": 1794837213.311557,
-    "ast_hash": "f1f01ddba7fa5dc7908d26ebbcb77cf3",
+    "mtime": 1794856067.1279583,
+    "seen": 1794856080.5826828,
+    "ast_hash": "dbff60b7b4ac6aaa2bdbf8f4aeb6f3ad",
     "semantic_hash": ""
   },
   "src/constants/member.ts": {
@@ -918,22 +918,22 @@
     "semantic_hash": "28feca5bae2214ab65ce1848d649e20b"
   },
   "src/hooks/forms/teamFormData.ts": {
-    "mtime": 1794227070.6094263,
-    "seen": 1794263408.551121,
-    "ast_hash": "a84386a8d577bd504b137aca5737e4ec",
+    "mtime": 1794856067.128371,
+    "seen": 1794856080.5830576,
+    "ast_hash": "fb885dd7355604c3abb5faf8c9879587",
     "semantic_hash": ""
   },
   "src/hooks/forms/useTeamForm.ts": {
-    "mtime": 1791822110.0333123,
-    "seen": 1792609757.1323965,
-    "ast_hash": "50457cef5f9cd6913f484711da92add6",
-    "semantic_hash": "50457cef5f9cd6913f484711da92add6"
+    "mtime": 1794856067.1287115,
+    "seen": 1794856080.5830584,
+    "ast_hash": "58c862b04abf4f38c8bcffbe3d7e7566",
+    "semantic_hash": ""
   },
   "src/hooks/forms/useTeamTypeForm.ts": {
-    "mtime": 1791554290.0978816,
-    "seen": 1792609757.1323972,
-    "ast_hash": "c3cafe0136099041995c33b08d17226f",
-    "semantic_hash": "c3cafe0136099041995c33b08d17226f"
+    "mtime": 1794856067.1291056,
+    "seen": 1794856080.5830595,
+    "ast_hash": "5e088ee0115ed742212d9a9c12a673ab",
+    "semantic_hash": ""
   },
   "src/hooks/index.ts": {
     "mtime": 1791554290.0978816,
@@ -3060,9 +3060,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoFacts.tsx": {
-    "mtime": 1794749723.0240986,
-    "seen": 1794750673.9794478,
-    "ast_hash": "403f3beaf4f5974e9d3c191874742147",
+    "mtime": 1794856067.1275892,
+    "seen": 1794856080.5816896,
+    "ast_hash": "3135be978af009513a2163561e10b865",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberMiniAvatar.tsx": {
@@ -3411,6 +3411,42 @@
     "mtime": 1794847313.6383657,
     "seen": 1794847683.2442446,
     "ast_hash": "1ebb1c93da975b4eb759620b3e516da1",
+    "semantic_hash": ""
+  },
+  "src/components/sidebar/form/SuccessBubble.tsx": {
+    "mtime": 1794855593.754774,
+    "seen": 1794856080.5799558,
+    "ast_hash": "25464f09aa134d65f5c0cece38c3feca",
+    "semantic_hash": ""
+  },
+  "src/components/sidebar/form/editMemberFormData.ts": {
+    "mtime": 1794856040.894501,
+    "seen": 1794856080.5801034,
+    "ast_hash": "ca818a40c4e87f04eb6ac073df17fb47",
+    "semantic_hash": ""
+  },
+  "src/hooks/forms/teamFormData.test.ts": {
+    "mtime": 1794855696.7348123,
+    "seen": 1794856080.5830564,
+    "ast_hash": "599c5bfaff89063068acffd2b35c45de",
+    "semantic_hash": ""
+  },
+  "src/hooks/forms/useTransientMessage.ts": {
+    "mtime": 1794856032.764924,
+    "seen": 1794856080.5830603,
+    "ast_hash": "adaa84105eb4f846cf4e19f6542008ab",
+    "semantic_hash": ""
+  },
+  "src/utils/formDataEquals.test.ts": {
+    "mtime": 1794856032.8097408,
+    "seen": 1794856080.5909176,
+    "ast_hash": "71568601baf6811ab0739c5502ef3e57",
+    "semantic_hash": ""
+  },
+  "src/utils/formDataEquals.ts": {
+    "mtime": 1794856032.7953074,
+    "seen": 1794856080.5909195,
+    "ast_hash": "7053bee972a4c2a21afad4dcab5bbed0",
     "semantic_hash": ""
   }
 }

@@ -174,7 +174,7 @@ const TeamFormContent = ({
       />
 
       <FormFooter>
-        <FormMessages error={error} success={success} color={color} />
+        <FormMessages error={error} color={color} />
         <div className="flex w-4/5 flex-row justify-center gap-3">
           <ClearButton
             isSubmitting={isSubmitting}
@@ -183,7 +183,12 @@ const TeamFormContent = ({
           >
             Очистити
           </ClearButton>
-          <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
+          <SubmitButton
+            isSubmitting={isSubmitting}
+            form={formId}
+            color={color}
+            message={success}
+          >
             {submitLabel}
           </SubmitButton>
         </div>

@@ -4,6 +4,7 @@ import type {
   TeamType,
   TeamMemberRow,
 } from "@/types";
+import { isSameFormData } from "@/utils/formDataEquals";
 
 export type TeamFormMode = "create" | "edit";
 
@@ -85,3 +86,23 @@ export const buildTeamRequestBody = (
   else if (isEdit && form.icon === null) formData.append("icon", "");
   return formData;
 };
+
+/** Body of the roster request: which member holds which role in the team. */
+export const toTeamMembersBody = (rows: TeamMemberRow[]) =>
+  rows.map(({ memberId, roleId, roleName }) => ({
+    memberId: memberId!,
+    ...(roleId ? { roleId } : { roleName: roleName.trim() }),
+  }));
+
+// Roster rows as a sorted list, so reordering rows is not a change.
+const rosterKey = (rows: TeamMemberRow[]) =>
+  toTeamMembersBody(rows).map((row) => JSON.stringify(row)).sort();
+
+/** True when saving `form` would send exactly what `baseline` already holds. */
+export const isSameTeamForm = (form: TeamFormData, baseline: TeamFormData) =>
+  isSameFormData(
+    buildTeamRequestBody(form, "edit"),
+    buildTeamRequestBody(baseline, "edit"),
+  ) &&
+  JSON.stringify(rosterKey(form.members)) ===
+    JSON.stringify(rosterKey(baseline.members));

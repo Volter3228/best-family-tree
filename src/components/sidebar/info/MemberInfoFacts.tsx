@@ -38,7 +38,10 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
       {format(date, "dd.LL.yyyy")}
       {years > 0 && (
         <span
-          className={twMerge("whitespace-nowrap text-sm font-medium", COLOR_CLASSES[color].text)}
+          className={twMerge(
+            "whitespace-nowrap text-sm font-medium",
+            COLOR_CLASSES[color].text,
+          )}
         >
           {" · "}
           {formatCount(years, YEAR_FORMS)}
@@ -68,7 +71,9 @@ const MemberInfoFacts = ({
           icon={StarIcon}
           color={color}
           fullWidth={fullWidth}
-          onClick={mentorClickable ? () => onMemberNameClick?.(mentor.id) : undefined}
+          onClick={
+            mentorClickable ? () => onMemberNameClick?.(mentor.id) : undefined
+          }
         >
           <span
             className={twMerge(
@@ -86,7 +91,12 @@ const MemberInfoFacts = ({
   tiles.push({
     key: "joined",
     render: (fullWidth) => (
-      <MemberFactTile label="Член з" icon={UserPlusIcon} color={color} fullWidth={fullWidth}>
+      <MemberFactTile
+        label="Учасник з"
+        icon={UserPlusIcon}
+        color={color}
+        fullWidth={fullWidth}
+      >
         <DateWithYears date={joinedAt} color={color} />
       </MemberFactTile>
     ),
@@ -127,7 +137,9 @@ const MemberInfoFacts = ({
           icon={PhoneIcon}
           color={color}
           fullWidth={fullWidth}
-          action={<MemberInfoCopy valueToCopy={phoneNumbers[0]} color={color} />}
+          action={
+            <MemberInfoCopy valueToCopy={phoneNumbers[0]} color={color} />
+          }
         >
           {phoneNumbers[0]}
         </MemberFactTile>

@@ -12,12 +12,14 @@ import apiDeleteMember from "@/api/deleteMember";
 import { getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
 import type { MemberFormData, AccentColor } from "@/types";
+import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { MemberFormFields } from "./fields";
 import FormError from "./FormError";
 import { describeSubmitError } from "./describeSubmitError";
-import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
+import { isSameFormData } from "@/utils/formDataEquals";
+import { MEMBER_FORM_DEFAULTS, NO_CHANGES_MESSAGE } from "@/constants/form";
 import { SubmitButton, ClearButton } from "./buttons";
-import { buildMemberFormData } from "./buildMemberFormData";
+import { buildEditPayload, getInitialFormData } from "./editMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
 import FormFooter from "./FormFooter";
 import { DeleteMemberButton, DeleteMemberPrompt } from "./MemberDeleteControls";
@@ -29,39 +31,6 @@ interface Props {
   onDeleted?: () => void;
   color?: AccentColor;
 }
-
-const getInitialFormData = (member: Member): MemberFormData => {
-  const nameParts = member.name.split(" ");
-  const firstName = nameParts[0] || "";
-  const lastName = nameParts.slice(1).join(" ") || "";
-
-  return {
-    firstName,
-    lastName,
-    birthday: member.birthday,
-    joinedAt: member.joinedAt ? new Date(member.joinedAt) : null,
-    mentorId: member.mentorId || "",
-    status: member.status || "",
-    gender: member.gender,
-    phoneNumber: member.phoneNumbers[0] || "",
-    email: member.email || "",
-    photo: member.photo,
-    telegramLink: member.telegramLink || "",
-    instagramLink: member.instagramLink || "",
-    facebookLink: member.facebookLink || "",
-    linkedinLink: member.linkedinLink || "",
-    positions: (member.positions || []).map((p) => ({
-      id: crypto.randomUUID(),
-      roleId: p.roleId,
-      roleName: p.role?.name || "",
-      teamTypeId: p.team?.teamTypeId || undefined,
-      teamName: p.team?.name || undefined,
-      organization: p.organization || undefined,
-      startYear: p.startYear || undefined,
-      endYear: p.endYear || undefined,
-    })),
-  };
-};
 
 const EditMemberForm = ({
   member,
@@ -77,6 +46,7 @@ const EditMemberForm = ({
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [success, showSuccess, hideSuccess] = useTransientMessage();
   // "confirm": asking before deleting. "blocked": explaining why deleting is not possible.
   const [deletePrompt, setDeletePrompt] = useState<
     "confirm" | "blocked" | null
@@ -105,6 +75,14 @@ const EditMemberForm = ({
 
     setErrors({});
     setFormError(null);
+    hideSuccess();
+    if (
+      isSameFormData(buildEditPayload(form), buildEditPayload(initialFormData))
+    ) {
+      showSuccess(NO_CHANGES_MESSAGE);
+      return;
+    }
+
     const validationErrors = validateMemberForm(
       form,
       mentorsList,
@@ -117,12 +95,7 @@ const EditMemberForm = ({
     }
 
     setIsSubmitting(true);
-    // buildMemberFormData skips null photo; send "" explicitly to request removal.
-    const formData = buildMemberFormData(form);
-
-    if (!form.photo) {
-      formData.append("photo", "");
-    }
+    const formData = buildEditPayload(form);
 
     try {
       const updatedMember = await apiEditMember(member.id, formData);
@@ -132,7 +105,7 @@ const EditMemberForm = ({
         reloadRoles();
         reloadTeams();
         reloadTeamTypes();
-        onExit();
+        showSuccess("Збережено");
       }
     } catch (error) {
       const { field, message } = describeSubmitError(
@@ -222,6 +195,7 @@ const EditMemberForm = ({
                 isSubmitting={isSubmitting}
                 form={formId}
                 color={color}
+                message={success}
               >
                 {submitLabel}
               </SubmitButton>
