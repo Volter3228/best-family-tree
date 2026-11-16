@@ -10,3 +10,4 @@ export * from "./useTeamSelection";
 export * from "./useSceneTransition";
 export * from "./useTreeDirection";
 export * from "./useViewportCulling";
+export * from "./useProgressiveIds";

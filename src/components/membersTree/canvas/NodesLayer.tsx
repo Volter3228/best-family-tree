@@ -1,4 +1,5 @@
 import { memo, useMemo } from "react";
+import { useProgressiveIds } from "@/hooks";
 import { Member } from "@/models";
 import { getMemberTeamRoles, parseTeamNodeId } from "@/utils";
 import type { MemberNode } from "@/types";
@@ -32,28 +33,34 @@ const NodesLayer = ({
     [nodes, isTeamView],
   );
 
+  // Mount new nodes over a few frames instead of one long task.
+  const ids = useMemo(() => entries.map((e) => e.node.id), [entries]);
+  const admitted = useProgressiveIds(ids);
+
   return (
     <pixiContainer>
-      {entries.map(({ node, teamId, teamRole }) => {
-        const isSelected =
-          selectedId === node.data.member.id &&
-          (!teamId || !selectedTeamId || selectedTeamId === teamId);
+      {entries
+        .filter((e) => admitted.has(e.node.id))
+        .map(({ node, teamId, teamRole }) => {
+          const isSelected =
+            selectedId === node.data.member.id &&
+            (!teamId || !selectedTeamId || selectedTeamId === teamId);
 
-        return (
-          <PixiMemberNode
-            key={node.id}
-            nodeId={node.id}
-            x={node.position.x}
-            y={node.position.y}
-            member={node.data.member}
-            placeholderColorIndex={node.data.placeholderColorIndex}
-            isSelected={isSelected}
-            teamRole={teamRole}
-            teamId={teamId}
-            onClick={onNodeClick}
-          />
-        );
-      })}
+          return (
+            <PixiMemberNode
+              key={node.id}
+              nodeId={node.id}
+              x={node.position.x}
+              y={node.position.y}
+              member={node.data.member}
+              placeholderColorIndex={node.data.placeholderColorIndex}
+              isSelected={isSelected}
+              teamRole={teamRole}
+              teamId={teamId}
+              onClick={onNodeClick}
+            />
+          );
+        })}
     </pixiContainer>
   );
 };
