@@ -1,3 +1,4 @@
 graphify-out/graph.json -diff
 graphify-out/graph.html -diff
 graphify-out/cache/** -diff
+* text=auto eol=lf
