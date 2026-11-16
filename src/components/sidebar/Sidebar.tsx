@@ -26,6 +26,9 @@ interface Props {
   // The header overlays the top of the content (e.g. a cover) instead of
   // taking its own row. Ignored while the mobile card is minimized.
   floatingHeader?: boolean;
+  // Content always takes the full available height instead of following its
+  // own, so switching views inside it never resizes the card.
+  fillHeight?: boolean;
   isOpen: boolean;
   color?: AccentColor;
   onClose: () => void;
@@ -46,6 +49,7 @@ const Sidebar = ({
   isOpen,
   headerTitle = "Sidebar Header",
   floatingHeader = false,
+  fillHeight = false,
   color = "blue",
   onClose,
   onEditClick,
@@ -105,6 +109,7 @@ const Sidebar = ({
     contentOuterRef,
     contentInnerRef,
     canAnimateHeightRef,
+    !fillHeight,
   );
   useSidebarChromeHeights(cardElement, headerElement, footerElement);
 
@@ -176,7 +181,8 @@ const Sidebar = ({
               <div
                 ref={contentOuterRef}
                 className={twMerge(
-                  "sidebar-content h-full min-h-0 overflow-y-auto",
+                  "sidebar-content min-h-0 overflow-y-auto",
+                  fillHeight ? "sidebar-content--fill" : "h-full",
                   headerFloats && "sidebar-content--under-header",
                 )}
                 style={contentStyle}

@@ -19,10 +19,11 @@
    by useSidebarChromeHeights) plus the root's padding: 0.5rem top and 6rem
    bottom (room for the toolbar) on mobile, 1rem each side from md. */
 .sidebar-content {
-  max-height: calc(
+  --sidebar-content-max: calc(
     100dvh - 6.5rem - var(--sidebar-header-height, 0px) -
       var(--sidebar-footer-height, 0px)
   );
+  max-height: var(--sidebar-content-max);
   overflow-y: auto;
   overflow-anchor: none;
   scrollbar-gutter: stable;
@@ -31,11 +32,17 @@
 
 @media (min-width: 768px) {
   .sidebar-content {
-    max-height: calc(
+    --sidebar-content-max: calc(
       100dvh - 2rem - var(--sidebar-header-height, 0px) -
         var(--sidebar-footer-height, 0px)
     );
   }
+}
+
+/* Forms: always the tallest the card may be, so switching tabs never resizes
+   it and the footer actions stay pinned to the bottom. */
+.sidebar-content--fill {
+  height: var(--sidebar-content-max);
 }
 
 /* A floating header overlays the content, so it takes no room of its own. */

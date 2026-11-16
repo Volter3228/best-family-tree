@@ -7,15 +7,18 @@ export function useSidebarHeightAnimation(
   // Height changes only animate while this is true (the sidebar is settled
   // open); while it slides in or out the height follows the content instantly.
   canAnimateRef: React.RefObject<boolean>,
+  // Off: the content's height is set by CSS and this hook stays out of it.
+  enabled = true,
 ) {
   const hasMountedRef = useRef(false);
   const heightTweenRef = useRef<gsap.core.Tween | null>(null);
   const lastHeightRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!innerRef.current || !outerRef.current) return;
+    if (!enabled || !innerRef.current || !outerRef.current) return;
     const inner = innerRef.current;
     const outer = outerRef.current;
+    hasMountedRef.current = false;
 
     const clampScrollTop = () => {
       const maxScroll = Math.max(0, outer.scrollHeight - outer.clientHeight);
@@ -77,6 +80,7 @@ export function useSidebarHeightAnimation(
       heightTweenRef.current?.kill();
       heightTweenRef.current = null;
       outer.classList.remove("sidebar-height-animating");
+      gsap.set(outer, { clearProps: "height" });
     };
-  }, [innerRef, outerRef, canAnimateRef]);
+  }, [innerRef, outerRef, canAnimateRef, enabled]);
 }

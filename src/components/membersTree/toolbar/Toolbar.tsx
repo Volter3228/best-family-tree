@@ -158,6 +158,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
       {editable && (
         <Sidebar
           headerTitle="Керування"
+          fillHeight
           onClose={closeSidebar}
           isOpen={isSidebarOpen}
           color="blue"
