@@ -56,11 +56,25 @@ const applyHiddenDeferred = (card: Container): void => {
 interface Props {
   cardRef: RefObject<Container | null>;
   memberId: string;
+  // The card mounts late, right after cards were revealed: play the reveal.
+  animateIn?: boolean;
 }
+
+const revealOptions = (delay: number) => ({
+  delay,
+  collapsedScaleX: COLLAPSED_SCALE_X,
+  collapsedScaleY: COLLAPSED_SCALE_Y,
+  slideStartY: SLIDE_START_Y,
+  restY: CARD_PIVOT_Y,
+});
 
 // Hides/shows the card as the tree zooms. It listens to the store signal instead
 // of taking a prop, so crossing the zoom threshold does not re-render every node.
-export const useCardAnimation = ({ cardRef, memberId }: Props) => {
+export const useCardAnimation = ({
+  cardRef,
+  memberId,
+  animateIn = false,
+}: Props) => {
   const delay = useMemo(() => getCardAnimDelay(memberId), [memberId]);
 
   useLayoutEffect(() => {
@@ -72,7 +86,14 @@ export const useCardAnimation = ({ cardRef, memberId }: Props) => {
       ? "hidden"
       : "shown";
     if (applied === "hidden") applyHidden(card);
-    else applyShown(card);
+    else if (animateIn) {
+      card.visible = true;
+      registerCardReveal(card, {
+        direction: "show",
+        finalize: applyShown,
+        ...revealOptions(delay),
+      });
+    } else applyShown(card);
 
     // Only animate on actual visibility transitions
     const unsubscribe = cardsHiddenSignal.subscribe((shouldBeHidden) => {
@@ -83,12 +104,8 @@ export const useCardAnimation = ({ cardRef, memberId }: Props) => {
       if (!shouldBeHidden) card.visible = true;
       registerCardReveal(card, {
         direction: shouldBeHidden ? "hide" : "show",
-        delay,
         finalize: shouldBeHidden ? applyHiddenDeferred : applyShown,
-        collapsedScaleX: COLLAPSED_SCALE_X,
-        collapsedScaleY: COLLAPSED_SCALE_Y,
-        slideStartY: SLIDE_START_Y,
-        restY: CARD_PIVOT_Y,
+        ...revealOptions(delay),
       });
     });
 
@@ -96,5 +113,5 @@ export const useCardAnimation = ({ cardRef, memberId }: Props) => {
       unsubscribe();
       finishCardReveal(card);
     };
-  }, [delay, cardRef]);
+  }, [delay, cardRef, animateIn]);
 };

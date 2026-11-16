@@ -1,12 +1,7 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { Container, FederatedPointerEvent, Rectangle } from "pixi.js";
-import {
-  useTapWithoutDrag,
-  useHoverNodeAnimation,
-  useCardAnimation,
-  CARD_PIVOT_X,
-  CARD_PIVOT_Y,
-} from "@/hooks";
+import { useTapWithoutDrag, useHoverNodeAnimation } from "@/hooks";
+import { registerLazyCard } from "@/hooks/membersTree/animations/lazyCardDriver";
 import { Member } from "@/models";
 import { zoomedOutSignal } from "@/store/treeSignals";
 import {
@@ -17,7 +12,7 @@ import {
 } from "@/constants/canvas";
 import MemberNodeAvatar from "./MemberNodeAvatar";
 import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
-import MemberNodeCard from "./MemberNodeCard";
+import MemberNodeCardSlot from "./MemberNodeCardSlot";
 import MemberNodeGlow from "./MemberNodeGlow";
 import MemberNodeBirthday from "./MemberNodeBirthday";
 
@@ -56,7 +51,6 @@ const AVATAR_HIT_AREA = new Rectangle(
 const CONTENT_CENTER_X = NODE_WIDTH / 2;
 const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
 const NODE_PIVOT = { x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y };
-const CARD_PIVOT = { x: CARD_PIVOT_X, y: CARD_PIVOT_Y };
 // Each hovered node rises above the previous one and stays there: dropping the
 // zIndex on leave would sort every sibling again.
 let hoverOrder = 10;
@@ -75,16 +69,22 @@ const MemberNode = ({
   const [isHovered, setIsHovered] = useState(false);
   const [hoverZIndex, setHoverZIndex] = useState(0);
   const containerRef = useRef<Container>(null);
-  const cardRef = useRef<Container>(null);
 
   const { glowMounted, shouldShowGlow } = useHoverNodeAnimation({
     container: containerRef.current,
     isHovered,
     isSelected,
   });
-  // Zoom thresholds reach the node through store signals, not props: a prop
-  // would re-render every node (culled or not) in the frame it flips.
-  useCardAnimation({ cardRef, memberId: member.id });
+  // The card is built only once it is first needed (see lazyCardDriver).
+  const [cardMode, setCardMode] = useState<"none" | "shown" | "reveal">("none");
+  const isCardPending = cardMode === "none";
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!isCardPending || !container) return;
+    return registerLazyCard(container, (animate) =>
+      setCardMode(animate ? "reveal" : "shown"),
+    );
+  }, [isCardPending]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -184,17 +184,17 @@ const MemberNode = ({
         {glowMounted && (
           <MemberNodeGlow kind="avatar" active={shouldShowGlow} />
         )}
-        <pixiContainer ref={cardRef} pivot={CARD_PIVOT} x={CARD_PIVOT_X}>
-          {glowMounted && (
-            <MemberNodeGlow kind="card" active={shouldShowGlow} />
-          )}
-          <MemberNodeCard
+        {cardMode !== "none" && (
+          <MemberNodeCardSlot
             member={member}
             isSelected={isSelected}
             placeholderColorIndex={placeholderColorIndex}
             teamRole={teamRole}
+            glowMounted={glowMounted}
+            shouldShowGlow={shouldShowGlow}
+            animateIn={cardMode === "reveal"}
           />
-        </pixiContainer>
+        )}
 
         <MemberNodeAvatar
           nodeId={nodeId}
