@@ -29,8 +29,13 @@ export const createIdentityFactory = (
   const emails = new Set<string>();
   const handles = lower(avoid.handles ?? []);
 
-  const person = () => {
-    const sex = faker.person.sexType();
+  // A stored gender picks the matching name forms; otherwise a random one.
+  const person = (gender?: "MALE" | "FEMALE" | null) => {
+    const sex = gender
+      ? gender === "MALE"
+        ? "male"
+        : "female"
+      : faker.person.sexType();
     for (let i = 0; i < MAX_TRIES; i++) {
       const firstName = faker.person.firstName(sex);
       const lastName = faker.person.lastName(sex);

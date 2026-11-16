@@ -25,6 +25,7 @@ import {
 import SocialMediaFields from "./SocialMediaFormFields";
 import PositionFormFields from "./position/PositionFormFields";
 import FieldError from "./FieldError";
+import GenderFormField from "./GenderFormField";
 
 interface Props {
   form: MemberFormData;
@@ -152,6 +153,13 @@ const MemberFormFields = ({
           />
           <FieldError message={errors.joinedAt} color={color} />
         </div>
+      </div>
+      <div className="flex flex-row w-full">
+        <GenderFormField
+          value={form.gender}
+          onChange={(gender) => setForm({ ...form, gender })}
+          color={color}
+        />
       </div>
       <div className="flex flex-row flex-1 gap-2 w-full">
         <div className="flex flex-col flex-1 relative">

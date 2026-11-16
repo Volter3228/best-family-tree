@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDropdownPosition } from "@/hooks";
 import type { AccentColor, DropdownOption } from "@/types";
 import DropdownMenu from "@/components/common/DropdownMenu";
@@ -29,6 +29,7 @@ const ComboboxInput = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [showActive, setShowActive] = useState(false);
   const {
     isOpen,
     setIsOpen,
@@ -49,6 +50,7 @@ const ComboboxInput = ({
 
   const handleFocus = () => {
     updateDropdownPosition();
+    setShowActive(false);
     setIsOpen(true);
   };
 
@@ -93,7 +95,12 @@ const ComboboxInput = ({
         color={color}
         onFocus={handleFocus}
         onChange={handleInputChange}
-        onKeyDown={(event) => handleKeyDown(event, dropUp)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            setShowActive(true);
+          }
+          handleKeyDown(event, dropUp);
+        }}
       />
       {(isOpen || isClosing) && (
         <DropdownMenu
@@ -106,6 +113,8 @@ const ComboboxInput = ({
           position={dropdownPos}
           menuRef={menuRef}
           color={color}
+          showActive={showActive}
+          onMouseMove={() => setShowActive(false)}
           onSelect={selectOption}
         />
       )}

@@ -1,6 +1,7 @@
 import { getMonth, getYear } from "date-fns";
 import {
   type Member as MemberType,
+  type Gender,
   type RecruitmentSeason,
   type RecruitmentTerm,
   type MemberPosition,
@@ -44,6 +45,7 @@ export default class Member {
   instagramLink: string | null;
   joinedAt: Date;
   linkedinLink: string | null;
+  gender: Gender | null;
   mentorId: string | null;
   name: string;
   phoneNumbers: string[];
@@ -67,6 +69,7 @@ export default class Member {
     instagramLink,
     joinedAt,
     linkedinLink,
+    gender,
     mentorId,
     name,
     phoneNumbers,
@@ -87,6 +90,7 @@ export default class Member {
     this.instagramLink = instagramLink;
     this.joinedAt = joinedAt;
     this.linkedinLink = linkedinLink;
+    this.gender = gender ?? null;
     this.mentorId = mentorId;
     this.name = name;
     this.phoneNumbers = phoneNumbers;

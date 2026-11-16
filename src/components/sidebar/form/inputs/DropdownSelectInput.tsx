@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
 import { useDropdown, useDropdownPosition } from "@/hooks";
@@ -32,6 +32,7 @@ const DropdownSelectInput = ({
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
+  const [showActive, setShowActive] = useState(false);
 
   const {
     isOpen,
@@ -55,6 +56,7 @@ const DropdownSelectInput = ({
 
   const handleInputFocus = () => {
     updateDropdownPosition();
+    setShowActive(false);
     setIsOpen(true);
   };
 
@@ -90,7 +92,10 @@ const DropdownSelectInput = ({
           readOnly={!autoComplete}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          onKeyDown={(e) => handleKeyDown(e, dropUp)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") setShowActive(true);
+            handleKeyDown(e, dropUp);
+          }}
           autoComplete="off"
           className={twMerge(
             "block w-full px-3 py-2 rounded-xl shadow-inner font-light bg-surface",
@@ -113,6 +118,8 @@ const DropdownSelectInput = ({
             menuRef={menuRef}
             color={color}
             selectedValue={inputValue}
+            showActive={showActive}
+            onMouseMove={() => setShowActive(false)}
             listClassName="drop-shadow-2xl"
             onSelect={handleOptionSelect}
           />

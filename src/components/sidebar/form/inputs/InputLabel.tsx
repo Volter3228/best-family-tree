@@ -4,7 +4,8 @@ import type { AccentColor } from "@/types";
 
 interface Props {
   label: string;
-  htmlFor: string;
+  // Omitted for controls that are not a single input (e.g. a segmented switch).
+  htmlFor?: string;
   required: boolean;
   onClick?: () => void;
   color?: AccentColor;

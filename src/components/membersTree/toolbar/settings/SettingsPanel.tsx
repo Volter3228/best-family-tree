@@ -1,81 +1,19 @@
-import {
-  ArrowDownIcon,
-  ArrowPathIcon,
-  ArrowRightIcon,
-  ComputerDesktopIcon,
-  MoonIcon,
-  SunIcon,
-} from "@heroicons/react/24/outline";
 import SegmentedSwitch from "@/components/ui/SegmentedSwitch";
-import { useSettingsStore } from "@/store/settingsStore";
-import type { EdgeStyle, OrientationSetting, ThemePreference } from "@/types";
+import { DEFAULT_SETTINGS, useSettingsStore } from "@/store/settingsStore";
+import { useFiltersStore } from "@/store/filtersStore";
 import ToolbarPanel from "../ToolbarPanel";
+import PanelResetButton from "../PanelResetButton";
+import {
+  EDGE_STYLE_OPTIONS,
+  ORIENTATION_OPTIONS,
+  THEME_OPTIONS,
+  TREE_MODE_OPTIONS,
+} from "./settingsOptions";
 
 interface Props {
   isOpen: boolean;
   isClosing: boolean;
 }
-
-const iconClass = "h-4 w-4 shrink-0";
-
-const THEME_OPTIONS = [
-  {
-    value: "system",
-    label: "Системна",
-    icon: <ComputerDesktopIcon className={iconClass} />,
-  },
-  { value: "light", label: "Світла", icon: <SunIcon className={iconClass} /> },
-  { value: "dark", label: "Темна", icon: <MoonIcon className={iconClass} /> },
-] satisfies { value: ThemePreference; label: string; icon: React.ReactNode }[];
-
-const ORIENTATION_OPTIONS = [
-  {
-    value: "auto",
-    label: "Авто",
-    icon: <ArrowPathIcon className={iconClass} />,
-  },
-  { value: "tb", label: "Вниз", icon: <ArrowDownIcon className={iconClass} /> },
-  {
-    value: "lr",
-    label: "Праворуч",
-    icon: <ArrowRightIcon className={iconClass} />,
-  },
-] satisfies {
-  value: OrientationSetting;
-  label: string;
-  icon: React.ReactNode;
-}[];
-
-const edgeIcon = (d: string) => (
-  <svg
-    viewBox="0 0 16 16"
-    className="h-4 w-4 shrink-0"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d={d} />
-  </svg>
-);
-
-const EDGE_STYLE_OPTIONS = [
-  {
-    value: "orthogonal",
-    label: "Кутові",
-    icon: edgeIcon(
-      "M1.5 12.5 L6.5 12.5 Q8.5 12.5 8.5 10.5 L8.5 5.5 Q8.5 3.5 10.5 3.5 L14.5 3.5",
-    ),
-  },
-  {
-    value: "bezier",
-    label: "Плавні",
-    icon: edgeIcon("M1.5 11 C5 3, 11 13, 14.5 5"),
-  },
-  { value: "straight", label: "Прямі", icon: edgeIcon("M1.5 12.5 L14.5 3.5") },
-] satisfies { value: EdgeStyle; label: string; icon: React.ReactNode }[];
 
 interface SectionProps {
   title: string;
@@ -100,8 +38,21 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
   const setOrientation = useSettingsStore((s) => s.setOrientation);
   const setEdgeStyle = useSettingsStore((s) => s.setEdgeStyle);
   const resetSettings = useSettingsStore((s) => s.resetSettings);
+  const treeMode = useFiltersStore((s) => s.appliedFilters.treeMode);
+  const setTreeMode = useFiltersStore((s) => s.setTreeMode);
 
   if (!isOpen) return null;
+
+  const isDefault =
+    theme === DEFAULT_SETTINGS.theme &&
+    orientation === DEFAULT_SETTINGS.orientation &&
+    edgeStyle === DEFAULT_SETTINGS.edgeStyle &&
+    treeMode === "family";
+
+  const handleReset = () => {
+    resetSettings();
+    setTreeMode("family");
+  };
 
   return (
     <ToolbarPanel isClosing={isClosing} className="flex flex-col max-h-[60vh]">
@@ -109,20 +60,27 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
         <span className="text-base font-semibold text-foreground">
           Налаштування
         </span>
-        <button
-          type="button"
-          onClick={resetSettings}
-          className="text-sm text-accent-green transition-colors hover:opacity-70"
-        >
-          Скинути
-        </button>
+        <PanelResetButton
+          label="Скинути налаштування"
+          disabled={isDefault}
+          onClick={handleReset}
+        />
       </div>
       <div
-        className="overflow-y-auto overflow-x-hidden flex-1 transparent"
+        className="overflow-y-auto overscroll-contain overflow-x-hidden flex-1 transparent"
         style={
           { "--scroll-color": "var(--accent-green)" } as React.CSSProperties
         }
       >
+        <Section title="Розмітка дерева">
+          <SegmentedSwitch
+            options={TREE_MODE_OPTIONS}
+            value={treeMode}
+            onChange={setTreeMode}
+            ariaLabel="Розмітка дерева"
+            color="green"
+          />
+        </Section>
         <Section title="Тема">
           <SegmentedSwitch
             options={THEME_OPTIONS}

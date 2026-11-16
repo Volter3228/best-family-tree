@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { EMPTY_FILTER_STATE } from "@/constants/filters";
 import { computeFilteredMembers, type FilteredMembers } from "@/utils/filters";
 import { useMembersStore } from "./membersStore";
-import type { FilterState } from "@/types";
+import type { FilterState, TreeMode } from "@/types";
 
 interface FiltersState extends FilteredMembers {
   /** Draft filters edited in the panel (not yet applied). */
@@ -15,7 +15,12 @@ interface FiltersState extends FilteredMembers {
 interface FiltersActions {
   setDraftFilters: (next: FilterState | ((prev: FilterState) => FilterState)) => void;
   applyFilters: () => void;
+  /** Drops draft edits: the draft goes back to the applied filters. */
+  discardDraft: () => void;
+  /** Clears every criterion in the draft and the applied filters; keeps the layout. */
   resetFilters: () => void;
+  /** Switches the layout at once, leaving other draft edits pending. */
+  setTreeMode: (treeMode: TreeMode) => void;
   /** Applies filters read from the URL (draft and applied together). */
   applyUrlFilters: (filters: FilterState) => void;
 }
@@ -31,7 +36,7 @@ const initialState: FiltersState = {
 };
 
 export const useFiltersStore = create<FiltersState & FiltersActions>(
-  (set, get) => ({
+  (set) => ({
     ...initialState,
 
     setDraftFilters: (next) =>
@@ -47,14 +52,35 @@ export const useFiltersStore = create<FiltersState & FiltersActions>(
         ...derive(state.draftFilters, state),
       })),
 
-    // Clearing the criteria keeps the chosen layout.
+    discardDraft: () =>
+      set((state) => ({ draftFilters: state.appliedFilters })),
+
     resetFilters: () =>
-      set((state) => ({
-        draftFilters: {
+      set((state) => {
+        const cleared = {
           ...EMPTY_FILTER_STATE,
-          treeMode: state.draftFilters.treeMode,
-        },
-      })),
+          treeMode: state.appliedFilters.treeMode,
+        };
+        return {
+          draftFilters: cleared,
+          appliedFilters: cleared,
+          filterVersion: state.filterVersion + 1,
+          ...derive(cleared, state),
+        };
+      }),
+
+    setTreeMode: (treeMode) =>
+      set((state) => {
+        if (state.appliedFilters.treeMode === treeMode) return state;
+        const applied = { ...state.appliedFilters, treeMode };
+        return {
+          draftFilters: { ...state.draftFilters, treeMode },
+          appliedFilters: applied,
+          // Same refit as an apply that changes the layout.
+          filterVersion: state.filterVersion + 1,
+          ...derive(applied, state),
+        };
+      }),
 
     applyUrlFilters: (filters) =>
       set((state) => ({

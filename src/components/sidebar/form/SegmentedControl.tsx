@@ -9,7 +9,7 @@ export interface SegmentOption<T extends string> {
 
 interface Props<T extends string> {
   options: readonly SegmentOption<T>[];
-  value: T;
+  value: T | null;
   onChange: (value: T) => void;
   color?: AccentColor;
   className?: string;

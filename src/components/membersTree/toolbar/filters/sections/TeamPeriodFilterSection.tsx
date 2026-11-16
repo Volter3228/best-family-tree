@@ -3,44 +3,38 @@ import YearRangeFilterSection from "./YearRangeFilterSection";
 import FilterCheckbox from "./FilterCheckbox";
 
 interface Props {
-  isOpen: boolean;
   filters: FilterState;
   onChange: (patch: Partial<FilterState>) => void;
-  onToggle: () => void;
 }
 
-// Teams whose years overlap the chosen year(s); "Активні" keeps only teams
-// that are still running.
-const TeamPeriodFilterSection = ({
-  filters,
-  onChange,
-  isOpen,
-  onToggle,
-}: Props) => (
-  <YearRangeFilterSection
-    title="Період активності"
-    isOpen={isOpen}
-    onToggle={onToggle}
-    hasActiveValue={
-      filters.teamYearFrom !== null ||
-      filters.teamYearTo !== null ||
-      filters.teamOnlyOngoing
+// Teams whose years overlap the chosen year(s). "Активні зараз" keeps only
+// teams still running, which makes the years meaningless, so it greys them out.
+const TeamPeriodFilterSection = ({ filters, onChange }: Props) => {
+  const { teamOnlyOngoing } = filters;
+
+  const toggleOngoing = () => {
+    if (teamOnlyOngoing) {
+      onChange({ teamOnlyOngoing: false });
+    } else {
+      onChange({ teamOnlyOngoing: true, teamYearFrom: null, teamYearTo: null });
     }
-    value={{
-      from: filters.teamYearFrom,
-      to: filters.teamYearTo,
-      isRange: filters.teamYearRange,
-    }}
-    onChange={({ from, to, isRange }) =>
-      onChange({ teamYearFrom: from, teamYearTo: to, teamYearRange: isRange })
-    }
-  >
-    <FilterCheckbox
-      checked={filters.teamOnlyOngoing}
-      onChange={() => onChange({ teamOnlyOngoing: !filters.teamOnlyOngoing })}
-      label="Активні"
+  };
+
+  return (
+    <YearRangeFilterSection
+      title="Період активності"
+      disabled={teamOnlyOngoing}
+      leading={
+        <FilterCheckbox
+          checked={teamOnlyOngoing}
+          onChange={toggleOngoing}
+          label="Активні зараз"
+        />
+      }
+      value={{ from: filters.teamYearFrom, to: filters.teamYearTo }}
+      onChange={({ from, to }) => onChange({ teamYearFrom: from, teamYearTo: to })}
     />
-  </YearRangeFilterSection>
-);
+  );
+};
 
 export default TeamPeriodFilterSection;

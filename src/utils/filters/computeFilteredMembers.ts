@@ -1,7 +1,6 @@
 import type { Member } from "@/models";
-import type { ChildrenMap, FilterState, MembersMap } from "@/types";
+import type { FilterState } from "@/types";
 import { memberMatchesFilters, isFilterActive } from "./filterMembers";
-import { computeLineageBranchIds } from "../membersTree/lineageBranch";
 import {
   countVisibleTeams,
   getTeamTreeNodeIds,
@@ -15,8 +14,6 @@ export interface FilteredMembers {
 
 interface Source {
   members: Member[];
-  byId: MembersMap;
-  childrenOf: ChildrenMap;
 }
 
 const areSetsEqual = (a: Set<string>, b: Set<string>) => {
@@ -32,7 +29,7 @@ const areSetsEqual = (a: Set<string>, b: Set<string>) => {
  */
 export const computeFilteredMembers = (
   filters: FilterState,
-  { members, byId, childrenOf }: Source,
+  { members }: Source,
   previous: FilteredMembers | null,
 ): FilteredMembers => {
   const active = isFilterActive(filters);
@@ -43,26 +40,14 @@ export const computeFilteredMembers = (
 
   let ids: Set<string> | null = null;
   if (active) {
-    const lineageIds = filters.lineageMemberId
-      ? computeLineageBranchIds(byId, childrenOf, filters.lineageMemberId)
-      : null;
-
     ids = new Set<string>();
     for (const member of members) {
       if (
         memberMatchesFilters(member, filters) &&
-        (!lineageIds || lineageIds.has(member.id)) &&
         (!teamTreeNodeIds || teamTreeNodeIds.has(member.id))
       ) {
         ids.add(member.id);
       }
-    }
-
-    // The lineage focus member stays whatever the other filters say (but it
-    // still has to be part of the team tree in team view).
-    const focusId = filters.lineageMemberId;
-    if (focusId && (!teamTreeNodeIds || teamTreeNodeIds.has(focusId))) {
-      ids.add(focusId);
     }
 
     const prevIds = previous?.filteredMemberIds;

@@ -15,7 +15,7 @@ const FlowerIcon = ({ className, style }: Props) => (
         transform={`rotate(${angle} 12 12)`}
       />
     ))}
-    <circle cx="12" cy="12" r="2.6" fill="var(--surface)" fillOpacity="0.85" />
+    <circle cx="12" cy="12" r="2.6" fill="var(--flower-center, var(--surface))" fillOpacity="0.85" />
   </svg>
 );
 

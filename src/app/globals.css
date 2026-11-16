@@ -26,6 +26,8 @@
   --color-surface-blue: var(--surface-blue);
   --color-surface-green: var(--surface-green);
   --color-surface-orange: var(--surface-orange);
+  /* Light green fill and dark green text for small labels (counts, chips). */
+  --color-accent-green-soft: var(--accent-green-soft);
 
   /* Animations */
   --animate-sidebar-slide-in: sidebar-slide-in 0.25s ease-out forwards;
@@ -54,6 +56,7 @@
     --surface-blue: hsl(203 100% 97.5%);
     --surface-green: hsl(87 74% 96.5%);
     --surface-orange: hsl(37 99% 97.5%);
+    --accent-green-soft: hsl(87 55% 87%);
 
     /* Gradients */
     --primary-gradient-start: hsl(203 100% 43%);
@@ -68,6 +71,10 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
     font-family: Nunito, Arial, Helvetica, sans-serif;
+  }
+
+  :root[data-theme="dark"] {
+    --accent-green-soft: hsl(87 35% 26%);
   }
 
   body {

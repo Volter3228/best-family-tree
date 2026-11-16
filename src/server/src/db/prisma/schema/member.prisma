@@ -15,6 +15,7 @@ model Member {
   instagramLink String?
   facebookLink  String?
   linkedinLink  String?
+  gender        Gender?
 
   foundedFamilyGroup FamilyGroup?
   familyGroup        FamilyGroup?     @relation("FamilyGroupMembers", fields: [familyGroupId], references: [id])
@@ -42,4 +43,9 @@ enum Status {
   BABY
   FULL
   ALUMNI
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }

@@ -20,6 +20,7 @@ export const ENDPOINTS = {
   deleteTeamType: (id: string) => `/team-types/${id}`,
 
   getRoles: "/roles",
+  getFamilyGroups: "/family-groups",
   createRole: "/roles",
   getTeams: "/teams",
   getTeam: (id: string) => `/teams/${id}`,

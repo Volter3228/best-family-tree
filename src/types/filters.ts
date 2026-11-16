@@ -1,22 +1,19 @@
-import { RecruitmentSeason, MemberStatus, ActivityState } from "./members";
+import { RecruitmentSeason, MemberStatus, ActivityState, Gender } from "./members";
 
-export type AvatarFilterValue = "with" | "without";
 
 export type TreeMode = "family" | "grid" | "team";
 
 export interface FilterState {
   joinYearFrom: number | null;
   joinYearTo: number | null;
-  joinYearRange: boolean;
   joinSeasons: RecruitmentSeason[];
   statuses: MemberStatus[];
   activityStates: ActivityState[];
+  genders: Gender[];
+  familyGroupIds: string[];
   birthdayFrom: string | null;
   birthdayTo: string | null;
-  birthdayRange: boolean;
   birthdayIncludeYear: boolean;
-  avatars: AvatarFilterValue[];
-  lineageMemberId: string | null;
   treeMode: TreeMode;
   // Team filters. In team view they pick teams; elsewhere they keep members
   // that hold a matching position.
@@ -24,20 +21,8 @@ export interface FilterState {
   teamTypeNames: string[];
   teamYearFrom: number | null;
   teamYearTo: number | null;
-  teamYearRange: boolean;
-  // Only teams that are still running / only event teams.
+  // Only teams that are still running.
   teamOnlyOngoing: boolean;
-  teamOnlyEvents: boolean;
 }
 
-export type FilterSectionKey =
-  | "joinYear"
-  | "joinSeason"
-  | "status"
-  | "activity"
-  | "birthday"
-  | "avatar"
-  | "lineage"
-  | "role"
-  | "teamType"
-  | "teamPeriod";
+export type FilterCategoryKey = "dates" | "member" | "teams" | "roles";

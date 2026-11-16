@@ -86,6 +86,7 @@ const buildSharedFields = (
 ) => {
   const {
     status,
+    gender,
     email,
     telegramLink,
     instagramLink,
@@ -96,6 +97,8 @@ const buildSharedFields = (
   return {
     email: email || null,
     status,
+    // undefined (not null) leaves a stored gender untouched.
+    gender: gender || undefined,
     photo: photoUrl,
     ...normalizeSocialLinks({
       telegramLink,

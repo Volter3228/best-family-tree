@@ -1,4 +1,5 @@
 import { CSSProperties, RefObject } from "react";
+import { CheckIcon } from "@heroicons/react/20/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor, DropdownOption } from "@/types";
@@ -13,6 +14,9 @@ interface Props {
   menuRef: RefObject<HTMLUListElement | null>;
   color?: AccentColor;
   selectedValue?: string;
+  selectedValues?: string[];
+  showActive?: boolean;
+  onMouseMove?: () => void;
   listClassName?: string;
   optionClassName?: string;
   onSelect: (option: DropdownOption) => void;
@@ -27,6 +31,9 @@ const DropdownMenu = ({
   menuRef,
   color = "blue",
   selectedValue,
+  selectedValues,
+  showActive = false,
+  onMouseMove,
   listClassName,
   optionClassName,
   onSelect,
@@ -34,13 +41,16 @@ const DropdownMenu = ({
   const colorClasses = COLOR_CLASSES[color];
   if (options.length === 0) return null;
 
+  const hasSelectionProp =
+    selectedValue !== undefined || selectedValues !== undefined;
+
   return (
     <DropdownPortal>
       <ul
         ref={menuRef}
         className={twMerge(
           // Positioned via inline styles from useDropdownPosition.
-          "fixed z-50 overflow-y-auto",
+          "fixed z-50 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           dropUp && "flex flex-col-reverse",
           "rounded-xl bg-surface/80 backdrop-blur-lg shadow-lg transition-all transform scale-95 scroll-smooth",
           isClosing ? "animate-fade-slide-up" : "animate-fade-slide-down",
@@ -53,17 +63,21 @@ const DropdownMenu = ({
           } as CSSProperties
         }
         tabIndex={-1}
+        onMouseMove={onMouseMove}
       >
         {options.map((option, index) => {
           const displayIndex = dropUp ? options.length - 1 - index : index;
           const isActive = displayIndex === activeIndex;
+          const isSelected =
+            option.value === selectedValue ||
+            !!selectedValues?.includes(option.value);
           return (
             <li
               key={option.value}
               role="option"
               aria-selected={
-                selectedValue
-                  ? option.value === selectedValue
+                hasSelectionProp
+                  ? isSelected
                     ? "true"
                     : "false"
                   : isActive
@@ -81,14 +95,18 @@ const DropdownMenu = ({
                 }
               }}
               className={twMerge(
-                "px-3 py-2 cursor-pointer",
-                isActive
-                  ? `${colorClasses.accentBg} text-white`
-                  : colorClasses.hoverAccentBg,
+                "flex items-center justify-between gap-2 px-3 py-2 pointer-coarse:min-h-11 cursor-pointer transition-colors duration-100",
+                isSelected
+                  ? `${colorClasses.selectedBg} ${colorClasses.selectedHoverBg} ${colorClasses.text} font-medium`
+                  : colorClasses.rowHoverBg,
+                isActive &&
+                  showActive &&
+                  `${colorClasses.activeBg} ring-1 ring-inset ${colorClasses.softRing}`,
                 optionClassName,
               )}
             >
-              {option.text}
+              <span className="min-w-0 truncate">{option.text}</span>
+              {isSelected && <CheckIcon className="h-4 w-4 shrink-0" />}
             </li>
           );
         })}

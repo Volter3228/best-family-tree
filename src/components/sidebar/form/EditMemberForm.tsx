@@ -42,6 +42,7 @@ const getInitialFormData = (member: Member): MemberFormData => {
     joinedAt: member.joinedAt ? new Date(member.joinedAt) : null,
     mentorId: member.mentorId || "",
     status: member.status || "",
+    gender: member.gender,
     phoneNumber: member.phoneNumbers[0] || "",
     email: member.email || "",
     photo: member.photo,

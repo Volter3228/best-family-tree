@@ -20,6 +20,11 @@ export const memberBodySchema = z.object({
   birthday: z.string().refine(isValidDate, "Invalid birthday date"),
   joinedAt: z.string().refine(isValidDate, "Invalid join date"),
   mentorId: z.string().min(1, "Mentor ID is required"),
+  // Optional: "" means "not sent", so the stored gender is left unchanged.
+  gender: z
+    .enum(["MALE", "FEMALE", ""], { error: "Invalid gender value" })
+    .optional()
+    .default(""),
   status: z.enum(["OBSERVER", "BABY", "FULL", "ALUMNI"], {
     error: "Invalid status value",
   }),

@@ -14,8 +14,6 @@ import {
 import { requestLayout } from "@/libs/layoutClient";
 import {
   computeGridLayout,
-  reorderEdgesForLineageCentering,
-  alignLineageLayout,
   applyElkPositions,
 } from "@/utils/membersTree/layout";
 import { buildLayoutGraph } from "@/utils/membersTree/layoutGraph";
@@ -42,7 +40,6 @@ export const useTreeLayout = () => {
   const appliedFilters = useFiltersStore((s) => s.appliedFilters);
   const { fitView } = useViewportAnimation();
 
-  const lineageMemberId = appliedFilters.lineageMemberId;
   const treeMode = appliedFilters.treeMode;
   const direction = useResolvedDirection();
 
@@ -92,7 +89,7 @@ export const useTreeLayout = () => {
       appliedFilters,
       filteredMemberIds,
     });
-    let finalEdges = edges;
+    const finalEdges = edges;
 
     // Edits that land while a layout is pending must not be overwritten.
     const withLatestMembers = (layoutedNodes: MemberNode[]) =>
@@ -179,15 +176,6 @@ export const useTreeLayout = () => {
       return;
     }
 
-    // Reorder edges so lineage member is centered among siblings
-    if (lineageMemberId) {
-      finalEdges = reorderEdgesForLineageCentering(
-        finalEdges,
-        lineageMemberId,
-        membersMap,
-      );
-    }
-
     requestLayout("elk", {
       nodeIds: finalNodes.map((node) => node.id),
       edges: finalEdges.map(({ id, source, target }) => ({ id, source, target })),
@@ -197,19 +185,9 @@ export const useTreeLayout = () => {
         if (requestId !== layoutRequestRef.current) return;
 
         const positioned = applyElkPositions(finalNodes, positions, direction);
-        const layoutedNodes = lineageMemberId
-          ? alignLineageLayout(
-            positioned,
-            lineageMemberId,
-            membersMap,
-            childrenOf,
-            direction,
-          )
-          : positioned;
-
         commit(() => {
-          prepareFitView(layoutedNodes);
-          setNodes(withLatestMembers(layoutedNodes));
+          prepareFitView(positioned);
+          setNodes(withLatestMembers(positioned));
           setEdges(finalEdges);
           setTeamFrames([]);
         });
@@ -219,7 +197,6 @@ export const useTreeLayout = () => {
     structureVersion,
     filteredMemberIds,
     filterVersion,
-    lineageMemberId,
     treeMode,
     direction,
     appliedFilters,

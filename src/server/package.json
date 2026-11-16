@@ -18,6 +18,7 @@
     "auth:grant": "tsx src/scripts/grantAccess.ts",
     "auth:seed-grants": "tsx src/scripts/seedGrants.ts",
     "auth:seed-questions": "tsx src/scripts/seedQuestions.ts",
+    "db:backfill-gender": "tsx src/scripts/backfillGender.ts",
     "auth:import-emails": "tsx src/scripts/importAllowedEmails.ts",
     "auth:report-duplicate-contacts": "tsx src/scripts/reportDuplicateContacts.ts",
     "auth:preview-email": "tsx src/scripts/previewSignInEmail.ts",

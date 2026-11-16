@@ -1,5 +1,6 @@
 import { Member } from "@/models";
 import type { FilterState, MemberPosition, Team } from "@/types";
+import { rangeBounds } from "./filterRange";
 
 export type TeamFilters = Pick<
   FilterState,
@@ -8,7 +9,6 @@ export type TeamFilters = Pick<
   | "teamYearFrom"
   | "teamYearTo"
   | "teamOnlyOngoing"
-  | "teamOnlyEvents"
 >;
 
 // Whether any team criterion (including roles) is set.
@@ -17,8 +17,7 @@ export const isTeamFilterActive = (filters: TeamFilters): boolean =>
   filters.teamTypeNames.length > 0 ||
   filters.teamYearFrom !== null ||
   filters.teamYearTo !== null ||
-  filters.teamOnlyOngoing ||
-  filters.teamOnlyEvents;
+  filters.teamOnlyOngoing;
 
 // A team's span of years: unknown ends fall back to the other end, and a team
 // that is still running lasts until this year.
@@ -31,27 +30,28 @@ const getTeamSpan = (team: Team): [number, number] | null => {
   return [start, end];
 };
 
-// The team's span overlaps [from, to]; a missing bound is open-ended.
+// The team's span overlaps the filter's range (see rangeBounds).
 const matchesPeriod = (
   team: Team,
   from: number | null,
   to: number | null,
 ): boolean => {
-  if (from === null && to === null) return true;
+  const bounds = rangeBounds(from, to);
+  if (!bounds) return true;
   const span = getTeamSpan(team);
   if (!span) return false;
-  return (from === null || span[1] >= from) && (to === null || span[0] <= to);
+  return span[1] >= bounds[0] && span[0] <= bounds[1];
 };
 
 /**
- * Team-level criteria (everything except roles): type, name, period, running,
- * event. Roles belong to positions, see `positionMatchesTeamFilters`.
+ * Team-level criteria (everything except roles): type, period, running.
+ * Roles belong to positions, see `positionMatchesTeamFilters`.
  */
 export const teamMatchesFilters = (
   team: Team,
   filters: TeamFilters,
 ): boolean => {
-  const { teamTypeNames, teamOnlyOngoing, teamOnlyEvents } = filters;
+  const { teamTypeNames, teamOnlyOngoing } = filters;
   const { teamType } = team;
 
   if (teamTypeNames.length > 0) {
@@ -62,7 +62,6 @@ export const teamMatchesFilters = (
     if (!matches) return false;
   }
   if (teamOnlyOngoing && !team.isOngoing) return false;
-  if (teamOnlyEvents && !teamType?.isEvent) return false;
   return matchesPeriod(team, filters.teamYearFrom, filters.teamYearTo);
 };
 
@@ -102,5 +101,4 @@ export const countActiveTeamFilters = (filters: TeamFilters): number =>
     filters.teamTypeNames.length > 0,
     filters.teamYearFrom !== null || filters.teamYearTo !== null,
     filters.teamOnlyOngoing,
-    filters.teamOnlyEvents,
   ].filter(Boolean).length;

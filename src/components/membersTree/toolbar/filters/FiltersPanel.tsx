@@ -1,40 +1,38 @@
 import { useCallback, useMemo, useState } from "react";
-import type { FilterState, FilterSectionKey } from "@/types";
+import type { FilterCategoryKey, FilterState } from "@/types";
 import { useFiltersStore } from "@/store/filtersStore";
-import { isFilterActive } from "@/utils/filters";
+import { areFiltersEqual, isFilterActive } from "@/utils/filters";
 import ToolbarPanel from "../ToolbarPanel";
+import FiltersFooter from "./FiltersFooter";
 import FiltersHeader from "./FiltersHeader";
-import MemberFilterCategory from "./MemberFilterCategory";
-import TeamFilterCategory from "./TeamFilterCategory";
-import ViewModeSwitch from "./ViewModeSwitch";
+import FilterCategoryRail from "./FilterCategoryRail";
+import FilterCategoryPane, {
+  SELF_SCROLLING_PANES,
+} from "./panes/FilterCategoryPane";
+import { useDraftFilterCount } from "./useDraftFilterCount";
 
 interface Props {
   isOpen: boolean;
   isClosing: boolean;
 }
 
-const ALL_SECTIONS_CLOSED: Record<FilterSectionKey, boolean> = {
-  joinYear: false,
-  joinSeason: false,
-  status: false,
-  activity: false,
-  birthday: false,
-  avatar: false,
-  lineage: false,
-  role: false,
-  teamType: false,
-  teamPeriod: false,
-};
-
+// Fixed height: switching categories must not resize the panel.
 const FiltersPanel = ({ isOpen, isClosing }: Props) => {
   const draftFilters = useFiltersStore((s) => s.draftFilters);
   const setDraftFilters = useFiltersStore((s) => s.setDraftFilters);
   const applyFilters = useFiltersStore((s) => s.applyFilters);
+  const discardDraft = useFiltersStore((s) => s.discardDraft);
   const resetFilters = useFiltersStore((s) => s.resetFilters);
-  const filteredCount = useFiltersStore((s) => s.filteredCount);
   const appliedFilters = useFiltersStore((s) => s.appliedFilters);
+  const shownCount = useFiltersStore((s) => s.filteredCount);
 
-  const [openSections, setOpenSections] = useState(ALL_SECTIONS_CLOSED);
+  const [category, setCategory] = useState<FilterCategoryKey>("dates");
+
+  const hasChanges = useMemo(
+    () => !areFiltersEqual(draftFilters, appliedFilters),
+    [draftFilters, appliedFilters],
+  );
+  const draftCount = useDraftFilterCount(draftFilters, hasChanges);
 
   // The layout alone is not a criterion: "Очистити" keeps it.
   const canReset = useMemo(
@@ -42,12 +40,6 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
       isFilterActive({ ...appliedFilters, treeMode: "family" }) ||
       isFilterActive({ ...draftFilters, treeMode: "family" }),
     [appliedFilters, draftFilters],
-  );
-
-  const handleToggleSection = useCallback(
-    (key: FilterSectionKey) => () =>
-      setOpenSections((prev) => ({ ...prev, [key]: !prev[key] })),
-    [],
   );
 
   const handleChange = useCallback(
@@ -58,35 +50,47 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
 
   if (!isOpen) return null;
 
-  const groupProps = {
-    filters: draftFilters,
-    openSections,
-    onChange: handleChange,
-    onToggleSection: handleToggleSection,
-  };
-
   return (
-    <ToolbarPanel isClosing={isClosing} className="flex flex-col max-h-[60vh]">
+    <ToolbarPanel
+      isClosing={isClosing}
+      className="flex h-[min(60vh,26rem)] max-w-[26rem] flex-col touch-manipulation"
+    >
       <FiltersHeader
-        count={filteredCount}
-        isTeamMode={appliedFilters.treeMode === "team"}
+        shownCount={shownCount}
+        isTeamView={appliedFilters.treeMode === "team"}
         canReset={canReset}
-        onApply={applyFilters}
         onReset={resetFilters}
       />
-      <ViewModeSwitch
-        value={draftFilters.treeMode}
-        onChange={(treeMode) => handleChange({ treeMode })}
-      />
-      <div
-        className="overflow-y-auto overflow-x-hidden flex-1 transparent"
-        style={
-          { "--scroll-color": "var(--accent-green)" } as React.CSSProperties
-        }
-      >
-        <MemberFilterCategory {...groupProps} />
-        <TeamFilterCategory {...groupProps} />
+      <div className="flex min-h-0 flex-1 pl-3 pr-1.5">
+        <FilterCategoryRail
+          active={category}
+          filters={draftFilters}
+          onSelect={setCategory}
+        />
+        <div
+          role="tabpanel"
+          className={
+            SELF_SCROLLING_PANES.has(category)
+              ? "relative min-w-0 flex-1 overflow-hidden pl-3 pr-2.5"
+              : "relative min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pl-3 pr-2.5 [scrollbar-gutter:stable]"
+          }
+          style={
+            { "--scroll-color": "var(--accent-green)" } as React.CSSProperties
+          }
+        >
+          <FilterCategoryPane
+            category={category}
+            filters={draftFilters}
+            onChange={handleChange}
+          />
+        </div>
       </div>
+      <FiltersFooter
+        count={draftCount}
+        hasChanges={hasChanges}
+        onApply={applyFilters}
+        onDiscard={discardDraft}
+      />
     </ToolbarPanel>
   );
 };

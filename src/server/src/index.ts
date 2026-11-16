@@ -9,6 +9,7 @@ import memberRoutes from "./routes/memberRoutes.js";
 import mentorRoutes from "./routes/mentorRoutes.js";
 import teamTypeRoutes from "./routes/teamTypeRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
+import familyGroupRoutes from "./routes/familyGroupRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import questionRoutes from "./routes/auth/questionRoutes.js";
 import emailRoutes from "./routes/auth/emailRoutes.js";
@@ -83,6 +84,7 @@ app.use("/api", memberRoutes);
 app.use("/api", mentorRoutes);
 app.use("/api", teamTypeRoutes);
 app.use("/api", roleRoutes);
+app.use("/api", familyGroupRoutes);
 app.use("/api", teamRoutes);
 
 // Upload rejections (file too big / not an image) are the client's fault.

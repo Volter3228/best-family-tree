@@ -14,6 +14,11 @@ export enum ActivityState {
   Excluded = "EXCLUDED",
 }
 
+export enum Gender {
+  Male = "MALE",
+  Female = "FEMALE",
+}
+
 export type Member = {
   id: string;
   name: string;
@@ -30,6 +35,7 @@ export type Member = {
   instagramLink: string | null;
   facebookLink: string | null;
   linkedinLink: string | null;
+  gender: Gender | null;
   createdAt: Date;
   updatedAt: Date;
   phoneNumbers: string[];

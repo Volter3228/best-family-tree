@@ -145,3 +145,28 @@ describe("validateSparseMemberBody", () => {
     if (!result.success) expect(result.errors).toContain(field);
   });
 });
+
+describe("gender in member updates", () => {
+  it("accepts MALE, FEMALE, empty and missing gender", () => {
+    for (const gender of ["MALE", "FEMALE", "", undefined]) {
+      const result = validateMemberUpdate(
+        bodyFor(completeMember, { gender }),
+        completeMember,
+      );
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("defaults a missing gender to an empty string", () => {
+    const result = validateMemberUpdate(bodyFor(completeMember), completeMember);
+    expect(result.success && result.data.gender).toBe("");
+  });
+
+  it("rejects an unknown gender", () => {
+    const result = validateMemberUpdate(
+      bodyFor(completeMember, { gender: "OTHER" }),
+      completeMember,
+    );
+    expect(result.success).toBe(false);
+  });
+});

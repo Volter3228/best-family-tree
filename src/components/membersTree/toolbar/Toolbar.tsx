@@ -11,6 +11,7 @@ import { usePanelToggle, useSearchShortcut } from "@/hooks";
 import { authStrings as t } from "@/components/auth/strings";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useFiltersStore } from "@/store/filtersStore";
+import { countActiveFilters } from "@/utils/filters";
 import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
 import { FiltersPanel } from "./filters";
@@ -39,7 +40,9 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const filters = usePanelToggle();
   const settings = usePanelToggle();
   const account = usePanelToggle();
-  const hasActiveFilters = useFiltersStore((s) => s.isFilterActive);
+  const activeFilterCount = useFiltersStore((s) =>
+    countActiveFilters(s.appliedFilters),
+  );
 
   const session = useSessionStore((s) => s.session);
   const sessionLoaded = useSessionStore((s) => s.loaded);
@@ -101,7 +104,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
               icon={FunnelIcon}
               color="green"
               isActive={filters.isOpen}
-              showBadge={hasActiveFilters && !filters.isOpen}
+              badgeCount={activeFilterCount}
             />
             <FitViewButton onClick={onFitView} color="orange" />
             <ToolbarIconButton

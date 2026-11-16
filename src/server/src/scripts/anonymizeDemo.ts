@@ -125,7 +125,7 @@ const groupPhotos = await mapLimit(groups, 5, async (g) =>
 await prisma.$transaction(
   async (tx) => {
     for (const [i, m] of members.entries()) {
-      const person = factory.person();
+      const person = factory.person(m.gender);
       const handle = factory.handle(person);
       await tx.member.update({
         where: { id: m.id },

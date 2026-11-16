@@ -13,6 +13,7 @@ export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   joinedAt: null,
   mentorId: "",
   status: null,
+  gender: null,
   phoneNumber: "",
   email: "",
   photo: null,

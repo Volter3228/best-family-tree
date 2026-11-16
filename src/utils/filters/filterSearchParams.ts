@@ -2,13 +2,14 @@ import {
   MEMBER_STATUSES,
   ACTIVITY_STATES,
   JOIN_SEASONS,
-  AVATAR_VALUES,
+  GENDER_VALUES,
 } from "@/constants/filters";
+import { isListFilterSet } from "./filterMembers";
 import {
-  type AvatarFilterValue,
   type FilterState,
   type RecruitmentSeason,
   type TreeMode,
+  Gender,
   MemberStatus,
   ActivityState,
 } from "@/types";
@@ -45,15 +46,12 @@ const parseCsvStrings = (val: string | null): string[] => {
 const serializeNameCsv = (names: string[]): string =>
   names.map(encodeURIComponent).join(",");
 
-const parseCsvArray = <T extends string>(
-  val: string | null,
-  fallback: T[],
-): T[] => {
-  if (!val) return [...fallback];
+const parseCsvArray = <T extends string>(val: string | null, all: T[]): T[] => {
+  if (!val) return [];
   return val
     .split(",")
     .filter(Boolean)
-    .map((item) => fallback.find((f) => f.toLowerCase() === item.toLowerCase()))
+    .map((item) => all.find((f) => f.toLowerCase() === item.toLowerCase()))
     .filter((x): x is T => x !== undefined);
 };
 
@@ -70,7 +68,6 @@ export const parseFiltersFromSearchParams = (
   return {
     joinYearFrom: parseNumberOrNull(params.get("joinYearFrom")),
     joinYearTo: parseNumberOrNull(params.get("joinYearTo")),
-    joinYearRange: params.get("joinYearRange") === "1",
     joinSeasons: parseCsvArray<RecruitmentSeason>(
       params.get("season"),
       JOIN_SEASONS,
@@ -83,15 +80,11 @@ export const parseFiltersFromSearchParams = (
       params.get("activityState"),
       ACTIVITY_STATES,
     ),
+    genders: parseCsvArray<Gender>(params.get("gender"), GENDER_VALUES),
+    familyGroupIds: parseCsvStrings(params.get("family")),
     birthdayFrom: params.get("birthdayFrom") || null,
     birthdayTo: params.get("birthdayTo") || null,
-    birthdayRange: params.get("birthdayRange") === "1",
     birthdayIncludeYear: params.get("birthdayIncludeYear") === "1",
-    avatars: parseCsvArray<AvatarFilterValue>(
-      params.get("avatar"),
-      AVATAR_VALUES,
-    ),
-    lineageMemberId: params.get("lineageMemberId") || null,
     treeMode: parseTreeMode(params.get("treeMode")),
     roleNames: parseCsvStrings(params.get("role")),
     // "eventType" is the pre-rename name of this parameter.
@@ -100,9 +93,7 @@ export const parseFiltersFromSearchParams = (
     ),
     teamYearFrom: parseNumberOrNull(params.get("teamYearFrom")),
     teamYearTo: parseNumberOrNull(params.get("teamYearTo")),
-    teamYearRange: params.get("teamYearRange") === "1",
     teamOnlyOngoing: params.get("teamOngoing") === "1",
-    teamOnlyEvents: params.get("teamEvents") === "1",
   };
 };
 
@@ -117,33 +108,27 @@ export const filtersToSearchParams = (
 
   set("joinYearFrom", serializeNumber(filters.joinYearFrom));
   set("joinYearTo", serializeNumber(filters.joinYearTo));
-  if (filters.joinYearRange) set("joinYearRange", "1");
-  if (filters.joinSeasons.length < JOIN_SEASONS.length)
+  if (isListFilterSet(filters.joinSeasons, JOIN_SEASONS))
     set("season", serializeCsv(filters.joinSeasons));
-  if (filters.statuses.length < MEMBER_STATUSES.length)
+  if (isListFilterSet(filters.statuses, MEMBER_STATUSES))
     set("status", serializeCsv(filters.statuses));
-  if (filters.activityStates.length < ACTIVITY_STATES.length)
+  if (isListFilterSet(filters.activityStates, ACTIVITY_STATES))
     set("activityState", serializeCsv(filters.activityStates));
+  if (isListFilterSet(filters.genders, GENDER_VALUES))
+    set("gender", serializeCsv(filters.genders));
+  if (filters.familyGroupIds.length > 0)
+    set("family", serializeNameCsv(filters.familyGroupIds));
   set("birthdayFrom", filters.birthdayFrom);
   set("birthdayTo", filters.birthdayTo);
-  if (filters.birthdayRange) set("birthdayRange", "1");
   if (filters.birthdayIncludeYear) set("birthdayIncludeYear", "1");
-  if (filters.avatars.length < AVATAR_VALUES.length)
-    set("avatar", serializeCsv(filters.avatars));
   if (filters.treeMode !== "family") set("treeMode", filters.treeMode);
-  if (filters.roleNames.length > 0) set("role", serializeNameCsv(filters.roleNames));
+  if (filters.roleNames.length > 0)
+    set("role", serializeNameCsv(filters.roleNames));
   if (filters.teamTypeNames.length > 0)
     set("teamType", serializeNameCsv(filters.teamTypeNames));
   set("teamYearFrom", serializeNumber(filters.teamYearFrom));
   set("teamYearTo", serializeNumber(filters.teamYearTo));
-  if (filters.teamYearRange) set("teamYearRange", "1");
   if (filters.teamOnlyOngoing) set("teamOngoing", "1");
-  if (filters.teamOnlyEvents) set("teamEvents", "1");
-
-  const { lineageMemberId } = filters;
-  if (lineageMemberId) {
-    set("lineageMemberId", lineageMemberId);
-  }
 
   return params;
 };

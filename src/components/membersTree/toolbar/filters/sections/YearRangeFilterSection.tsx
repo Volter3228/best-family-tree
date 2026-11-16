@@ -1,24 +1,23 @@
-import { DATE_PICKER_CLASSES } from "@/constants/filters";
+import { useId, type ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
+import { FILTER_INPUT_CLASSES } from "@/constants/filters";
 import FilterSection from "./FilterSection";
-import FilterCheckbox from "./FilterCheckbox";
 import ClearButton from "./ClearButton";
+import RangeInputs, { type RangeSlot } from "./RangeInputs";
 
-export interface YearRangeValue {
+interface YearRangeValue {
   from: number | null;
   to: number | null;
-  isRange: boolean;
 }
 
 interface Props {
   title: string;
-  isOpen: boolean;
   value: YearRangeValue;
   onChange: (value: YearRangeValue) => void;
-  onToggle: () => void;
-  // Highlights the section in the list even when no year is entered.
-  hasActiveValue?: boolean;
-  // Extra controls under the years (e.g. "only running teams").
-  children?: React.ReactNode;
+  // Greys out the years.
+  disabled?: boolean;
+  // Controls above the years (e.g. "only running teams").
+  leading?: ReactNode;
 }
 
 const parseYear = (raw: string): number | null => {
@@ -26,8 +25,7 @@ const parseYear = (raw: string): number | null => {
   return digits ? Number(digits) : null;
 };
 
-interface YearInputProps {
-  placeholder: string;
+interface YearInputProps extends RangeSlot {
   value: number | null;
   onChange: (value: number | null) => void;
   onBlur?: (value: number | null) => void;
@@ -35,94 +33,85 @@ interface YearInputProps {
 }
 
 const YearInput = ({
+  id,
   placeholder,
   value,
+  disabled,
   onChange,
   onBlur,
   onClear,
 }: YearInputProps) => (
-  <div className="relative flex-1">
+  <div className="relative">
     <input
+      id={id}
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"
       placeholder={placeholder}
       value={value ?? ""}
+      disabled={disabled}
       onChange={(e) => onChange(parseYear(e.target.value))}
       onBlur={(e) => onBlur?.(parseYear(e.target.value))}
-      className={DATE_PICKER_CLASSES}
+      className={twMerge(
+        FILTER_INPUT_CLASSES,
+        value !== null && !disabled && "pr-8",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+      )}
     />
-    {value !== null && <ClearButton onClick={onClear} />}
+    {value !== null && !disabled && <ClearButton onClick={onClear} />}
   </div>
 );
 
-// One year, or a from/to range with open ends (an empty bound means "no limit").
+// A from/to year range with open ends (an empty bound means "no limit").
+// One filled year is an exact match.
 const YearRangeFilterSection = ({
   title,
-  isOpen,
   value,
   onChange,
-  onToggle,
-  hasActiveValue,
-  children,
+  disabled = false,
+  leading,
 }: Props) => {
-  const { from, to, isRange } = value;
+  const inputId = useId();
+  const { from, to } = value;
 
   // A range typed the wrong way round is fixed once the field loses focus.
   const handleBlur = (field: "from" | "to") => (year: number | null) => {
     if (year === null) return;
     if (field === "from" && to !== null && year > to) {
-      onChange({ ...value, from: year, to: year });
+      onChange({ from: year, to: year });
     } else if (field === "to" && from !== null && year < from) {
-      onChange({ ...value, from: year, to: year });
+      onChange({ from: year, to: year });
     }
   };
 
-  const toggleRange = () =>
-    onChange({ from, to: isRange ? from : null, isRange: !isRange });
-
   return (
-    <FilterSection
-      title={title}
-      isOpen={isOpen}
-      onToggle={onToggle}
-      hasActiveValue={hasActiveValue ?? (from !== null || to !== null)}
-    >
+    <FilterSection title={title} htmlFor={inputId}>
       <div className="flex flex-col gap-2">
-        {isRange ? (
-          <div className="flex items-center gap-2">
+        {leading}
+        <RangeInputs
+          fromId={inputId}
+          fromPlaceholder="Від"
+          toPlaceholder="До"
+          disabled={disabled}
+          renderFrom={(slot) => (
             <YearInput
-              placeholder="Від"
+              {...slot}
               value={from}
-              onChange={(year) => onChange({ ...value, from: year })}
+              onChange={(year) => onChange({ from: year, to })}
               onBlur={handleBlur("from")}
-              onClear={() => onChange({ ...value, from: null })}
+              onClear={() => onChange({ from: null, to })}
             />
-            <span className="text-placeholder text-xs shrink-0">—</span>
+          )}
+          renderTo={(slot) => (
             <YearInput
-              placeholder="До"
+              {...slot}
               value={to}
-              onChange={(year) => onChange({ ...value, to: year })}
+              onChange={(year) => onChange({ from, to: year })}
               onBlur={handleBlur("to")}
-              onClear={() => onChange({ ...value, to: null })}
+              onClear={() => onChange({ from, to: null })}
             />
-          </div>
-        ) : (
-          <div className="flex">
-            <YearInput
-              placeholder="Рік"
-              value={from}
-              onChange={(year) => onChange({ ...value, from: year, to: year })}
-              onClear={() => onChange({ ...value, from: null, to: null })}
-            />
-          </div>
-        )}
-        <FilterCheckbox
-          checked={isRange}
-          onChange={toggleRange}
-          label="Діапазон"
+          )}
         />
-        {children}
       </div>
     </FilterSection>
   );

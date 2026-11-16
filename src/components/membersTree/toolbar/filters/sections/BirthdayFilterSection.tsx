@@ -1,27 +1,24 @@
+import { useId } from "react";
 import DatePicker from "react-datepicker";
+import { twMerge } from "tailwind-merge";
 import { toDate, fromDate } from "@/utils";
-import { DATE_PICKER_CLASSES } from "@/constants/filters";
+import { FILTER_INPUT_CLASSES } from "@/constants/filters";
 import { MAX_DATE_BIRTHDAY, MIN_DATE_BIRTHDAY } from "@/constants/form";
 import type { FilterState } from "@/types";
 import FilterSection from "./FilterSection";
 import FilterCheckbox from "./FilterCheckbox";
 import ClearButton from "./ClearButton";
+import RangeInputs from "./RangeInputs";
 
 interface Props {
-  isOpen: boolean;
   filters: FilterState;
   onChange: (patch: Partial<FilterState>) => void;
-  onToggle: () => void;
 }
 
-const BirthdayFilterSection = ({
-  isOpen,
-  filters,
-  onChange,
-  onToggle,
-}: Props) => {
-  const { birthdayRange, birthdayIncludeYear, birthdayFrom, birthdayTo } =
-    filters;
+const BirthdayFilterSection = ({ filters, onChange }: Props) => {
+  const { birthdayIncludeYear, birthdayFrom, birthdayTo } = filters;
+  // Labels the first date field.
+  const firstInputId = useId();
   const fmt = birthdayIncludeYear ? "dd.MM.yyyy" : "dd.MM";
 
   const fromDateObj = toDate(birthdayFrom, birthdayIncludeYear);
@@ -32,14 +29,6 @@ const BirthdayFilterSection = ({
 
   const handleToChange = (d: Date | null) =>
     onChange({ birthdayTo: fromDate(d, birthdayIncludeYear) });
-
-  const toggleRange = () => {
-    if (birthdayRange) {
-      onChange({ birthdayRange: false, birthdayTo: null });
-    } else {
-      onChange({ birthdayRange: true });
-    }
-  };
 
   const toggleIncludeYear = () => {
     // Reset dates when toggling year mode to avoid format mismatch
@@ -56,6 +45,10 @@ const BirthdayFilterSection = ({
     });
   };
 
+  // Room for the clear button only when the field holds a date.
+  const inputClass = (value: string | null) =>
+    twMerge(FILTER_INPUT_CLASSES, value ? "pr-8" : undefined);
+
   const minBound = birthdayIncludeYear ? MIN_DATE_BIRTHDAY : undefined;
   const maxBound = birthdayIncludeYear ? MAX_DATE_BIRTHDAY : undefined;
 
@@ -67,68 +60,48 @@ const BirthdayFilterSection = ({
     scrollableYearDropdown: birthdayIncludeYear,
     yearDropdownItemNumber: birthdayIncludeYear ? 40 : undefined,
     dateFormatCalendar: birthdayIncludeYear ? "LLLL yyyy" : "LLLL",
-    className: DATE_PICKER_CLASSES,
+    // Block wrapper, so the 40px field is the full height the clear button centres on.
+    wrapperClassName: "block w-full",
     portalId: "datepicker-portal",
     popperClassName: "datepicker-accent-green",
     minDate: minBound,
     maxDate: maxBound,
   };
 
-  const hasActiveValue = birthdayFrom !== null || birthdayTo !== null;
-
   return (
-    <FilterSection
-      title="День народження"
-      isOpen={isOpen}
-      onToggle={onToggle}
-      hasActiveValue={hasActiveValue}
-    >
+    <FilterSection title="День народження" htmlFor={firstInputId}>
       <div className="flex flex-col gap-2">
-        {birthdayRange ? (
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 min-w-0">
+        <RangeInputs
+          fromId={firstInputId}
+          fromPlaceholder="Від"
+          toPlaceholder="До"
+          renderFrom={({ id, placeholder }) => (
+            <div className="relative">
               <DatePicker
+                id={id}
                 selected={fromDateObj}
                 onChange={handleFromChange}
-                placeholderText="Від"
+                placeholderText={placeholder}
                 {...pickerProps}
+                className={inputClass(birthdayFrom)}
                 maxDate={toDateObj ?? maxBound}
               />
-              {birthdayFrom && (
-                <ClearButton onClick={handleClear("birthdayFrom")} />
-              )}
+              {birthdayFrom && <ClearButton onClick={handleClear("birthdayFrom")} />}
             </div>
-            <span className="text-placeholder text-xs shrink-0">—</span>
-            <div className="relative flex-1 min-w-0">
+          )}
+          renderTo={({ placeholder }) => (
+            <div className="relative">
               <DatePicker
                 selected={toDateObj}
                 onChange={handleToChange}
-                placeholderText="До"
+                placeholderText={placeholder}
                 {...pickerProps}
+                className={inputClass(birthdayTo)}
                 minDate={fromDateObj ?? minBound}
               />
-              {birthdayTo && (
-                <ClearButton onClick={handleClear("birthdayTo")} />
-              )}
+              {birthdayTo && <ClearButton onClick={handleClear("birthdayTo")} />}
             </div>
-          </div>
-        ) : (
-          <div className="relative w-full">
-            <DatePicker
-              selected={fromDateObj}
-              onChange={handleFromChange}
-              placeholderText="Дата"
-              {...pickerProps}
-            />
-            {birthdayFrom && (
-              <ClearButton onClick={handleClear("birthdayFrom")} />
-            )}
-          </div>
-        )}
-        <FilterCheckbox
-          checked={birthdayRange}
-          onChange={toggleRange}
-          label="Діапазон"
+          )}
         />
         <FilterCheckbox
           checked={birthdayIncludeYear}
