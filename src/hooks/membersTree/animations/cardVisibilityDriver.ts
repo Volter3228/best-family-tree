@@ -25,7 +25,17 @@ interface Entry {
 
 let entries: Entry[] = [];
 
-const tick = () => {
+// Finished hides wait here so every card flips `visible = false` in the same
+// tick. A visible flip dirties the render group's structure, and staggered flips
+// made most frames of the collapse rebuild instructions for all nodes.
+const pendingHidden = new Set<Container>();
+
+export const deferCardHidden = (card: Container): void => {
+  pendingHidden.add(card);
+  gsap.ticker.add(tick);
+};
+
+function tick() {
   const now = gsap.ticker.time;
   entries = entries.filter((entry) => {
     const local = now - entry.startAt;
@@ -37,8 +47,14 @@ const tick = () => {
     entry.reveal(entry.card, local);
     return true;
   });
-  if (entries.length === 0) gsap.ticker.remove(tick);
-};
+  if (entries.length === 0) {
+    pendingHidden.forEach((card) => {
+      card.visible = false;
+    });
+    pendingHidden.clear();
+    gsap.ticker.remove(tick);
+  }
+}
 
 export const finishCardReveal = (card: Container): void => {
   entries = entries.filter((entry) => {
@@ -46,6 +62,7 @@ export const finishCardReveal = (card: Container): void => {
     entry.finalize(card);
     return false;
   });
+  pendingHidden.delete(card);
 };
 
 interface RegisterOptions {

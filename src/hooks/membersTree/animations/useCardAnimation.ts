@@ -6,7 +6,11 @@ import {
   NODE_AVATAR_RADIUS,
 } from "@/constants/canvas";
 import { cardsHiddenSignal } from "@/store/treeSignals";
-import { finishCardReveal, registerCardReveal } from "./cardVisibilityDriver";
+import {
+  deferCardHidden,
+  finishCardReveal,
+  registerCardReveal,
+} from "./cardVisibilityDriver";
 
 // Card animation pivot: top-center of the card (where it hides behind the avatar)
 export const CARD_PIVOT_X = NODE_WIDTH / 2;
@@ -41,6 +45,14 @@ const applyHidden = (card: Container): void => {
   card.y = SLIDE_START_Y;
 };
 
+// Animated hide: the real `visible = false` is deferred so all cards flip together.
+const applyHiddenDeferred = (card: Container): void => {
+  card.alpha = 0;
+  card.scale.set(COLLAPSED_SCALE_X, COLLAPSED_SCALE_Y);
+  card.y = SLIDE_START_Y;
+  deferCardHidden(card);
+};
+
 interface Props {
   cardRef: RefObject<Container | null>;
   memberId: string;
@@ -72,7 +84,7 @@ export const useCardAnimation = ({ cardRef, memberId }: Props) => {
       registerCardReveal(card, {
         direction: shouldBeHidden ? "hide" : "show",
         delay,
-        finalize: shouldBeHidden ? applyHidden : applyShown,
+        finalize: shouldBeHidden ? applyHiddenDeferred : applyShown,
         collapsedScaleX: COLLAPSED_SCALE_X,
         collapsedScaleY: COLLAPSED_SCALE_Y,
         slideStartY: SLIDE_START_Y,
