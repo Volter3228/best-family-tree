@@ -3,6 +3,11 @@ import { CARD_VIEW_SCALE, NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 import type { MemberNode, TeamFrame } from "@/types";
 import { useTreeStore } from "@/store/treeStore";
 import gsap from "gsap";
+import {
+  clearViewportTimeline,
+  killViewportAnimation,
+  setViewportTimeline,
+} from "./viewportTimeline";
 
 const getBounds = (nodes: MemberNode[], frames: TeamFrame[]) => {
   let minX = Infinity;
@@ -49,7 +54,6 @@ export const getFitViewTargetScale = (
 };
 
 export const useFitViewAnimation = () => {
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
   return useCallback(
@@ -71,10 +75,7 @@ export const useFitViewAnimation = () => {
       if (!viewport || nodes.length === 0 || width === 0 || height === 0)
         return;
 
-      // Kill any existing fitView animation to prevent conflicts
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-      }
+      killViewportAnimation(viewport);
 
       const targetScale = getFitViewTargetScale(
         nodes,
@@ -105,12 +106,7 @@ export const useFitViewAnimation = () => {
           setScale(targetScale);
           setIsFitViewAnimating(false);
           setFitViewTargetScale(null);
-          timelineRef.current = null;
-        },
-        onInterrupt: () => {
-          setIsFitViewAnimating(false);
-          setFitViewTargetScale(null);
-          timelineRef.current = null;
+          clearViewportTimeline(timeline);
         },
       });
 
@@ -136,7 +132,10 @@ export const useFitViewAnimation = () => {
         0,
       );
 
-      timelineRef.current = timeline;
+      setViewportTimeline(timeline, () => {
+        setIsFitViewAnimating(false);
+        setFitViewTargetScale(null);
+      });
     },
     [],
   );

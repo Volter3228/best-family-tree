@@ -174,9 +174,9 @@
     "semantic_hash": "05d13fe807eb7a18992290ab808bcc0a"
   },
   "src/components/membersTree/MembersTreeContent.tsx": {
-    "mtime": 1794750616.1627126,
-    "seen": 1794750673.9743907,
-    "ast_hash": "694f279738bbcfa95d40303043354c3c",
+    "mtime": 1794837411.1303117,
+    "seen": 1794837829.4998612,
+    "ast_hash": "f1d020dadeb7fa4ffc6e5be8cd29fdf3",
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeDynamic.tsx": {
@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeScene.tsx": {
-    "mtime": 1794682811.504726,
-    "seen": 1794682836.8509305,
-    "ast_hash": "85ca76a62b1aa669d57ae61070050aed",
+    "mtime": 1794837414.5749989,
+    "seen": 1794837829.499896,
+    "ast_hash": "cc7622ae7b7f4424a6fc90e80eb9b097",
     "semantic_hash": ""
   },
   "src/components/membersTree/TeamInfoSidebar.tsx": {
@@ -258,16 +258,16 @@
     "semantic_hash": "1555672a9457d13095ecd29526170ab4"
   },
   "src/components/membersTree/canvas/Viewport.tsx": {
-    "mtime": 1794168957.9273465,
-    "seen": 1794172290.818871,
-    "ast_hash": "24257c6ae5a158356df5761f52d27e46",
+    "mtime": 1794837766.9865947,
+    "seen": 1794837829.5002928,
+    "ast_hash": "0406490ebe6ebe56779c985712e9ffd2",
     "semantic_hash": ""
   },
   "src/components/membersTree/canvas/ZoomFadeContainer.tsx": {
-    "mtime": 1791905760.3603532,
-    "seen": 1792609757.1323183,
-    "ast_hash": "314318890d7039c5de96b1cce9e9a91d",
-    "semantic_hash": "314318890d7039c5de96b1cce9e9a91d"
+    "mtime": 1794837411.1312451,
+    "seen": 1794837829.5002937,
+    "ast_hash": "a8abdd3d5efe0ed37e12dce8b2f9bd99",
+    "semantic_hash": ""
   },
   "src/components/membersTree/canvas/index.ts": {
     "mtime": 1791906093.3861284,
@@ -948,38 +948,38 @@
     "semantic_hash": "dc4bd153a57d003b5f7554c5e2d2eb02"
   },
   "src/hooks/membersTree/animations/useCardAnimation.ts": {
-    "mtime": 1794836863.191607,
-    "seen": 1794837213.3121157,
+    "mtime": 1794837766.9707627,
+    "seen": 1794837829.507553,
     "ast_hash": "69744b2d3b405699df5cdb4e091a8179",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useFitViewAnimation.ts": {
-    "mtime": 1791905576.6611056,
-    "seen": 1792609757.1324,
-    "ast_hash": "94e03d9db571316ebe06f8765679c6e6",
-    "semantic_hash": "94e03d9db571316ebe06f8765679c6e6"
+    "mtime": 1794837766.9748979,
+    "seen": 1794837829.5075538,
+    "ast_hash": "d67239439298eb89949fe1c329a96547",
+    "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useFocusFrameAnimation.ts": {
-    "mtime": 1791905576.6613884,
-    "seen": 1792609757.132401,
-    "ast_hash": "d9bf80480a2fb5a692664d99677d498b",
-    "semantic_hash": "d9bf80480a2fb5a692664d99677d498b"
+    "mtime": 1794837812.0563047,
+    "seen": 1794837829.5075545,
+    "ast_hash": "8d92df8bc2ec6902e275ad08a2dad1c9",
+    "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useFocusNodeAnimation.ts": {
-    "mtime": 1791905576.6612437,
-    "seen": 1792609757.1324015,
-    "ast_hash": "cd71ee719743d652a575451a62e8d403",
-    "semantic_hash": "cd71ee719743d652a575451a62e8d403"
+    "mtime": 1794837812.0561762,
+    "seen": 1794837829.5075552,
+    "ast_hash": "a6e9c912f3041009e0739f2ce8ddf48e",
+    "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useHoverNodeAnimation.ts": {
-    "mtime": 1794836626.7282357,
-    "seen": 1794837213.3122184,
+    "mtime": 1794837766.975261,
+    "seen": 1794837829.5075564,
     "ast_hash": "3f29b6eb9c0bae28210a6ccc4151cb44",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useViewportAnimation.ts": {
-    "mtime": 1791905576.6614945,
-    "seen": 1792609757.1324027,
+    "mtime": 1794837766.9753764,
+    "seen": 1794837829.5075572,
     "ast_hash": "0c28e92e955ebf19fa734325378b0dda",
     "semantic_hash": "0c28e92e955ebf19fa734325378b0dda"
   },
@@ -1956,8 +1956,8 @@
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/cardVisibilityDriver.ts": {
-    "mtime": 1794836863.191043,
-    "seen": 1794837213.3120801,
+    "mtime": 1794837791.2913759,
+    "seen": 1794837829.5075178,
     "ast_hash": "dd1479cf7abe956dad2330edd74a2dd4",
     "semantic_hash": ""
   },
@@ -3369,6 +3369,12 @@
     "mtime": 1794835597.4787369,
     "seen": 1794837213.319572,
     "ast_hash": "7018a5da274859e06f6eee64130eaf04",
+    "semantic_hash": ""
+  },
+  "src/hooks/membersTree/animations/viewportTimeline.ts": {
+    "mtime": 1794837766.8074112,
+    "seen": 1794837829.5075583,
+    "ast_hash": "bdf14ea64493dfcaa7ffa19d6cff5a2b",
     "semantic_hash": ""
   }
 }

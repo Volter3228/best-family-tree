@@ -1,4 +1,9 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
+import {
+  clearViewportTimeline,
+  killViewportAnimation,
+  setViewportTimeline,
+} from "./viewportTimeline";
 import gsap from "gsap";
 import type { TeamFrame } from "@/types";
 import { isZoomedOut } from "@/utils";
@@ -9,13 +14,11 @@ const DURATION = 1.2;
 
 // Fit one team frame into the middle of the screen (no sidebar opens for it).
 export const useFocusFrameAnimation = () => {
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
-
   return useCallback(
     (frame: TeamFrame) => {
       const { viewport, setScale } = useTreeStore.getState();
       if (!viewport) return;
-      timelineRef.current?.kill();
+      killViewportAnimation(viewport);
 
       const visibleWidth = window.innerWidth;
       const visibleHeight = window.innerHeight;
@@ -46,7 +49,7 @@ export const useFocusFrameAnimation = () => {
         },
         onComplete: () => {
           setScale(targetScale);
-          timelineRef.current = null;
+          clearViewportTimeline(timeline);
         },
       });
 
@@ -66,7 +69,7 @@ export const useFocusFrameAnimation = () => {
         0,
       );
 
-      timelineRef.current = timeline;
+      setViewportTimeline(timeline);
     },
     [],
   );

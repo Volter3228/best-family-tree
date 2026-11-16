@@ -1,11 +1,15 @@
 import { useCallback, useRef } from "react";
+import {
+  clearViewportTimeline,
+  killViewportAnimation,
+  setViewportTimeline,
+} from "./viewportTimeline";
 import gsap from "gsap";
 import { useTreeStore } from "@/store/treeStore";
 import { isZoomedOut } from "@/utils";
 import { NODE_HEIGHT, NODE_WIDTH } from "@/constants/canvas";
 
 export const useFocusNodeAnimation = () => {
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const lodTriggeredRef = useRef<boolean>(false);
 
   return useCallback(
@@ -18,10 +22,7 @@ export const useFocusNodeAnimation = () => {
       );
       if (!node) return;
 
-      // Kill any existing animation
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-      }
+      killViewportAnimation(viewport);
 
       // Calculate target position (center of the node)
       const nodeCenterX = node.position.x + NODE_WIDTH / 2;
@@ -64,7 +65,7 @@ export const useFocusNodeAnimation = () => {
         },
         onComplete: () => {
           setScale(TARGET_SCALE);
-          timelineRef.current = null;
+          clearViewportTimeline(timeline);
         },
       });
 
@@ -93,7 +94,7 @@ export const useFocusNodeAnimation = () => {
         0,
       );
 
-      timelineRef.current = timeline;
+      setViewportTimeline(timeline);
     },
     [],
   );

@@ -8,6 +8,7 @@ import {
 import { Viewport as PixiViewport } from "pixi-viewport";
 import { useApplication } from "@pixi/react";
 import { isZoomedOut } from "@/utils";
+import { killViewportAnimation } from "@/hooks/membersTree/animations/viewportTimeline";
 import {
   BIRTHDAY_ANIMATION_MIN_SCALE,
   MAX_VIEWPORT_ZOOM,
@@ -54,10 +55,15 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
     wasBirthdayVisibleRef.current =
       viewport.scale.x >= BIRTHDAY_ANIMATION_MIN_SCALE;
 
-    const handleDragStart = () => (viewport.cursor = "grabbing");
+    const handleDragStart = () => {
+      viewport.cursor = "grabbing";
+      killViewportAnimation(viewport);
+    };
+    const handlePinchStart = () => killViewportAnimation(viewport);
     const handleDragEnd = () => (viewport.cursor = "grab");
 
     const handleWheel = () => {
+      killViewportAnimation(viewport);
       const decelerate = viewport.plugins.get("decelerate");
       decelerate?.reset();
     };
@@ -80,12 +86,14 @@ const Viewport = ({ ref, children, width, height, onScaleChange }: Props) => {
     viewport.on("drag-start", handleDragStart);
     viewport.on("drag-end", handleDragEnd);
     viewport.on("wheel", handleWheel);
+    viewport.on("pinch-start", handlePinchStart);
     viewport.on("zoomed", handleZoomed);
 
     return () => {
       viewport.off("drag-start", handleDragStart);
       viewport.off("drag-end", handleDragEnd);
       viewport.off("wheel", handleWheel);
+      viewport.off("pinch-start", handlePinchStart);
       viewport.off("zoomed", handleZoomed);
     };
   }, [width, height, onScaleChange, isInitialised]);
