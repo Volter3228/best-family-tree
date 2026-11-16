@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
-import { Container, Filter, FederatedPointerEvent, Rectangle } from "pixi.js";
+import { Container, FederatedPointerEvent, Rectangle } from "pixi.js";
 import gsap from "gsap";
 import {
   useTapWithoutDrag,
@@ -20,6 +20,7 @@ import MemberBirthdayAnimation from "@/components/animations/memberBirthday";
 import MemberNodeAvatar from "./MemberNodeAvatar";
 import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
 import MemberNodeCard from "./MemberNodeCard";
+import MemberNodeGlow from "./MemberNodeGlow";
 
 interface Props {
   nodeId: string;
@@ -33,7 +34,6 @@ interface Props {
   onClick: (member: Member, teamId?: string) => void;
 }
 
-const EMPTY_FILTERS: Filter[] = [];
 // Culling box in world coordinates (Pixi compares cullArea with the view as
 // is): the avatar and the card below it, with room for the hover glow.
 const CULL_MARGIN = 80;
@@ -74,7 +74,7 @@ const MemberNode = ({
   const containerRef = useRef<Container>(null);
   const cardRef = useRef<Container>(null);
 
-  const { shadowFilter } = useHoverNodeAnimation({
+  const { glowMounted, shouldShowGlow } = useHoverNodeAnimation({
     container: containerRef.current,
     isHovered,
     isSelected,
@@ -151,11 +151,6 @@ const MemberNode = ({
     };
   }, [isHovered]);
 
-  const filters = useMemo(() => {
-    if ((!isHovered && !isSelected) || !shadowFilter) return EMPTY_FILTERS;
-    return [shadowFilter];
-  }, [isHovered, isSelected, shadowFilter]);
-
   const cullArea = useMemo(() => getCullArea(x, y), [x, y]);
 
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
@@ -193,16 +188,17 @@ const MemberNode = ({
         onPointerDown={tap.onPointerDown}
         onClick={tap.onClick}
         onTap={tap.onClick}
-        filters={filters}
         cullable
         cullableChildren={false}
         cullArea={cullArea}
       >
-        <pixiContainer
-          ref={cardRef}
-          pivot={CARD_PIVOT}
-          x={CARD_PIVOT_X}
-        >
+        {glowMounted && (
+          <MemberNodeGlow kind="avatar" active={shouldShowGlow} />
+        )}
+        <pixiContainer ref={cardRef} pivot={CARD_PIVOT} x={CARD_PIVOT_X}>
+          {glowMounted && (
+            <MemberNodeGlow kind="card" active={shouldShowGlow} />
+          )}
           <MemberNodeCard
             member={member}
             isSelected={isSelected}

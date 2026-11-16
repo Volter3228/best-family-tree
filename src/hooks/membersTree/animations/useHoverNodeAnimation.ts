@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Container } from "pixi.js";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -8,7 +8,6 @@ import {
   NODE_HOVER_ANIMATION_DURATION,
   ZOOMED_OUT_HOVER_SCALE_MAP,
 } from "@/constants/canvas";
-import { DropShadowFilter } from "pixi-filters";
 
 const calculateTargetScale = (appScale: number, isHovered: boolean) => {
   if (!isHovered) return 1;
@@ -22,18 +21,6 @@ const calculateTargetScale = (appScale: number, isHovered: boolean) => {
   return NODE_HOVER_SCALE;
 };
 
-const createShadowFilter = () => {
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-  return new DropShadowFilter({
-    color: 0xffffff,
-    alpha: 0,
-    offset: { x: 0, y: 0 },
-    resolution: Math.max(dpr, 2),
-    quality: 5,
-    shadowOnly: false,
-  });
-};
-
 interface Props {
   container: Container | null;
   isHovered: boolean;
@@ -45,12 +32,11 @@ export const useHoverNodeAnimation = ({
   isHovered,
   isSelected,
 }: Props) => {
-  // Created on first hover/selection: most nodes never need one, and each
-  // filter builds blur passes and GPU programs.
-  const filterRef = useRef<DropShadowFilter | null>(null);
-  const [shadowFilter, setShadowFilter] = useState<DropShadowFilter | null>(
-    null,
-  );
+  // The glow sprites are mounted on first hover/selection: most nodes never
+  // need one.
+  const shouldShowGlow = isHovered || isSelected;
+  const [glowMounted, setGlowMounted] = useState(false);
+  if (shouldShowGlow && !glowMounted) setGlowMounted(true);
 
   useGSAP(() => {
     if (!container) return;
@@ -65,22 +51,7 @@ export const useHoverNodeAnimation = ({
       ease: "power2.out",
       overwrite: "auto",
     });
+  }, [isHovered]);
 
-    const shouldShowShadow = isHovered || isSelected;
-    if (!filterRef.current && shouldShowShadow) {
-      filterRef.current = createShadowFilter();
-      setShadowFilter(filterRef.current);
-    }
-    const filter = filterRef.current;
-    if (!filter) return;
-    gsap.to(filter, {
-      blur: shouldShowShadow ? 8 : 0,
-      alpha: shouldShowShadow ? 0.6 : 0,
-      duration: NODE_HOVER_ANIMATION_DURATION / 2,
-      ease: "power1.out",
-      overwrite: "auto",
-    });
-  }, [isHovered, isSelected]);
-
-  return { shadowFilter };
+  return { glowMounted, shouldShowGlow };
 };
