@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { FillGradient, TextStyleOptions } from "pixi.js";
+import { FillGradient, TextStyle, TextStyleOptions } from "pixi.js";
 import { useTheme } from "@/context/ThemeContext";
 import type { CanvasThemeTokens } from "@/types";
 import {
@@ -17,6 +17,14 @@ export interface CanvasTextStyles {
   placeholderInitials: TextStyleOptions;
 }
 
+// Shared across all nodes: never mutate them.
+export interface CanvasTextStyleInstances {
+  title: TextStyle;
+  subtitle: TextStyle;
+  tooltip: TextStyle;
+  placeholderInitials: TextStyle;
+}
+
 export interface CanvasColors {
   surface: string;
   accent: CanvasThemeTokens["accent"];
@@ -28,6 +36,7 @@ export interface CanvasColors {
   text: CanvasThemeTokens["text"];
   placeholder: CanvasThemeTokens["placeholder"];
   textStyles: CanvasTextStyles;
+  textStyleInstances: CanvasTextStyleInstances;
   cardStroke: string;
   cardStrokeAlpha: number;
   edgeColor: string;
@@ -74,6 +83,13 @@ const buildCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
     },
   };
 
+  const textStyleInstances: CanvasTextStyleInstances = {
+    title: new TextStyle(textStyles.title),
+    subtitle: new TextStyle(textStyles.subtitle),
+    tooltip: new TextStyle(textStyles.tooltip),
+    placeholderInitials: new TextStyle(textStyles.placeholderInitials),
+  };
+
   return {
     surface: canvas.surface,
     accent,
@@ -85,6 +101,7 @@ const buildCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
     text,
     placeholder,
     textStyles,
+    textStyleInstances,
     cardStroke: canvas.cardStroke,
     cardStrokeAlpha: canvas.cardStrokeAlpha,
     edgeColor: canvas.edgeColor,
@@ -92,7 +109,20 @@ const buildCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
   };
 };
 
+// `canvas` is the same object for a given theme, so every component shares
+// one result (and one set of gradients and text styles) per theme.
+const colorsByCanvas = new WeakMap<CanvasThemeTokens, CanvasColors>();
+
+const getCanvasColors = (canvas: CanvasThemeTokens): CanvasColors => {
+  let colors = colorsByCanvas.get(canvas);
+  if (!colors) {
+    colors = buildCanvasColors(canvas);
+    colorsByCanvas.set(canvas, colors);
+  }
+  return colors;
+};
+
 export const useCanvasTheme = (): CanvasColors => {
   const { canvas } = useTheme();
-  return useMemo(() => buildCanvasColors(canvas), [canvas]);
+  return useMemo(() => getCanvasColors(canvas), [canvas]);
 };

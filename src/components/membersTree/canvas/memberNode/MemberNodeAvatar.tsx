@@ -1,5 +1,5 @@
 import { useMemo, memo } from "react";
-import { Assets, TextStyle } from "pixi.js";
+import { Assets } from "pixi.js";
 import { useTexture, useCanvasTheme } from "@/hooks";
 import { getInitials, getMemberNodeAvatar } from "@/utils";
 import { useTreeStore } from "@/store/treeStore";
@@ -28,7 +28,7 @@ const MemberNodeAvatar = ({
   memberName,
   placeholderColorIndex,
 }: Props) => {
-  const { accentColors, textStyles } = useCanvasTheme();
+  const { accentColors, textStyleInstances } = useCanvasTheme();
   // Small texture for everyone, the full-size one only where it is visible.
   const lowResUrl = useMemo(
     () => getMemberNodeAvatar({ photo }, AVATAR_LOW_RES_SIZE),
@@ -48,10 +48,6 @@ const MemberNodeAvatar = ({
   const patternTexture = Assets.get(PATTERN_TEXTURE_SRC);
 
   const initials = useMemo(() => getInitials(memberName), [memberName]);
-  const placeholderStyle = useMemo(
-    () => new TextStyle(textStyles.placeholderInitials),
-    [textStyles],
-  );
 
   if (avatarImage) {
     // The texture is already a circle (see getMemberNodeAvatar): no mask.
@@ -93,7 +89,7 @@ const MemberNodeAvatar = ({
         anchor={0.5}
         x={CENTER_X}
         y={NODE_AVATAR_RADIUS}
-        style={placeholderStyle}
+        style={textStyleInstances.placeholderInitials}
       />
     </pixiContainer>
   );

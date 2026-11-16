@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { CanvasTextMetrics, Graphics, TextStyle } from "pixi.js";
+import { CanvasTextMetrics, Graphics } from "pixi.js";
 import { Member } from "@/models";
 import { formatMemberRecruitmentSeason, truncateText } from "@/utils";
 import { useCanvasTheme } from "@/hooks";
+import { getCardBackgroundContext } from "./cardBackgroundContext";
 import {
   NODE_AVATAR_SIZE,
   NODE_WIDTH,
@@ -21,6 +22,9 @@ interface Props {
 const TEXT_Y = NODE_AVATAR_SIZE + 17;
 const SUBTITLE_PADDING = 16;
 
+// The typings require `draw`; the shared context is already drawn.
+const keepSharedContext = () => {};
+
 const MemberNodeCard = ({
   member,
   isSelected,
@@ -31,19 +35,13 @@ const MemberNodeCard = ({
   const {
     primaryGradientToBottomRight,
     surfaceAccentColors,
-    textStyles,
+    textStyleInstances,
     cardStroke,
     cardStrokeAlpha,
   } = useCanvasTheme();
 
-  const titleStyle = useMemo(
-    () => new TextStyle(textStyles.title),
-    [textStyles],
-  );
-  const subtitleStyle = useMemo(
-    () => new TextStyle(textStyles.subtitle),
-    [textStyles],
-  );
+  const titleStyle = textStyleInstances.title;
+  const subtitleStyle = textStyleInstances.subtitle;
 
   const titleMetrics = useMemo(
     () => CanvasTextMetrics.measureText(member.name, titleStyle),
@@ -63,7 +61,8 @@ const MemberNodeCard = ({
 
   const subtitleY = titleMetrics.height / 2 + 12;
 
-  const drawCardBackground = useCallback(
+  // Only the selected card has its own geometry (gradient stroke).
+  const drawSelectedBackground = useCallback(
     (g: Graphics) => {
       g.clear();
       g.beginPath();
@@ -77,30 +76,33 @@ const MemberNodeCard = ({
       g.fill({
         color: surfaceAccentColors[placeholderColorIndex],
       });
-
-      if (isSelected) {
-        g.stroke({ fill: primaryGradientToBottomRight, width: 3 });
-      } else {
-        g.stroke({
-          color: cardStroke,
-          width: 3,
-          alpha: cardStrokeAlpha,
-        });
-      }
+      g.stroke({ fill: primaryGradientToBottomRight, width: 3 });
     },
-    [
-      isSelected,
-      placeholderColorIndex,
-      surfaceAccentColors,
-      primaryGradientToBottomRight,
-      cardStroke,
-      cardStrokeAlpha,
-    ],
+    [placeholderColorIndex, surfaceAccentColors, primaryGradientToBottomRight],
+  );
+
+  const sharedBackground = useMemo(
+    () =>
+      getCardBackgroundContext(
+        surfaceAccentColors[placeholderColorIndex],
+        cardStroke,
+        cardStrokeAlpha,
+      ),
+    [surfaceAccentColors, placeholderColorIndex, cardStroke, cardStrokeAlpha],
   );
 
   return (
     <pixiContainer>
-      <pixiGraphics draw={drawCardBackground} />
+      {/* Distinct keys remount the Graphics: draw() must never touch a shared context. */}
+      {isSelected ? (
+        <pixiGraphics key="selected" draw={drawSelectedBackground} />
+      ) : (
+        <pixiGraphics
+          key="shared"
+          context={sharedBackground}
+          draw={keepSharedContext}
+        />
+      )}
       <pixiContainer x={centerX} y={TEXT_Y}>
         <pixiBitmapText text={member.name} style={titleStyle} anchor={0.5} />
         <pixiBitmapText

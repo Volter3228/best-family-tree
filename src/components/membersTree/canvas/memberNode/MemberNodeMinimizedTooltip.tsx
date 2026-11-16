@@ -1,5 +1,5 @@
-import { memo, useCallback, useRef, useMemo } from "react";
-import { CanvasTextMetrics, Container, Graphics, TextStyle } from "pixi.js";
+import { memo, useCallback, useRef } from "react";
+import { CanvasTextMetrics, Container, Graphics } from "pixi.js";
 import { useTick } from "@pixi/react";
 import { useCanvasTheme } from "@/hooks";
 import {
@@ -22,14 +22,11 @@ const MemberNodeMinimizedTooltip = ({
   placeholderColorIndex,
   onHidden,
 }: Props) => {
-  const { accentColors, textStyles } = useCanvasTheme();
+  const { accentColors, textStyleInstances } = useCanvasTheme();
   const tooltipRef = useRef<Container>(null);
   const animationProgress = useRef(0);
 
-  const textStyle = useMemo(
-    () => new TextStyle(textStyles.tooltip),
-    [textStyles],
-  );
+  const textStyle = textStyleInstances.tooltip;
 
   const drawTooltipBackground = useCallback(
     (g: Graphics) => {
