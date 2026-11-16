@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import {
   parseFiltersFromSearchParams,
   filtersToSearchParams,
@@ -13,7 +13,6 @@ interface Props {
 
 export const useFilterSearchParams = ({ filters, setFilters }: Props) => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const pathname = usePathname();
   const isInitializedRef = useRef(false);
   const skipNextUrlUpdateRef = useRef(false);
@@ -43,9 +42,10 @@ export const useFilterSearchParams = ({ filters, setFilters }: Props) => {
       const queryStr = params.toString().replaceAll("%2C", ",");
       const url = queryStr ? `${pathname}?${queryStr}` : pathname;
 
-      router.replace(url, { scroll: false });
+      // Not router.replace: that re-runs the server page and refetches the tree
+      window.history.replaceState(null, "", url);
     },
-    [pathname, router],
+    [pathname],
   );
 
   useEffect(() => {
