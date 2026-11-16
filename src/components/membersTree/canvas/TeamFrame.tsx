@@ -46,6 +46,7 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
 
   const fillRef = useRef<Graphics>(null);
   const strokeRef = useRef<Graphics>(null);
+  const pixelStrokeRef = useRef<Graphics>(null);
   const selectedStrokeRef = useRef<Graphics>(null);
   const rippleRef = useRef<Container>(null);
 
@@ -94,8 +95,12 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
     [width, height, color],
   );
   const drawStroke = useMemo(
-    () => drawOutline(TEAM_FRAME_STROKE_WIDTH, pixelLine),
-    [drawOutline, pixelLine],
+    () => drawOutline(TEAM_FRAME_STROKE_WIDTH),
+    [drawOutline],
+  );
+  const drawPixelStroke = useMemo(
+    () => drawOutline(TEAM_FRAME_STROKE_WIDTH, true),
+    [drawOutline],
   );
   const drawSelected = useMemo(
     () => drawOutline(SELECTED_STROKE_WIDTH),
@@ -140,7 +145,9 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
       fillRef.current.alpha =
         lerp(FILL_ALPHA, fade) + SELECTED_FILL_BOOST * selection;
     }
-    if (strokeRef.current) strokeRef.current.alpha = lerp(STROKE_ALPHA, fade);
+    const strokeAlpha = lerp(STROKE_ALPHA, fade);
+    if (strokeRef.current) strokeRef.current.alpha = strokeAlpha;
+    if (pixelStrokeRef.current) pixelStrokeRef.current.alpha = strokeAlpha;
     if (selectedStrokeRef.current) {
       selectedStrokeRef.current.alpha = selection * 0.85;
     }
@@ -182,6 +189,14 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
         draw={drawStroke}
         eventMode="none"
         alpha={STROKE_ALPHA[0]}
+        visible={!pixelLine}
+      />
+      <pixiGraphics
+        ref={pixelStrokeRef}
+        draw={drawPixelStroke}
+        eventMode="none"
+        alpha={STROKE_ALPHA[0]}
+        visible={pixelLine}
       />
       {hasBeenSelected && (
         <>
