@@ -44,7 +44,13 @@ const LineageEdge = ({
     width: FIXED_EDGE_WIDTH + 2,
   });
 
-  return <pixiGraphics draw={initDraw} eventMode="none" />;
+  // A render group of its own: the dashes rebuild ~30 times a second, and
+  // that must not invalidate the instructions of the whole tree.
+  return (
+    <pixiContainer isRenderGroup label="lineage-edge">
+      <pixiGraphics draw={initDraw} eventMode="none" />
+    </pixiContainer>
+  );
 };
 
 export default memo(LineageEdge);

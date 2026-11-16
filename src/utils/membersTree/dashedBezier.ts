@@ -4,7 +4,6 @@ import {
   alignPolylines,
   cumulativeLengths,
   lerpPoints,
-  pointAtLength,
 } from "./edgePolyline";
 import { FLOW_VIEWPORT_DIRECTION } from "@/libs/elk";
 import type { Direction, EdgeStyle, Point, SegmentData } from "@/types";
@@ -52,10 +51,19 @@ interface DashStrokeOptions {
   pixelLine?: boolean;
 }
 
+export type DashStyle = DashStrokeOptions & { color: string };
+
+/** One stroke style per colour, built once and reused by every redraw. */
+export const buildDashStyles = (
+  colors: readonly string[],
+  options: DashStrokeOptions,
+): DashStyle[] => colors.map((color) => ({ ...options, color }));
+
 /**
- * Draw dashes along a pre-computed segment, cycling through `colors` per dash.
- * dashOffset controls animation position.
- * Color is position-based so it flows smoothly as dashes animate.
+ * Draw dashes along a pre-computed segment, cycling through `styles` per dash.
+ * dashOffset controls animation position. Colour is position-based so it flows
+ * smoothly as dashes animate. Dashes of one colour share a single path and
+ * stroke, so a redraw costs one stroke per colour instead of one per dash.
  */
 export const drawDashes = (
   g: Graphics,
@@ -64,43 +72,75 @@ export const drawDashes = (
   gapLen: number,
   dashOffset: number,
   maxDist: number = seg.totalLen,
-  colors: readonly string[] = [],
-  strokeOptions: DashStrokeOptions = { width: 1 },
+  styles: readonly DashStyle[] = [],
 ): void => {
   const { points, arcLengths, totalLen } = seg;
   const clampLen = Math.min(totalLen, maxDist);
-  if (clampLen <= 0 || colors.length === 0) return;
+  const n = styles.length;
+  if (clampLen <= 0 || n === 0) return;
 
   const patternLen = dashLen + gapLen;
   let pos = -(dashOffset % patternLen);
   if (pos > 0) pos -= patternLen;
 
-  let groupIdx = Math.round((dashOffset + pos) / patternLen);
+  const firstGroup = Math.round((dashOffset + pos) / patternLen);
+  const lastIdx = points.length - 1;
 
-  while (pos < clampLen) {
-    const ds = Math.max(pos, 0);
-    const de = Math.min(pos + dashLen, clampLen);
-    if (de > ds) {
-      const colorIdx =
-        ((groupIdx % colors.length) + colors.length) % colors.length;
+  // Binary search for the segment holding arc distance `d`.
+  const segmentAt = (d: number) => {
+    let lo = 0;
+    let hi = lastIdx;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (arcLengths[mid] <= d) lo = mid;
+      else hi = mid;
+    }
+    return hi;
+  };
+  const lineToAt = (d: number, move: boolean) => {
+    let x: number;
+    let y: number;
+    if (d <= 0 || arcLengths[lastIdx] === 0) {
+      x = points[0].x;
+      y = points[0].y;
+    } else if (d >= arcLengths[lastIdx]) {
+      x = points[lastIdx].x;
+      y = points[lastIdx].y;
+    } else {
+      const hi = segmentAt(d);
+      const lo = hi - 1;
+      const span = arcLengths[hi] - arcLengths[lo];
+      const t = span === 0 ? 0 : (d - arcLengths[lo]) / span;
+      x = points[lo].x + (points[hi].x - points[lo].x) * t;
+      y = points[lo].y + (points[hi].y - points[lo].y) * t;
+    }
+    if (move) g.moveTo(x, y);
+    else g.lineTo(x, y);
+  };
 
-      g.beginPath();
-      const startPt = pointAtLength(points, arcLengths, ds);
-      g.moveTo(startPt.x, startPt.y);
-
+  for (let c = 0; c < n; c++) {
+    // Dashes cycle through the colours, so this colour owns every n-th one.
+    const firstJ = (((c - firstGroup) % n) + n) % n;
+    let started = false;
+    for (let p = pos + firstJ * patternLen; p < clampLen; p += patternLen * n) {
+      const ds = Math.max(p, 0);
+      const de = Math.min(p + dashLen, clampLen);
+      if (de <= ds) continue;
+      if (!started) {
+        g.beginPath();
+        started = true;
+      }
+      lineToAt(ds, true);
       let i = 0;
       while (i < arcLengths.length && arcLengths[i] <= ds) i++;
       for (; i < arcLengths.length && arcLengths[i] < de; i++) {
         g.lineTo(points[i].x, points[i].y);
       }
-
-      const endPt = pointAtLength(points, arcLengths, de);
-      g.lineTo(endPt.x, endPt.y);
-
-      g.setStrokeStyle({ ...strokeOptions, color: colors[colorIdx] });
+      lineToAt(de, false);
+    }
+    if (started) {
+      g.setStrokeStyle(styles[c]);
       g.stroke();
     }
-    pos += patternLen;
-    groupIdx++;
   }
 };

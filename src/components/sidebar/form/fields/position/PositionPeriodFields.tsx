@@ -49,8 +49,8 @@ const PositionPeriodFields = ({
         name={`position-team-years-${rowId}`}
         start={row.teamStartYear}
         end={row.teamEndYear}
-        startLabel="Початок команди"
-        endLabel="Кінець команди"
+        startLabel="Початок діяльності"
+        endLabel="Кінець діяльності"
         onChange={(teamStartYear, teamEndYear) =>
           onUpdate({ teamStartYear, teamEndYear })
         }
@@ -64,12 +64,12 @@ const PositionPeriodFields = ({
     <>
       <TextInput
         name={`position-organization-${rowId}`}
-        label="Організація (без команди)"
+        label="Організація"
         value={row.organization ?? ""}
         onChange={(organization) =>
           onUpdate({ organization: organization || undefined })
         }
-        placeholder="Зовнішній проєкт"
+        placeholder="Міжнар"
         color={color}
       />
       <YearRangeInput

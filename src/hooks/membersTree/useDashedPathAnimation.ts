@@ -2,7 +2,15 @@ import { useEffect, useRef } from "react";
 import { useApplication } from "@pixi/react";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
-import { findCommonLen, animDuration, drawDashes, alignSegments, lerpSegment } from "@/utils";
+import {
+  findCommonLen,
+  animDuration,
+  drawDashes,
+  alignSegments,
+  lerpSegment,
+} from "@/utils";
+import { buildDashStyles } from "@/utils/membersTree/dashedBezier";
+import { isPathOffScreen } from "@/utils/membersTree/pathVisibility";
 import {
   DASH_LEN,
   GAP_LEN,
@@ -18,7 +26,6 @@ import type { PathData } from "@/types";
 const MIN_REDRAW_OFFSET = 1.2;
 // How long the dash path takes to morph after its geometry changes.
 const MORPH_SECONDS = 0.35;
-
 interface Options {
   targetId: string | null;
   buildPath: (id: string) => PathData;
@@ -183,6 +190,12 @@ export const useDashedPathAnimation = ({
     // `clear()` marks the Graphics as changed even when it is already empty,
     // which keeps Pixi re-processing the scene every frame; clear it once.
     let isCleared = false;
+    const styles = buildDashStyles(colors, {
+      width,
+      cap: "round",
+      join: "round",
+      pixelLine,
+    });
 
     const onTick = () => {
       const g = graphicsRef.current;
@@ -218,6 +231,9 @@ export const useDashedPathAnimation = ({
       const transitionActive =
         (timelineRef.current?.isActive() ?? false) || morphRef.current !== null;
       if (offsetDelta < MIN_REDRAW_OFFSET && !transitionActive) return;
+      // Off screen: keep the offset moving but skip the rebuild. The offset
+      // gap makes the first on-screen tick redraw.
+      if (!morph && isPathOffScreen(pathRef.current)) return;
       lastOffsetRef.current = offsetRef.current;
 
       isCleared = false;
@@ -234,8 +250,7 @@ export const useDashedPathAnimation = ({
           GAP_LEN,
           offsetRef.current + offsets[i],
           segMaxDist,
-          colors,
-          { width, cap: "round", join: "round", pixelLine },
+          styles,
         );
         remainingLen -= segments[i].totalLen;
       }
