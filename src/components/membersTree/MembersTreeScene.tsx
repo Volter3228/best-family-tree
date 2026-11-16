@@ -1,5 +1,4 @@
-import { memo, type RefObject } from "react";
-import type { Container } from "pixi.js";
+import { memo } from "react";
 import { isZoomedOut as getIsZoomedOut } from "@/utils";
 import { useTreeStore } from "@/store/treeStore";
 import {
@@ -27,7 +26,6 @@ import {
 } from "./canvas";
 
 interface Props {
-  sceneRef: RefObject<Container | null>;
   treeMode: TreeMode;
   direction: Direction;
   edgeStyle: EdgeStyle;
@@ -44,10 +42,9 @@ interface Props {
   onFrameClick: (frame: TeamFrame) => void;
 }
 
-// Everything drawn inside the viewport. The root container is faded by
+// Everything drawn inside the viewport. The parent render group is faded by
 // `useSceneTransition` when the tree mode changes.
 const MembersTreeScene = ({
-  sceneRef,
   treeMode,
   direction,
   edgeStyle,
@@ -67,7 +64,7 @@ const MembersTreeScene = ({
   const isTeamView = treeMode === "team";
 
   return (
-    <pixiContainer ref={sceneRef}>
+    <pixiContainer>
       {isTeamView && (
         <TeamFramesLayer
           frames={teamFrames}

@@ -13,6 +13,7 @@ interface Props {
 
 // Fades children towards `minAlpha` in the team overview and makes them
 // non-interactive there, so team cards underneath can take the pointer.
+// A render group, so the alpha is one uniform, not a per-descendant update.
 const ZoomFadeContainer = ({ enabled, minAlpha, children }: Props) => {
   const viewport = useTreeStore((s) => s.viewport);
   const containerRef = useRef<Container>(null);
@@ -33,7 +34,7 @@ const ZoomFadeContainer = ({ enabled, minAlpha, children }: Props) => {
     }
   });
 
-  return <pixiContainer ref={containerRef}>{children}</pixiContainer>;
+  return <pixiContainer ref={containerRef} isRenderGroup>{children}</pixiContainer>;
 };
 
 export default memo(ZoomFadeContainer);

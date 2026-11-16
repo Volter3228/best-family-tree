@@ -178,9 +178,12 @@ const MembersTreeContent = ({ members }: Props) => {
           <SharpAvatarTracker />
           {/* A render group of its own: panning the viewport then moves one
               transform instead of recomputing every node's world transform. */}
-          <pixiContainer isRenderGroup label="tree-render-group">
+          <pixiContainer
+            ref={sceneRef}
+            isRenderGroup
+            label="tree-render-group"
+          >
             <MembersTreeScene
-              sceneRef={sceneRef}
               treeMode={treeMode}
               direction={direction}
               edgeStyle={edgeStyle}
