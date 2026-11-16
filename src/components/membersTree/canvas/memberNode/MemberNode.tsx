@@ -1,6 +1,5 @@
 import { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { Container, FederatedPointerEvent, Rectangle } from "pixi.js";
-import gsap from "gsap";
 import {
   useTapWithoutDrag,
   useHoverNodeAnimation,
@@ -9,18 +8,18 @@ import {
   CARD_PIVOT_Y,
 } from "@/hooks";
 import { Member } from "@/models";
-import { birthdayVisibleSignal, zoomedOutSignal } from "@/store/treeSignals";
+import { zoomedOutSignal } from "@/store/treeSignals";
 import {
   NODE_WIDTH,
   NODE_HEIGHT,
   NODE_CARD_TOP,
   NODE_CARD_HEIGHT,
 } from "@/constants/canvas";
-import MemberBirthdayAnimation from "@/components/animations/memberBirthday";
 import MemberNodeAvatar from "./MemberNodeAvatar";
 import MemberNodeMinimizedTooltip from "./MemberNodeMinimizedTooltip";
 import MemberNodeCard from "./MemberNodeCard";
 import MemberNodeGlow from "./MemberNodeGlow";
+import MemberNodeBirthday from "./MemberNodeBirthday";
 
 interface Props {
   nodeId: string;
@@ -58,6 +57,9 @@ const CONTENT_CENTER_X = NODE_WIDTH / 2;
 const CONTENT_CENTER_Y = NODE_HEIGHT / 2;
 const NODE_PIVOT = { x: CONTENT_CENTER_X, y: CONTENT_CENTER_Y };
 const CARD_PIVOT = { x: CARD_PIVOT_X, y: CARD_PIVOT_Y };
+// Each hovered node rises above the previous one and stays there: dropping the
+// zIndex on leave would sort every sibling again.
+let hoverOrder = 10;
 
 const MemberNode = ({
   nodeId,
@@ -71,6 +73,7 @@ const MemberNode = ({
   onClick,
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [hoverZIndex, setHoverZIndex] = useState(0);
   const containerRef = useRef<Container>(null);
   const cardRef = useRef<Container>(null);
 
@@ -100,8 +103,11 @@ const MemberNode = ({
   // A drag that starts on the node pans the tree; it only selects the member
   // when it was a quick, tiny slip of a click.
   // A touch held still shows the hover state instead (and selects nothing).
-  const handleLongPress = useCallback(() => setIsHovered(true), []);
-  const tap = useTapWithoutDrag(handleSelect, handleLongPress);
+  const startHover = useCallback(() => {
+    setIsHovered(true);
+    setHoverZIndex(++hoverOrder);
+  }, []);
+  const tap = useTapWithoutDrag(handleSelect, startHover);
 
   // The tooltip only exists while it is needed (and while it fades out).
   const [isTooltipMounted, setIsTooltipMounted] = useState(false);
@@ -125,8 +131,8 @@ const MemberNode = ({
   // Touch does not hover on enter: a tap selects, a long press hovers (below).
   const handlePointerEnter = useCallback((event: FederatedPointerEvent) => {
     if (event.pointerType === "touch") return;
-    setIsHovered(true);
-  }, []);
+    startHover();
+  }, [startHover]);
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
 
   useEffect(() => {
@@ -154,23 +160,6 @@ const MemberNode = ({
   const cullArea = useMemo(() => getCullArea(x, y), [x, y]);
 
   const isBirthday = useMemo(() => member.isBirthdayToday(), [member.birthday]);
-  const birthdayRef = useRef<Container>(null);
-  const [showBirthday, setShowBirthday] = useState(birthdayVisibleSignal.get);
-  // Only birthday nodes follow the zoom state.
-  useEffect(() => {
-    if (!isBirthday) return;
-    setShowBirthday(birthdayVisibleSignal.get());
-    return birthdayVisibleSignal.subscribe(setShowBirthday);
-  }, [isBirthday]);
-
-  useEffect(() => {
-    if (!birthdayRef.current || !isBirthday) return;
-    gsap.to(birthdayRef.current, {
-      alpha: showBirthday ? 1 : 0,
-      duration: 0.6,
-      ease: "power2.inOut",
-    });
-  }, [showBirthday, isBirthday]);
 
   return (
     <>
@@ -179,7 +168,7 @@ const MemberNode = ({
         x={x + CONTENT_CENTER_X}
         y={y + CONTENT_CENTER_Y}
         pivot={NODE_PIVOT}
-        zIndex={isHovered ? 1000 : 0}
+        zIndex={hoverZIndex}
         eventMode="static"
         interactiveChildren={false}
         cursor="pointer"
@@ -224,19 +213,11 @@ const MemberNode = ({
         )}
       </pixiContainer>
       {isBirthday && (
-        <pixiContainer
-          ref={birthdayRef}
+        <MemberNodeBirthday
           x={x + CONTENT_CENTER_X}
           y={y + CONTENT_CENTER_Y}
-          alpha={0}
-          zIndex={1001}
-          eventMode="none"
-          cullable
-          cullableChildren={false}
           cullArea={cullArea}
-        >
-          <MemberBirthdayAnimation paused={!showBirthday} />
-        </pixiContainer>
+        />
       )}
     </>
   );
