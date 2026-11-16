@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, memo } from "react";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
 import { useCanvasTheme } from "@/hooks";
-import { lerpPoints } from "@/utils/membersTree/edgePolyline";
 import { teamEdgePath } from "@/utils/membersTree/teamEdgePath";
 import {
   teamMorphPairs,
   type MorphPair,
 } from "@/utils/membersTree/teamMorph";
+import { useTreeStore } from "@/store/treeStore";
 import { FIXED_EDGE_WIDTH } from "@/constants/canvas";
 import type { Direction, EdgeStyle, Point, TeamFrame } from "@/types";
 
@@ -25,6 +25,14 @@ const MAX_MORPH_EDGES = 2500;
 const drawPolyline = (g: Graphics, points: Point[]) => {
   g.moveTo(points[0].x, points[0].y);
   for (let i = 1; i < points.length; i++) g.lineTo(points[i].x, points[i].y);
+};
+
+// Draws the polyline a..b blended by t, without allocating points.
+const drawLerped = (g: Graphics, a: Point[], b: Point[], t: number) => {
+  g.moveTo(a[0].x + (b[0].x - a[0].x) * t, a[0].y + (b[0].y - a[0].y) * t);
+  for (let i = 1; i < a.length; i++) {
+    g.lineTo(a[i].x + (b[i].x - a[i].x) * t, a[i].y + (b[i].y - a[i].y) * t);
+  }
 };
 
 // Leader-to-member edges of every team, drawn from the layout's geometry.
@@ -52,10 +60,20 @@ const TeamEdgesLayer = ({ frames, pixelLine, direction, edgeStyle }: Props) => {
         prevStyle !== edgeStyle &&
         frames.reduce((n, f) => n + f.edges.length, 0) <= MAX_MORPH_EDGES
       ) {
+        // Only frames on screen are morphed; the rest snap to the final shape.
+        const viewport = useTreeStore.getState().viewport;
+        const view =
+          viewport && !viewport.destroyed ? viewport.getVisibleBounds() : null;
         const morph = {
           t: 0,
-          pairs: frames.flatMap(({ edges }) =>
-            teamMorphPairs(edges, direction, prevStyle, edgeStyle),
+          pairs: frames.flatMap((frame) =>
+            view &&
+            (frame.x > view.right ||
+              frame.x + frame.width < view.x ||
+              frame.y > view.bottom ||
+              frame.y + frame.height < view.y)
+              ? []
+              : teamMorphPairs(frame.edges, direction, prevStyle, edgeStyle),
           ),
         };
         morphRef.current = morph;
@@ -92,7 +110,7 @@ const TeamEdgesLayer = ({ frames, pixelLine, direction, edgeStyle }: Props) => {
       if (morph) {
         g.setStrokeStyle({ ...stroke, alpha: edgeAlpha });
         for (const { from, to } of morph.pairs) {
-          drawPolyline(g, lerpPoints(from, to, morph.t));
+          drawLerped(g, from, to, morph.t);
         }
         g.stroke();
         return;
