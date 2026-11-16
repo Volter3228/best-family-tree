@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "pixi.js";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { isZoomedOut } from "@/utils";
 import {
   NODE_HOVER_SCALE,
@@ -38,20 +37,24 @@ export const useHoverNodeAnimation = ({
   const [glowMounted, setGlowMounted] = useState(false);
   if (shouldShowGlow && !glowMounted) setGlowMounted(true);
 
-  useGSAP(() => {
+  useEffect(() => {
     if (!container) return;
 
     const appScale = Math.abs(container.parent?.worldTransform?.a || 1);
     const targetScale = calculateTargetScale(appScale, isHovered);
 
-    gsap.to(container.scale, {
+    const tween = gsap.to(container.scale, {
       x: targetScale,
       y: targetScale,
       duration: NODE_HOVER_ANIMATION_DURATION,
       ease: "power2.out",
       overwrite: "auto",
     });
-  }, [isHovered]);
+    // The next tween starts from the current scale, so killing does not snap.
+    return () => {
+      tween.kill();
+    };
+  }, [container, isHovered]);
 
   return { glowMounted, shouldShowGlow };
 };

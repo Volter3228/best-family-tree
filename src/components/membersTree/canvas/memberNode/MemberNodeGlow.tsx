@@ -1,7 +1,6 @@
-import { memo, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Sprite } from "pixi.js";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   NODE_AVATAR_SIZE,
   NODE_CARD_TOP,
@@ -28,14 +27,17 @@ interface Props {
 const MemberNodeGlow = ({ kind, active }: Props) => {
   const spriteRef = useRef<Sprite>(null);
 
-  useGSAP(() => {
+  useEffect(() => {
     if (!spriteRef.current) return;
-    gsap.to(spriteRef.current, {
+    const tween = gsap.to(spriteRef.current, {
       alpha: active ? GLOW_ALPHA : 0,
       duration: NODE_HOVER_ANIMATION_DURATION / 2,
       ease: "power1.out",
       overwrite: "auto",
     });
+    return () => {
+      tween.kill();
+    };
   }, [active]);
 
   const origin = ORIGINS[kind];

@@ -23,7 +23,8 @@ interface Entry {
   finalize: (card: Container) => void;
 }
 
-let entries: Entry[] = [];
+// A card has at most one active entry.
+const entries = new Map<Container, Entry>();
 
 // Finished hides wait here so every card flips `visible = false` in the same
 // tick. A visible flip dirties the render group's structure, and staggered flips
@@ -37,17 +38,17 @@ export const deferCardHidden = (card: Container): void => {
 
 function tick() {
   const now = gsap.ticker.time;
-  entries = entries.filter((entry) => {
+  for (const [card, entry] of entries) {
     const local = now - entry.startAt;
-    if (local < 0) return true;
+    if (local < 0) continue;
     if (local >= entry.duration) {
-      entry.finalize(entry.card);
-      return false;
+      entries.delete(card);
+      entry.finalize(card);
+    } else {
+      entry.reveal(card, local);
     }
-    entry.reveal(entry.card, local);
-    return true;
-  });
-  if (entries.length === 0) {
+  }
+  if (entries.size === 0) {
     pendingHidden.forEach((card) => {
       card.visible = false;
     });
@@ -57,11 +58,11 @@ function tick() {
 }
 
 export const finishCardReveal = (card: Container): void => {
-  entries = entries.filter((entry) => {
-    if (entry.card !== card) return true;
+  const entry = entries.get(card);
+  if (entry) {
+    entries.delete(card);
     entry.finalize(card);
-    return false;
-  });
+  }
   pendingHidden.delete(card);
 };
 
@@ -119,7 +120,7 @@ export const registerCardReveal = (
 
   // Start state applied right away (as the delayed timeline used to do).
   reveal(card, 0);
-  entries.push({
+  entries.set(card, {
     card,
     startAt: gsap.ticker.time + delay,
     duration: isShow ? SHOW_DURATION : HIDE_DURATION,

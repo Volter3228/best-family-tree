@@ -22,11 +22,14 @@ const MemberNodeBirthday = ({ x, y, cullArea }: Props) => {
 
   useEffect(() => {
     if (!birthdayRef.current) return;
-    gsap.to(birthdayRef.current, {
+    const tween = gsap.to(birthdayRef.current, {
       alpha: showBirthday ? 1 : 0,
       duration: 0.6,
       ease: "power2.inOut",
     });
+    return () => {
+      tween.kill();
+    };
   }, [showBirthday]);
 
   return (
