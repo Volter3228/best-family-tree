@@ -49,6 +49,7 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
   const pixelStrokeRef = useRef<Graphics>(null);
   const selectedStrokeRef = useRef<Graphics>(null);
   const rippleRef = useRef<Container>(null);
+  const rootRef = useRef<Container>(null);
 
   const lastScaleRef = useRef<number | null>(null);
   const selectionRef = useRef(0);
@@ -124,8 +125,15 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
 
   // Does nothing while idle: only runs on zoom, selection or ripple changes.
   useTick((ticker) => {
-    const scale = viewport?.scale.x ?? 1;
     const target = selectedTargetRef.current ? 1 : 0;
+    // Off screen: skip the work, but snap selection (the badge reads it) and
+    // force a full refresh on return. A pending ripple is kept to play later.
+    if (rootRef.current?.culled) {
+      lastScaleRef.current = null;
+      selectionRef.current = target;
+      return;
+    }
+    const scale = viewport?.scale.x ?? 1;
     const selectionChanging = Math.abs(selectionRef.current - target) > 0.002;
     const rippling = rippleProgressRef.current >= 0;
     if (lastScaleRef.current === scale && !selectionChanging && !rippling) {
@@ -171,6 +179,7 @@ const TeamFrame = ({ frame, pixelLine, isSelected, onBadgeClick }: Props) => {
 
   return (
     <pixiContainer
+      ref={rootRef}
       x={frame.x}
       y={frame.y}
       eventMode="passive"

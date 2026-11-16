@@ -132,6 +132,11 @@ const TeamBadge = ({ frame, color, isDark, selectionRef, onClick }: Props) => {
   useTick((ticker) => {
     const container = containerRef.current;
     if (!container) return;
+    // The frame is off screen: skip and refresh fully on return.
+    if (container.parent?.culled) {
+      lastStateRef.current.scale = NaN;
+      return;
+    }
     const scale = viewport?.scale.x ?? 1;
     const selection = selectionRef.current ?? 0;
     const hoverTarget = isHoveredRef.current ? 1 : 0;

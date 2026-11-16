@@ -104,6 +104,19 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
     [width, height],
   );
 
+  // Culling box in world coordinates: the frame scaled by the hover growth
+  // around its centre, so a grown card stays while partly on screen.
+  const cullArea = useMemo(() => {
+    const w = width * TEAM_HOVER_MAX_SCALE;
+    const h = height * TEAM_HOVER_MAX_SCALE;
+    return new Rectangle(
+      frame.x + width / 2 - w / 2,
+      frame.y + height / 2 - h / 2,
+      w,
+      h,
+    );
+  }, [frame.x, frame.y, width, height]);
+
   const drawCard = useCallback(
     (g: Graphics) => {
       g.clear();
@@ -121,6 +134,14 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
   useTick((ticker) => {
     const container = containerRef.current;
     if (!container) return;
+
+    // Off screen: skip, drop any hover, and refresh fully on return.
+    if (container.culled) {
+      lastScaleRef.current = null;
+      if (hoveredRef.current) stopHover();
+      hoverRef.current = 0;
+      return;
+    }
 
     const scale = viewport?.scale.x ?? 1;
     const target = hoveredRef.current ? 1 : 0;
@@ -180,6 +201,9 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
       y={frame.y + height / 2}
       alpha={0}
       visible={false}
+      cullable
+      cullableChildren={false}
+      cullArea={cullArea}
       eventMode="none"
       cursor="pointer"
       hitArea={hitArea}
