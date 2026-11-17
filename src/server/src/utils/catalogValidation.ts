@@ -82,6 +82,8 @@ export const roleBodySchema = z.object({
   isLeaderPosition: optional(booleanLike),
 });
 
+export const roleUpdateSchema = roleBodySchema.partial();
+
 // A role is referenced by id or, when it is new, by name.
 const roleRef = {
   roleId: optional(z.string().min(1)),

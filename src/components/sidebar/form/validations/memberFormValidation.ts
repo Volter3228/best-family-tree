@@ -5,10 +5,12 @@ import {
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
 import type { Member } from "@/models";
+import { getRowPeriod } from "../fields/position/positionFormUtils";
 import type {
   MemberFormData,
   MentorsListItem,
   PositionFormRow,
+  Team,
   TeamType,
 } from "@/types";
 
@@ -53,19 +55,24 @@ const validateLinks = ({
 };
 
 // Events without a team name are named "<type> <start year>", so they need it.
+// New teams exist only as editions of an event type (the server enforces it).
 const validatePositions = (
   positions: PositionFormRow[],
   teamTypes: TeamType[],
+  teams: Team[],
 ): string | undefined => {
   for (const position of positions) {
-    if (!position.roleName.trim() || position.teamName?.trim()) continue;
+    if (!position.roleName.trim()) continue;
+
+    if (getRowPeriod(teams, position, teamTypes).kind === "unavailable") {
+      return "Такої команди немає. Оберіть наявну або створіть її у вкладці «Команди».";
+    }
+    if (position.teamName?.trim()) continue;
 
     const teamType = teamTypes.find(({ id }) => id === position.teamTypeId);
-    const typeName = teamType?.name ?? position.teamTypeName;
-    const isEvent = teamType ? teamType.isEvent : Boolean(typeName);
 
-    if (typeName && isEvent && !position.teamStartYear) {
-      return `Вкажіть рік початку для «${typeName}» або назву команди.`;
+    if (teamType?.isEvent && !position.teamStartYear) {
+      return `Вкажіть рік початку для «${teamType.name}» або назву команди.`;
     }
   }
 };
@@ -111,7 +118,7 @@ const validateMemberForm = (
   mentorsList: MentorsListItem[],
   teamTypes: TeamType[] = [],
   stored: StoredMemberValues | null = null,
-  { minimal = false }: { minimal?: boolean } = {},
+  { minimal = false, teams = [] }: { minimal?: boolean; teams?: Team[] } = {},
 ): Partial<Record<keyof MemberFormData, string>> => {
   let errors: Partial<Record<keyof MemberFormData, string>> = {};
   const {
@@ -198,7 +205,7 @@ const validateMemberForm = (
     errors.phoneNumber = "Некоректний номер.";
   }
 
-  const positionsError = validatePositions(form.positions, teamTypes);
+  const positionsError = validatePositions(form.positions, teamTypes, teams);
   if (positionsError) errors.positions = positionsError;
 
   errors = {

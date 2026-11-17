@@ -1,11 +1,11 @@
-import { Gender, type AccentColor } from "@/types";
-import SegmentedControl, { type SegmentOption } from "../SegmentedControl";
+import { useMemo, type ComponentType } from "react";
+import { twMerge } from "tailwind-merge";
+import { GENDER_OPTIONS } from "@/constants/filters";
+import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { GENDER_ICONS } from "@/components/ui/GenderIcons";
+import ChipGroup from "@/components/ui/ChipGroup";
+import type { AccentColor, Gender } from "@/types";
 import InputLabel from "../inputs/InputLabel";
-
-const GENDER_OPTIONS: readonly SegmentOption<Gender>[] = [
-  { value: Gender.Male, label: "Чоловіча" },
-  { value: Gender.Female, label: "Жіноча" },
-];
 
 interface Props {
   value: Gender | null;
@@ -14,17 +14,34 @@ interface Props {
 }
 
 // Optional: nothing is selected until one is picked, and there is no way to
-// clear it, so a stored gender can never be emptied from the form.
-const GenderFormField = ({ value, onChange, color = "blue" }: Props) => (
-  <div className="flex flex-col flex-1 relative">
-    <InputLabel label="Стать" required={false} color={color} />
-    <SegmentedControl
-      options={GENDER_OPTIONS}
-      value={value}
-      onChange={onChange}
-      color={color}
-    />
-  </div>
-);
+// clear it, so a stored gender can never be emptied from the form. The sign
+// icons take the accent color when idle and turn white when chosen.
+const GenderFormField = ({ value, onChange, color = "blue" }: Props) => {
+  const options = useMemo(() => {
+    const idleText = COLOR_CLASSES[color].text;
+    return GENDER_OPTIONS.map((option) => {
+      const Icon = GENDER_ICONS[option.value];
+      const TintedIcon: ComponentType<{ className?: string }> = ({
+        className,
+      }) => <Icon className={twMerge(idleText, className)} />;
+      return { ...option, icon: TintedIcon };
+    });
+  }, [color]);
+
+  return (
+    <div className="flex flex-col relative">
+      <InputLabel label="Стать" required={false} color={color} />
+      <ChipGroup
+        label="Стать"
+        options={options}
+        value={value ?? undefined}
+        onChange={onChange}
+        color={color}
+        className="mt-1"
+        fill
+      />
+    </div>
+  );
+};
 
 export default GenderFormField;

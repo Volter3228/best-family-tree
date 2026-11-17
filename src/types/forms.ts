@@ -3,7 +3,6 @@ import { Gender, MemberStatus } from "@/types";
 export type PositionFormRow = {
   id: string;
   teamTypeId?: string;
-  teamTypeName?: string;
   teamName?: string;
   // Period of the team this row creates (an existing team keeps its own).
   teamStartYear?: number;
@@ -29,7 +28,6 @@ export type TeamMemberRow = {
 export type TeamFormData = {
   name: string;
   teamTypeId?: string;
-  teamTypeName?: string;
   description: string;
   startYear?: number;
   endYear?: number;

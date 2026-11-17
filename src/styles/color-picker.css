@@ -1,0 +1,33 @@
+/* react-colorful, restyled to match the forms: no default radii or shadows. */
+.color-picker.react-colorful {
+  width: 100%;
+  height: auto;
+  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.color-picker .react-colorful__saturation {
+  height: 9rem;
+  border-radius: 0.75rem;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.color-picker .react-colorful__hue {
+  height: 0.75rem;
+  border-radius: 9999px;
+}
+
+.color-picker .react-colorful__saturation-pointer,
+.color-picker .react-colorful__hue-pointer {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #fff;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+}
+
+.color-picker .react-colorful__interactive:focus .react-colorful__pointer {
+  transform: translate(-50%, -50%) scale(1.15);
+}

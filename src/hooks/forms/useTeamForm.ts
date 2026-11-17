@@ -24,24 +24,27 @@ import { useTransientMessage } from "./useTransientMessage";
 export type { TeamFormMode };
 
 interface Options {
-  // Edit exactly this team (used by the team sidebar) instead of letting the
-  // user pick a mode and a team.
-  fixedTeamId?: string;
+  // Edit this team; without it the form creates a new one.
+  teamId?: string;
+  // A new team was saved (its roster included).
+  onCreated?: (teamId: string) => void;
   onSaved?: () => void;
   onDeleted?: () => void;
+  // Shown on the submit button when the form opens (e.g. "Створено").
+  initialMessage?: string;
 }
 
 export const useTeamForm = ({
-  fixedTeamId,
+  teamId,
+  onCreated,
   onSaved,
   onDeleted,
+  initialMessage,
 }: Options = {}) => {
-  const [mode, setMode] = useState<TeamFormMode>(
-    fixedTeamId ? "edit" : "create",
-  );
-  const [selectedTeamId, setSelectedTeamId] = useState(fixedTeamId ?? "");
+  const mode: TeamFormMode = teamId ? "edit" : "create";
+  const selectedTeamId = teamId ?? "";
   const [form, setForm] = useState<TeamFormData>(EMPTY_TEAM_FORM);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(Boolean(teamId));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +52,7 @@ export const useTeamForm = ({
   // The team as the server last returned it; edits that match it are not sent.
   const savedFormRef = useRef<TeamFormData | null>(null);
 
-  const [teams, , reloadTeams] = useTeams();
+  const [teams, setTeams, reloadTeams] = useTeams();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
   const { reloadMembers } = useMembersActions();
@@ -60,8 +63,8 @@ export const useTeamForm = ({
   );
 
   useEffect(() => {
-    if (fixedTeamId) setSelectedTeamId(fixedTeamId);
-  }, [fixedTeamId]);
+    if (initialMessage) showSuccess(initialMessage);
+  }, [initialMessage, showSuccess]);
 
   // Load the chosen team with its roster.
   useEffect(() => {
@@ -86,22 +89,11 @@ export const useTeamForm = ({
     };
   }, [mode, selectedTeamId]);
 
-  const teamOptions = useMemo(
-    () => teams.map((team) => ({ value: team.id, text: team.name })),
-    [teams],
-  );
-
   const resetForm = () => {
     setForm(EMPTY_TEAM_FORM);
     setError(null);
     hideSuccess();
     setIsConfirmingDelete(false);
-  };
-
-  const changeMode = (nextMode: TeamFormMode) => {
-    setMode(nextMode);
-    setSelectedTeamId("");
-    resetForm();
   };
 
   const updateMemberRow = (id: string, patch: Partial<TeamMemberRow>) =>
@@ -165,6 +157,9 @@ export const useTeamForm = ({
       if (mode === "edit" || form.members.length > 0) {
         await setTeamMembers(saved.id, toTeamMembersBody(form.members));
       }
+      // Show the new team in the list right away, so its editor never renders
+      // blank while the reload is in flight.
+      if (mode === "create") setTeams([...teams, saved]);
       await refreshAfterChange();
 
       if (mode === "edit") {
@@ -175,7 +170,8 @@ export const useTeamForm = ({
         onSaved?.();
       } else {
         resetForm();
-        showSuccess(`Створено: ${saved.name}`);
+        showSuccess("Створено");
+        onCreated?.(saved.id);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save team");
@@ -192,12 +188,7 @@ export const useTeamForm = ({
     try {
       await deleteTeam(selectedTeamId);
       await refreshAfterChange();
-      if (fixedTeamId) {
-        onDeleted?.();
-      } else {
-        changeMode("edit");
-        showSuccess("Команду видалено");
-      }
+      onDeleted?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete team");
     } finally {
@@ -210,11 +201,8 @@ export const useTeamForm = ({
     mode,
     form,
     setForm,
-    teamOptions,
     teamTypes,
     selectedTeam,
-    selectedTeamId,
-    setSelectedTeamId,
     isLoading,
     isSubmitting,
     isConfirmingDelete,
@@ -222,7 +210,6 @@ export const useTeamForm = ({
     error,
     success,
     resetForm,
-    changeMode,
     submit,
     removeTeam,
     addMemberRow,

@@ -47,6 +47,8 @@ const TeamInfo = ({
         <TeamLogo
           photoUrl={team.photoUrl}
           iconUrl={team.teamType?.iconUrl}
+          typeColor={team.teamType?.color}
+          typeName={team.teamType?.name}
           name={team.name}
           color={color}
         />

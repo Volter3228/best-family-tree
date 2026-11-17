@@ -43,7 +43,6 @@ export const getPositionRowSummary = (
   const context =
     row.teamName?.trim() ||
     teamTypes.find((teamType) => teamType.id === row.teamTypeId)?.name ||
-    row.teamTypeName ||
     row.organization?.trim();
   const years = formatYearRange({
     start: row.teamStartYear ?? row.startYear,
@@ -72,19 +71,27 @@ export const findTeamByName = (
 export type PositionPeriod =
   | { kind: "existingTeam"; team: Team }
   | { kind: "newTeam" }
+  // The row names a team that does not exist and cannot be created here (the
+  // server only creates new teams as editions of an event type).
+  | { kind: "unavailable" }
   | { kind: "standalone" };
 
 export const getRowPeriod = (
   teams: Team[],
   row: PositionFormRow,
+  teamTypes: TeamType[],
 ): PositionPeriod => {
+  const teamType = teamTypes.find(({ id }) => id === row.teamTypeId);
   if (row.teamName?.trim()) {
     const team = findTeamByName(teams, row.teamName);
-    return team ? { kind: "existingTeam", team } : { kind: "newTeam" };
+    if (team) return { kind: "existingTeam", team };
+    return teamType?.isEvent ? { kind: "newTeam" } : { kind: "unavailable" };
   }
-  return row.teamTypeId || row.teamTypeName
-    ? { kind: "newTeam" }
-    : { kind: "standalone" };
+  if (!teamType) return { kind: "standalone" };
+  if (teamType.isEvent) return { kind: "newTeam" };
+  // A team without a name falls back to the type's own team.
+  const own = findTeamByName(teams, teamType.name);
+  return own ? { kind: "existingTeam", team: own } : { kind: "unavailable" };
 };
 
 // Picking an existing team also picks its type; its period comes with it.
@@ -101,36 +108,31 @@ export const getTeamSelectionPatch = (
   return {
     teamName: team.name,
     teamTypeId: team.teamTypeId ?? row.teamTypeId,
-    teamTypeName: undefined,
     teamStartYear: undefined,
     teamEndYear: undefined,
   };
 };
 
-// Picking a team type drops the team name only when it names an existing team
-// of another type (re-picking the same type changes nothing).
+// Picking a team type drops the team name when it names an existing team of
+// another type, or a new team the chosen type cannot create (only event types
+// create teams). Re-picking the same type changes nothing. Team types are
+// pick-only, so an empty value means the field was cleared.
 export const getTeamTypeSelectionPatch = (
   teams: Team[],
   row: PositionFormRow,
   teamTypeId: string,
-  text: string,
+  teamTypes: TeamType[],
 ): Partial<PositionFormRow> | null => {
-  const teamTypeName = teamTypeId ? undefined : text.trim() || undefined;
-  if (
-    teamTypeId
-      ? teamTypeId === row.teamTypeId
-      : teamTypeName === row.teamTypeName && !row.teamTypeId
-  ) {
-    return null;
-  }
+  if (teamTypeId === (row.teamTypeId ?? "")) return null;
 
   const currentTeam = findTeamByName(teams, row.teamName);
-  const dropsTeam =
-    !!currentTeam && (currentTeam.teamTypeId ?? "") !== teamTypeId;
+  const isEvent = teamTypes.find(({ id }) => id === teamTypeId)?.isEvent;
+  const dropsTeam = currentTeam
+    ? (currentTeam.teamTypeId ?? "") !== teamTypeId
+    : !!row.teamName?.trim() && !isEvent;
 
   return {
     teamTypeId: teamTypeId || undefined,
-    teamTypeName,
     ...(dropsTeam && { teamName: undefined }),
   };
 };

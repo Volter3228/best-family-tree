@@ -1,64 +1,86 @@
-import { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import ChipGroup from "@/components/ui/ChipGroup";
+import ColorField from "@/components/ui/color/ColorField";
 import type { AccentColor, TeamType, TeamTypeFormData } from "@/types";
-import type { TeamTypeFormMode } from "@/hooks/forms";
-import { FormCheckbox, LogoFileInput, TextInput } from "../inputs";
+import { teamsInUseMessage, teamTypeTeamCount, type TeamTypeFormMode } from "@/hooks/forms";
+import { TextInput } from "../inputs";
 import { ClearButton, SubmitButton } from "../buttons";
+import ConfirmDeleteControl from "../ConfirmDeleteControl";
 import FormFooter from "../FormFooter";
 import FormMessages from "../FormMessages";
-import TeamTypeColorField from "./TeamTypeColorField";
+import TeamTypeIdentityTile from "./TeamTypeIdentityTile";
+
+const KIND_OPTIONS = [
+  { value: "event", label: "Івент" },
+  { value: "permanent", label: "Інше" },
+] as const;
 
 interface Props {
   mode: TeamTypeFormMode;
-  selectedEvent: TeamType | null;
+  selectedType: TeamType | null;
   form: TeamTypeFormData;
   setForm: Dispatch<SetStateAction<TeamTypeFormData>>;
   color?: AccentColor;
   isSubmitting: boolean;
+  isDeleting: boolean;
+  isConfirmingDelete: boolean;
+  setIsConfirmingDelete: (isConfirming: boolean) => void;
   formId: string;
   error: string | null;
+  setError: Dispatch<SetStateAction<string | null>>;
   success: string | null;
-  submitLabel: string;
-  onReset: () => void;
+  onDelete: () => void;
+  onCancel: () => void;
 }
 
 const TeamTypeFormContent = ({
   mode,
-  selectedEvent,
+  selectedType,
   form,
   setForm,
   color = "blue",
   isSubmitting,
+  isDeleting,
+  isConfirmingDelete,
+  setIsConfirmingDelete,
   formId,
   error,
+  setError,
   success,
-  submitLabel,
-  onReset,
+  onDelete,
+  onCancel,
 }: Props) => {
+  if (mode === "edit" && !selectedType) return null;
 
-  if (mode === "edit" && !selectedEvent) return null;
+  const isEdit = mode === "edit";
+  const submitLabel = isSubmitting
+    ? isEdit
+      ? "Зберігаємо..."
+      : "Створюємо..."
+    : isEdit
+      ? "Зберегти"
+      : "Створити";
+  // Types that teams still use cannot be deleted; say so before asking.
+  const teams = selectedType ? teamTypeTeamCount(selectedType) : 0;
+  const blockedReason = teams > 0 ? teamsInUseMessage(teams) : null;
 
   return (
     <>
-      <div className="flex flex-row flex-1 w-full justify-center mb-2">
-        <LogoFileInput
-          onImageSelect={(file) => setForm({ ...form, icon: file ?? null })}
-          image={form.icon ?? null}
-          initialImage={
-            mode === "edit" && selectedEvent?.iconUrl
-              ? selectedEvent.iconUrl
-              : null
-          }
-          color={color}
+      <div className="flex items-end gap-3">
+        <TeamTypeIdentityTile
+          name={form.name}
+          color={form.color}
+          icon={form.icon ?? null}
+          onIconChange={(icon) => setForm((prev) => ({ ...prev, icon }))}
+          onError={setError}
+          accent={color}
         />
-      </div>
-
-      <div className="flex flex-row w-full">
-        <div className="flex flex-col flex-1 relative">
+        <div className="min-w-0 flex-1">
           <TextInput
             name="teamTypeName"
-            label="Назва типу команди"
+            label="Назва"
             value={form.name}
-            onChange={(value) => setForm({ ...form, name: value })}
+            onChange={(name) => setForm((prev) => ({ ...prev, name }))}
             placeholder="EJF"
             required
             color={color}
@@ -66,38 +88,51 @@ const TeamTypeFormContent = ({
         </div>
       </div>
 
-      <FormCheckbox
-        checked={form.isEvent}
-        label="Команда івенту"
+      <div className="flex flex-col">
+        <span className="mb-1.5 text-sm font-semibold text-foreground">Вид</span>
+        <ChipGroup
+          label="Вид"
+          options={KIND_OPTIONS}
+          value={form.isEvent ? "event" : "permanent"}
+          onChange={(kind) =>
+            setForm((prev) => ({ ...prev, isEvent: kind === "event" }))
+          }
+          color={color}
+        />
+      </div>
+
+      <ColorField
+        value={form.color}
+        onChange={(value) => setForm((prev) => ({ ...prev, color: value }))}
         color={color}
-        onChange={(isEvent) => setForm({ ...form, isEvent })}
       />
 
-      <TeamTypeColorField
-        value={form.color}
-        onChange={(value) => setForm({ ...form, color: value })}
-        color={color}
-      />
+      <FormMessages error={error} color={color} />
 
       <FormFooter>
-        <FormMessages error={error} color={color} />
-        <div className="flex w-4/5 flex-row justify-center gap-3">
-          <ClearButton
-            isSubmitting={isSubmitting}
-            onClick={onReset}
-            color={color}
-          >
-            Очистити
-          </ClearButton>
-          <SubmitButton
-            isSubmitting={isSubmitting}
-            form={formId}
-            color={color}
-            message={success}
-          >
-            {submitLabel}
-          </SubmitButton>
-        </div>
+        {isEdit && selectedType && (
+          <ConfirmDeleteControl
+            label="Видалити"
+            title="Видалити тип команди?"
+            message={`Видалити «${selectedType.name}»? Цю дію не можна скасувати.`}
+            isConfirming={isConfirmingDelete}
+            isSubmitting={isDeleting}
+            blockedReason={blockedReason}
+            onAsk={setIsConfirmingDelete}
+            onConfirm={onDelete}
+          />
+        )}
+        <ClearButton isSubmitting={isSubmitting} onClick={onCancel} color={color}>
+          Скасувати
+        </ClearButton>
+        <SubmitButton
+          isSubmitting={isSubmitting}
+          form={formId}
+          color={color}
+          message={success}
+        >
+          {submitLabel}
+        </SubmitButton>
       </FormFooter>
     </>
   );

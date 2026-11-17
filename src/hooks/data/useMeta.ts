@@ -12,8 +12,16 @@ const createMetaStore = <T>(fetcher: () => Promise<T[]>) => {
 
   const notify = () => listeners.forEach((listener) => listener());
 
+  // A reload asked for while a fetch is in flight runs right after it: the
+  // running fetch may predate the change that asked for the reload.
+  let reloadQueued = false;
+
   const run = (force: boolean) => {
-    if (promise || (!force && data !== null)) return;
+    if (promise) {
+      if (force) reloadQueued = true;
+      return;
+    }
+    if (!force && data !== null) return;
     promise = fetcher()
       .then((result) => {
         data = result;
@@ -22,6 +30,10 @@ const createMetaStore = <T>(fetcher: () => Promise<T[]>) => {
       .finally(() => {
         promise = null;
         notify();
+        if (reloadQueued) {
+          reloadQueued = false;
+          run(true);
+        }
       });
   };
 

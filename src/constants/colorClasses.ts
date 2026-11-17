@@ -23,6 +23,12 @@ interface ColorClasses {
   caret: string;
   fill: string;
   dropShadow: string;
+  softBorder: string;
+  softBorderHover: string;
+  focusBorder: string;
+  focusRingSoft: string;
+  focusVisibleRingSoft: string;
+  softBgStrongHover: string;
 }
 
 // NOTE: Tailwind's JIT scanner only picks up class names it can see as
@@ -53,6 +59,12 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     caret: "caret-accent-blue",
     fill: "fill-accent-blue",
     dropShadow: "drop-shadow-accent-blue",
+    softBorder: "border-accent-blue/30",
+    softBorderHover: "hover:border-accent-blue/60",
+    focusBorder: "focus:border-accent-blue",
+    focusRingSoft: "focus:ring-accent-blue/20",
+    focusVisibleRingSoft: "focus-visible:ring-accent-blue/60",
+    softBgStrongHover: "hover:bg-accent-blue/20",
   },
   green: {
     text: "text-accent-green",
@@ -77,6 +89,12 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     caret: "caret-accent-green",
     fill: "fill-accent-green",
     dropShadow: "drop-shadow-accent-green",
+    softBorder: "border-accent-green/30",
+    softBorderHover: "hover:border-accent-green/60",
+    focusBorder: "focus:border-accent-green",
+    focusRingSoft: "focus:ring-accent-green/20",
+    focusVisibleRingSoft: "focus-visible:ring-accent-green/60",
+    softBgStrongHover: "hover:bg-accent-green/20",
   },
   orange: {
     text: "text-accent-orange",
@@ -101,5 +119,11 @@ export const COLOR_CLASSES: Record<AccentColor, ColorClasses> = {
     caret: "caret-accent-orange",
     fill: "fill-accent-orange",
     dropShadow: "drop-shadow-accent-orange",
+    softBorder: "border-accent-orange/30",
+    softBorderHover: "hover:border-accent-orange/60",
+    focusBorder: "focus:border-accent-orange",
+    focusRingSoft: "focus:ring-accent-orange/20",
+    focusVisibleRingSoft: "focus-visible:ring-accent-orange/60",
+    softBgStrongHover: "hover:bg-accent-orange/20",
   },
 };

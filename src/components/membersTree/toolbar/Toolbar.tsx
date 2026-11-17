@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import Sidebar, { ManageForm } from "@/components/sidebar";
+import { ManageSidebar } from "@/components/sidebar";
 import {
   PencilSquareIcon,
   FunnelIcon,
@@ -85,7 +85,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
     <>
       {session?.demo && <DemoBadge />}
       {sessionLoaded && (
-        <div className="fixed bottom-6 left-1/2 z-40 rounded-2xl animate-dock-rise">
+        <div className="fixed bottom-6 left-1/2 z-[60] rounded-2xl animate-dock-rise">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 rounded-2xl bg-surface/80 shadow-2xl backdrop-blur-xl"
@@ -156,15 +156,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         onClose={account.close}
       />
       {editable && (
-        <Sidebar
-          headerTitle="Керування"
-          fillHeight
-          onClose={closeSidebar}
-          isOpen={isSidebarOpen}
-          color="blue"
-        >
-          <ManageForm onSuccess={closeSidebar} color="blue" />
-        </Sidebar>
+        <ManageSidebar isOpen={isSidebarOpen} onClose={closeSidebar} color="blue" />
       )}
     </>
   );

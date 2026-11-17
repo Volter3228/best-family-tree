@@ -10,6 +10,7 @@ import "../styles/animations.css";
 import "../styles/brand-spinner.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker-overrides.css";
+import "../styles/color-picker.css";
 
 const nunito = Nunito({
   subsets: ["cyrillic-ext"],

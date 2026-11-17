@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import Chip from "@/components/ui/Chip";
 import FilterSection from "./FilterSection";
 
 interface Option<T extends string> {
@@ -35,21 +35,16 @@ const PillGroupFilterSection = <T extends string>({
         {options.map(({ value, label, icon: Icon }) => {
           const pressed = selected.includes(value);
           return (
-            <button
+            <Chip
               key={value}
-              type="button"
-              aria-pressed={pressed}
+              color="green"
+              pressed={pressed}
+              icon={Icon}
               onClick={handleClick(value)}
-              className={twMerge(
-                "group inline-flex h-8 pointer-coarse:h-10 touch-manipulation items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-green/60",
-                pressed
-                  ? "border-accent-green bg-accent-green text-white [--flower-center:var(--accent-green)]"
-                  : "border-accent-green/30 bg-surface text-foreground/80 hover:border-accent-green/60 hover:text-foreground",
-              )}
+              className={pressed ? "[--flower-center:var(--accent-green)]" : undefined}
             >
-              {Icon && <Icon className="h-4 w-4 shrink-0" />}
               {label}
-            </button>
+            </Chip>
           );
         })}
       </div>

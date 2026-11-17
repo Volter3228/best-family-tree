@@ -14,6 +14,8 @@ interface Props {
   onSelect: (value: string, text: string) => void;
   initialValue?: string;
   color?: AccentColor;
+  // False: only existing options can be chosen. Default true.
+  allowCreate?: boolean;
 }
 
 const ComboboxInput = ({
@@ -25,6 +27,7 @@ const ComboboxInput = ({
   onSelect,
   initialValue = "",
   color = "blue",
+  allowCreate = true,
 }: Props) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -41,7 +44,7 @@ const ComboboxInput = ({
     selectOption,
     tryAutoSelect,
     handleKeyDown,
-  } = useComboboxState(options, initialValue, onSelect);
+  } = useComboboxState(options, initialValue, onSelect, allowCreate);
   const {
     dropUp,
     position: dropdownPos,

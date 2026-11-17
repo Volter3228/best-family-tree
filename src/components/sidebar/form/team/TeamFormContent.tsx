@@ -3,20 +3,16 @@ import { useMembersList, useRoles } from "@/hooks";
 import type { AccentColor, Team, TeamFormData, TeamType } from "@/types";
 import type { useTeamForm } from "@/hooks/forms";
 import {
-  ComboboxInput,
-  LogoFileInput,
+  DropdownSelectInput,
   TextAreaInput,
   TextInput,
   YearRangeInput,
 } from "../inputs";
-import { ClearButton, SubmitButton } from "../buttons";
-import {
-  getRoleOptions,
-  getTeamTypeOptions,
-} from "../fields/position/positionFormUtils";
-import ConfirmDeleteControl from "../ConfirmDeleteControl";
-import FormFooter from "../FormFooter";
+import { getRoleOptions, getTeamTypeOptions } from "../fields/position/positionFormUtils";
 import FormMessages from "../FormMessages";
+import FormSection from "./FormSection";
+import TeamFormFooter from "./TeamFormFooter";
+import TeamLogoPicker from "./TeamLogoPicker";
 import TeamMembersEditor from "./TeamMembersEditor";
 
 type FormState = ReturnType<typeof useTeamForm>;
@@ -33,24 +29,18 @@ interface Props {
   isConfirmingDelete: boolean;
   error: string | null;
   success: string | null;
-  submitLabel: string;
-  onReset: () => void;
+  onCancel?: () => void;
   onAskDelete: (isConfirming: boolean) => void;
   onDelete: () => void;
-  members: Pick<
-    FormState,
-    "addMemberRow" | "updateMemberRow" | "removeMemberRow"
-  >;
+  members: Pick<FormState, "addMemberRow" | "updateMemberRow" | "removeMemberRow">;
 }
 
 // What an empty name will become, shown as the placeholder.
-const getDerivedName = (form: TeamFormData, teamTypes: TeamType[]) => {
-  const teamType = teamTypes.find(({ id }) => id === form.teamTypeId);
-  const typeName = teamType?.name ?? form.teamTypeName;
-  if (!typeName) return "Назва команди";
-  return teamType?.isEvent === false || !form.startYear
-    ? typeName
-    : `${typeName} ${form.startYear}`;
+const getDerivedName = (form: TeamFormData, teamType?: TeamType) => {
+  if (!teamType) return "Назва команди";
+  return teamType.isEvent === false || !form.startYear
+    ? teamType.name
+    : `${teamType.name} ${form.startYear}`;
 };
 
 const TeamFormContent = ({
@@ -65,8 +55,7 @@ const TeamFormContent = ({
   isConfirmingDelete,
   error,
   success,
-  submitLabel,
-  onReset,
+  onCancel,
   onAskDelete,
   onDelete,
   members,
@@ -74,10 +63,7 @@ const TeamFormContent = ({
   const [roles] = useRoles();
   const flatMembersList = useMembersList();
 
-  const teamTypeOptions = useMemo(
-    () => getTeamTypeOptions(teamTypes),
-    [teamTypes],
-  );
+  const teamTypeOptions = useMemo(() => getTeamTypeOptions(teamTypes), [teamTypes]);
   const roleOptions = useMemo(() => getRoleOptions(roles), [roles]);
   const memberOptions = useMemo(
     () => flatMembersList.map((member) => ({ value: member.id, text: member.name })),
@@ -86,82 +72,71 @@ const TeamFormContent = ({
 
   if (mode === "edit" && !selectedTeam) return null;
 
+  const teamType = teamTypes.find(({ id }) => id === form.teamTypeId);
+  const derivedName = getDerivedName(form, teamType);
+
   return (
     <>
-      <div className="flex flex-row flex-1 w-full justify-center mb-2">
-        <LogoFileInput
-          onImageSelect={(file) => setForm({ ...form, icon: file ?? null })}
-          image={form.icon ?? null}
-          label="Фото команди"
-          initialImage={
-            mode === "edit" && selectedTeam?.photoUrl
-              ? selectedTeam.photoUrl
-              : null
-          }
-          color={color}
-          showCheckerboard={false}
-        />
-      </div>
-
-      <div className="flex flex-col w-full">
-        <TextInput
-          name="teamName"
-          label="Назва команди"
-          value={form.name}
-          onChange={(name) => setForm({ ...form, name })}
-          placeholder={getDerivedName(form, teamTypes)}
-          color={color}
-        />
-      </div>
-
-      <div className="flex flex-col w-full">
-        <ComboboxInput
+      <FormSection title="Основне" color={color}>
+        <div className="flex items-start gap-3">
+          <TeamLogoPicker
+            name={form.name || derivedName}
+            value={form.icon ?? null}
+            onChange={(file) => setForm((prev) => ({ ...prev, icon: file }))}
+            iconUrl={teamType?.iconUrl}
+            typeColor={teamType?.color}
+            color={color}
+          />
+          <div className="min-w-0 flex-1">
+            <TextInput
+              name="teamName"
+              label="Назва"
+              value={form.name}
+              onChange={(name) => setForm((prev) => ({ ...prev, name }))}
+              placeholder={derivedName}
+              color={color}
+            />
+          </div>
+        </div>
+        <DropdownSelectInput
           key={selectedTeam?.id ?? "new"}
-          name="teamTypeName"
+          name="teamType"
           label="Тип команди"
+          autoComplete
           options={teamTypeOptions}
-          onSelect={(value, text) =>
-            setForm((prev) => ({
-              ...prev,
-              teamTypeId: value || undefined,
-              teamTypeName: value ? undefined : text.trim() || undefined,
-            }))
+          onSelect={(value) =>
+            setForm((prev) => ({ ...prev, teamTypeId: value || undefined }))
           }
-          placeholder="BTW"
-          initialValue={form.teamTypeId ?? form.teamTypeName}
+          placeholder="Оберіть тип"
+          initialValue={form.teamTypeId}
           color={color}
         />
-      </div>
+        <TextAreaInput
+          name="teamDescription"
+          label="Опис"
+          value={form.description}
+          onChange={(description) => setForm((prev) => ({ ...prev, description }))}
+          color={color}
+        />
+      </FormSection>
 
-      <div className="w-full">
+      <FormSection title="Період" color={color}>
         <YearRangeInput
           name="teamYears"
           start={form.startYear}
           end={form.endYear}
           ongoing={form.isOngoing}
           onOngoingChange={(isOngoing) =>
-            setForm({
-              ...form,
+            setForm((prev) => ({
+              ...prev,
               isOngoing,
-              endYear: isOngoing ? undefined : form.endYear,
-            })
+              endYear: isOngoing ? undefined : prev.endYear,
+            }))
           }
-          onChange={(startYear, endYear) =>
-            setForm({ ...form, startYear, endYear })
-          }
+          onChange={(startYear, endYear) => setForm((prev) => ({ ...prev, startYear, endYear }))}
           color={color}
         />
-      </div>
-
-      <div className="flex flex-col w-full">
-        <TextAreaInput
-          name="teamDescription"
-          label="Опис"
-          value={form.description}
-          onChange={(description) => setForm({ ...form, description })}
-          color={color}
-        />
-      </div>
+      </FormSection>
 
       <TeamMembersEditor
         rows={form.members}
@@ -173,36 +148,20 @@ const TeamFormContent = ({
         onRemove={members.removeMemberRow}
       />
 
-      <FormFooter>
-        <FormMessages error={error} color={color} />
-        <div className="flex w-4/5 flex-row justify-center gap-3">
-          <ClearButton
-            isSubmitting={isSubmitting}
-            onClick={onReset}
-            color={color}
-          >
-            Очистити
-          </ClearButton>
-          <SubmitButton
-            isSubmitting={isSubmitting}
-            form={formId}
-            color={color}
-            message={success}
-          >
-            {submitLabel}
-          </SubmitButton>
-        </div>
-        {mode === "edit" && (
-          <ConfirmDeleteControl
-            label="Видалити команду"
-            message={`Команду та ${selectedTeam?._count?.positions ?? 0} посад її учасників буде видалено.`}
-            isConfirming={isConfirmingDelete}
-            isSubmitting={isSubmitting}
-            onAsk={onAskDelete}
-            onConfirm={onDelete}
-          />
-        )}
-      </FormFooter>
+      <FormMessages error={error} color={color} />
+
+      <TeamFormFooter
+        isEdit={mode === "edit"}
+        formId={formId}
+        color={color}
+        isSubmitting={isSubmitting}
+        isConfirmingDelete={isConfirmingDelete}
+        success={success}
+        positionsCount={selectedTeam?._count?.positions ?? 0}
+        onCancel={onCancel}
+        onAskDelete={onAskDelete}
+        onDelete={onDelete}
+      />
     </>
   );
 };

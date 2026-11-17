@@ -1,71 +1,137 @@
-import { TrashIcon } from "@heroicons/react/16/solid";
+import { useEffect, useId, useRef } from "react";
+import { InformationCircleIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { twMerge } from "tailwind-merge";
+import Spinner from "@/components/ui/Spinner";
 
 interface Props {
   label: string;
+  // Question in the popover header; defaults to "<label>?". A blocked state
+  // always says "Видалити не можна".
+  title?: string;
   message: string;
   isConfirming: boolean;
   isSubmitting: boolean;
-  // When set, deletion is not allowed yet: the button is disabled and this
-  // text explains what has to happen first.
+  // When set, deletion is not allowed: the button still opens the panel, but
+  // it only explains what has to happen first.
   blockedReason?: string | null;
   onAsk: (isConfirming: boolean) => void;
   onConfirm: () => void;
 }
 
-// Two-step destructive action: a quiet red button first, then an explicit
-// confirmation that says what will be lost.
+// Two-step destructive action. The trigger is a round trash button that sits
+// at the left of a footer row and never leaves it. The confirmation floats
+// above the footer (anchored to the sidebar's footer slot), so asking does not
+// resize the card or move the content.
 const ConfirmDeleteControl = ({
   label,
+  title,
   message,
   isConfirming,
   isSubmitting,
   blockedReason,
   onAsk,
   onConfirm,
-}: Props) =>
-  blockedReason ? (
-    <div className="flex w-full flex-col items-center gap-2">
+}: Props) => {
+  const titleId = useId();
+  const descriptionId = useId();
+  const secondaryRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isConfirming) secondaryRef.current?.focus();
+  }, [isConfirming]);
+
+  const heading = blockedReason
+    ? "Видалити не можна"
+    : (title ?? `${label}?`);
+
+  return (
+    <>
       <button
         type="button"
-        disabled
-        className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-red-500/20 text-sm font-medium text-red-500 opacity-50"
+        onClick={() => onAsk(!isConfirming)}
+        disabled={isSubmitting}
+        aria-label={label}
+        title={label}
+        aria-expanded={isConfirming}
+        className={twMerge(
+          "flex h-11 w-11 shrink-0 touch-manipulation items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 disabled:opacity-50",
+          isConfirming && "bg-red-500/10",
+          blockedReason && "opacity-50",
+        )}
       >
         <TrashIcon className="h-4 w-4" />
-        {label}
       </button>
-      <p className="text-center text-xs text-foreground/60">{blockedReason}</p>
-    </div>
-  ) : isConfirming ? (
-    <div className="flex w-full flex-col items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-3">
-      <p className="text-center text-sm text-foreground/80">{message}</p>
-      <div className="flex w-full gap-2">
-        <button
-          type="button"
-          onClick={() => onAsk(false)}
-          className="h-9 flex-1 rounded-full text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/10"
+      {isConfirming && (
+        <div
+          role="alertdialog"
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          onKeyDown={(event) => {
+            if (event.key !== "Escape" || isSubmitting) return;
+            event.stopPropagation();
+            onAsk(false);
+          }}
+          className="absolute inset-x-4 bottom-full z-20 mb-2 animate-rise-in rounded-2xl origin-bottom bg-surface/80 p-4 shadow-2xl ring-1 ring-foreground/10 backdrop-blur-xl motion-reduce:animate-none"
         >
-          Скасувати
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={isSubmitting}
-          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full bg-red-500 text-sm font-semibold text-white transition-all hover:brightness-90 disabled:opacity-60"
-        >
-          <TrashIcon className="h-4 w-4" />
-          Видалити
-        </button>
-      </div>
-    </div>
-  ) : (
-    <button
-      type="button"
-      onClick={() => onAsk(true)}
-      className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-red-500/40 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
-    >
-      <TrashIcon className="h-4 w-4" />
-      {label}
-    </button>
+          <div className="flex items-start gap-3">
+            <span
+              className={twMerge(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                blockedReason
+                  ? "bg-foreground/5 text-foreground/60"
+                  : "bg-red-500/10 text-red-500",
+              )}
+            >
+              {blockedReason ? (
+                <InformationCircleIcon className="h-5 w-5" />
+              ) : (
+                <TrashIcon className="h-5 w-5" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p id={titleId} className="text-sm font-semibold text-foreground">
+                {heading}
+              </p>
+              <p id={descriptionId} className="mt-0.5 text-sm text-foreground/60">
+                {blockedReason ?? message}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <button
+              ref={secondaryRef}
+              type="button"
+              onClick={() => onAsk(false)}
+              disabled={isSubmitting}
+              className="h-10 flex-1 rounded-full bg-foreground/5 text-sm font-semibold text-foreground/80 transition-colors hover:bg-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/30 disabled:opacity-50"
+            >
+              {blockedReason ? "Зрозуміло" : "Скасувати"}
+            </button>
+            {!blockedReason && (
+              <button
+                type="button"
+                onClick={onConfirm}
+                disabled={isSubmitting}
+                className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-red-500 text-sm font-semibold text-white shadow-sm transition-[background-color,box-shadow,scale] hover:bg-red-600 hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-60"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Spinner className="h-4 w-4" />
+                    Видаляємо…
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="h-4 w-4" />
+                    Видалити
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
+};
 
 export default ConfirmDeleteControl;

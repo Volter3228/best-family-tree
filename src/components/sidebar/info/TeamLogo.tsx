@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import PhotoOpenButton, {
   useIsPhotoOpen,
 } from "@/components/photoViewer/PhotoOpenButton";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { initialsOf } from "@/utils/strings";
 import { AvatarSkeleton } from "./MemberAvatarImage";
 
 interface Props {
@@ -14,12 +15,33 @@ interface Props {
   photoUrl?: string | null;
   // Fallback logo of the team type: shown whole, never cropped.
   iconUrl?: string | null;
+  // Type colour (`#rrggbb`): the fallback is tinted with it, like the type tiles.
+  typeColor?: string | null;
+  // The type's name; its initials stand in when the type has no icon.
+  typeName?: string | null;
   name: string;
   color?: AccentColor;
 }
 
 const GROUP_ICON_URL = 'url("/images/lion-group.svg")';
 const INNER = "relative h-full w-full overflow-hidden rounded-[1.25rem] ring-4 ring-surface";
+
+// The tinted look of the team type tiles: a light tint of the type colour over
+// the (opaque) surface, with the mark in the type colour.
+const tintStyle = (typeColor: string): CSSProperties => ({
+  backgroundColor: "var(--surface)",
+  backgroundImage: `linear-gradient(${typeColor}26, ${typeColor}26)`,
+  color: typeColor,
+});
+
+// Rim of the tinted frame: the type colour, softened like the tile's ring.
+const rimStyle = (typeColor: string): CSSProperties => ({
+  backgroundColor: `color-mix(in srgb, ${typeColor} 60%, var(--surface))`,
+});
+
+// The tinted fallbacks (no own photo, type has a colour).
+const isTinted = (photoUrl?: string | null, typeColor?: string | null) =>
+  !photoUrl && !!typeColor;
 
 const LoadingImage = ({ url, name, className }: { url: string; name: string; className: string }) => {
   const [loaded, setLoaded] = useState(false);
@@ -51,10 +73,12 @@ const LoadingImage = ({ url, name, className }: { url: string; name: string; cla
 // Counterpart of the member avatar: the same accent rim and white ring, as a
 // wide rounded frame. Group photos are mostly landscape, so a 16:10 cover crop
 // loses little, and the photo viewer shows the whole thing.
-const TeamLogo = ({ photoUrl, iconUrl, name, color = "blue" }: Props) => {
+const TeamLogo = ({ photoUrl, iconUrl, typeColor, typeName, name, color = "blue" }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
   const viewerId = `team-photo:${name}`;
   const photoOpen = useIsPhotoOpen(viewerId);
+
+  const tinted = isTinted(photoUrl, typeColor);
 
   let content: React.ReactNode;
   if (photoUrl) {
@@ -72,8 +96,20 @@ const TeamLogo = ({ photoUrl, iconUrl, name, color = "blue" }: Props) => {
     );
   } else if (iconUrl) {
     content = (
-      <div className={twMerge(INNER, "bg-surface")}>
+      <div
+        className={twMerge(INNER, !typeColor && "bg-surface")}
+        style={typeColor ? tintStyle(typeColor) : undefined}
+      >
         <LoadingImage key={iconUrl} url={iconUrl} name={name} className="object-contain p-6" />
+      </div>
+    );
+  } else if (typeColor) {
+    content = (
+      <div
+        className={twMerge(INNER, "flex items-center justify-center text-5xl font-semibold")}
+        style={tintStyle(typeColor)}
+      >
+        {initialsOf(typeName || name) || "?"}
       </div>
     );
   } else {
@@ -100,12 +136,13 @@ const TeamLogo = ({ photoUrl, iconUrl, name, color = "blue" }: Props) => {
     <div
       className={twMerge(
         "member-info-avatar relative aspect-[16/10] w-full max-w-80 rounded-3xl p-1 drop-shadow-2xl/30",
-        colorClasses.accentBg,
-        colorClasses.dropShadow,
+        !tinted && colorClasses.accentBg,
+        !tinted && colorClasses.dropShadow,
         // `invisible`, not opacity: the sidebar switch animation leaves an
         // inline opacity on this element.
         photoOpen && "invisible",
       )}
+      style={tinted && typeColor ? rimStyle(typeColor) : undefined}
     >
       {content}
     </div>

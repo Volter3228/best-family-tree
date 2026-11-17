@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
 import InputLabel from "../InputLabel";
+import { formInputClasses } from "../inputClasses";
 
 interface Props {
   name: string;
@@ -55,15 +56,7 @@ const ComboboxInputField = ({
           onFocus={onFocus}
           onKeyDown={onKeyDown}
           autoComplete="off"
-          className={twMerge(
-            "block w-full pl-3 pr-7 py-2 rounded-xl shadow-inner font-light bg-surface",
-            colorClasses.border,
-            "placeholder:text-placeholder",
-            "focus:outline-hidden focus:ring-2",
-            colorClasses.accentRing,
-            colorClasses.caret,
-            "transition-all duration-200 ease-out",
-          )}
+          className={formInputClasses(color, "pr-7")}
         />
         <div
           className={twMerge(

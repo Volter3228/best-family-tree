@@ -10,6 +10,9 @@ import {
   updateTeamType,
   fetchRoles,
   createRole,
+  updateRole,
+  deleteRole,
+  deleteTeamType,
   fetchTeams,
 } from "./fetchMeta";
 
@@ -25,6 +28,9 @@ export {
   updateTeamType,
   fetchRoles,
   createRole,
+  updateRole,
+  deleteRole,
+  deleteTeamType,
   fetchTeams,
 };
 

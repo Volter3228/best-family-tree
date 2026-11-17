@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
+import { removeBadgeClasses } from "./inputClasses";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
@@ -91,7 +92,7 @@ const LogoFileInput = ({
 
   return (
     <div className="flex flex-col items-center gap-2 w-full">
-      <label className="text-sm font-medium text-foreground/80">{label}</label>
+      <label className="text-sm font-semibold text-foreground">{label}</label>
       <div className="relative w-24 h-24">
         <label className="group cursor-pointer relative block w-full h-full rounded-xl overflow-hidden shadow-lg bg-surface">
           {selectedImage ? (
@@ -132,12 +133,7 @@ const LogoFileInput = ({
           <button
             type="button"
             onClick={handleRemoveImage}
-            className={twMerge(
-              "absolute top-0 right-0 mt-1 mr-1 p-1",
-              "text-white text-sm rounded-full focus:outline-hidden w-6 h-6 shadow-md hover:scale-[1.3]",
-              "transition-transform duration-200 ease-in-out",
-              colorClasses.accentBg,
-            )}
+            className={removeBadgeClasses(color, "absolute right-1 top-1 h-6 w-6 p-1")}
             aria-label="Remove Logo"
           >
             <XMarkIcon />

@@ -16,7 +16,6 @@ import type {
 import { MemberFormFields } from "./fields";
 import FormError from "./FormError";
 import { describeSubmitError } from "./describeSubmitError";
-import { FormCheckbox } from "./inputs";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildMemberFormData } from "./buildMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
@@ -41,7 +40,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
   const mentorsList = useMentorsList();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
   const [, , reloadRoles] = useRoles();
-  const [, , reloadTeams] = useTeams();
+  const [teams, , reloadTeams] = useTeams();
 
   useEffect(() => {
     if (!mentorsList.length) {
@@ -60,6 +59,7 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
     setErrors({});
     const validationErrors = validateMemberForm(form, mentorsList, teamTypes, null, {
       minimal: isMinimal,
+      teams,
     });
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -97,20 +97,13 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
   return (
     <form
       id={formId}
-      className="flex flex-col items-center"
+      className="flex w-full flex-col gap-4"
       onSubmit={handleSubmit}
       noValidate
     >
-      <div className="mb-4 w-full">
-        <FormCheckbox
-          checked={isMinimal}
-          label="Мінімальний запис (старий учасник)"
-          color={color}
-          onChange={setIsMinimal}
-        />
-      </div>
       <MemberFormFields
         minimal={isMinimal}
+        onMinimalChange={setIsMinimal}
         form={form}
         setForm={setForm}
         errors={errors}
@@ -118,18 +111,16 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
       />
       <FormError message={formError} color={color} />
       <FormFooter>
-        <div className="flex w-4/5 flex-row justify-center gap-3">
-          <ClearButton
-            isSubmitting={isSubmitting}
-            onClick={handleResetForm}
-            color={color}
-          >
-            Очистити
-          </ClearButton>
-          <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
-            {isSubmitting ? "Додаємо..." : "Додати"}
-          </SubmitButton>
-        </div>
+        <ClearButton
+          isSubmitting={isSubmitting}
+          onClick={handleResetForm}
+          color={color}
+        >
+          Очистити
+        </ClearButton>
+        <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
+          {isSubmitting ? "Створюємо..." : "Створити"}
+        </SubmitButton>
       </FormFooter>
     </form>
   );

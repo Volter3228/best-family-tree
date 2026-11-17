@@ -6,6 +6,8 @@ export type TeamType = {
   iconUrl?: string | null;
   // Events have yearly editions ("BTW 2024"); other types are working groups.
   isEvent: boolean;
+  // Only on the team types list: how many teams use the type.
+  _count?: { teams: number };
 };
 
 export type Role = {
@@ -13,6 +15,10 @@ export type Role = {
   name: string;
   description?: string | null;
   isLeaderPosition: boolean;
+  // Only on the roles list: how many positions use the role.
+  _count?: { positions: number };
+  // Only on the roles list: how many distinct members hold the role.
+  memberCount?: number;
 };
 
 export type Team = {

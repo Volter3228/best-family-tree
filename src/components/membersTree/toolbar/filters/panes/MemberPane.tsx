@@ -13,12 +13,13 @@ import {
   PillGroupFilterSection,
 } from "../sections";
 import { ACTIVITY_ICONS } from "../ActivityStateIcons";
-import { GENDER_ICONS } from "../GenderIcons";
+import { greenPillIcon } from "../greenPillIcon";
+import { GENDER_ICONS } from "@/components/ui/GenderIcons";
 import type { FilterPaneProps } from "./types";
 
 const STATUS_PILLS = STATUS_OPTIONS.map((option) => ({
   ...option,
-  icon: STATUS_ICONS[option.value],
+  icon: greenPillIcon(STATUS_ICONS[option.value]),
 }));
 
 const ACTIVITY_PILLS = ACTIVITY_OPTIONS.map((option) => ({

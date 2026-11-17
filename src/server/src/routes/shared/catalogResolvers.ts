@@ -41,6 +41,7 @@ export const resolveRole = async (tx: Tx, ref: RoleRef) => {
   });
 };
 
+// Team types are only picked, never created on the fly.
 export const resolveTeamType = async (
   tx: Tx,
   ref: TeamTypeRef,
@@ -59,7 +60,10 @@ export const resolveTeamType = async (
   const existing = await tx.teamType.findFirst({
     where: { name: sameName(name) },
   });
-  return existing ?? tx.teamType.create({ data: { name } });
+  if (!existing) {
+    throw new ValidationError(`Тип команди «${name}» не знайдено`);
+  }
+  return existing;
 };
 
 /**
@@ -81,7 +85,7 @@ export const deriveTeamName = (
 };
 
 /**
- * Find the team a position refers to, or create it. Team names are globally
+ * Find the team a position refers to, or create it (event types only). Team names are globally
  * unique, so a name identifies its team (and type); the period is only used
  * when the team is created.
  */
@@ -107,6 +111,13 @@ export const resolveTeam = async (
       });
     }
     return existing;
+  }
+
+  // New teams appear only as editions of an event type.
+  if (!teamType?.isEvent) {
+    throw new ValidationError(
+      "Нову команду тут можна створити лише як випуск івенту",
+    );
   }
 
   return tx.team.create({

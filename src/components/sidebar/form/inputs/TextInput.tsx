@@ -1,6 +1,7 @@
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { formInputClasses } from "./inputClasses";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -53,7 +54,7 @@ const TextInput = ({
   const colorClasses = COLOR_CLASSES[color];
 
   return (
-    <>
+    <div>
       <InputLabel
         label={label}
         htmlFor={id || name}
@@ -82,16 +83,11 @@ const TextInput = ({
             : undefined
         }
         placeholder={placeholder}
-        className={twMerge(
-          "block w-full pl-3",
-          Icon ? "pr-10" : "pr-3",
-          "py-2 rounded-xl shadow-inner font-light",
-          "placeholder:text-placeholder focus:outline-hidden focus:ring-2",
-          "transition-all duration-200 ease-out bg-surface",
-          colorClasses.border,
-          colorClasses.accentRing,
-          colorClasses.caret,
-          invalid && "ring-2 ring-accent-orange",
+        className={formInputClasses(
+          color,
+          Icon && "pr-10",
+          invalid && "border-accent-orange ring-2 ring-accent-orange/30",
+          disabled && "cursor-not-allowed opacity-60",
         )}
         autoComplete={autoComplete}
         required={required}
@@ -109,7 +105,7 @@ const TextInput = ({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

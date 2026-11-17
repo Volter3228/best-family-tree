@@ -27,18 +27,21 @@ const SubmitButton = ({
   message,
 }: Props) => {
   return (
-    <div className="relative w-full">
+    <div className="relative flex-1">
       <button
         className={twMerge(
-          "flex items-center justify-center w-full h-10 rounded-full text-white font-semibold focus:outline-hidden focus:ring-2 transition-all duration-300 ease-in-out",
+          "flex h-11 w-full touch-manipulation items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white shadow-sm transition-[background-color,color,box-shadow,scale] duration-200 hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-default disabled:shadow-none disabled:active:scale-100",
           gradient
             ? [
                 // The label sits on the light green middle; a soft shadow keeps it readable.
                 "brand-gradient [text-shadow:0_1px_3px_rgb(0_0_0/0.45)] hover:shadow-[-6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-blue)_45%,transparent),0_6px_14px_-4px_color-mix(in_srgb,var(--accent-green)_45%,transparent),6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-orange)_45%,transparent)] focus:shadow-[-6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-blue)_45%,transparent),0_6px_14px_-4px_color-mix(in_srgb,var(--accent-green)_45%,transparent),6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-orange)_45%,transparent)]",
                 isSubmitting && "brand-gradient-moving",
               ]
-            : [COLOR_CLASSES[color].accentBg, "hover:brightness-80 focus:brightness-80"],
-          COLOR_CLASSES[color].surfaceRing,
+            : [
+                COLOR_CLASSES[color].accentBg,
+                COLOR_CLASSES[color].focusVisibleRing,
+                "disabled:opacity-40",
+              ],
         )}
         type="submit"
         form={form}
