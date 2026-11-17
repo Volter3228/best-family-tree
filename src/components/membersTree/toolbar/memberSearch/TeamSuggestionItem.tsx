@@ -1,22 +1,17 @@
-import { twMerge } from "tailwind-merge";
 import type { TeamFrame } from "@/types";
-import SearchSuggestionRow from "./SearchSuggestionRow";
+import SearchSuggestionRow, { type SuggestionRowProps } from "./SearchSuggestionRow";
 
-interface Props {
+interface Props extends SuggestionRowProps {
   frame: TeamFrame;
   subtitle: string;
-  isActive: boolean;
-  onClick: () => void;
 }
 
 const GROUP_ICON_URL = 'url("/images/lion-group.svg")';
 
-// The lion group is drawn as a mask so it takes the text colour exactly like
-// the lion in member suggestions: white on blue, blue on white when active.
-const TeamSuggestionItem = ({ frame, subtitle, isActive, onClick }: Props) => (
+// The lion group is drawn as a mask: white lion on a blue disc.
+const TeamSuggestionItem = ({ frame, subtitle, ...rowProps }: Props) => (
   <SearchSuggestionRow
-    isActive={isActive}
-    onClick={onClick}
+    {...rowProps}
     title={frame.name}
     subtitle={subtitle}
     avatar={
@@ -27,17 +22,9 @@ const TeamSuggestionItem = ({ frame, subtitle, isActive, onClick }: Props) => (
           className="h-full w-full object-contain bg-white p-0.5"
         />
       ) : (
-        <div
-          className={twMerge(
-            "flex items-center justify-center w-full h-full p-0.5 transition-colors duration-150",
-            isActive ? "bg-white" : "bg-accent-blue",
-          )}
-        >
+        <div className="flex items-center justify-center w-full h-full p-0.5 bg-accent-blue">
           <div
-            className={twMerge(
-              "h-full w-full transition-colors duration-150",
-              isActive ? "bg-accent-blue" : "bg-white",
-            )}
+            className="h-full w-full bg-white"
             style={{
               WebkitMaskImage: GROUP_ICON_URL,
               maskImage: GROUP_ICON_URL,

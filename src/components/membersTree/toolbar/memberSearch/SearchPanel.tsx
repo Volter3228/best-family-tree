@@ -1,6 +1,7 @@
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { removeBadgeClasses } from "@/components/sidebar/form/inputs/inputClasses";
 import ToolbarPanel from "../ToolbarPanel";
 
 interface Props {
@@ -9,6 +10,11 @@ interface Props {
   query: string;
   placeholder: string;
   resultCount: number;
+  // Id of the listbox; rows are `${listId}-${suggestionIndex}`.
+  listId: string;
+  activeIndex: number;
+  // Matches hidden by the current filters (members only).
+  hiddenCount?: number;
   onQueryChange: (query: string) => void;
   onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onClose: () => void;
@@ -23,6 +29,9 @@ const SearchPanel = ({
   query,
   placeholder,
   resultCount,
+  listId,
+  activeIndex,
+  hiddenCount = 0,
   onQueryChange,
   onKeyDown,
   onClose,
@@ -42,50 +51,91 @@ const SearchPanel = ({
     onKeyDown(e);
   };
 
+  const clear = () => {
+    onQueryChange("");
+    inputRef.current?.focus();
+  };
+
   if (!isOpen) return null;
+
+  const hasResults = resultCount > 0;
+  const isEmpty = query.trim() !== "" && !hasResults;
 
   return (
     <ToolbarPanel isClosing={isClosing} className="flex flex-col-reverse">
-      <div className="flex items-center gap-2 px-3 py-2 h-10">
+      <div
+        className={twMerge(
+          "flex h-12 items-center gap-2 px-3",
+          (hasResults || isEmpty) && "border-t border-foreground/10",
+        )}
+      >
+        <MagnifyingGlassIcon className="pointer-events-none h-5 w-5 shrink-0 stroke-accent-blue" />
         <input
           ref={inputRef}
           data-search-input
           type="text"
+          role="combobox"
+          aria-label={placeholder}
+          aria-expanded={hasResults}
+          aria-controls={listId}
+          aria-activedescendant={
+            hasResults ? `${listId}-${activeIndex}` : undefined
+          }
+          aria-autocomplete="list"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           autoComplete="off"
           className={twMerge(
-            "flex-1 bg-transparent text-foreground text-sm",
-            "placeholder:text-foreground/80",
+            "min-w-0 flex-1 bg-transparent text-base font-medium text-foreground",
+            "placeholder:font-normal placeholder:text-placeholder caret-accent-blue",
             "focus:outline-none",
           )}
         />
         {query && (
           <button
-            onClick={() => onQueryChange("")}
-            className="p-0.5 rounded-full hover:bg-foreground/10 transition-colors"
+            type="button"
+            aria-label="Очистити пошук"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={clear}
+            className={removeBadgeClasses("blue", "h-6 w-6 shrink-0")}
           >
-            <XMarkIcon className="h-4 w-4 stroke-foreground/80" />
+            <XMarkIcon className="h-3.5 w-3.5 stroke-2" />
           </button>
         )}
       </div>
-      <ul
+      {hiddenCount > 0 && (
+        <p className="px-4 pb-2 text-xs text-foreground/60">
+          Ще {hiddenCount} приховано фільтрами
+        </p>
+      )}
+      {/* Reveal animates grid rows on the wrapper, so the scrolling ul is never
+          shorter than its content and no scrollbar flashes. */}
+      <div
         className={twMerge(
-          "overflow-y-auto rounded-t-2xl transition-all duration-200 ease-in-out origin-bottom",
-          resultCount > 0
-            ? "opacity-100 translate-y-0 scale-y-100 max-h-10/12"
-            : "opacity-0 translate-y-1 scale-y-95 pointer-events-none max-h-0",
+          "grid origin-bottom transition-[grid-template-rows,opacity,transform] duration-200 ease-in-out",
+          hasResults
+            ? "grid-rows-[1fr] opacity-100 translate-y-0 scale-y-100"
+            : "grid-rows-[0fr] opacity-0 translate-y-1 scale-y-95 pointer-events-none",
         )}
-        style={
-          { "--scroll-color": "var(--accent-blue)" } as React.CSSProperties
-        }
       >
-        {children}
-      </ul>
-      {query.trim() && resultCount === 0 && (
-        <div className="border-b border-foreground/20 px-3 py-3 text-center text-sm text-foreground/80">
+        <div className="min-h-0 overflow-hidden">
+          <ul
+            id={listId}
+            role="listbox"
+            aria-label={placeholder}
+            className="flex max-h-[min(28rem,50dvh)] flex-col gap-0.5 overflow-y-auto overscroll-contain p-1.5"
+            style={
+              { "--scroll-color": "var(--accent-blue)" } as React.CSSProperties
+            }
+          >
+            {children}
+          </ul>
+        </div>
+      </div>
+      {isEmpty && (
+        <div className="px-3 py-3 text-center text-sm text-foreground/80">
           Нима таких...
         </div>
       )}

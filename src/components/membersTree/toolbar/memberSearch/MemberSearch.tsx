@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { Member } from "@/models";
-import { useMembersList, useSearchSuggestions } from "@/hooks";
+import { matchesQuery, useMembersList, useSearchSuggestions } from "@/hooks";
+import { formatMemberRecruitmentSeason } from "@/utils";
 import { useFiltersStore } from "@/store/filtersStore";
 import SearchPanel from "./SearchPanel";
 import SearchSuggestionItem from "./SearchSuggestionItem";
@@ -12,10 +13,14 @@ interface Props {
   onSearch: (memberId: string) => void;
 }
 
-const getSearchable = (member: Member) => [member.name, member.status];
+const getSearchable = (member: Member) => [
+  member.name,
+  formatMemberRecruitmentSeason(member),
+];
 const compare = (a: Member, b: Member) => a.name.localeCompare(b.name, "uk");
 
 const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
+  const listId = useId();
   const flatMembersList = useMembersList();
   const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
 
@@ -33,6 +38,7 @@ const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
     setQuery,
     suggestions,
     activeIndex,
+    setActiveIndex,
     handleSelect,
     handleKeyDown,
   } = useSearchSuggestions({
@@ -45,6 +51,15 @@ const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
     },
   });
 
+  // Matches the filters currently keep out of the tree.
+  const hiddenCount = useMemo(() => {
+    if (!filteredMemberIds || !query.trim()) return 0;
+    return flatMembersList.filter(
+      (m) =>
+        !filteredMemberIds.has(m.id) && matchesQuery(getSearchable(m), query),
+    ).length;
+  }, [flatMembersList, filteredMemberIds, query]);
+
   // First match should sit closest to the input at the bottom.
   const displayed = useMemo(() => [...suggestions].reverse(), [suggestions]);
 
@@ -55,18 +70,27 @@ const MemberSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
       query={query}
       placeholder="Пошук учасника..."
       resultCount={suggestions.length}
+      listId={listId}
+      activeIndex={activeIndex}
+      hiddenCount={hiddenCount}
       onQueryChange={setQuery}
       onKeyDown={handleKeyDown}
       onClose={onClose}
     >
-      {displayed.map((member, index) => (
-        <SearchSuggestionItem
-          key={member.id}
-          member={member}
-          isActive={suggestions.length - 1 - index === activeIndex}
-          onClick={() => handleSelect(member)}
-        />
-      ))}
+      {displayed.map((member, index) => {
+        const i = suggestions.length - 1 - index;
+        return (
+          <SearchSuggestionItem
+            key={member.id}
+            id={`${listId}-${i}`}
+            member={member}
+            query={query}
+            isActive={i === activeIndex}
+            onHover={() => setActiveIndex(i)}
+            onClick={() => handleSelect(member)}
+          />
+        );
+      })}
     </SearchPanel>
   );
 };

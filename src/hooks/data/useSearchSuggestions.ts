@@ -1,18 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { normalize } from "@/utils";
+import { matchesQuery, rankMatch } from "./searchMatching";
+
+export { matchesQuery, rankMatch, getMatchRanges } from "./searchMatching";
 
 const MAX_SUGGESTIONS = 8;
-
-// Every query word must be a prefix-or-substring of some searchable word.
-export const matchesQuery = (searchable: string[], query: string): boolean => {
-  const normalizedQuery = normalize(query);
-  if (!normalizedQuery) return false;
-
-  const tokens = searchable.flatMap((text) => normalize(text).split(/\s+/));
-  return normalizedQuery
-    .split(/\s+/)
-    .every((part) => tokens.some((token) => token.includes(part)));
-};
 
 interface Options<T> {
   items: T[];
@@ -38,13 +29,15 @@ export const useSearchSuggestions = <T>({
     if (!query.trim()) return [];
     return items
       .filter((item) => matchesQuery(getSearchable(item), query))
-      .sort(compare)
+      .map((item) => ({ item, rank: rankMatch(getSearchable(item), query) }))
+      .sort((a, b) => a.rank - b.rank || compare(a.item, b.item))
+      .map(({ item }) => item)
       .slice(0, MAX_SUGGESTIONS);
   }, [items, query, getSearchable, compare]);
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [suggestions.length]);
+  }, [suggestions]);
 
   const handleSelect = useCallback(
     (item: T) => {
@@ -85,6 +78,7 @@ export const useSearchSuggestions = <T>({
     setQuery,
     suggestions,
     activeIndex,
+    setActiveIndex,
     handleSelect,
     handleKeyDown,
   };

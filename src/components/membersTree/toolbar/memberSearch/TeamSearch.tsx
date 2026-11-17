@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { useSearchSuggestions } from "@/hooks";
 import { useTreeStore } from "@/store/treeStore";
 import { PARTICIPANT_FORMS, formatCount } from "@/utils";
@@ -24,6 +24,7 @@ const getSubtitle = (frame: TeamFrame) =>
 // Team view lists each member once per team, so searching by member is
 // ambiguous; the search box finds team frames instead.
 const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
+  const listId = useId();
   const teamFrames = useTreeStore((s) => s.teamFrames);
 
   const {
@@ -31,6 +32,7 @@ const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
     setQuery,
     suggestions,
     activeIndex,
+    setActiveIndex,
     handleSelect,
     handleKeyDown,
   } = useSearchSuggestions({
@@ -52,19 +54,27 @@ const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
       query={query}
       placeholder="Пошук команди..."
       resultCount={suggestions.length}
+      listId={listId}
+      activeIndex={activeIndex}
       onQueryChange={setQuery}
       onKeyDown={handleKeyDown}
       onClose={onClose}
     >
-      {displayed.map((frame, index) => (
-        <TeamSuggestionItem
-          key={frame.teamId}
-          frame={frame}
-          subtitle={getSubtitle(frame)}
-          isActive={suggestions.length - 1 - index === activeIndex}
-          onClick={() => handleSelect(frame)}
-        />
-      ))}
+      {displayed.map((frame, index) => {
+        const i = suggestions.length - 1 - index;
+        return (
+          <TeamSuggestionItem
+            key={frame.teamId}
+            id={`${listId}-${i}`}
+            frame={frame}
+            subtitle={getSubtitle(frame)}
+            query={query}
+            isActive={i === activeIndex}
+            onHover={() => setActiveIndex(i)}
+            onClick={() => handleSelect(frame)}
+          />
+        );
+      })}
     </SearchPanel>
   );
 };

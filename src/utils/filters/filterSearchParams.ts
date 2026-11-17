@@ -6,6 +6,11 @@ import {
 } from "@/constants/filters";
 import { isListFilterSet } from "./filterMembers";
 import {
+  familyIdToSlug,
+  familyTokenToId,
+  type FamilyGroupRef,
+} from "./familySlug";
+import {
   type FilterState,
   type RecruitmentSeason,
   type TreeMode,
@@ -64,6 +69,7 @@ const serializeNumber = (n: number | null): string | null =>
 
 export const parseFiltersFromSearchParams = (
   params: URLSearchParams,
+  familyGroups: FamilyGroupRef[] = [],
 ): FilterState => {
   return {
     joinYearFrom: parseNumberOrNull(params.get("joinYearFrom")),
@@ -81,7 +87,9 @@ export const parseFiltersFromSearchParams = (
       ACTIVITY_STATES,
     ),
     genders: parseCsvArray<Gender>(params.get("gender"), GENDER_VALUES),
-    familyGroupIds: parseCsvStrings(params.get("family")),
+    familyGroupIds: parseCsvStrings(params.get("family")).map((token) =>
+      familyTokenToId(familyGroups, token),
+    ),
     birthdayFrom: params.get("birthdayFrom") || null,
     birthdayTo: params.get("birthdayTo") || null,
     birthdayIncludeYear: params.get("birthdayIncludeYear") === "1",
@@ -99,6 +107,7 @@ export const parseFiltersFromSearchParams = (
 
 export const filtersToSearchParams = (
   filters: FilterState,
+  familyGroups: FamilyGroupRef[] = [],
 ): URLSearchParams => {
   const params = new URLSearchParams();
 
@@ -117,7 +126,12 @@ export const filtersToSearchParams = (
   if (isListFilterSet(filters.genders, GENDER_VALUES))
     set("gender", serializeCsv(filters.genders));
   if (filters.familyGroupIds.length > 0)
-    set("family", serializeNameCsv(filters.familyGroupIds));
+    set(
+      "family",
+      serializeNameCsv(
+        filters.familyGroupIds.map((id) => familyIdToSlug(familyGroups, id)),
+      ),
+    );
   set("birthdayFrom", filters.birthdayFrom);
   set("birthdayTo", filters.birthdayTo);
   if (filters.birthdayIncludeYear) set("birthdayIncludeYear", "1");
