@@ -12,6 +12,7 @@ const nextConfig = {
   // The Express server has its own node_modules; never trace it into the bundle.
   outputFileTracingExcludes: { "*": ["src/server/**"] },
   experimental: {
+    agentUpgrade: "security",
     // proxy.ts makes Next buffer request bodies (default 10 MB, silently
     // truncated beyond). Photo uploads may be 10 MB plus multipart overhead.
     proxyClientMaxBodySize: "12mb",
