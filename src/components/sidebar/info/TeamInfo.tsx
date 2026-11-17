@@ -75,10 +75,9 @@ const TeamInfo = ({
                 {years}
               </span>
             )}
-            <MemberActivityPill
-              state={team.isOngoing ? ActivityState.Active : ActivityState.Inactive}
-              color={color}
-            />
+            {!!team.isOngoing && (
+              <MemberActivityPill state={ActivityState.Active} color={color} />
+            )}
           </div>
         </div>
       </div>

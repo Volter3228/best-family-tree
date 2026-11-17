@@ -6,11 +6,11 @@ type Years = {
   ongoing?: boolean;
 };
 
-// "2018–2019", "2018–…" (still running), the single known year, or ""
+// "2018 – 2019", "2018 – …" (still running), the single known year, or ""
 // when nothing is known.
 export const formatYearRange = ({ start, end, ongoing }: Years): string => {
-  if (start && ongoing) return `${start}–…`;
-  if (start && end && start !== end) return `${start}–${end}`;
+  if (start && ongoing) return `${start} – …`;
+  if (start && end && start !== end) return `${start} – ${end}`;
   return String(start ?? end ?? "");
 };
 

@@ -1,7 +1,7 @@
 # Graph Report - best-family-tree  (2026-11-17)
 
 ## Corpus Check
-- 621 files · ~194,003 words
+- 621 files · ~194,004 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 30 file(s) not represented in the graph (top: .prisma 9, (none) 7, .css 7)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `35a47c0e`
+- Built from commit: `ae3c2bc7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -722,16 +722,16 @@ Nodes (11): Controlling Playback, Creating a Timeline, Do Not, GSAP Timeline, La
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `filters()` connect `filterTeams.ts` to `Core Patterns`, `filterSearchParams.ts`, `Common Mistakes`, `Constructor options (Container-inherited)`?**
-  _High betweenness centrality (0.130) - this node is a cross-community bridge._
+  _High betweenness centrality (0.131) - this node is a cross-community bridge._
 - **What connects `@prisma/client`, `dotenv`, `lodash` to the rest of the system?**
   _45 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `react` be split into smaller, more focused modules?**
   _Cohesion score 0.1147086031452359 - nodes in this community are weakly interconnected._
 - **Why does `react` connect `react` to `BirthdayFilterSection.tsx`, `TextInput`, `react`, `constants/filters.ts`, `DropdownPortal.tsx`, `FilterState`, `teamFrame.ts`, `MemberNodeAvatar.tsx`, `MemberNodeCard.tsx`, `auth.ts`, `treeStore.ts`, `Member`, `utils/membersTree/index.ts`, `MemberInfo.tsx`, `src/utils/index.ts`, `MemberSearch.tsx`, `useTeamTypeForm.ts`, `layout.tsx`, `NodesLayer.tsx`, `package.json`, `useTeamForm.ts`, `positionFormUtils.ts`, `Direction`, `PhotoViewer.tsx`, `constants/canvas/index.ts`, `MemberStatus`, `hooks/index.ts`, `useRoleForm.ts`, `AvatarFileInput.tsx`, `TeamFormContent.tsx`, `Toolbar.tsx`, `useMembersStore`, `YearRangeFilterSection.tsx`, `registerPixiPlugins.ts`, `tailwind-merge`, `Sidebar.tsx`, `FilterCategoryPane.tsx`, `utils/strings.ts`, `MembersTreeContent.tsx`, `GroupedCheckListFilter.tsx`, `MembersTreeDynamic.tsx`, `PhotoOpenButton.tsx`, `EditMemberForm.tsx`, `photoViewerMath.ts`, `src/types/index.ts`, `GenderFormField.tsx`, `ui/index.ts`, `useTreeDirection.ts`, `ColorField.tsx`, `searchShortcut.ts`, `useCardAnimation.ts`?**
-  _High betweenness centrality (0.107) - this node is a cross-community bridge._
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **Should `emailRoutes.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07518796992481203 - nodes in this community are weakly interconnected._
 - **Why does `Constructor options` connect `Common Mistakes` to `filterTeams.ts`?**
-  _High betweenness centrality (0.097) - this node is a cross-community bridge._
+  _High betweenness centrality (0.098) - this node is a cross-community bridge._
 - **Should `server/package.json` be split into smaller, more focused modules?**
   _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
