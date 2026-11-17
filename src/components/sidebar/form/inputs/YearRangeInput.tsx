@@ -1,5 +1,5 @@
-import { twMerge } from "tailwind-merge";
-import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { Fragment } from "react";
+import { formInputClasses } from "./inputClasses";
 import type { AccentColor } from "@/types";
 import FormCheckbox from "./FormCheckbox";
 import InputLabel from "./InputLabel";
@@ -36,13 +36,8 @@ const YearRangeInput = ({
   onOngoingChange,
   color = "blue",
 }: Props) => {
-  const colorClasses = COLOR_CLASSES[color];
-  const inputClassName = twMerge(
-    "w-full px-3 py-2 rounded-xl shadow-inner font-light bg-surface",
-    colorClasses.caret,
-    "placeholder:text-placeholder focus:outline-hidden focus:ring-2",
-    colorClasses.accentRing,
-    "transition-all duration-200 ease-out",
+  const inputClassName = formInputClasses(
+    color,
     "disabled:cursor-not-allowed disabled:opacity-60",
   );
 
@@ -88,9 +83,18 @@ const YearRangeInput = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
-        {fields.map((field) => (
-          <div key={field.id} className="flex flex-col flex-1">
+      <div className="flex flex-row items-end gap-2">
+        {fields.map((field, index) => (
+          <Fragment key={field.id}>
+            {index > 0 && (
+              <span
+                aria-hidden
+                className="flex h-10 items-center text-foreground/40"
+              >
+                –
+              </span>
+            )}
+          <div className="flex min-w-0 flex-1 flex-col">
             <InputLabel
               label={field.label}
               htmlFor={`${name}-${field.id}`}
@@ -111,6 +115,7 @@ const YearRangeInput = ({
               className={inputClassName}
             />
           </div>
+          </Fragment>
         ))}
       </div>
       {onOngoingChange && (

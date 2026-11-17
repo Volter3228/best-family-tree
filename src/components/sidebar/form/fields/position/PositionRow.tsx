@@ -25,7 +25,7 @@ interface Props {
   onRemove: () => void;
   onUpdate: (patch: Partial<PositionFormData>) => void;
   onTeamSelect: (teamName: string) => void;
-  onTeamTypeSelect: (value: string, text: string) => void;
+  onTeamTypeSelect: (value: string) => void;
 }
 
 const PositionRow = ({
@@ -47,8 +47,8 @@ const PositionRow = ({
   return (
     <div
       className={twMerge(
-        "flex flex-col gap-2 rounded-xl border bg-surface/50 p-3",
-        colorClasses.border,
+        "flex flex-col gap-3 rounded-2xl p-3",
+        colorClasses.softBg,
       )}
     >
       <PositionRowHeader
@@ -66,6 +66,9 @@ const PositionRow = ({
             teamTypeOptions={teamTypeOptions}
             teamOptions={teamOptions}
             roleOptions={roleOptions}
+            canCreateTeam={teamTypes.some(
+              (teamType) => teamType.id === row.teamTypeId && teamType.isEvent,
+            )}
             color={color}
             onUpdate={onUpdate}
             onTeamSelect={onTeamSelect}
@@ -75,6 +78,7 @@ const PositionRow = ({
             rowId={row.id}
             row={row}
             teams={teams}
+            teamTypes={teamTypes}
             color={color}
             onUpdate={onUpdate}
           />

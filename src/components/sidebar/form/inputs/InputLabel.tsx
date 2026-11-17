@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -8,24 +7,18 @@ interface Props {
   htmlFor?: string;
   required: boolean;
   onClick?: () => void;
+  // Kept for call-site compatibility: labels are neutral, not accented.
   color?: AccentColor;
 }
 
-const InputLabel = ({
-  label,
-  htmlFor,
-  required,
-  onClick,
-  color = "blue",
-}: Props) => {
+const InputLabel = ({ label, htmlFor, required, onClick }: Props) => {
   return (
     <label
       htmlFor={htmlFor}
       onClick={onClick}
       className={twMerge(
-        "block mb-1",
-        required &&
-          `after:content-['*'] after:ml-0.5 ${COLOR_CLASSES[color].afterText}`,
+        "mb-1.5 block text-sm font-semibold text-foreground",
+        required && "after:ml-0.5 after:text-foreground/40 after:content-['*']",
       )}
     >
       {label}

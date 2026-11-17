@@ -1,4 +1,4 @@
-import { UserGroupIcon } from "@heroicons/react/16/solid";
+import { PencilIcon, UserGroupIcon } from "@heroicons/react/16/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useMemo, useRef } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
@@ -58,7 +58,11 @@ const TeamInfoSidebar = ({
             {team?.teamType?.name ?? "Команда"}
           </HeaderChip>
         ) : (
-          "Редагувати"
+          team && (
+            <HeaderChip icon={PencilIcon} color="blue">
+              Редагувати: {team.name}
+            </HeaderChip>
+          )
         )
       }
       floatingHeader={mode === "info"}
@@ -107,6 +111,7 @@ const TeamInfoSidebar = ({
             <TeamForm
               teamId={teamId}
               onSaved={state.backToInfo}
+              onCancel={state.backToInfo}
               onDeleted={state.close}
             />
           ))}

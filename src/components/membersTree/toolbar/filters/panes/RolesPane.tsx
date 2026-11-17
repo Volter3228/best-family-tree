@@ -13,7 +13,7 @@ const RolesPane = ({ filters, onChange }: FilterPaneProps) => {
   const searchId = useId();
 
   return (
-    <FilterSection title="Ролі" htmlFor={searchId} className="min-h-0 flex-1">
+    <FilterSection title="Посади" htmlFor={searchId} className="min-h-0 flex-1">
       <CheckListFilter
         inputId={searchId}
         scrollable

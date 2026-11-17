@@ -1,8 +1,8 @@
 import Sidebar from "./Sidebar";
 import MemberInfo from "./info/MemberInfo";
-import ManageForm from "./form/ManageForm";
+import { ManageSidebar } from "./manage";
 import EditMemberForm from "./form/EditMemberForm";
 import MemberSidebarContent from "./MemberSidebarContent";
 
-export { MemberInfo, ManageForm, EditMemberForm, MemberSidebarContent };
+export { MemberInfo, ManageSidebar, EditMemberForm, MemberSidebarContent };
 export default Sidebar;

@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { formatYearRange } from "@/utils";
-import type { AccentColor, PositionFormRow, Team } from "@/types";
+import type { AccentColor, PositionFormRow, Team, TeamType } from "@/types";
 import { TextInput, YearRangeInput } from "../../inputs";
 import {
   MAX_POSITION_YEAR,
@@ -13,6 +13,7 @@ interface Props {
   rowId: string;
   row: PositionFormRow;
   teams: Team[];
+  teamTypes: TeamType[];
   color?: AccentColor;
   onUpdate: (patch: Partial<PositionFormRow>) => void;
 }
@@ -25,11 +26,15 @@ const PositionPeriodFields = ({
   rowId,
   row,
   teams,
+  teamTypes,
   color = "blue",
   onUpdate,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
-  const period = getRowPeriod(teams, row);
+  const period = getRowPeriod(teams, row, teamTypes);
+
+  // The validation error explains what to do; no period fields apply.
+  if (period.kind === "unavailable") return null;
 
   if (period.kind === "existingTeam") {
     const years = formatYearRange({
@@ -62,16 +67,18 @@ const PositionPeriodFields = ({
 
   return (
     <>
-      <TextInput
-        name={`position-organization-${rowId}`}
-        label="Організація"
-        value={row.organization ?? ""}
-        onChange={(organization) =>
-          onUpdate({ organization: organization || undefined })
-        }
-        placeholder="Міжнар"
-        color={color}
-      />
+      <div>
+        <TextInput
+          name={`position-organization-${rowId}`}
+          label="Організація"
+          value={row.organization ?? ""}
+          onChange={(organization) =>
+            onUpdate({ organization: organization || undefined })
+          }
+          placeholder="Міжнар"
+          color={color}
+        />
+      </div>
       <YearRangeInput
         name={`position-years-${rowId}`}
         start={row.startYear}

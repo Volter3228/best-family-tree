@@ -13,7 +13,7 @@ interface Props {
 const ToolbarPanel = ({ isClosing, className, children }: Props) => (
   <div
     className={twMerge(
-      "fixed inset-x-0 bottom-24 z-40 mx-auto w-[calc(100%-2rem)] max-w-80",
+      "fixed inset-x-0 bottom-24 z-[60] mx-auto w-[calc(100%-2rem)] max-w-80",
       "rounded-2xl bg-surface/80 shadow-2xl backdrop-blur-xl",
       isClosing ? "animate-sidebar-slide-out" : "animate-sidebar-slide-in",
       className,

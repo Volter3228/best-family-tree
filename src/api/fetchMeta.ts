@@ -1,4 +1,5 @@
 import { http } from "@/libs/http";
+import { toApiError } from "./ApiError";
 import { ENDPOINTS } from "@/constants/endpoints";
 import type { TeamType, Role, Team } from "@/types";
 
@@ -40,6 +41,11 @@ export async function updateTeamType(
   return res.json();
 }
 
+export async function deleteTeamType(id: string): Promise<void> {
+  const res = await http(ENDPOINTS.deleteTeamType(id), { method: "DELETE" });
+  if (!res.ok) throw await toApiError(res);
+}
+
 export async function fetchRoles(): Promise<Role[]> {
   const res = await http(ENDPOINTS.getRoles);
   if (!res.ok) {
@@ -50,6 +56,7 @@ export async function fetchRoles(): Promise<Role[]> {
 
 export async function createRole(data: {
   name: string;
+  description?: string;
   isLeaderPosition?: boolean;
 }): Promise<Role> {
   const res = await http(ENDPOINTS.createRole, {
@@ -62,6 +69,30 @@ export async function createRole(data: {
     throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
   }
   return res.json();
+}
+
+export async function updateRole(
+  id: string,
+  data: { name?: string; description?: string; isLeaderPosition?: boolean },
+): Promise<Role> {
+  const res = await http(ENDPOINTS.updateRole(id), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function deleteRole(id: string): Promise<void> {
+  const res = await http(ENDPOINTS.deleteRole(id), { method: "DELETE" });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+  }
 }
 
 export async function fetchTeams(teamTypeId?: string): Promise<Team[]> {

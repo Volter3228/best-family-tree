@@ -7,6 +7,8 @@ export const useComboboxState = (
   options: DropdownOption[],
   initialValue: string,
   onSelect: (value: string, text: string) => void,
+  // False: only existing options can be chosen (no "create" option).
+  allowCreate = true,
 ) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -45,14 +47,14 @@ export const useComboboxState = (
   // Existing matches come first (the first one is focused by default); the
   // "create" option is last, so it is only focused when nothing else matches.
   const allOptions = useMemo(() => {
-    if (inputValue.trim() && !isExistingOption) {
+    if (allowCreate && inputValue.trim() && !isExistingOption) {
       return [
         ...filteredOptions,
         { value: NEW_OPTION_VALUE, text: `Створити: "${inputValue}"` },
       ];
     }
     return filteredOptions;
-  }, [filteredOptions, inputValue, isExistingOption]);
+  }, [filteredOptions, inputValue, isExistingOption, allowCreate]);
 
   const close = useCallback(() => {
     setIsClosing(true);
@@ -91,10 +93,24 @@ export const useComboboxState = (
 
     if (exactMatch) selectOption(exactMatch);
     else {
-      onSelect("", inputValue);
+      // Pick-only: free text is dropped, and the stored value is cleared so
+      // the form state matches the empty input.
+      if (allowCreate) onSelect("", inputValue);
+      else {
+        onSelect("", "");
+        setInputValue("");
+      }
       close();
     }
-  }, [inputValue, initialValue, allOptions, onSelect, close, selectOption]);
+  }, [
+    inputValue,
+    initialValue,
+    allOptions,
+    allowCreate,
+    onSelect,
+    close,
+    selectOption,
+  ]);
 
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,

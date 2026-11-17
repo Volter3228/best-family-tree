@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import CheckBox from "./CheckBox";
+import CheckBox from "@/components/ui/CheckBox";
 
 interface Props {
   checked: boolean;
@@ -27,6 +27,7 @@ const FilterCheckbox = ({ checked, onChange, label, disabled = false }: Props) =
     >
       <CheckBox
         checked={checked}
+        color="green"
       />
     </button>
     {label}

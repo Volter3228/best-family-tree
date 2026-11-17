@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useDropdown, useDropdownPosition } from "@/hooks";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { formInputClasses } from "./inputClasses";
 import type { AccentColor, DropdownOption } from "@/types";
 import DropdownMenu from "@/components/common/DropdownMenu";
 
@@ -97,15 +98,10 @@ const DropdownSelectInput = ({
             handleKeyDown(e, dropUp);
           }}
           autoComplete="off"
-          className={twMerge(
-            "block w-full px-3 py-2 rounded-xl shadow-inner font-light bg-surface",
-            colorClasses.border,
-            "placeholder:text-placeholder",
-            "focus:outline-hidden focus:ring-2",
-            colorClasses.accentRing,
-            colorClasses.caret,
-            "transition-all duration-200 ease-out",
-            !autoComplete ? "cursor-pointer select-none caret-transparent" : "",
+          className={formInputClasses(
+            color,
+            "pr-7",
+            !autoComplete && "cursor-pointer select-none caret-transparent",
           )}
         />
         {(isOpen || isClosing) && !!filteredOptions.length && (

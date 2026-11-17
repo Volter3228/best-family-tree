@@ -6,7 +6,8 @@ import {
 } from "@/components/icons/social";
 import type { MemberFormData, AccentColor } from "@/types";
 import TextInput from "../inputs/TextInput";
-import FieldError from "./FieldError";
+import FormField from "./FormField";
+import SectionHeading from "./SectionHeading";
 
 interface Props {
   form: MemberFormData;
@@ -22,9 +23,10 @@ const SocialMediaFormFields = ({
   color = "blue",
 }: Props) => {
   return (
-    <>
-      <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1 relative">
+    <section className="flex flex-col gap-3">
+      <SectionHeading title="Соцмережі" color={color} />
+      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+        <FormField error={errors.telegramLink} color={color}>
           <TextInput
             name="telegramLink"
             value={form.telegramLink}
@@ -34,9 +36,8 @@ const SocialMediaFormFields = ({
             icon={TelegramIcon}
             color={color}
           />
-          <FieldError message={errors.telegramLink} color={color} />
-        </div>
-        <div className="flex flex-col flex-1 relative">
+        </FormField>
+        <FormField error={errors.instagramLink} color={color}>
           <TextInput
             name="instagramLink"
             value={form.instagramLink}
@@ -46,11 +47,8 @@ const SocialMediaFormFields = ({
             icon={InstagramIcon}
             color={color}
           />
-          <FieldError message={errors.instagramLink} color={color} />
-        </div>
-      </div>
-      <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1 relative">
+        </FormField>
+        <FormField error={errors.facebookLink} color={color}>
           <TextInput
             name="facebookLink"
             value={form.facebookLink}
@@ -60,9 +58,8 @@ const SocialMediaFormFields = ({
             icon={FacebookIcon}
             color={color}
           />
-          <FieldError message={errors.facebookLink} color={color} />
-        </div>
-        <div className="flex flex-col flex-1 relative">
+        </FormField>
+        <FormField error={errors.linkedinLink} color={color}>
           <TextInput
             name="linkedinLink"
             value={form.linkedinLink}
@@ -72,10 +69,9 @@ const SocialMediaFormFields = ({
             icon={LinkedinIcon}
             color={color}
           />
-          <FieldError message={errors.linkedinLink} color={color} />
-        </div>
+        </FormField>
       </div>
-    </>
+    </section>
   );
 };
 

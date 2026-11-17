@@ -13,15 +13,14 @@ interface Props {
 // buttons living there must reference their form through the `form` attribute.
 const FormFooter = ({ children, className }: Props) => {
   const footer = useContext(SidebarFooterContext);
-  if (footer) return createPortal(children, footer);
-
-  return (
-    <div
-      className={twMerge("mt-4 flex flex-col items-center gap-3", className)}
-    >
+  const row = (
+    <div className={twMerge("flex w-full items-center gap-3", className)}>
       {children}
     </div>
   );
+  if (footer) return createPortal(row, footer);
+
+  return <div className="mt-4">{row}</div>;
 };
 
 export default FormFooter;

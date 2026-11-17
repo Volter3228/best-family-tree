@@ -52,7 +52,8 @@ const DropdownMenu = ({
           // Positioned via inline styles from useDropdownPosition.
           "fixed z-50 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           dropUp && "flex flex-col-reverse",
-          "rounded-xl bg-surface/80 backdrop-blur-lg shadow-lg transition-all transform scale-95 scroll-smooth",
+          "rounded-xl border bg-surface/80 backdrop-blur-lg shadow-lg transition-all transform scale-95 scroll-smooth",
+          colorClasses.softBorder,
           isClosing ? "animate-fade-slide-up" : "animate-fade-slide-down",
           listClassName,
         )}

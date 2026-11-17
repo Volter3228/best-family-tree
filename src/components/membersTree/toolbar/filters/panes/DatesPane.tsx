@@ -6,11 +6,12 @@ import {
   JoinYearFilterSection,
   PillGroupFilterSection,
 } from "../sections";
+import { greenPillIcon } from "../greenPillIcon";
 import type { FilterPaneProps } from "./types";
 
 const SEASON_PILLS = SEASON_OPTIONS.map((option) => ({
   ...option,
-  icon: option.value === "spring" ? FlowerIcon : MapleLeafIcon,
+  icon: greenPillIcon(option.value === "spring" ? FlowerIcon : MapleLeafIcon),
 }));
 
 const DatesPane = ({ filters, onChange }: FilterPaneProps) => {

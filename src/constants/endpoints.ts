@@ -22,6 +22,8 @@ export const ENDPOINTS = {
   getRoles: "/roles",
   getFamilyGroups: "/family-groups",
   createRole: "/roles",
+  updateRole: (id: string) => `/roles/${id}`,
+  deleteRole: (id: string) => `/roles/${id}`,
   getTeams: "/teams",
   getTeam: (id: string) => `/teams/${id}`,
   createTeam: "/teams",

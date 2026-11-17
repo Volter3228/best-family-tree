@@ -5,8 +5,10 @@ import { Gender } from "@/types";
 type IconProps = { className?: string };
 
 // Mars and Venus signs, green like the activity dots and white on a pressed
-// (green) pill.
-const SIGN_CLASS = "text-accent-green group-aria-pressed:text-white";
+// (toggle) or checked (radio) pill. Callers can override the idle color
+// through `className` (e.g. text-accent-blue in the forms).
+const SIGN_CLASS =
+  "text-accent-green group-aria-pressed:text-white group-aria-checked:text-white";
 
 const MaleIcon = ({ className }: IconProps) => (
   <svg

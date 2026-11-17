@@ -37,7 +37,11 @@ const MemberMiniAvatar = ({ member, size, color = "blue", className }: Props) =>
         className,
       )}
     >
-      {getInitials(member.name)}
+      {/* Trim the line box to the capitals so they sit at the optical
+          centre; the font's line box leaves more room below than above. */}
+      <span className="leading-none [text-box:trim-both_cap_alphabetic]">
+        {getInitials(member.name)}
+      </span>
     </span>
   );
 };

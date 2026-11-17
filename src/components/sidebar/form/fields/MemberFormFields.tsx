@@ -1,31 +1,11 @@
-import { useMemo } from "react";
-import { useMembersStore } from "@/store/membersStore";
-import { useMentorsList, useSelectedId } from "@/hooks";
-import { collectDescendantIds } from "@/utils/membersTree";
-import { capitalizeOnlyFirstLetter } from "@/utils";
-import {
-  MAX_DATE_BIRTHDAY,
-  MIN_DATE_BIRTHDAY,
-  MIN_DATE_JOIN,
-} from "@/constants/form";
-import { MEMBER_STATUSES } from "@/constants/member";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/16/solid";
-import type {
-  MemberFormData,
-  MemberFormMode,
-  DropdownOption,
-  AccentColor,
-} from "@/types";
-import {
-  AvatarFileInput,
-  TextInput,
-  DateInput,
-  DropdownSelectInput,
-} from "../inputs";
+import type { MemberFormData, MemberFormMode, AccentColor } from "@/types";
+import InfoBubble from "@/components/ui/InfoBubble";
+import { AvatarFileInput, FormCheckbox } from "../inputs";
+import MemberBasicsSection from "./MemberBasicsSection";
+import MemberBestSection from "./MemberBestSection";
+import MemberContactsSection from "./MemberContactsSection";
 import SocialMediaFields from "./SocialMediaFormFields";
 import PositionFormFields from "./position/PositionFormFields";
-import FieldError from "./FieldError";
-import GenderFormField from "./GenderFormField";
 
 interface Props {
   form: MemberFormData;
@@ -35,6 +15,10 @@ interface Props {
   initialAvatar?: string | null;
   color?: AccentColor;
   minimal?: boolean;
+  // Create mode only: shows the "minimal record" checkbox under the avatar.
+  onMinimalChange?: (minimal: boolean) => void;
+  // Edit mode: the member being edited (excluded from the mentor options).
+  editedMemberId?: string;
 }
 
 const MemberFormFields = ({
@@ -45,193 +29,66 @@ const MemberFormFields = ({
   initialAvatar = null,
   color = "blue",
   minimal = false,
-}: Props) => {
-  const mentorsList = useMentorsList();
-  const selectedId = useSelectedId();
-  const childrenOf = useMembersStore((s) => s.childrenOf);
-
-  const mentorOptions: DropdownOption[] = useMemo(() => {
-    const excludedIds = selectedId
-      ? new Set([
-        selectedId,
-        ...collectDescendantIds(childrenOf, selectedId),
-      ])
-      : new Set<string>();
-
-    return mentorsList
-      .filter(({ id }) => !excludedIds.has(id))
-      .map(({ id, name }) => ({
-        text: name,
-        value: id,
-      }));
-  }, [mentorsList, selectedId, childrenOf]);
-
-  const statusOptions: DropdownOption[] = useMemo(
-    () =>
-      MEMBER_STATUSES.map((status) => ({
-        value: status,
-        text: capitalizeOnlyFirstLetter(status),
-      })),
-    [],
-  );
-
-  const handleTextChange = (name: string) => (value: string) => {
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleDateChange = (name: string) => (date: Date | null) => {
-    if (date) {
-      setForm({ ...form, [name]: date });
-    }
-  };
-
-  const handleFileChange = (name: string) => (file: File | null) => {
-    setForm({ ...form, [name]: file });
-  };
-
-  return (
-    <div className="flex flex-col gap-6 items-center w-full">
-      <div className="flex flex-row flex-1 w-full justify-center mb-2">
-        <AvatarFileInput
-          onImageSelect={handleFileChange("photo")}
-          image={form.photo}
-          initialImage={mode === "edit" ? initialAvatar : null}
-          color={color}
-        />
-      </div>
-      <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1 relative">
-          <TextInput
-            name="firstName"
-            label="Ім'я"
-            value={form.firstName}
-            onChange={handleTextChange("firstName")}
-            placeholder="В'ячеслав"
-            required
-            color={color}
-          />
-          <FieldError message={errors.firstName} color={color} />
-        </div>
-        <div className="flex flex-col flex-1 relative">
-          <TextInput
-            name="lastName"
-            label="Прізвище"
-            value={form.lastName}
-            onChange={handleTextChange("lastName")}
-            placeholder="Українцев"
-            required={!minimal}
-            color={color}
-          />
-          <FieldError message={errors.lastName} color={color} />
-        </div>
-      </div>
-      <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1 relative">
-          <DateInput
-            name="birthday"
-            label="День народження"
-            selected={form.birthday}
-            onChange={handleDateChange("birthday")}
-            placeholder="18.04.2000"
-            maxDate={MAX_DATE_BIRTHDAY}
-            minDate={MIN_DATE_BIRTHDAY}
-            required={!minimal}
-            color={color}
-          />
-          <FieldError message={errors.birthday} color={color} />
-        </div>
-        <div className="flex flex-col flex-1 relative">
-          <DateInput
-            name="joinedAt"
-            label="День вступу"
-            selected={form.joinedAt}
-            onChange={handleDateChange("joinedAt")}
-            placeholder="22.10.2017"
-            minDate={MIN_DATE_JOIN}
-            required
-            color={color}
-          />
-          <FieldError message={errors.joinedAt} color={color} />
-        </div>
-      </div>
-      <div className="flex flex-row w-full">
-        <GenderFormField
-          value={form.gender}
-          onChange={(gender) => setForm({ ...form, gender })}
-          color={color}
-        />
-      </div>
-      <div className="flex flex-row flex-1 gap-2 w-full">
-        <div className="flex flex-col flex-1 relative">
-          <DropdownSelectInput
-            name="status"
-            label="Статус"
-            options={statusOptions}
-            onSelect={handleTextChange("status")}
-            placeholder="Excluded"
-            initialValue={form.status || undefined}
-            required
-            color={color}
-          />
-          <FieldError message={errors.status} color={color} />
-        </div>
-        <div className="flex flex-col flex-1 relative">
-          <DropdownSelectInput
-            name="mentor"
-            label="Ментор"
-            options={mentorOptions}
-            onSelect={handleTextChange("mentorId")}
-            placeholder="Ментор Менторовенко"
-            autoComplete
-            required={!minimal}
-            initialValue={form.mentorId || undefined}
-            color={color}
-          />
-          <FieldError message={errors.mentorId} color={color} />
-        </div>
-      </div>
-      <div className="flex flex-row w-full">
-        <div className="flex flex-col flex-1 relative">
-          <TextInput
-            name="email"
-            label="Email"
-            value={form.email}
-            onChange={handleTextChange("email")}
-            placeholder="kak.pukiv.worst@ukr.net"
-            icon={EnvelopeIcon}
-            color={color}
-          />
-          <FieldError message={errors.email} color={color} />
-        </div>
-      </div>
-      <div className="flex flex-row w-full">
-        <div className="flex flex-col flex-1 relative">
-          <TextInput
-            name="phoneNumber"
-            label="Номер телефону"
-            value={form.phoneNumber}
-            onChange={handleTextChange("phoneNumber")}
-            placeholder="+380674947207"
-            icon={PhoneIcon}
-            color={color}
-          />
-          <FieldError message={errors.phoneNumber} color={color} />
-        </div>
-      </div>
-      <SocialMediaFields
-        form={form}
-        onTextChange={handleTextChange}
-        errors={errors}
+  onMinimalChange,
+  editedMemberId,
+}: Props) => (
+  <div className="@container flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col items-center gap-3">
+      <AvatarFileInput
+        onImageSelect={(photo) => setForm({ ...form, photo })}
+        image={form.photo}
+        initialImage={mode === "edit" ? initialAvatar : null}
         color={color}
       />
-      <PositionFormFields
-        error={errors.positions}
-        positions={form.positions}
-        onChange={(positions) => setForm({ ...form, positions })}
-        color={color}
-      />
+      {onMinimalChange && (
+        <div className="flex items-center gap-1.5">
+          <FormCheckbox
+            checked={minimal}
+            label="Мінімальний запис"
+            color={color}
+            onChange={onMinimalChange}
+          />
+          <InfoBubble>
+            Для старих учасників, про яких мало відомо: обов&apos;язкові лише
+            ім&apos;я, статус та день вступу, решта даних опціональні.
+          </InfoBubble>
+        </div>
+      )}
     </div>
-  );
-};
+    <MemberBasicsSection
+      form={form}
+      setForm={setForm}
+      errors={errors}
+      color={color}
+      minimal={minimal}
+    />
+    <MemberBestSection
+      form={form}
+      setForm={setForm}
+      errors={errors}
+      color={color}
+      minimal={minimal}
+      editedMemberId={editedMemberId}
+    />
+    <MemberContactsSection
+      form={form}
+      setForm={setForm}
+      errors={errors}
+      color={color}
+    />
+    <SocialMediaFields
+      form={form}
+      onTextChange={(name) => (value) => setForm({ ...form, [name]: value })}
+      errors={errors}
+      color={color}
+    />
+    <PositionFormFields
+      error={errors.positions}
+      positions={form.positions}
+      onChange={(positions) => setForm({ ...form, positions })}
+      color={color}
+    />
+  </div>
+);
 
 export default MemberFormFields;

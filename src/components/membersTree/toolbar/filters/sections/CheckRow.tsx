@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import CheckBox from "./CheckBox";
+import CheckBox from "@/components/ui/CheckBox";
 
 interface Props {
   label: string;
@@ -20,7 +20,7 @@ const CheckRow = ({ label, checked, onToggle }: Props) => (
       checked ? "text-foreground" : "text-foreground/80",
     )}
   >
-    <CheckBox checked={checked} />
+    <CheckBox checked={checked} color="green" />
     <span className="min-w-0 truncate">{label}</span>
   </button>
 );

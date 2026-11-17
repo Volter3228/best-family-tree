@@ -1,12 +1,27 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createTeamType, updateTeamType } from "@/api";
+import { ApiError } from "@/api/ApiError";
+import { deleteTeamType } from "@/api/fetchMeta";
 import { useTeamTypes } from "../data/useMeta";
 import type { TeamType, TeamTypeFormData } from "@/types";
 import { NO_CHANGES_MESSAGE } from "@/constants/form";
 import { isSameFormData } from "@/utils/formDataEquals";
+import { formatCount, pluralizeUk, TEAM_FORMS } from "@/utils/strings";
 import { useTransientMessage } from "./useTransientMessage";
 
 export type TeamTypeFormMode = "create" | "edit";
+
+// The list endpoint adds how many teams use each type.
+export const teamTypeTeamCount = (teamType: TeamType) =>
+  teamType._count?.teams ?? 0;
+
+// "1 команда використовує", "3 команди використовують": the verb and the
+// pronoun agree with the count.
+export const teamsInUseMessage = (teams: number) => {
+  const verb = pluralizeUk(teams, ["використовує", "використовують", "використовують"]);
+  const them = pluralizeUk(teams, ["її", "їх", "їх"]);
+  return `Тип ${verb} ${formatCount(teams, TEAM_FORMS)} — спершу змініть ${them}`;
+};
 
 const EMPTY_FORM: TeamTypeFormData = {
   name: "",
@@ -18,9 +33,17 @@ const EMPTY_FORM: TeamTypeFormData = {
 const toFormData = (teamType: TeamType): TeamTypeFormData => ({
   name: teamType.name,
   isEvent: teamType.isEvent,
-  color: teamType.color || undefined,
+  color: teamType.color?.toLowerCase() || undefined,
   icon: teamType.iconUrl || null,
 });
+
+const byName = (a: TeamType, b: TeamType) => a.name.localeCompare(b.name, "uk");
+
+// Update responses leave out the team count; keep the one the list had.
+const keepCount = (updated: TeamType, previous: TeamType | undefined): TeamType => {
+  const count = previous?._count;
+  return count ? { ...updated, _count: count } : updated;
+};
 
 // Multipart body of a create/update request. On edit an empty value clears
 // the field on the server.
@@ -47,60 +70,47 @@ const buildTeamTypeFormData = (
   return formData;
 };
 
-export const useTeamTypeForm = () => {
-  const [mode, setMode] = useState<TeamTypeFormMode>("create");
-  const [teamTypes, setTeamTypes] = useTeamTypes();
-  const [selectedEventId, setSelectedEventId] = useState("");
-  const [form, setForm] = useState<TeamTypeFormData>(EMPTY_FORM);
+interface Callbacks {
+  // Called after a create, with the new type's id.
+  onCreated?: (id: string) => void;
+  onDeleted?: () => void;
+}
+
+export const useTeamTypeForm = (
+  teamTypeId: string | undefined,
+  { onCreated, onDeleted }: Callbacks = {},
+) => {
+  const mode: TeamTypeFormMode = teamTypeId ? "edit" : "create";
+  const [teamTypes, setTeamTypes, reloadTeamTypes] = useTeamTypes();
+  const selectedType = useMemo(
+    () => teamTypes.find((teamType) => teamType.id === teamTypeId) ?? null,
+    [teamTypes, teamTypeId],
+  );
+  // Starts from the stored type, so the form never flashes the empty defaults.
+  const [form, setForm] = useState<TeamTypeFormData>(() =>
+    selectedType ? toFormData(selectedType) : EMPTY_FORM,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, showSuccess, hideSuccess] = useTransientMessage();
   // The type as the server last returned it; edits that match it are not sent.
-  const savedFormRef = useRef<TeamTypeFormData | null>(null);
-
-  const eventOptions = useMemo(
-    () =>
-      teamTypes.map((teamType) => ({
-        value: teamType.id,
-        text: teamType.name,
-      })),
-    [teamTypes],
+  const savedFormRef = useRef<TeamTypeFormData | null>(
+    selectedType ? toFormData(selectedType) : null,
   );
 
-  const selectedEvent = useMemo(
-    () =>
-      teamTypes.find((teamType) => teamType.id === selectedEventId) || null,
-    [teamTypes, selectedEventId],
-  );
+  const isLoaded = selectedType !== null;
 
-  // Hydrate only on mode/selection change — depending on selectedEvent
-  // identity would wipe in-progress edits when the list refreshes.
+  // Fill the form when the edited type changes or its data first arrives.
+  // Not on every list refresh, which would wipe in-progress edits.
   useEffect(() => {
-    if (mode !== "edit") return;
-    const selected =
-      teamTypes.find((teamType) => teamType.id === selectedEventId) || null;
-    setForm(selected ? toFormData(selected) : EMPTY_FORM);
+    if (!selectedType) return;
+    const saved = toFormData(selectedType);
+    savedFormRef.current = saved;
+    setForm(saved);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, selectedEventId]);
-
-  // Keep the baseline in step with the server copy of the selected type, which
-  // can change from elsewhere, without touching the user's in-progress edits.
-  useEffect(() => {
-    savedFormRef.current =
-      mode === "edit" && selectedEvent ? toFormData(selectedEvent) : null;
-  }, [mode, selectedEvent]);
-
-  const resetForm = () => {
-    setForm(EMPTY_FORM);
-    setError(null);
-    hideSuccess();
-  };
-
-  const changeMode = (nextMode: TeamTypeFormMode) => {
-    setMode(nextMode);
-    setSelectedEventId("");
-    resetForm();
-  };
+  }, [teamTypeId, isLoaded]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -112,11 +122,11 @@ export const useTeamTypeForm = () => {
 
     const saved = savedFormRef.current;
     if (
-      mode === "edit" &&
+      teamTypeId &&
       saved &&
       isSameFormData(
-        buildTeamTypeFormData(form, mode),
-        buildTeamTypeFormData(saved, mode),
+        buildTeamTypeFormData(form, "edit"),
+        buildTeamTypeFormData(saved, "edit"),
       )
     ) {
       setError(null);
@@ -129,36 +139,63 @@ export const useTeamTypeForm = () => {
     hideSuccess();
 
     try {
-      const formData = buildTeamTypeFormData(form, mode);
-
-      if (mode === "edit" && selectedEventId) {
-        const updatedEvent = await updateTeamType(selectedEventId, formData);
+      if (teamTypeId) {
+        const updated = await updateTeamType(
+          teamTypeId,
+          buildTeamTypeFormData(form, "edit"),
+        );
         setTeamTypes(
           teamTypes
             .map((teamType) =>
-              teamType.id === updatedEvent.id ? updatedEvent : teamType,
+              teamType.id === updated.id
+                ? keepCount(updated, teamType)
+                : teamType,
             )
-            .sort((a, b) => a.name.localeCompare(b.name, "uk")),
+            .sort(byName),
         );
-        savedFormRef.current = toFormData(updatedEvent);
+        savedFormRef.current = toFormData(updated);
         setForm(savedFormRef.current);
         showSuccess("Збережено");
       } else {
-        const createdEvent = await createTeamType(formData);
-        setTeamTypes(
-          [...teamTypes, createdEvent].sort((a, b) =>
-            a.name.localeCompare(b.name, "uk"),
-          ),
+        const created = await createTeamType(
+          buildTeamTypeFormData(form, "create"),
         );
-        resetForm();
-        showSuccess(`Створено: ${createdEvent.name}`);
+        setTeamTypes([...teamTypes, created].sort(byName));
+        showSuccess("Створено");
+        onCreated?.(created.id);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save team type",
-      );
+      setError(err instanceof Error ? err.message : "Не вдалося зберегти тип");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const removeTeamType = async () => {
+    if (!teamTypeId) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      await deleteTeamType(teamTypeId);
+      setTeamTypes(teamTypes.filter((teamType) => teamType.id !== teamTypeId));
+      reloadTeamTypes();
+      onDeleted?.();
+    } catch (err) {
+      setIsConfirmingDelete(false);
+      // The server refuses (409) while teams still use the type.
+      const teams = selectedType ? teamTypeTeamCount(selectedType) : 0;
+      const inUse = err instanceof ApiError && err.status === 409;
+      setError(
+        teams > 0
+          ? teamsInUseMessage(teams)
+          : inUse
+            ? "Тип використовують команди — спершу змініть їх"
+            : err instanceof Error
+            ? err.message
+            : "Не вдалося видалити тип",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -166,15 +203,15 @@ export const useTeamTypeForm = () => {
     mode,
     form,
     setForm,
-    eventOptions,
-    selectedEvent,
-    selectedEventId,
-    setSelectedEventId,
+    selectedType,
     isSubmitting,
+    isDeleting,
+    isConfirmingDelete,
+    setIsConfirmingDelete,
     error,
+    setError,
     success,
-    resetForm,
-    changeMode,
     submit,
+    removeTeamType,
   };
 };

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import CheckBox from "./CheckBox";
+import CheckBox from "@/components/ui/CheckBox";
 import CheckRow from "./CheckRow";
 import SearchField from "./SearchField";
 
@@ -106,6 +106,7 @@ const GroupedCheckListFilter = ({
                 <CheckBox
                   checked={allSelected}
                   indeterminate={!allSelected && !noneSelected}
+                  color="green"
                 />
               </button>
               <button

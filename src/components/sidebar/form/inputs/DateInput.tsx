@@ -3,6 +3,7 @@ import { CalendarDaysIcon } from "@heroicons/react/16/solid";
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { formInputClasses } from "./inputClasses";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -56,13 +57,9 @@ const DateInput = ({
         disabled={disabled}
         required={required}
         autoComplete="off"
-        className={twMerge(
-          "w-full pl-3 pr-9 py-2 rounded-xl shadow-inner font-light bg-surface",
-          colorClasses.caret,
-          "placeholder:text-placeholder focus:outline-hidden focus:ring-2",
-          colorClasses.accentRing,
-          "transition-all duration-200 ease-out",
-          "disabled:cursor-not-allowed disabled:opacity-60",
+        className={formInputClasses(
+          color,
+          "pr-9 disabled:cursor-not-allowed disabled:opacity-60",
         )}
         popperClassName={`datepicker-accent-${color}`}
         portalId="datepicker-portal"

@@ -58,7 +58,7 @@ A category of teams (for example a project, a board, an event kind) with its own
 A team type that happens at a point in time rather than continuously. When it has no own name it is called "<type> <start year>".
 
 **Role**:
-What a member does in a team, for example leader.
+What a member does in a team, for example leader. Shown in the UI as «Посада» (plural «Посади»); the code keeps `Role`.
 
 **Position**:
 One member holding one role in one team (or organisation) for a period.

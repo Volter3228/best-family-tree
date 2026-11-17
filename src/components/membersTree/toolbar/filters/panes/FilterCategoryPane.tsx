@@ -9,7 +9,7 @@ export const FILTER_CATEGORY_LABELS: Record<FilterCategoryKey, string> = {
   dates: "Дати",
   member: "Учасник",
   teams: "Команди",
-  roles: "Ролі",
+  roles: "Посади",
 };
 
 const PANES: Record<FilterCategoryKey, (props: FilterPaneProps) => React.ReactNode> = {

@@ -44,7 +44,7 @@ export const validateTeamForm = (
   const hasName = form.name.trim() !== "";
 
   if (mode === "edit" && !hasName) return "Назва команди обов'язкова";
-  if (!hasName && !teamType && !form.teamTypeName) {
+  if (!hasName && !teamType) {
     return "Вкажіть назву команди або її тип";
   }
   if (!hasName && teamType?.isEvent && !form.startYear) {
@@ -54,7 +54,7 @@ export const validateTeamForm = (
     return "Вкажіть рік початку для команди, що триває";
   }
   if (form.members.some((row) => !row.memberId || !row.roleName.trim())) {
-    return "Кожному учаснику потрібно обрати людину зі списку та роль";
+    return "Кожному учаснику потрібно обрати людину зі списку та посаду";
   }
 };
 
@@ -72,7 +72,6 @@ export const buildTeamRequestBody = (
     name: form.name.trim(),
     description: form.description.trim(),
     teamTypeId: form.teamTypeId,
-    teamTypeName: form.teamTypeName,
     startYear: form.startYear,
     endYear: form.isOngoing ? undefined : form.endYear,
     isOngoing: String(Boolean(form.isOngoing)),
@@ -80,7 +79,7 @@ export const buildTeamRequestBody = (
 
   for (const [key, value] of Object.entries(fields)) {
     if (value !== undefined && value !== "") formData.append(key, `${value}`);
-    else if (isEdit && key !== "teamTypeName") formData.append(key, "");
+    else if (isEdit) formData.append(key, "");
   }
   if (form.icon instanceof File) formData.append("icon", form.icon);
   else if (isEdit && form.icon === null) formData.append("icon", "");

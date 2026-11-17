@@ -14,7 +14,7 @@ interface Props {
 
 const PositionRowHeader = ({
   summary,
-  removeLabel = "Видалити позицію",
+  removeLabel = "Видалити посаду",
   isExpanded,
   color = "blue",
   onToggle,

@@ -12,6 +12,7 @@ import {
   getTeamSelectionPatch,
 } from "./positionFormUtils";
 import FieldError from "../FieldError";
+import SectionHeading from "../SectionHeading";
 import PositionRow from "./PositionRow";
 import { usePositionRows } from "./usePositionRows";
 
@@ -46,17 +47,15 @@ const PositionFormFields = ({
     if (row) updateRow(id, getTeamSelectionPatch(teams, row, teamName));
   };
 
-  const handleTeamTypeSelect = (id: string, value: string, text: string) => {
+  const handleTeamTypeSelect = (id: string, value: string) => {
     const row = positions.find((position) => position.id === id);
-    const patch = row && getTeamTypeSelectionPatch(teams, row, value, text);
+    const patch = row && getTeamTypeSelectionPatch(teams, row, value, teamTypes);
     if (patch) updateRow(id, patch);
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full">
-      <h3 className={twMerge("text-lg font-semibold", colorClasses.text)}>
-        Посади
-      </h3>
+    <section className="flex w-full flex-col gap-3">
+      <SectionHeading title="Посади" count={positions.length} color={color} />
       {positions.map((row) => (
         <PositionRow
           key={row.id}
@@ -72,9 +71,7 @@ const PositionFormFields = ({
           onRemove={() => removeRow(row.id)}
           onUpdate={(patch) => updateRow(row.id, patch)}
           onTeamSelect={(teamName) => handleTeamSelect(row.id, teamName)}
-          onTeamTypeSelect={(value, text) =>
-            handleTeamTypeSelect(row.id, value, text)
-          }
+          onTeamTypeSelect={(value) => handleTeamTypeSelect(row.id, value)}
         />
       ))}
       <FieldError message={error} color={color} />
@@ -82,17 +79,17 @@ const PositionFormFields = ({
         type="button"
         onClick={addRow}
         className={twMerge(
-          "flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed",
-          colorClasses.border,
+          "flex h-10 items-center justify-center gap-1 rounded-xl border border-dashed text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2",
+          colorClasses.softBorder,
           colorClasses.text,
           colorClasses.hoverSurfaceBg,
-          "transition-all duration-200",
+          colorClasses.focusVisibleRingSoft,
         )}
       >
         <PlusIcon className="h-4 w-4" />
-        Додати позицію
+        Додати посаду
       </button>
-    </div>
+    </section>
   );
 };
 

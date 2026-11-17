@@ -3,6 +3,7 @@ import Image from "next/image";
 import LionIcon from "@/components/icons/Lion";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
+import { removeBadgeClasses } from "./inputClasses";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
 import {
@@ -110,12 +111,7 @@ const AvatarFileInput = ({
           <button
             type="button"
             onClick={handleRemoveImage}
-            className={twMerge(
-              "absolute top-0 right-0 mt-1 mr-1 p-1",
-              "text-white text-sm rounded-full focus:outline-hidden w-6 h-6 shadow-md hover:scale-[1.3]",
-              "transition-transform duration-200 ease-in-out",
-              colorClasses.accentBg,
-            )}
+            className={removeBadgeClasses(color, "absolute right-1 top-1 h-6 w-6 p-1")}
             aria-label="Remove Avatar"
           >
             <XMarkIcon />

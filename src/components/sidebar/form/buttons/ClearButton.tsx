@@ -19,10 +19,11 @@ const ClearButton = ({
   return (
     <button
       className={twMerge(
-        "w-full h-10 rounded-full font-semibold focus:outline-hidden focus:ring-2 transition-colors duration-300 ease-in-out group-hover:opacity-50",
+        "h-11 touch-manipulation whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors duration-150 focus:outline-none focus-visible:ring-2 disabled:opacity-50",
         colorClasses.text,
-        colorClasses.hoverSurfaceBg,
-        colorClasses.accentRing,
+        colorClasses.softBg,
+        colorClasses.softBgStrongHover,
+        colorClasses.focusVisibleRingSoft,
       )}
       onClick={onClick}
       type="button"

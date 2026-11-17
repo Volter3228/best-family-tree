@@ -5,6 +5,7 @@ import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor, DropdownOption, TeamMemberRow } from "@/types";
 import { ComboboxInput, DropdownSelectInput } from "../inputs";
 import PositionRowHeader from "../fields/position/PositionRowHeader";
+import FormSection from "./FormSection";
 
 interface Props {
   rows: TeamMemberRow[];
@@ -64,17 +65,11 @@ const TeamMembersEditor = ({
   }, [pendingFocusId]);
 
   return (
-    <div className="flex flex-col gap-3 w-full">
-      <h3 className={twMerge("text-lg font-semibold", colorClasses.text)}>
-        Учасники{rows.length > 0 && ` (${rows.length})`}
-      </h3>
+    <FormSection title="Учасники" count={rows.length} color={color}>
       {rows.map((row) => (
         <div
           key={row.id}
-          className={twMerge(
-            "flex flex-col gap-2 rounded-xl border bg-surface/50 p-3",
-            colorClasses.border,
-          )}
+          className={twMerge("flex flex-col gap-3 rounded-2xl p-3", colorClasses.softBg)}
         >
           <PositionRowHeader
             summary={getSummary(row)}
@@ -85,7 +80,7 @@ const TeamMembersEditor = ({
             color={color}
           />
           {expanded.has(row.id) && (
-            <>
+            <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
               <DropdownSelectInput
                 name={`team-member-${row.id}`}
                 label="Учасник"
@@ -104,7 +99,7 @@ const TeamMembersEditor = ({
               />
               <ComboboxInput
                 name={`team-role-${row.id}`}
-                label="Роль"
+                label="Посада"
                 options={roleOptions}
                 onSelect={(value, text) =>
                   onUpdate(row.id, {
@@ -116,7 +111,7 @@ const TeamMembersEditor = ({
                 initialValue={row.roleName}
                 color={color}
               />
-            </>
+            </div>
           )}
         </div>
       ))}
@@ -124,18 +119,18 @@ const TeamMembersEditor = ({
         type="button"
         onClick={handleAdd}
         className={twMerge(
-          "flex items-center justify-center gap-1 py-2 rounded-xl border border-dashed focus:outline-hidden focus:ring-2",
-          colorClasses.border,
+          "flex h-10 items-center justify-center gap-1 rounded-xl border border-dashed text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2",
+          colorClasses.softBorder,
+          colorClasses.softBorderHover,
           colorClasses.text,
           colorClasses.hoverSurfaceBg,
-          colorClasses.accentRing,
-          "transition-all duration-200",
+          colorClasses.focusVisibleRingSoft,
         )}
       >
         <PlusIcon className="h-4 w-4" />
         Додати учасника
       </button>
-    </div>
+    </FormSection>
   );
 };
 

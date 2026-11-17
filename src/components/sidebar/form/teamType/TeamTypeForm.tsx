@@ -1,82 +1,55 @@
 import { useId } from "react";
 import { useTeamTypeForm } from "@/hooks/forms";
 import type { AccentColor } from "@/types";
-import { DropdownSelectInput } from "../inputs";
-import SegmentedControl, { CREATE_EDIT_OPTIONS } from "../SegmentedControl";
 import TeamTypeFormContent from "./TeamTypeFormContent";
 
 interface Props {
+  // Edit this type; omitted to create one.
+  teamTypeId?: string;
+  onCreated?: (id: string) => void;
+  onDeleted?: () => void;
+  onCancel: () => void;
   color?: AccentColor;
 }
 
-const TeamTypeForm = ({ color = "blue" }: Props) => {
+const TeamTypeForm = ({ teamTypeId, onCreated, onDeleted, onCancel, color = "blue" }: Props) => {
   const {
     mode,
     form,
     setForm,
-    eventOptions,
-    selectedEvent,
-    selectedEventId,
-    setSelectedEventId,
+    selectedType,
     isSubmitting,
+    isDeleting,
+    isConfirmingDelete,
+    setIsConfirmingDelete,
     error,
+    setError,
     success,
-    resetForm,
-    changeMode,
     submit,
-  } = useTeamTypeForm();
+    removeTeamType,
+  } = useTeamTypeForm(teamTypeId, { onCreated, onDeleted });
   const formId = useId();
 
-  const submitLabel = isSubmitting
-    ? mode === "edit"
-      ? "Зберігаємо..."
-      : "Створюємо..."
-    : mode === "edit"
-      ? "Зберегти"
-      : "Створити";
-
   return (
-    <div className="flex flex-col items-center gap-4 w-full">
-      <SegmentedControl
-        options={CREATE_EDIT_OPTIONS}
-        value={mode}
-        onChange={changeMode}
+    <form id={formId} className="flex w-full flex-col gap-3" onSubmit={submit} noValidate>
+      <TeamTypeFormContent
+        mode={mode}
+        selectedType={selectedType}
+        form={form}
+        setForm={setForm}
         color={color}
+        isSubmitting={isSubmitting}
+        isDeleting={isDeleting}
+        isConfirmingDelete={isConfirmingDelete}
+        setIsConfirmingDelete={setIsConfirmingDelete}
+        formId={formId}
+        error={error}
+        setError={setError}
+        success={success}
+        onDelete={removeTeamType}
+        onCancel={onCancel}
       />
-      <form
-        id={formId}
-        className="flex flex-col items-center gap-6 w-full"
-        onSubmit={submit}
-        noValidate
-      >
-        {mode === "edit" && (
-          <div className="flex flex-col w-full">
-            <DropdownSelectInput
-              name="teamTypeSelect"
-              label="Тип команди"
-              options={eventOptions}
-              onSelect={setSelectedEventId}
-              initialValue={selectedEventId}
-              placeholder="Тип команди"
-              color={color}
-            />
-          </div>
-        )}
-        <TeamTypeFormContent
-          mode={mode}
-          selectedEvent={selectedEvent}
-          form={form}
-          setForm={setForm}
-          color={color}
-          isSubmitting={isSubmitting}
-          formId={formId}
-          error={error}
-          success={success}
-          submitLabel={submitLabel}
-          onReset={resetForm}
-        />
-      </form>
-    </div>
+    </form>
   );
 };
 
