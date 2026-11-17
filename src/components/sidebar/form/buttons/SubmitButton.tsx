@@ -10,8 +10,6 @@ interface Props {
   form?: string;
   children: Readonly<React.ReactNode>;
   color?: AccentColor;
-  // Brand gradient instead of a single accent; it moves while submitting.
-  gradient?: boolean;
   disabled?: boolean;
   // Floats above the button, centred on it, after a successful save.
   message?: string | null;
@@ -22,7 +20,6 @@ const SubmitButton = ({
   form,
   children,
   color = "blue",
-  gradient = false,
   disabled = false,
   message,
 }: Props) => {
@@ -30,18 +27,10 @@ const SubmitButton = ({
     <div className="relative flex-1">
       <button
         className={twMerge(
-          "flex h-11 w-full touch-manipulation items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white shadow-sm transition-[background-color,color,box-shadow,scale] duration-200 hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-default disabled:shadow-none disabled:active:scale-100",
-          gradient
-            ? [
-                // The label sits on the light green middle; a soft shadow keeps it readable.
-                "brand-gradient [text-shadow:0_1px_3px_rgb(0_0_0/0.45)] hover:shadow-[-6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-blue)_45%,transparent),0_6px_14px_-4px_color-mix(in_srgb,var(--accent-green)_45%,transparent),6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-orange)_45%,transparent)] focus:shadow-[-6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-blue)_45%,transparent),0_6px_14px_-4px_color-mix(in_srgb,var(--accent-green)_45%,transparent),6px_4px_14px_-4px_color-mix(in_srgb,var(--accent-orange)_45%,transparent)]",
-                isSubmitting && "brand-gradient-moving",
-              ]
-            : [
-                COLOR_CLASSES[color].accentBg,
-                COLOR_CLASSES[color].focusVisibleRing,
-                "disabled:opacity-40",
-              ],
+          "flex h-11 w-full touch-manipulation items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white shadow-sm transition-[background-color,color,box-shadow,scale,filter] duration-200 enabled:hover:shadow-lg enabled:hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-default disabled:shadow-none disabled:active:scale-100",
+          COLOR_CLASSES[color].accentBg,
+          COLOR_CLASSES[color].focusVisibleRing,
+          "disabled:opacity-40",
         )}
         type="submit"
         form={form}

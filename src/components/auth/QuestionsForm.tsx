@@ -196,7 +196,7 @@ const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
       {lockSeconds > 0 && <AuthMessage>{t.locked(lockSeconds)}</AuthMessage>}
       {message && lockSeconds <= 0 && <AuthMessage>{message}</AuthMessage>}
       <div className="pt-2">
-        <SubmitButton isSubmitting={busy} disabled={done} gradient>
+        <SubmitButton isSubmitting={busy} disabled={done}>
           {done ? t.welcome : busy ? t.checking : t.submit}
         </SubmitButton>
       </div>

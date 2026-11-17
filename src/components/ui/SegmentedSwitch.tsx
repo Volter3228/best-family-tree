@@ -19,6 +19,7 @@ interface Props<T extends string> {
   ariaLabel: string;
   color?: AccentColor;
   disabled?: boolean;
+  size?: "sm" | "lg";
 }
 
 const SegmentedSwitch = <T extends string>({
@@ -28,7 +29,9 @@ const SegmentedSwitch = <T extends string>({
   ariaLabel,
   color = "green",
   disabled = false,
+  size = "sm",
 }: Props<T>) => {
+  const large = size === "lg";
   const activeIndex = Math.max(
     0,
     options.findIndex((o) => o.value === value),
@@ -49,6 +52,7 @@ const SegmentedSwitch = <T extends string>({
       aria-hidden
       className={twMerge(
         "pointer-events-none absolute inset-y-0.5 left-0.5 rounded-lg shadow-sm transition-[transform,background-color] duration-300 ease-out",
+        large && "rounded-[10px]",
         COLOR_CLASSES[activeColor].accentBg,
       )}
       style={{
@@ -68,6 +72,7 @@ const SegmentedSwitch = <T extends string>({
           onClick={() => onChange(option.value)}
           className={twMerge(
             "relative flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-colors duration-300",
+            large && "h-9 gap-2 rounded-[10px] text-sm font-semibold",
             "focus:outline-none focus-visible:ring-1",
             COLOR_CLASSES[option.color ?? color].focusVisibleRing,
             value === option.value

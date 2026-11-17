@@ -77,7 +77,7 @@ const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props
       />
       {message && <AuthMessage>{message}</AuthMessage>}
       <div className="pt-2">
-        <SubmitButton isSubmitting={busy} disabled={done} gradient>
+        <SubmitButton isSubmitting={busy} disabled={done}>
           {done ? t.welcome : busy ? t.checking : t.submit}
         </SubmitButton>
       </div>

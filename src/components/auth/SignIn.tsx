@@ -3,6 +3,7 @@
 import { navigateWithSlide } from "@/utils/navigateWithSlide";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { QuestionMarkCircleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useSidebarHeightAnimation } from "@/hooks/sidebar/useSidebarHeightAnimation";
 import { LionIcon } from "@/components/icons";
 import SegmentedSwitch from "@/components/ui/SegmentedSwitch";
@@ -103,9 +104,20 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
             ariaLabel={t.methodLabel}
             value={method}
             onChange={setMethod}
+            size="lg"
             options={[
-              { value: "account", label: t.methodAccount, color: "green" },
-              { value: "questions", label: t.methodQuestions, color: "blue" },
+              {
+                value: "account",
+                label: t.methodAccount,
+                color: "green",
+                icon: <UserIcon className="h-[18px] w-[18px] shrink-0" />,
+              },
+              {
+                value: "questions",
+                label: t.methodQuestions,
+                color: "orange",
+                icon: <QuestionMarkCircleIcon className="h-[18px] w-[18px] shrink-0" />,
+              },
             ]}
           />
         </div>

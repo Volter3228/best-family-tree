@@ -59,7 +59,7 @@ const EmailForm = ({ initialEmail, onSubmit }: Props) => {
       />
       {message && <AuthMessage>{message}</AuthMessage>}
       <div className="pt-2">
-        <SubmitButton isSubmitting={busy} gradient>
+        <SubmitButton isSubmitting={busy}>
           {busy ? t.sending : t.sendCode}
         </SubmitButton>
       </div>
