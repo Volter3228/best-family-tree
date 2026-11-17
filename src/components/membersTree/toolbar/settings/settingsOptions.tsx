@@ -5,6 +5,7 @@ import {
   ComputerDesktopIcon,
   MoonIcon,
   SunIcon,
+  RectangleGroupIcon,
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import type {
@@ -14,7 +15,6 @@ import type {
   TreeMode,
 } from "@/types";
 import FamilyTreeIcon from "@/components/icons/FamilyTreeIcon";
-import MaskIcon from "@/components/ui/MaskIcon";
 
 export const iconClass = "h-4 w-4 shrink-0";
 
@@ -47,9 +47,7 @@ export const TREE_MODE_OPTIONS = [
   {
     value: "team",
     label: "Команди",
-    icon: (
-      <MaskIcon src="/images/lion-group.svg" className={`${iconClass} bg-current`} />
-    ),
+    icon: <RectangleGroupIcon className={iconClass} />,
   },
 ] satisfies { value: TreeMode; label: string; icon: React.ReactNode }[];
 

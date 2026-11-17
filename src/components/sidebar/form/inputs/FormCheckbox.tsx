@@ -12,7 +12,11 @@ interface Props {
 
 const FormCheckbox = ({ checked, label, color, onChange, hint }: Props) => (
   <label
-    className="flex items-start gap-2.5 text-sm text-foreground"
+    // `relative` anchors the sr-only input here. Otherwise it is positioned
+    // against a far ancestor, and focusing it (Tab) scrolls the card's
+    // overflow-hidden wrappers, which cuts the form's visible height.
+    className="relative flex items-start gap-2.5 text-sm text-foreground"
+    style={{ "--focus-color": `var(--accent-${color})` } as React.CSSProperties}
     onClick={(event) => {
       event.preventDefault();
       onChange(!checked);
@@ -27,7 +31,7 @@ const FormCheckbox = ({ checked, label, color, onChange, hint }: Props) => (
     <CheckBox
       checked={checked}
       color={color}
-      className="mt-0.5 peer-focus-visible:ring-2"
+      className="mt-0.5 peer-focus-visible:ring-2 peer-focus-visible:ring-(--focus-color) peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface"
     />
     <span className="flex flex-col">
       {label}
