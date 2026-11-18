@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { StarIcon } from "@heroicons/react/16/solid";
 import { BriefcaseIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
@@ -10,7 +9,6 @@ import { useLocale, useT } from "@/i18n/useT";
 import { formatCount } from "@/i18n/plural";
 import RoleForm from "../form/role/RoleForm";
 import ManageList from "./ManageList";
-import ManageNotice from "./ManageNotice";
 import { LIST_VIEW, type ManageTabProps } from "./types";
 import { useEditorTitle } from "./useEditorTitle";
 import { useJustCreated } from "./useJustCreated";
@@ -19,7 +17,6 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   const t = useT().manage;
   const locale = useLocale();
   const [roles] = useRoles();
-  const [notice, showNotice] = useTransientMessage();
   const { markCreated, messageFor } = useJustCreated(view);
   const sorted = useMemo(
     () => [...roles].sort((a, b) => a.name.localeCompare(b.name, locale)),
@@ -52,7 +49,6 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
           go({ kind: "edit", id: role.id });
         }}
         onDeleted={() => {
-          showNotice(t.deleted);
           go(LIST_VIEW);
         }}
         onCancel={() => go(LIST_VIEW)}
@@ -61,40 +57,37 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   }
 
   return (
-    <div className="flex flex-col">
-      <ManageNotice message={notice} />
-      <ManageList
-        items={sorted}
-        getKey={(r) => r.id}
-        getTitle={(r) => r.name}
-        getSearchable={(r) => [r.name]}
-        renderTitleSuffix={(r) =>
-          r.isLeaderPosition ? (
-            <StarIcon
-              aria-label={t.leaderRole}
-              className={twMerge("h-3.5 w-3.5 shrink-0", colorClasses.text)}
-            />
-          ) : null
-        }
-        getSubtitle={getSubtitle}
-        renderLeading={() => (
-          <span
-            className={twMerge(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-              colorClasses.softBg,
-              colorClasses.text,
-            )}
-          >
-            <BriefcaseIcon className="h-5 w-5" />
-          </span>
-        )}
-        onOpen={(r) => go({ kind: "edit", id: r.id })}
-        onCreate={() => go({ kind: "create" })}
-        searchPlaceholder={t.searchRoles}
-        emptyText={t.noRoles}
-        color={color}
-      />
-    </div>
+    <ManageList
+      items={sorted}
+      getKey={(r) => r.id}
+      getTitle={(r) => r.name}
+      getSearchable={(r) => [r.name]}
+      renderTitleSuffix={(r) =>
+        r.isLeaderPosition ? (
+          <StarIcon
+            aria-label={t.leaderRole}
+            className={twMerge("h-3.5 w-3.5 shrink-0", colorClasses.text)}
+          />
+        ) : null
+      }
+      getSubtitle={getSubtitle}
+      renderLeading={() => (
+        <span
+          className={twMerge(
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+            colorClasses.softBg,
+            colorClasses.text,
+          )}
+        >
+          <BriefcaseIcon className="h-5 w-5" />
+        </span>
+      )}
+      onOpen={(r) => go({ kind: "edit", id: r.id })}
+      onCreate={() => go({ kind: "create" })}
+      searchPlaceholder={t.searchRoles}
+      emptyText={t.noRoles}
+      color={color}
+    />
   );
 };
 

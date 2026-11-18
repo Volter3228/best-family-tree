@@ -11,7 +11,6 @@ export const manage = {
   nothingFound: (query: string) => `Нічого не знайдено за «${query}».`,
   showing: (shown: number, total: number) =>
     `Показано ${shown} з ${total} — уточни пошук`,
-  deleted: "Видалено",
   created: "Створено",
   newMember: "Новий учасник",
   newTeam: "Нова команда",

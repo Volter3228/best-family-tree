@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 import { useTeamTypes } from "@/hooks";
 import { teamTypeTeamCount } from "@/hooks/forms/useTeamTypeForm";
-import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { useLocale, useT } from "@/i18n/useT";
 import { formatCount } from "@/i18n/plural";
 import TeamTypeForm from "../form/teamType/TeamTypeForm";
 import TeamTypeMark from "../form/teamType/TeamTypeMark";
 import ManageList from "./ManageList";
-import ManageNotice from "./ManageNotice";
 import { LIST_VIEW, type ManageTabProps } from "./types";
 import { useEditorTitle } from "./useEditorTitle";
 
@@ -15,7 +13,6 @@ const TeamTypesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   const t = useT().manage;
   const locale = useLocale();
   const [teamTypes] = useTeamTypes();
-  const [notice, showNotice] = useTransientMessage();
 
   const sorted = useMemo(
     () => [...teamTypes].sort((a, b) => a.name.localeCompare(b.name, locale)),
@@ -42,7 +39,6 @@ const TeamTypesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
         color={color}
         onCreated={(id) => go({ kind: "edit", id })}
         onDeleted={() => {
-          showNotice(t.deleted);
           go(LIST_VIEW);
         }}
         onCancel={() => go(LIST_VIEW)}
@@ -51,31 +47,28 @@ const TeamTypesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   }
 
   return (
-    <div className="flex flex-col">
-      <ManageNotice message={notice} />
-      <ManageList
-        items={sorted}
-        getKey={(teamType) => teamType.id}
-        getTitle={(teamType) => teamType.name}
-        getSearchable={(teamType) => [teamType.name]}
-        getSubtitle={(teamType) =>
-          `${teamType.isEvent ? t.event : t.other}, ${formatCount(locale, teamTypeTeamCount(teamType), t.teamForms)}`
-        }
-        renderLeading={(teamType) => (
-          <TeamTypeMark
-            name={teamType.name}
-            iconSrc={teamType.iconUrl || null}
-            color={teamType.color || undefined}
-            className="h-10 w-10 rounded-xl text-sm"
-          />
-        )}
-        onOpen={(teamType) => go({ kind: "edit", id: teamType.id })}
-        onCreate={() => go({ kind: "create" })}
-        searchPlaceholder={t.searchTeamTypes}
-        emptyText={t.noTeamTypes}
-        color={color}
-      />
-    </div>
+    <ManageList
+      items={sorted}
+      getKey={(teamType) => teamType.id}
+      getTitle={(teamType) => teamType.name}
+      getSearchable={(teamType) => [teamType.name]}
+      getSubtitle={(teamType) =>
+        `${teamType.isEvent ? t.event : t.other}, ${formatCount(locale, teamTypeTeamCount(teamType), t.teamForms)}`
+      }
+      renderLeading={(teamType) => (
+        <TeamTypeMark
+          name={teamType.name}
+          iconSrc={teamType.iconUrl || null}
+          color={teamType.color || undefined}
+          className="h-10 w-10 rounded-xl text-sm"
+        />
+      )}
+      onOpen={(teamType) => go({ kind: "edit", id: teamType.id })}
+      onCreate={() => go({ kind: "create" })}
+      searchPlaceholder={t.searchTeamTypes}
+      emptyText={t.noTeamTypes}
+      color={color}
+    />
   );
 };
 

@@ -1,12 +1,10 @@
 import { useMemo } from "react";
-import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { useTeams, useTeamTypes } from "@/hooks";
 import type { Team, TeamType } from "@/types";
 import { useLocale, useT } from "@/i18n/useT";
 import TeamForm from "../form/team/TeamForm";
 import TeamTile from "../form/team/TeamTile";
 import ManageList from "./ManageList";
-import ManageNotice from "./ManageNotice";
 import { useEditorTitle } from "./useEditorTitle";
 import { useJustCreated } from "./useJustCreated";
 import { LIST_VIEW, type ManageTabProps } from "./types";
@@ -44,7 +42,6 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   const locale = useLocale();
   const [teams] = useTeams();
   const [teamTypes] = useTeamTypes();
-  const [notice, showNotice] = useTransientMessage();
   // The team just created: its editor opens with a "Created" bubble.
   const { markCreated, messageFor } = useJustCreated(view);
 
@@ -97,7 +94,6 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
         initialMessage={messageFor(view.id)}
         onCancel={() => go(LIST_VIEW)}
         onDeleted={() => {
-          showNotice(t.deleted);
           go(LIST_VIEW);
         }}
       />
@@ -105,42 +101,39 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   }
 
   return (
-    <div className="flex flex-col">
-      <ManageNotice message={notice} />
-      <ManageList
-        items={sorted}
-        getKey={(team) => team.id}
-        getTitle={(team) => team.name}
-        getSubtitle={(team) =>
-          [
-            typeOf(team)?.name ?? "",
-            formatTeamYears({
-              start: team.startYear,
-              end: team.endYear,
-              ongoing: team.isOngoing,
-            }),
-          ]
-            .filter(Boolean)
-            .join(" · ") || undefined
-        }
-        getSearchable={(team) => [team.name, typeOf(team)?.name ?? ""]}
-        renderLeading={(team) => (
-          <TeamTile
-            name={team.name}
-            photoUrl={team.photoUrl}
-            iconUrl={typeOf(team)?.iconUrl}
-            typeColor={typeOf(team)?.color}
-            color={color}
-            className="h-10 w-10"
-          />
-        )}
-        onOpen={(team) => go({ kind: "edit", id: team.id })}
-        onCreate={() => go({ kind: "create" })}
-        searchPlaceholder={t.searchTeams}
-        emptyText={t.noTeams}
-        color={color}
-      />
-    </div>
+    <ManageList
+      items={sorted}
+      getKey={(team) => team.id}
+      getTitle={(team) => team.name}
+      getSubtitle={(team) =>
+        [
+          typeOf(team)?.name ?? "",
+          formatTeamYears({
+            start: team.startYear,
+            end: team.endYear,
+            ongoing: team.isOngoing,
+          }),
+        ]
+          .filter(Boolean)
+          .join(" · ") || undefined
+      }
+      getSearchable={(team) => [team.name, typeOf(team)?.name ?? ""]}
+      renderLeading={(team) => (
+        <TeamTile
+          name={team.name}
+          photoUrl={team.photoUrl}
+          iconUrl={typeOf(team)?.iconUrl}
+          typeColor={typeOf(team)?.color}
+          color={color}
+          className="h-10 w-10"
+        />
+      )}
+      onOpen={(team) => go({ kind: "edit", id: team.id })}
+      onCreate={() => go({ kind: "create" })}
+      searchPlaceholder={t.searchTeams}
+      emptyText={t.noTeams}
+      color={color}
+    />
   );
 };
 

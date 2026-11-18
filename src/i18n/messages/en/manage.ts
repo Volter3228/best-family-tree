@@ -13,7 +13,6 @@ export const manage = {
   nothingFound: (query: string) => `Nothing found for “${query}”.`,
   showing: (shown: number, total: number) =>
     `Showing ${shown} of ${total} — refine your search`,
-  deleted: "Deleted",
   created: "Created",
   newMember: "New member",
   newTeam: "New team",
