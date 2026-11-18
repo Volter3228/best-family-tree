@@ -5,11 +5,9 @@ import { XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "./inputClasses";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
-import {
-  exceedsUploadLimit,
-  UPLOAD_TOO_LARGE_MESSAGE,
-} from "@/utils/uploadLimit";
+import { exceedsUploadLimit } from "@/utils/uploadLimit";
 
 interface Props {
   onImageSelect: (file: File | null) => void;
@@ -24,6 +22,7 @@ const AvatarFileInput = ({
   initialImage = null,
   color = "blue",
 }: Props) => {
+  const t = useT().formCommon;
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImage,
   );
@@ -78,7 +77,7 @@ const AvatarFileInput = ({
           {selectedImage ? (
             <Image
               src={selectedImage}
-              alt="Avatar"
+              alt={t.avatar}
               className="rounded-full shadow-lg"
               fill
             />
@@ -111,8 +110,11 @@ const AvatarFileInput = ({
           <button
             type="button"
             onClick={handleRemoveImage}
-            className={removeBadgeClasses(color, "absolute right-1 top-1 h-6 w-6 p-1")}
-            aria-label="Remove Avatar"
+            className={removeBadgeClasses(
+              color,
+              "absolute right-1 top-1 h-6 w-6 p-1",
+            )}
+            aria-label={t.removeAvatar}
           >
             <XMarkIcon />
           </button>
@@ -120,7 +122,7 @@ const AvatarFileInput = ({
       </div>
       {tooLarge && (
         <p role="alert" className="max-w-48 text-center text-sm text-red-500">
-          {UPLOAD_TOO_LARGE_MESSAGE}
+          {t.fileTooLarge}
         </p>
       )}
     </div>

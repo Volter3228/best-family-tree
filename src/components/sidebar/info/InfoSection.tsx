@@ -3,6 +3,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   title: string;
@@ -29,6 +30,7 @@ const InfoSection = ({
   expandLabel,
   color = "blue",
 }: Props) => {
+  const t = useT().sidebar;
   const [open, setOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const colorClasses = COLOR_CLASSES[color];
@@ -40,17 +42,26 @@ const InfoSection = ({
     // Once the list has grown, bring all of it into view.
     if (opening) {
       setTimeout(
-        () => sectionRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }),
+        () =>
+          sectionRef.current?.scrollIntoView({
+            block: "nearest",
+            behavior: "smooth",
+          }),
         200,
       );
     }
   };
-  const toggleLabel = open ? "Згорнути" : (expandLabel ?? `+${tail.length}`);
+  const toggleLabel = open ? t.collapse : (expandLabel ?? `+${tail.length}`);
 
   return (
-    <section ref={sectionRef} className="member-info-row flex scroll-mb-4 flex-col gap-2">
+    <section
+      ref={sectionRef}
+      className="member-info-row flex scroll-mb-4 flex-col gap-2"
+    >
       <h3 className="text-base">
-        <span className={twMerge("font-semibold", colorClasses.text)}>{title}</span>
+        <span className={twMerge("font-semibold", colorClasses.text)}>
+          {title}
+        </span>
         <span className="text-foreground/50"> · {items.length}</span>
       </h3>
       <div className={listClassName}>
@@ -103,7 +114,10 @@ const InfoSection = ({
         >
           {toggleLabel}
           <ChevronDownIcon
-            className={twMerge("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
+            className={twMerge(
+              "h-4 w-4 transition-transform duration-200",
+              open && "rotate-180",
+            )}
           />
         </button>
       )}

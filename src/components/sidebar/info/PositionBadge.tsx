@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useTheme } from "@/context/ThemeContext";
 import { useStackOnOverflow } from "@/hooks";
 import type { MemberPosition } from "@/types";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   position: MemberPosition;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const PositionBadge = ({ position, onClick }: Props) => {
+  const t = useT().memberInfo;
   const { role, team } = position;
   const { themeId } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
@@ -21,10 +23,12 @@ const PositionBadge = ({ position, onClick }: Props) => {
   const isDarkTheme = themeId === "dark";
   const isInteractive = !!onClick;
   const borderColor = teamType?.color || "var(--accent)";
-  const tintPercent = (isDarkTheme ? 28 : 14) + (isInteractive && isHovered ? 16 : 0);
+  const tintPercent =
+    (isDarkTheme ? 28 : 14) + (isInteractive && isHovered ? 16 : 0);
   const bgColor = teamType?.color
-    ? `color-mix(in srgb, ${teamType.color} ${tintPercent}%, ${isDarkTheme ? "var(--surface)" : "white"
-    })`
+    ? `color-mix(in srgb, ${teamType.color} ${tintPercent}%, ${
+        isDarkTheme ? "var(--surface)" : "white"
+      })`
     : "var(--accent-light)";
   // Mix the accent toward the theme foreground so text stays readable on the
   // tinted background for any accent color (e.g. near-black or near-white).
@@ -33,7 +37,7 @@ const PositionBadge = ({ position, onClick }: Props) => {
     : borderColor;
 
   // A standalone position shows its organisation instead of a team.
-  const teamLabel = team?.name ?? position.organization ?? "";
+  const teamLabel = team ? team.name : (position.organization ?? "");
   const teamWords = teamLabel.split(/\s+/).filter(Boolean);
   const teamPrefix = teamWords.slice(0, -1).join(" ");
   const lastTeamWord = teamWords.at(-1);
@@ -52,7 +56,7 @@ const PositionBadge = ({ position, onClick }: Props) => {
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      title={isInteractive ? "Показати в команді" : undefined}
+      title={isInteractive ? t.showInTeam : undefined}
       className={twMerge(
         "inline-flex min-w-0 max-w-full gap-x-1 px-2.5 py-1 text-left text-xs font-medium",
         "relative z-10 border transition-all duration-200",
@@ -60,7 +64,7 @@ const PositionBadge = ({ position, onClick }: Props) => {
           ? "flex-col items-start gap-y-0.5 rounded-2xl"
           : "items-center whitespace-nowrap rounded-full",
         isInteractive &&
-        "cursor-pointer hover:z-20 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm",
+          "cursor-pointer hover:z-20 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm",
       )}
       style={{
         backgroundColor: bgColor,
@@ -76,7 +80,7 @@ const PositionBadge = ({ position, onClick }: Props) => {
             {logoUrl && (
               <Image
                 src={logoUrl}
-                alt={team?.name ?? ""}
+                alt={team ? team.name : ""}
                 width={14}
                 height={14}
                 className="shrink-0 rounded-full"

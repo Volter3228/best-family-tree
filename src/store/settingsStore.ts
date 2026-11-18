@@ -1,10 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type {
-  EdgeStyle,
-  OrientationSetting,
-  ThemePreference,
-} from "@/types";
+import { writeLocaleCookie } from "@/i18n/cookie";
+import type { Locale } from "@/i18n/locale";
+import type { EdgeStyle, OrientationSetting, ThemePreference } from "@/types";
 
 export const SETTINGS_STORAGE_KEY = "best-family-tree-settings";
 
@@ -17,7 +15,12 @@ interface SettingsState {
   edgeStyle: EdgeStyle;
 }
 
+interface LocaleState {
+  locale: Locale;
+}
+
 interface SettingsActions {
+  setLocale: (locale: Locale) => void;
   setTheme: (theme: ThemePreference) => void;
   setOrientation: (orientation: OrientationSetting) => void;
   setEdgeStyle: (edgeStyle: EdgeStyle) => void;
@@ -40,11 +43,19 @@ const readLegacyTheme = (): ThemePreference | null => {
   return null;
 };
 
-export const useSettingsStore = create<SettingsState & SettingsActions>()(
+export const useSettingsStore = create<
+  SettingsState & LocaleState & SettingsActions
+>()(
   persist(
     (set) => ({
       ...DEFAULT_SETTINGS,
+      locale: "uk",
 
+      setLocale: (locale) => {
+        writeLocaleCookie(locale);
+        document.documentElement.lang = locale;
+        set({ locale });
+      },
       setTheme: (theme) => set({ theme }),
       setOrientation: (orientation) => set({ orientation }),
       setEdgeStyle: (edgeStyle) => set({ edgeStyle }),
@@ -52,7 +63,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
     }),
     {
       name: SETTINGS_STORAGE_KEY,
-      version: 1,
+      // Locale is not persisted: the cookie is its source of truth.
+      version: 2,
+      migrate: (persisted) => persisted as SettingsState,
       // Explicit so the store does not depend on `window` existing.
       storage: createJSONStorage(() => localStorage),
       partialize: ({ theme, orientation, edgeStyle }) => ({

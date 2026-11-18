@@ -1,4 +1,4 @@
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 import ProviderButton from "./ProviderButton";
 
 // Telegram's paper-plane mark on their brand blue.
@@ -12,8 +12,15 @@ const TelegramMark = () => (
   </svg>
 );
 
-const TelegramButton = () => (
-  <ProviderButton href="/api/auth/telegram/start" label={t.telegramSignIn} icon={<TelegramMark />} />
-);
+const TelegramButton = () => {
+  const t = useT().auth;
+  return (
+    <ProviderButton
+      href="/api/auth/telegram/start"
+      label={t.telegramSignIn}
+      icon={<TelegramMark />}
+    />
+  );
+};
 
 export default TelegramButton;

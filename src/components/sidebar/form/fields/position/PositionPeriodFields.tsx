@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { formatYearRange } from "@/utils";
+import { useT } from "@/i18n/useT";
 import type { AccentColor, PositionFormRow, Team, TeamType } from "@/types";
 import { TextInput, YearRangeInput } from "../../inputs";
 import {
@@ -31,6 +32,7 @@ const PositionPeriodFields = ({
   onUpdate,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const t = useT().memberForm.positions;
   const period = getRowPeriod(teams, row, teamTypes);
 
   // The validation error explains what to do; no period fields apply.
@@ -43,7 +45,7 @@ const PositionPeriodFields = ({
     });
     return (
       <p className={twMerge("text-sm", colorClasses.text)}>
-        Період команди: {years || "не вказано"}
+        {t.teamPeriod(years)}
       </p>
     );
   }
@@ -54,8 +56,8 @@ const PositionPeriodFields = ({
         name={`position-team-years-${rowId}`}
         start={row.teamStartYear}
         end={row.teamEndYear}
-        startLabel="Початок діяльності"
-        endLabel="Кінець діяльності"
+        startLabel={t.activityStart}
+        endLabel={t.activityEnd}
         onChange={(teamStartYear, teamEndYear) =>
           onUpdate({ teamStartYear, teamEndYear })
         }
@@ -70,12 +72,12 @@ const PositionPeriodFields = ({
       <div>
         <TextInput
           name={`position-organization-${rowId}`}
-          label="Організація"
+          label={t.organization}
           value={row.organization ?? ""}
           onChange={(organization) =>
             onUpdate({ organization: organization || undefined })
           }
-          placeholder="Міжнар"
+          placeholder={t.organizationPlaceholder}
           color={color}
         />
       </div>

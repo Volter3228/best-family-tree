@@ -3,6 +3,7 @@ import { Container, FederatedPointerEvent, Rectangle } from "pixi.js";
 import { useTapWithoutDrag, useHoverNodeAnimation } from "@/hooks";
 import { registerLazyCard } from "@/hooks/membersTree/animations/lazyCardDriver";
 import { Member } from "@/models";
+import { useDisplayName } from "@/utils/displayName";
 import { zoomedOutSignal } from "@/store/treeSignals";
 import {
   NODE_WIDTH,
@@ -66,6 +67,8 @@ const MemberNode = ({
   teamId,
   onClick,
 }: Props) => {
+  const dn = useDisplayName();
+  const shownName = useMemo(() => dn(member.name), [dn, member.name]);
   const [isHovered, setIsHovered] = useState(false);
   const [hoverZIndex, setHoverZIndex] = useState(0);
   const containerRef = useRef<Container>(null);
@@ -129,10 +132,13 @@ const MemberNode = ({
   // A tap makes the browser report pointer enter, but the matching leave is not
   // reliably delivered for touch, so the node stayed hovered until another tap.
   // Touch does not hover on enter: a tap selects, a long press hovers (below).
-  const handlePointerEnter = useCallback((event: FederatedPointerEvent) => {
-    if (event.pointerType === "touch") return;
-    startHover();
-  }, [startHover]);
+  const handlePointerEnter = useCallback(
+    (event: FederatedPointerEvent) => {
+      if (event.pointerType === "touch") return;
+      startHover();
+    },
+    [startHover],
+  );
   const handlePointerLeave = useCallback(() => setIsHovered(false), []);
 
   useEffect(() => {
@@ -199,13 +205,13 @@ const MemberNode = ({
         <MemberNodeAvatar
           nodeId={nodeId}
           photo={member.photo}
-          memberName={member.name}
+          memberName={shownName}
           placeholderColorIndex={placeholderColorIndex}
         />
 
         {isTooltipMounted && (
           <MemberNodeMinimizedTooltip
-            text={member.name}
+            text={shownName}
             visible={isTooltipVisible}
             placeholderColorIndex={placeholderColorIndex}
             onHidden={handleTooltipHidden}

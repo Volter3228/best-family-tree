@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createRole, deleteRole, updateRole } from "@/api/fetchMeta";
-import { NO_CHANGES_MESSAGE } from "@/constants/form";
+import { useT } from "@/i18n/useT";
 import type { Role } from "@/types";
 import { useRoles } from "../data/useMeta";
 import { useTransientMessage } from "./useTransientMessage";
@@ -43,6 +43,8 @@ export const useRoleForm = ({
   onDeleted,
   initialMessage,
 }: Options) => {
+  const tCommon = useT().formCommon;
+  const t = useT().roleForm;
   const [roles, setRoles, reloadRoles] = useRoles();
   const role = useMemo(
     () => roles.find((r) => r.id === roleId) ?? null,
@@ -80,13 +82,13 @@ export const useRoleForm = ({
     event.preventDefault();
     const name = form.name.trim();
     if (!name) {
-      setError("Назва обов'язкова");
+      setError(t.nameRequired);
       return;
     }
 
     if (roleId && savedRef.current && isSame(form, savedRef.current)) {
       setError(null);
-      showSuccess(NO_CHANGES_MESSAGE);
+      showSuccess(tCommon.noChanges);
       return;
     }
 
@@ -96,7 +98,7 @@ export const useRoleForm = ({
         (r) => r.id !== roleId && r.name.toLowerCase() === name.toLowerCase(),
       )
     ) {
-      setError("Посада з такою назвою вже є");
+      setError(t.nameTaken);
       return;
     }
 
@@ -113,7 +115,7 @@ export const useRoleForm = ({
         const updated = await updateRole(roleId, data);
         savedRef.current = toFormData(updated);
         setForm(savedRef.current);
-        showSuccess("Збережено");
+        showSuccess(tCommon.saved);
       } else {
         const created = await createRole(data);
         // In the list before the editor opens, so it never renders blank.
@@ -124,9 +126,7 @@ export const useRoleForm = ({
       }
       reloadRoles();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Не вдалося зберегти посаду",
-      );
+      setError(err instanceof Error ? err.message : t.saveFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -141,9 +141,7 @@ export const useRoleForm = ({
       reloadRoles();
       onDeleted();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Не вдалося видалити посаду",
-      );
+      setError(err instanceof Error ? err.message : t.deleteFailed);
       setIsConfirmingDelete(false);
     } finally {
       setIsSubmitting(false);

@@ -3,8 +3,9 @@ import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "../inputs/inputClasses";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
-import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "@/utils/uploadLimit";
+import { exceedsUploadLimit } from "@/utils/uploadLimit";
 import TeamTile from "./TeamTile";
 
 interface Props {
@@ -23,10 +24,20 @@ interface Props {
 const FOCUS_WITHIN: Record<AccentColor, string> = {
   blue: "focus-within:border-accent-blue focus-within:ring-accent-blue/20",
   green: "focus-within:border-accent-green focus-within:ring-accent-green/20",
-  orange: "focus-within:border-accent-orange focus-within:ring-accent-orange/20",
+  orange:
+    "focus-within:border-accent-orange focus-within:ring-accent-orange/20",
 };
 
-const TeamLogoPicker = ({ name, value, onChange, iconUrl, typeColor, color = "blue" }: Props) => {
+const TeamLogoPicker = ({
+  name,
+  value,
+  onChange,
+  iconUrl,
+  typeColor,
+  color = "blue",
+}: Props) => {
+  const t = useT().teamForm;
+  const common = useT().formCommon;
   const [tooLarge, setTooLarge] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const colorClasses = COLOR_CLASSES[color];
@@ -36,9 +47,12 @@ const TeamLogoPicker = ({ name, value, onChange, iconUrl, typeColor, color = "bl
     () => (value instanceof File ? URL.createObjectURL(value) : null),
     [value],
   );
-  useEffect(() => () => {
-    if (preview) URL.revokeObjectURL(preview);
-  }, [preview]);
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   const photoUrl = value instanceof File ? preview : value;
 
@@ -70,8 +84,8 @@ const TeamLogoPicker = ({ name, value, onChange, iconUrl, typeColor, color = "bl
             colorClasses.softBorderHover,
             FOCUS_WITHIN[color],
           )}
-          aria-label="Фото команди"
-          title="Фото команди"
+          aria-label={t.photoLabel}
+          title={t.photoLabel}
         >
           <TeamTile
             name={name}
@@ -96,7 +110,7 @@ const TeamLogoPicker = ({ name, value, onChange, iconUrl, typeColor, color = "bl
           <button
             type="button"
             onClick={remove}
-            aria-label="Прибрати фото"
+            aria-label={t.removePhoto}
             className={removeBadgeClasses(
               color,
               "absolute -right-1.5 -top-1.5 h-5 w-5",
@@ -108,7 +122,7 @@ const TeamLogoPicker = ({ name, value, onChange, iconUrl, typeColor, color = "bl
       </div>
       {tooLarge && (
         <p role="alert" className="max-w-24 text-center text-xs text-red-500">
-          {UPLOAD_TOO_LARGE_MESSAGE}
+          {common.fileTooLarge}
         </p>
       )}
     </div>

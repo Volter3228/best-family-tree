@@ -74,6 +74,6 @@ describe("settingsStore", () => {
     expect(persisted.state.orientation).toBe("lr");
     // Actions must never be persisted.
     expect(persisted.state.setTheme).toBeUndefined();
-    expect(persisted.version).toBe(1);
+    expect(persisted.version).toBe(2);
   });
 });

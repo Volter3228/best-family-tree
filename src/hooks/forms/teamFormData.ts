@@ -5,6 +5,7 @@ import type {
   TeamMemberRow,
 } from "@/types";
 import { isSameFormData } from "@/utils/formDataEquals";
+import type { Messages } from "@/i18n/messages";
 
 export type TeamFormMode = "create" | "edit";
 
@@ -23,15 +24,13 @@ export const toTeamFormData = (team: TeamDetails): TeamFormData => ({
   endYear: team.endYear ?? undefined,
   isOngoing: team.isOngoing,
   icon: team.photoUrl ?? null,
-  members: team.positions.map(
-    (position): TeamMemberRow => ({
-      id: position.id,
-      memberId: position.memberId,
-      memberName: position.member.name,
-      roleName: position.role.name,
-      roleId: position.role.id,
-    }),
-  ),
+  members: team.positions.map((position): TeamMemberRow => ({
+    id: position.id,
+    memberId: position.memberId,
+    memberName: position.member.name,
+    roleName: position.role.name,
+    roleId: position.role.id,
+  })),
 });
 
 /** First problem that blocks saving, or undefined when the form is valid. */
@@ -39,22 +38,23 @@ export const validateTeamForm = (
   form: TeamFormData,
   mode: TeamFormMode,
   teamTypes: TeamType[],
+  t: Messages["teamForm"]["validation"],
 ): string | undefined => {
   const teamType = teamTypes.find(({ id }) => id === form.teamTypeId);
   const hasName = form.name.trim() !== "";
 
-  if (mode === "edit" && !hasName) return "Назва команди обов'язкова";
+  if (mode === "edit" && !hasName) return t.nameRequired;
   if (!hasName && !teamType) {
-    return "Вкажіть назву команди або її тип";
+    return t.nameOrType;
   }
   if (!hasName && teamType?.isEvent && !form.startYear) {
-    return `Вкажіть рік початку для «${teamType.name}» або назву команди`;
+    return t.startYearRequired(teamType.name);
   }
   if (form.isOngoing && !form.startYear) {
-    return "Вкажіть рік початку для команди, що триває";
+    return t.ongoingStartYear;
   }
   if (form.members.some((row) => !row.memberId || !row.roleName.trim())) {
-    return "Кожному учаснику потрібно обрати людину зі списку та посаду";
+    return t.memberIncomplete;
   }
 };
 
@@ -95,7 +95,9 @@ export const toTeamMembersBody = (rows: TeamMemberRow[]) =>
 
 // Roster rows as a sorted list, so reordering rows is not a change.
 const rosterKey = (rows: TeamMemberRow[]) =>
-  toTeamMembersBody(rows).map((row) => JSON.stringify(row)).sort();
+  toTeamMembersBody(rows)
+    .map((row) => JSON.stringify(row))
+    .sort();
 
 /** True when saving `form` would send exactly what `baseline` already holds. */
 export const isSameTeamForm = (form: TeamFormData, baseline: TeamFormData) =>

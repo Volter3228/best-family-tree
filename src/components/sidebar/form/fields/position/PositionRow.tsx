@@ -1,5 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type {
   AccentColor,
   DropdownOption,
@@ -19,6 +20,7 @@ interface Props {
   teamTypeOptions: DropdownOption[];
   teamOptions: DropdownOption[];
   roleOptions: DropdownOption[];
+  roles: { id: string; name: string }[];
   isExpanded: boolean;
   color?: AccentColor;
   onToggle: () => void;
@@ -35,6 +37,7 @@ const PositionRow = ({
   teamTypeOptions,
   teamOptions,
   roleOptions,
+  roles,
   isExpanded,
   color = "blue",
   onToggle,
@@ -44,6 +47,7 @@ const PositionRow = ({
   onTeamTypeSelect,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const t = useT().memberForm.positions;
   return (
     <div
       className={twMerge(
@@ -52,7 +56,8 @@ const PositionRow = ({
       )}
     >
       <PositionRowHeader
-        summary={getPositionRowSummary(row, teamTypes)}
+        summary={getPositionRowSummary(row, teamTypes, t.newPosition)}
+        removeLabel={t.remove}
         isExpanded={isExpanded}
         onToggle={onToggle}
         onRemove={onRemove}
@@ -66,6 +71,7 @@ const PositionRow = ({
             teamTypeOptions={teamTypeOptions}
             teamOptions={teamOptions}
             roleOptions={roleOptions}
+            roles={roles}
             canCreateTeam={teamTypes.some(
               (teamType) => teamType.id === row.teamTypeId && teamType.isEvent,
             )}

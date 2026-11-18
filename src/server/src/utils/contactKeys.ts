@@ -1,9 +1,5 @@
 export type ContactPlatform =
-  | "email"
-  | "telegram"
-  | "instagram"
-  | "facebook"
-  | "linkedin";
+  "email" | "telegram" | "instagram" | "facebook" | "linkedin";
 
 const SOCIAL_DOMAINS: Record<Exclude<ContactPlatform, "email">, string[]> = {
   telegram: ["t.me", "telegram.me"],
@@ -50,7 +46,7 @@ export const contactKey = (
 };
 
 const LABELS: Record<ContactPlatform, string> = {
-  email: "Пошта",
+  email: "Email",
   telegram: "Telegram",
   instagram: "Instagram",
   facebook: "Facebook",

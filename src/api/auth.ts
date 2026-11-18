@@ -1,4 +1,5 @@
 import { http } from "@/libs/http";
+import { useSettingsStore } from "@/store/settingsStore";
 import { ENDPOINTS } from "@/constants/endpoints";
 
 export type AccessLevel = "VIEWER" | "EDITOR" | "ADMIN";
@@ -67,7 +68,10 @@ export const verifyAnswers = async (
   const res = await post(ENDPOINTS.questionsVerify, { challengeId, answers });
   if (res.status === 429) {
     const body = await res.json().catch(() => null);
-    return { kind: "locked", retryAfterSeconds: body?.retryAfterSeconds ?? 900 };
+    return {
+      kind: "locked",
+      retryAfterSeconds: body?.retryAfterSeconds ?? 900,
+    };
   }
   if (res.status === 404 || res.status === 410) return { kind: "expired" };
   if (!res.ok && res.status !== 401) throw new Error(String(res.status));
@@ -87,7 +91,10 @@ export type RequestCodeOutcome = "sent" | "limited";
 export const requestEmailCode = async (
   email: string,
 ): Promise<RequestCodeOutcome> => {
-  const res = await post(ENDPOINTS.emailRequest, { email });
+  const res = await post(ENDPOINTS.emailRequest, {
+    email,
+    locale: useSettingsStore.getState().locale,
+  });
   if (res.status === 429) return "limited";
   if (!res.ok) throw new Error(String(res.status));
   return "sent";

@@ -1,5 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -16,6 +17,7 @@ const ClearButton = ({
   color = "blue",
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const t = useT().formCommon;
   return (
     <button
       className={twMerge(
@@ -29,7 +31,7 @@ const ClearButton = ({
       type="button"
       disabled={isSubmitting}
     >
-      <span>{children || "Очистити"}</span>
+      <span>{children || t.clear}</span>
     </button>
   );
 };

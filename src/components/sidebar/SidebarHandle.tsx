@@ -1,5 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { useSidebarSwipe } from "@/hooks";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   isMinimized: boolean;
@@ -8,13 +9,18 @@ interface Props {
 }
 
 // Mobile-only grip at the top of the card: tap or swipe to minimize/expand.
-const SidebarHandle = ({ isMinimized, onMinimizedChange, className }: Props) => {
+const SidebarHandle = ({
+  isMinimized,
+  onMinimizedChange,
+  className,
+}: Props) => {
+  const t = useT().sidebar;
   const swipe = useSidebarSwipe(isMinimized, onMinimizedChange);
 
   return (
     <div
       role="button"
-      aria-label={isMinimized ? "Розгорнути" : "Згорнути"}
+      aria-label={isMinimized ? t.expand : t.collapse}
       className={twMerge(
         "flex h-9 shrink-0 cursor-pointer touch-none items-center justify-center md:hidden",
         className,

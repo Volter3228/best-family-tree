@@ -7,7 +7,7 @@ import {
   teamTypeBodySchema,
   teamTypeUpdateSchema,
 } from "../utils/catalogValidation.js";
-import { sendRouteError } from "../utils/httpErrors.js";
+import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import { sameName } from "../utils/names.js";
 
 const router = Router();
@@ -18,10 +18,11 @@ const rejectUpload = async (
   res: Response,
   status: number,
   error: string,
+  code: string,
   uploadedPath?: string,
 ) => {
   if (uploadedPath) await deleteCloudinaryImage(uploadedPath);
-  res.status(status).json({ error });
+  res.status(status).json(errorBody(error, code));
 };
 
 router.get("/team-types", async (_req, res) => {
@@ -46,7 +47,7 @@ router.post(
   async (req, res) => {
     const body = parseWith(teamTypeBodySchema, req.body);
     if (!body.success) {
-      await rejectUpload(res, 400, body.errors, req.file?.path);
+      await rejectUpload(res, 400, body.errors, "validation", req.file?.path);
       return;
     }
 
@@ -61,6 +62,7 @@ router.post(
           res,
           409,
           "Team type with this name already exists",
+          "team_type_exists",
           req.file?.path,
         );
         return;
@@ -90,7 +92,7 @@ router.put(
   async (req, res) => {
     const body = parseWith(teamTypeUpdateSchema, req.body);
     if (!body.success) {
-      await rejectUpload(res, 400, body.errors, req.file?.path);
+      await rejectUpload(res, 400, body.errors, "validation", req.file?.path);
       return;
     }
 
@@ -100,7 +102,13 @@ router.put(
 
       const existing = await prisma.teamType.findUnique({ where: { id } });
       if (!existing) {
-        await rejectUpload(res, 404, "Team type not found", req.file?.path);
+        await rejectUpload(
+          res,
+          404,
+          "Team type not found",
+          "team_type_not_found",
+          req.file?.path,
+        );
         return;
       }
 
@@ -113,6 +121,7 @@ router.put(
             res,
             409,
             "Team type with this name already exists",
+            "team_type_exists",
             req.file?.path,
           );
           return;
@@ -161,15 +170,22 @@ router.delete("/team-types/:id", async (req, res) => {
     });
 
     if (teamsCount > 0) {
-      res.status(409).json({
-        error: "Cannot delete team type: teams are still referencing it",
-      });
+      res
+        .status(409)
+        .json(
+          errorBody(
+            "Cannot delete team type: teams are still referencing it",
+            "team_type_in_use",
+          ),
+        );
       return;
     }
 
     const teamType = await prisma.teamType.findUnique({ where: { id } });
     if (!teamType) {
-      res.status(404).json({ error: "Team type not found" });
+      res
+        .status(404)
+        .json(errorBody("Team type not found", "team_type_not_found"));
       return;
     }
 

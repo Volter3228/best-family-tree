@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "../Sidebar";
 import type { AccentColor } from "@/types";
+import { useT } from "@/i18n/useT";
 import ManagePane from "./ManagePane";
-import ManageRail, { MANAGE_TAB_TITLES } from "./ManageRail";
+import ManageRail from "./ManageRail";
 import MembersTab from "./MembersTab";
 import RolesTab from "./RolesTab";
 import TeamTypesTab from "./TeamTypesTab";
@@ -33,6 +34,7 @@ interface Props {
 // Everything that creates, edits or removes data: a rail of tabs, each a
 // searchable list that drills into an editor.
 const ManageSidebar = ({ isOpen, onClose, color = "blue" }: Props) => {
+  const t = useT().manage;
   const [tab, setTab] = useState<ManageTab>("members");
   const [view, setView] = useState<ManageView>(LIST_VIEW);
   const [itemTitle, setItemTitle] = useState("");
@@ -66,14 +68,14 @@ const ManageSidebar = ({ isOpen, onClose, color = "blue" }: Props) => {
   const headerTitle = inEditor ? (
     <span className="flex min-w-0 flex-col">
       <span className="truncate text-xs font-medium leading-4 text-foreground/60">
-        {MANAGE_TAB_TITLES[tab]}
+        {t.tabs[tab]}
       </span>
       <span className="truncate text-base font-semibold leading-5 text-foreground">
         {itemTitle}
       </span>
     </span>
   ) : (
-    "Керування"
+    t.title
   );
 
   return (

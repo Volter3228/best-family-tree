@@ -22,7 +22,7 @@ import { requireEditorForWrites } from "./middleware/requireAccess.js";
 import { checkOrigin } from "./middleware/checkOrigin.js";
 import { isDemoMode } from "./auth/config.js";
 import { trackWrites } from "./utils/readCache.js";
-import { HttpError } from "./utils/httpErrors.js";
+import { HttpError, errorBody } from "./utils/httpErrors.js";
 import { assertConfig } from "./auth/checkConfig.js";
 
 assertConfig();
@@ -72,7 +72,9 @@ app.use("/api", requireSession);
 // Demo mode: sessions are synthetic and the database stays read-only.
 app.use("/api", (req, res, next) => {
   if (isDemoMode() && req.method !== "GET" && req.method !== "HEAD") {
-    res.status(403).json({ error: "У демо зміни не зберігаються" });
+    res
+      .status(403)
+      .json(errorBody("Changes aren't saved in the demo", "demo_readonly"));
     return;
   }
   next();
@@ -96,9 +98,11 @@ app.use(
     next: express.NextFunction,
   ) => {
     if (error instanceof HttpError) {
-      res.status(error.status).json({ error: error.message });
+      res
+        .status(error.status)
+        .json(errorBody(error.message, error.code, { params: error.params }));
     } else if (error instanceof multer.MulterError) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json(errorBody(error.message, "upload_rejected"));
     } else {
       next(error);
     }

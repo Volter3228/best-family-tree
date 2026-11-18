@@ -27,6 +27,17 @@
 - Put these rules in every subagent prompt that explores code.
 - Large `graph.json` diffs in PRs are expected. Do not flag them.
 
+## Delegating to subagents
+
+Subagents start with no context, and every token they spend re-discovering things is paid by the user. Hand over what you already know.
+
+- Give exact file paths, and line numbers or symbol names when you have them, taken from your context or earlier agent reports. Tell the agent to edit those files directly. Do not ask it to "find every place" when you, or an earlier report, already listed the places.
+- Only send an agent exploring (graphify/grep) when the locations really are unknown. If you know most of the files, list them and ask it to grep only for stragglers.
+- Paste the decisions and the exact strings, signatures or APIs it needs into the prompt. Do not make it read CLAUDE.md, GLOSSARY.md or long scratchpad files to find a few facts. Quote only the rules that apply to the task, e.g. CRLF for the files it edits, or the 250-line split.
+- Scope verification to the change. For small edits, run typecheck plus the affected tests. Run the full lint, test, prettier and `graphify update` once, in the final pass, not in every agent.
+- Do small follow-up corrections (a few known files, label or wording tweaks) in one tight agent with a short prompt, or by resuming the agent that wrote the code (SendMessage). Resuming keeps its context, so it does not start cold.
+- Ask for short reports: files changed, check results, and open questions. No restating of the task.
+
 ## Conventions
 
 - Tests: the root Vitest config picks up only `src/**/*.test.ts`, not `.tsx`. Test pure rules and cache/util logic, not rendering.

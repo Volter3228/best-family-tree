@@ -28,7 +28,8 @@ type TeamTypeRecord = { id: string; name: string; isEvent: boolean };
 export const resolveRole = async (tx: Tx, ref: RoleRef) => {
   if (ref.roleId) {
     const role = await tx.role.findUnique({ where: { id: ref.roleId } });
-    if (!role) throw new ValidationError("Unknown role");
+    if (!role)
+      throw new ValidationError("Unknown role", { code: "role_unknown" });
     return role;
   }
 
@@ -50,7 +51,10 @@ export const resolveTeamType = async (
     const teamType = await tx.teamType.findUnique({
       where: { id: ref.teamTypeId },
     });
-    if (!teamType) throw new ValidationError("Unknown team type");
+    if (!teamType)
+      throw new ValidationError("Unknown team type", {
+        code: "team_type_unknown",
+      });
     return teamType;
   }
 
@@ -61,7 +65,10 @@ export const resolveTeamType = async (
     where: { name: sameName(name) },
   });
   if (!existing) {
-    throw new ValidationError(`Тип команди «${name}» не знайдено`);
+    throw new ValidationError(`Team type "${name}" not found`, {
+      code: "team_type_not_found",
+      params: { name },
+    });
   }
   return existing;
 };
@@ -79,6 +86,7 @@ export const deriveTeamName = (
   if (startYear == null) {
     throw new ValidationError(
       `Start year is required for "${teamType.name}" when the team has no name`,
+      { code: "team_start_year_required", params: { name: teamType.name } },
     );
   }
   return `${teamType.name} ${startYear}`;
@@ -99,9 +107,15 @@ export const resolveTeam = async (
 
   const existing = await tx.team.findFirst({ where: { name: sameName(name) } });
   if (existing) {
-    if (teamType && existing.teamTypeId && existing.teamTypeId !== teamType.id) {
+    if (
+      teamType &&
+      existing.teamTypeId &&
+      existing.teamTypeId !== teamType.id
+    ) {
       throw new ConflictError(
         `Team "${existing.name}" already exists in another team type`,
+        undefined,
+        { code: "team_in_other_type", params: { name: existing.name } },
       );
     }
     if (teamType && !existing.teamTypeId) {
@@ -116,7 +130,8 @@ export const resolveTeam = async (
   // New teams appear only as editions of an event type.
   if (!teamType?.isEvent) {
     throw new ValidationError(
-      "Нову команду тут можна створити лише як випуск івенту",
+      "A new team can only be created here as an edition of an event",
+      { code: "team_create_event_only" },
     );
   }
 

@@ -1,0 +1,17 @@
+export const memberInfo = {
+  mentees: "Діти",
+  showAll: "Показати всіх",
+  positions: "Посади",
+  showInTeam: "Показати в команді",
+  mentor: "Ментор",
+  memberSince: "Учасник з",
+  birthday: "День народження",
+  addToCalendar: "Додати до календаря",
+  phone: "Номер",
+  call: "Зателефонувати",
+  emailInGmail: "Написати в Gmail",
+  copy: "Копіювати",
+  copied: "Скопійовано",
+  years: { one: "рік", few: "роки", many: "років", other: "років" },
+  calendarTitle: (name: string) => `🎉День Народження - ${name}🎉`,
+};

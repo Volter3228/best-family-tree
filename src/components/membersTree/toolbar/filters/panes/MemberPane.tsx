@@ -1,12 +1,13 @@
 import { useId, useMemo } from "react";
 import {
-  ACTIVITY_OPTIONS,
-  GENDER_OPTIONS,
-  STATUS_OPTIONS,
+  getActivityOptions,
+  getGenderOptions,
+  getStatusOptions,
 } from "@/constants/filters";
 import { STATUS_ICONS } from "@/constants/memberStatusIcons";
 import { useFamilyGroups } from "@/hooks/data/useFamilyGroups";
-import { pluralizeUk } from "@/utils";
+import { useLocale, useT } from "@/i18n/useT";
+import { displayFamilyName } from "@/utils/displayName";
 import {
   CheckListFilter,
   FilterSection,
@@ -17,52 +18,68 @@ import { greenPillIcon } from "../greenPillIcon";
 import { GENDER_ICONS } from "@/components/ui/GenderIcons";
 import type { FilterPaneProps } from "./types";
 
-const STATUS_PILLS = STATUS_OPTIONS.map((option) => ({
-  ...option,
-  icon: greenPillIcon(STATUS_ICONS[option.value]),
-}));
-
-const ACTIVITY_PILLS = ACTIVITY_OPTIONS.map((option) => ({
-  ...option,
-  icon: ACTIVITY_ICONS[option.value],
-}));
-
-const GENDER_PILLS = GENDER_OPTIONS.map((option) => ({
-  ...option,
-  icon: GENDER_ICONS[option.value],
-}));
-
 const MemberPane = ({ filters, onChange }: FilterPaneProps) => {
   const familyGroups = useFamilyGroups();
   const familyId = useId();
+  const locale = useLocale();
+  const t = useT().filters.member;
+
+  const statusPills = useMemo(
+    () =>
+      getStatusOptions(locale).map((option) => ({
+        ...option,
+        icon: greenPillIcon(STATUS_ICONS[option.value]),
+      })),
+    [locale],
+  );
+  const activityPills = useMemo(
+    () =>
+      getActivityOptions(locale).map((option) => ({
+        ...option,
+        icon: ACTIVITY_ICONS[option.value],
+      })),
+    [locale],
+  );
+  const genderPills = useMemo(
+    () =>
+      getGenderOptions(locale).map((option) => ({
+        ...option,
+        icon: GENDER_ICONS[option.value],
+      })),
+    [locale],
+  );
 
   const familyOptions = useMemo(
-    () => familyGroups.map((group) => ({ value: group.id, label: group.name })),
-    [familyGroups],
+    () =>
+      familyGroups.map((group) => ({
+        value: group.id,
+        label: displayFamilyName(group.name, locale),
+      })),
+    [familyGroups, locale],
   );
 
   return (
     <>
       <PillGroupFilterSection
-        title="Статус"
-        options={STATUS_PILLS}
+        title={t.status}
+        options={statusPills}
         selected={filters.statuses}
         onChangeSelected={(statuses) => onChange({ statuses })}
       />
       <PillGroupFilterSection
-        title="Стан активності"
-        options={ACTIVITY_PILLS}
+        title={t.activityState}
+        options={activityPills}
         selected={filters.activityStates}
         onChangeSelected={(activityStates) => onChange({ activityStates })}
       />
       <PillGroupFilterSection
-        title="Стать"
-        options={GENDER_PILLS}
+        title={t.gender}
+        options={genderPills}
         selected={filters.genders}
         onChangeSelected={(genders) => onChange({ genders })}
       />
       {familyOptions.length > 0 && (
-        <FilterSection title="Сім'я" htmlFor={familyId}>
+        <FilterSection title={t.family} htmlFor={familyId}>
           <CheckListFilter
             inputId={familyId}
             collapsedCount={8}
@@ -70,9 +87,8 @@ const MemberPane = ({ filters, onChange }: FilterPaneProps) => {
             selected={filters.familyGroupIds}
             onChange={(familyGroupIds) => onChange({ familyGroupIds })}
             noun={{
-              searchPlaceholder: "Знайти сім'ю",
-              moreLabel: (n) =>
-                `Ще ${n} ${pluralizeUk(n, ["сім'я", "сім'ї", "сімей"])}`,
+              searchPlaceholder: t.findFamily,
+              moreLabel: t.moreFamilies,
             }}
           />
         </FilterSection>

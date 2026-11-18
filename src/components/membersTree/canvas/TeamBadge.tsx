@@ -8,11 +8,7 @@ import {
 } from "react";
 import { Container, Graphics, Rectangle, TextStyle } from "pixi.js";
 import { useTick } from "@pixi/react";
-import {
-  useCanvasTheme,
-  useTapWithoutDrag,
-  useTexture,
-} from "@/hooks";
+import { useCanvasTheme, useTapWithoutDrag, useTexture } from "@/hooks";
 import { getIconUrlAsRounded } from "@/libs/cloudinary";
 import {
   getReadableColor,
@@ -56,10 +52,10 @@ const TeamBadge = ({ frame, color, isDark, selectionRef, onClick }: Props) => {
     () =>
       frame.iconUrl
         ? (getIconUrlAsRounded(
-          frame.iconUrl,
-          TEAM_TITLE_ICON_SIZE * ICON_TEXT_PX,
-          TEAM_TITLE_ICON_RADIUS * ICON_TEXT_PX,
-        ) ?? frame.iconUrl)
+            frame.iconUrl,
+            TEAM_TITLE_ICON_SIZE * ICON_TEXT_PX,
+            TEAM_TITLE_ICON_RADIUS * ICON_TEXT_PX,
+          ) ?? frame.iconUrl)
         : null,
     [frame.iconUrl],
   );
@@ -154,8 +150,8 @@ const TeamBadge = ({ frame, color, isDark, selectionRef, onClick }: Props) => {
 
     hoverRef.current = hoverChanging
       ? hoverRef.current +
-      (hoverTarget - hoverRef.current) *
-      (1 - Math.exp(-ticker.deltaMS / HOVER_SMOOTHING_MS))
+        (hoverTarget - hoverRef.current) *
+          (1 - Math.exp(-ticker.deltaMS / HOVER_SMOOTHING_MS))
       : hoverTarget;
 
     const fade = getTeamOverviewFade(scale);
@@ -163,7 +159,7 @@ const TeamBadge = ({ frame, color, isDark, selectionRef, onClick }: Props) => {
     const maxGrowth = (frame.width * 0.9) / layout.width;
     container.scale.set(
       Math.max(1, Math.min(wanted, maxGrowth)) *
-      (1 + SELECTED_SCALE * selection + HOVER_SCALE * hoverRef.current),
+        (1 + SELECTED_SCALE * selection + HOVER_SCALE * hoverRef.current),
     );
     container.alpha = 1 - fade;
     container.visible = fade < 1;

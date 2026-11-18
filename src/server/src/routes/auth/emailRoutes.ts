@@ -2,13 +2,24 @@ import { Router, type Request, type Response } from "express";
 import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import { authSecret, isDemoMode } from "../../auth/config.js";
-import { issueCode, verifyCode, type CodeOwner } from "../../auth/emailCodes.js";
+import {
+  issueCode,
+  verifyCode,
+  type CodeOwner,
+} from "../../auth/emailCodes.js";
 import { loadEmailIdentity, prismaCodeStore } from "../../auth/emailSignIn.js";
 import { normalizeEmail } from "../../auth/eligibility.js";
 import { getMailer } from "../../auth/mailer/index.js";
-import { renderSignInCodeEmail } from "../../auth/mailer/signInCodeEmail.js";
+import {
+  renderSignInCodeEmail,
+  type EmailLocale,
+} from "../../auth/mailer/signInCodeEmail.js";
 import { buildSessionInfo } from "../../auth/sessionInfo.js";
-import { createSession, findSession, setSessionCookie } from "../../auth/sessions.js";
+import {
+  createSession,
+  findSession,
+  setSessionCookie,
+} from "../../auth/sessions.js";
 import {
   browserHashOf,
   clearSignInCookie,
@@ -36,7 +47,9 @@ const limiter = (
     legacyHeaders: false,
     keyGenerator: key,
     handler: (_req, res) => {
-      res.status(429).json({ error: "Too many requests" });
+      res
+        .status(429)
+        .json({ error: "Too many requests", code: "too_many_requests" });
     },
   });
 
@@ -58,78 +71,103 @@ const requestLimits = [
 // Per IP only: a per-email limit would let anyone block someone else's sign-in.
 const verifyLimit = limiter(20, 15 * MINUTE, ipKey);
 
-const requestSchema = z.object({ email: z.string().max(254).pipe(z.email()) });
+const requestSchema = z.object({
+  email: z.string().max(254).pipe(z.email()),
+  locale: z.enum(["uk", "en"]).catch("uk"),
+});
 const verifySchema = z.object({
   email: z.string().max(254).pipe(z.email()),
   code: z.string().regex(/^\d{6}$/),
 });
 
-const sendCode = async (owner: CodeOwner) => {
+const sendCode = async (owner: CodeOwner, locale: EmailLocale) => {
   // The demo has no members to check against: any address gets a code.
   if (!isDemoMode()) {
     const identity = await loadEmailIdentity(owner.email);
     if (identity.kind === "refused") return;
   }
   const code = await issueCode(prismaCodeStore, authSecret(), owner);
-  const message = renderSignInCodeEmail(code, process.env.CLIENT_ORIGIN ?? "");
+  const message = renderSignInCodeEmail(
+    code,
+    process.env.CLIENT_ORIGIN ?? "",
+    locale,
+  );
   await getMailer().send({ to: owner.email, ...message });
 };
 
-router.post("/auth/email/request", ...requestLimits, (req: Request, res: Response) => {
-  const body = requestSchema.safeParse(req.body);
-  if (!body.success) {
-    res.status(400).json({ error: "Invalid email" });
-    return;
-  }
-  const owner = {
-    email: normalizeEmail(body.data.email),
-    browserHash: ensureBrowserHash(req, res),
-  };
-  // The answer, and the time it takes, are the same for every address: all
-  // the work happens after responding, so nobody can tell members apart.
-  res.json({ ok: true });
-  void sendCode(owner).catch((error) =>
-    console.error("Failed to send sign-in code", error),
-  );
-});
+router.post(
+  "/auth/email/request",
+  ...requestLimits,
+  (req: Request, res: Response) => {
+    const body = requestSchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid email", code: "invalid_email" });
+      return;
+    }
+    const owner = {
+      email: normalizeEmail(body.data.email),
+      browserHash: ensureBrowserHash(req, res),
+    };
+    // The answer, and the time it takes, are the same for every address: all
+    // the work happens after responding, so nobody can tell members apart.
+    res.json({ ok: true });
+    void sendCode(owner, body.data.locale).catch((error) =>
+      console.error("Failed to send sign-in code", error),
+    );
+  },
+);
 
-router.post("/auth/email/verify", verifyLimit, async (req: Request, res: Response) => {
-  const fail = () => res.status(401).json({ error: "Invalid or expired code" });
-  const body = verifySchema.safeParse(req.body);
-  if (!body.success) {
-    res.status(400).json({ error: "Invalid body" });
-    return;
-  }
-  const browserHash = browserHashOf(req);
-  if (!browserHash) return void fail();
-  try {
-    const email = normalizeEmail(body.data.email);
-    // The code first: it is one cheap lookup, and most bad calls stop here.
-    if (!(await verifyCode(prismaCodeStore, authSecret(), { email, browserHash }, body.data.code))) {
-      return void fail();
+router.post(
+  "/auth/email/verify",
+  verifyLimit,
+  async (req: Request, res: Response) => {
+    const fail = () =>
+      res
+        .status(401)
+        .json({ error: "Invalid or expired code", code: "invalid_code" });
+    const body = verifySchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid body" });
+      return;
     }
-    // Eligibility again: the member may have been excluded after the request.
-    // (The demo accepts any address and ties the session to no member.)
-    let memberId: string | null = null;
-    if (!isDemoMode()) {
-      const identity = await loadEmailIdentity(email);
-      if (identity.kind === "refused") return void fail();
-      memberId = identity.kind === "member" ? identity.memberId : null;
+    const browserHash = browserHashOf(req);
+    if (!browserHash) return void fail();
+    try {
+      const email = normalizeEmail(body.data.email);
+      // The code first: it is one cheap lookup, and most bad calls stop here.
+      if (
+        !(await verifyCode(
+          prismaCodeStore,
+          authSecret(),
+          { email, browserHash },
+          body.data.code,
+        ))
+      ) {
+        return void fail();
+      }
+      // Eligibility again: the member may have been excluded after the request.
+      // (The demo accepts any address and ties the session to no member.)
+      let memberId: string | null = null;
+      if (!isDemoMode()) {
+        const identity = await loadEmailIdentity(email);
+        if (identity.kind === "refused") return void fail();
+        memberId = identity.kind === "member" ? identity.memberId : null;
+      }
+      const token = await createSession({
+        method: "EMAIL",
+        memberId,
+        email,
+        userAgent: req.headers["user-agent"],
+      });
+      setSessionCookie(res, token, "EMAIL");
+      clearSignInCookie(res);
+      const session = await findSession(token);
+      if (!session) return void fail();
+      res.json(await buildSessionInfo(session));
+    } catch (error) {
+      sendRouteError(res, error, "Failed to verify code");
     }
-    const token = await createSession({
-      method: "EMAIL",
-      memberId,
-      email,
-      userAgent: req.headers["user-agent"],
-    });
-    setSessionCookie(res, token, "EMAIL");
-    clearSignInCookie(res);
-    const session = await findSession(token);
-    if (!session) return void fail();
-    res.json(await buildSessionInfo(session));
-  } catch (error) {
-    sendRouteError(res, error, "Failed to verify code");
-  }
-});
+  },
+);
 
 export default router;

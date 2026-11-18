@@ -30,6 +30,10 @@ export default function uploadMiddleware(folderName: string) {
     fileFilter: (_req, file, cb) =>
       file.mimetype.startsWith("image/")
         ? cb(null, true)
-        : cb(new ValidationError("Only image files are allowed")),
+        : cb(
+            new ValidationError("Only image files are allowed", {
+              code: "image_only",
+            }),
+          ),
   });
 }

@@ -3,6 +3,8 @@ import { CanvasTextMetrics, Graphics } from "pixi.js";
 import { Member } from "@/models";
 import { formatMemberRecruitmentSeason, truncateText } from "@/utils";
 import { useCanvasTheme } from "@/hooks";
+import { useLocale } from "@/i18n/useT";
+import { displayName } from "@/utils/displayName";
 import { getCardBackgroundContext } from "./cardBackgroundContext";
 import {
   NODE_AVATAR_SIZE,
@@ -31,6 +33,11 @@ const MemberNodeCard = ({
   placeholderColorIndex,
   teamRole,
 }: Props) => {
+  const locale = useLocale();
+  const shownName = useMemo(
+    () => displayName(member.name, locale),
+    [member.name, locale],
+  );
   const centerX = NODE_WIDTH / 2;
   const {
     primaryGradientToBottomRight,
@@ -44,19 +51,19 @@ const MemberNodeCard = ({
   const subtitleStyle = textStyleInstances.subtitle;
 
   const titleMetrics = useMemo(
-    () => CanvasTextMetrics.measureText(member.name, titleStyle),
-    [member.name, titleStyle],
+    () => CanvasTextMetrics.measureText(shownName, titleStyle),
+    [shownName, titleStyle],
   );
 
   // Several roles in one team are comma separated; keep them inside the card.
   const subtitleText = useMemo(
     () =>
       truncateText(
-        teamRole || formatMemberRecruitmentSeason(member),
+        teamRole || formatMemberRecruitmentSeason(member, false, locale),
         subtitleStyle,
         NODE_WIDTH - 2 * SUBTITLE_PADDING,
       ),
-    [member, teamRole, subtitleStyle],
+    [member, teamRole, subtitleStyle, locale],
   );
 
   const subtitleY = titleMetrics.height / 2 + 12;
@@ -104,7 +111,7 @@ const MemberNodeCard = ({
         />
       )}
       <pixiContainer x={centerX} y={TEXT_Y}>
-        <pixiBitmapText text={member.name} style={titleStyle} anchor={0.5} />
+        <pixiBitmapText text={shownName} style={titleStyle} anchor={0.5} />
         <pixiBitmapText
           text={subtitleText}
           anchor={0.5}

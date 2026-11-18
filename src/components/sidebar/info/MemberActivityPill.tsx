@@ -1,5 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import { ActivityState, type AccentColor } from "@/types";
 
 interface Props {
@@ -7,16 +8,11 @@ interface Props {
   color?: AccentColor;
 }
 
-const LABELS: Record<ActivityState, string> = {
-  [ActivityState.Active]: "Active",
-  [ActivityState.Inactive]: "Inactive",
-  [ActivityState.Excluded]: "Excluded",
-};
-
 // Secondary to the status pill: a soft tint in the card's accent while the
 // member is active, gray once they are inactive or excluded. Their history
 // stays on the card, so the pill never disappears.
 const MemberActivityPill = ({ state, color = "blue" }: Props) => {
+  const t = useT().filters.activity;
   const colorClasses = COLOR_CLASSES[color];
   const isActive = state === ActivityState.Active;
   const isInactive = state === ActivityState.Inactive;
@@ -39,7 +35,7 @@ const MemberActivityPill = ({ state, color = "blue" }: Props) => {
           !isActive && !isInactive && "bg-foreground/40",
         )}
       />
-      {LABELS[state]}
+      {t[state.toLowerCase() as Lowercase<ActivityState>]}
     </span>
   );
 };

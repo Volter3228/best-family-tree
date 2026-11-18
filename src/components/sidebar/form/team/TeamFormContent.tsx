@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { useMembersList, useRoles } from "@/hooks";
+import { useT } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import type { AccentColor, Team, TeamFormData, TeamType } from "@/types";
 import type { useTeamForm } from "@/hooks/forms";
 import {
@@ -8,7 +10,11 @@ import {
   TextInput,
   YearRangeInput,
 } from "../inputs";
-import { getRoleOptions, getTeamTypeOptions } from "../fields/position/positionFormUtils";
+import {
+  getRoleOptions,
+  getTeamTypeOptions,
+  resolveRoleName,
+} from "../fields/position/positionFormUtils";
 import FormMessages from "../FormMessages";
 import FormSection from "./FormSection";
 import TeamFormFooter from "./TeamFormFooter";
@@ -32,15 +38,23 @@ interface Props {
   onCancel?: () => void;
   onAskDelete: (isConfirming: boolean) => void;
   onDelete: () => void;
-  members: Pick<FormState, "addMemberRow" | "updateMemberRow" | "removeMemberRow">;
+  members: Pick<
+    FormState,
+    "addMemberRow" | "updateMemberRow" | "removeMemberRow"
+  >;
 }
 
 // What an empty name will become, shown as the placeholder.
-const getDerivedName = (form: TeamFormData, teamType?: TeamType) => {
-  if (!teamType) return "Назва команди";
+const getDerivedName = (
+  form: TeamFormData,
+  fallback: string,
+  teamType?: TeamType,
+) => {
+  if (!teamType) return fallback;
+  const typeName = teamType.name;
   return teamType.isEvent === false || !form.startYear
-    ? teamType.name
-    : `${teamType.name} ${form.startYear}`;
+    ? typeName
+    : `${typeName} ${form.startYear}`;
 };
 
 const TeamFormContent = ({
@@ -62,22 +76,34 @@ const TeamFormContent = ({
 }: Props) => {
   const [roles] = useRoles();
   const flatMembersList = useMembersList();
+  const tCommon = useT().formCommon;
+  const t = useT().teamForm;
+  const dn = useDisplayName();
 
-  const teamTypeOptions = useMemo(() => getTeamTypeOptions(teamTypes), [teamTypes]);
+  const teamTypeOptions = useMemo(
+    () => getTeamTypeOptions(teamTypes),
+    [teamTypes],
+  );
   const roleOptions = useMemo(() => getRoleOptions(roles), [roles]);
   const memberOptions = useMemo(
-    () => flatMembersList.map((member) => ({ value: member.id, text: member.name })),
-    [flatMembersList],
+    () =>
+      flatMembersList.map((member) => ({
+        value: member.id,
+        text: dn(member.name),
+      })),
+    [flatMembersList, dn],
   );
+  const memberNameById = (id: string) =>
+    flatMembersList.find((member) => member.id === id)?.name ?? "";
 
   if (mode === "edit" && !selectedTeam) return null;
 
   const teamType = teamTypes.find(({ id }) => id === form.teamTypeId);
-  const derivedName = getDerivedName(form, teamType);
+  const derivedName = getDerivedName(form, t.namePlaceholder, teamType);
 
   return (
     <>
-      <FormSection title="Основне" color={color}>
+      <FormSection title={tCommon.basics} color={color}>
         <div className="flex items-start gap-3">
           <TeamLogoPicker
             name={form.name || derivedName}
@@ -90,7 +116,7 @@ const TeamFormContent = ({
           <div className="min-w-0 flex-1">
             <TextInput
               name="teamName"
-              label="Назва"
+              label={tCommon.name}
               value={form.name}
               onChange={(name) => setForm((prev) => ({ ...prev, name }))}
               placeholder={derivedName}
@@ -101,26 +127,28 @@ const TeamFormContent = ({
         <DropdownSelectInput
           key={selectedTeam?.id ?? "new"}
           name="teamType"
-          label="Тип команди"
+          label={tCommon.teamType}
           autoComplete
           options={teamTypeOptions}
           onSelect={(value) =>
             setForm((prev) => ({ ...prev, teamTypeId: value || undefined }))
           }
-          placeholder="Оберіть тип"
+          placeholder={t.chooseType}
           initialValue={form.teamTypeId}
           color={color}
         />
         <TextAreaInput
           name="teamDescription"
-          label="Опис"
+          label={tCommon.description}
           value={form.description}
-          onChange={(description) => setForm((prev) => ({ ...prev, description }))}
+          onChange={(description) =>
+            setForm((prev) => ({ ...prev, description }))
+          }
           color={color}
         />
       </FormSection>
 
-      <FormSection title="Період" color={color}>
+      <FormSection title={t.period} color={color}>
         <YearRangeInput
           name="teamYears"
           start={form.startYear}
@@ -133,7 +161,9 @@ const TeamFormContent = ({
               endYear: isOngoing ? undefined : prev.endYear,
             }))
           }
-          onChange={(startYear, endYear) => setForm((prev) => ({ ...prev, startYear, endYear }))}
+          onChange={(startYear, endYear) =>
+            setForm((prev) => ({ ...prev, startYear, endYear }))
+          }
           color={color}
         />
       </FormSection>
@@ -142,6 +172,8 @@ const TeamFormContent = ({
         rows={form.members}
         memberOptions={memberOptions}
         roleOptions={roleOptions}
+        resolveRoleName={(id, text) => resolveRoleName(roles, id, text)}
+        memberNameById={memberNameById}
         color={color}
         onAdd={members.addMemberRow}
         onUpdate={members.updateMemberRow}

@@ -4,6 +4,7 @@ import {
   MIN_DATE_JOIN,
 } from "@/constants/form";
 import { MEMBER_STATUSES } from "@/constants/member";
+import { messages, type Messages } from "@/i18n/messages";
 import type { Member } from "@/models";
 import { getRowPeriod } from "../fields/position/positionFormUtils";
 import type {
@@ -14,8 +15,8 @@ import type {
   TeamType,
 } from "@/types";
 
-const REQUIRED_MESSAGE = "Обов'язкове поле.";
-const INVALID_LINK_MESSAGE = "Некоректне посилання.";
+type ValidationMessages = Messages["memberForm"]["validation"];
+
 const TELEGRAM_LINK_REGEX = /^((https?:\/\/)?(www\.)?t\.me\/\S+|@?\w{5,})$/;
 const INSTAGRAM_LINK_REGEX =
   /^((https?:\/\/)?(www\.)?instagram\.com\/\S+|@?[a-zA-Z0-9._]{1,30})$/;
@@ -31,12 +32,10 @@ type Links = {
   linkedinLink: string;
 };
 
-const validateLinks = ({
-  telegramLink,
-  facebookLink,
-  instagramLink,
-  linkedinLink,
-}: Links) => {
+const validateLinks = (
+  { telegramLink, facebookLink, instagramLink, linkedinLink }: Links,
+  INVALID_LINK_MESSAGE: string,
+) => {
   const errors: Partial<Links> = {};
   if (telegramLink && !TELEGRAM_LINK_REGEX.exec(telegramLink)) {
     errors.telegramLink = INVALID_LINK_MESSAGE;
@@ -60,19 +59,20 @@ const validatePositions = (
   positions: PositionFormRow[],
   teamTypes: TeamType[],
   teams: Team[],
+  t: ValidationMessages,
 ): string | undefined => {
   for (const position of positions) {
     if (!position.roleName.trim()) continue;
 
     if (getRowPeriod(teams, position, teamTypes).kind === "unavailable") {
-      return "Такої команди немає. Оберіть наявну або створіть її у вкладці «Команди».";
+      return t.noSuchTeam;
     }
     if (position.teamName?.trim()) continue;
 
     const teamType = teamTypes.find(({ id }) => id === position.teamTypeId);
 
     if (teamType?.isEvent && !position.teamStartYear) {
-      return `Вкажіть рік початку для «${teamType.name}» або назву команди.`;
+      return t.startYearRequired(teamType.name);
     }
   }
 };
@@ -118,8 +118,17 @@ const validateMemberForm = (
   mentorsList: MentorsListItem[],
   teamTypes: TeamType[] = [],
   stored: StoredMemberValues | null = null,
-  { minimal = false, teams = [] }: { minimal?: boolean; teams?: Team[] } = {},
+  {
+    minimal = false,
+    teams = [],
+    t = messages.uk.memberForm.validation,
+  }: {
+    minimal?: boolean;
+    teams?: Team[];
+    t?: ValidationMessages;
+  } = {},
 ): Partial<Record<keyof MemberFormData, string>> => {
+  const REQUIRED_MESSAGE = t.required;
   let errors: Partial<Record<keyof MemberFormData, string>> = {};
   const {
     firstName,
@@ -163,19 +172,19 @@ const validateMemberForm = (
     !isUnchanged("birthday", birthday) &&
     (birthday < MIN_DATE_BIRTHDAY || birthday > MAX_DATE_BIRTHDAY)
   ) {
-    errors.birthday = "День народження некоректний.";
+    errors.birthday = t.birthdayInvalid;
   }
 
   if (!joinedAt) {
     if (isRequired("joinedAt")) errors.joinedAt = REQUIRED_MESSAGE;
   } else if (!isUnchanged("joinedAt", joinedAt) && joinedAt < MIN_DATE_JOIN) {
-    errors.joinedAt = "День вступу некоректний.";
+    errors.joinedAt = t.joinedAtInvalid;
   }
 
   if (!status) {
     errors.status = REQUIRED_MESSAGE;
   } else if (!MEMBER_STATUSES.includes(status)) {
-    errors.status = "Некоректний статус.";
+    errors.status = t.statusInvalid;
   }
 
   if (!mentorId) {
@@ -184,7 +193,7 @@ const validateMemberForm = (
     !isUnchanged("mentorId", mentorId) &&
     !mentorsList.find(({ id }) => id === mentorId)
   ) {
-    errors.mentorId = "Некоректний ментор.";
+    errors.mentorId = t.mentorInvalid;
   }
 
   if (!email) {
@@ -193,7 +202,7 @@ const validateMemberForm = (
     !isUnchanged("email", email) &&
     !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)
   ) {
-    errors.email = "Некоректний email.";
+    errors.email = t.emailInvalid;
   }
 
   if (!phoneNumber) {
@@ -202,20 +211,18 @@ const validateMemberForm = (
     !isUnchanged("phoneNumber", phoneNumber) &&
     !/^(\+380|380|0)\d{9}$/.test(phoneNumber)
   ) {
-    errors.phoneNumber = "Некоректний номер.";
+    errors.phoneNumber = t.phoneInvalid;
   }
 
-  const positionsError = validatePositions(form.positions, teamTypes, teams);
+  const positionsError = validatePositions(form.positions, teamTypes, teams, t);
   if (positionsError) errors.positions = positionsError;
 
   errors = {
     ...errors,
-    ...validateLinks({
-      telegramLink,
-      instagramLink,
-      facebookLink,
-      linkedinLink,
-    }),
+    ...validateLinks(
+      { telegramLink, instagramLink, facebookLink, linkedinLink },
+      t.invalidLink,
+    ),
   };
 
   return errors;

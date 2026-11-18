@@ -5,7 +5,7 @@ import {
   roleBodySchema,
   roleUpdateSchema,
 } from "../utils/catalogValidation.js";
-import { sendRouteError } from "../utils/httpErrors.js";
+import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import { sameName } from "../utils/names.js";
 
 const router = Router();
@@ -50,7 +50,7 @@ router.get("/roles", async (_req, res) => {
 router.post("/roles", async (req, res) => {
   const body = parseWith(roleBodySchema, req.body);
   if (!body.success) {
-    res.status(400).json({ error: body.errors });
+    res.status(400).json(errorBody(body.errors, "validation"));
     return;
   }
 
@@ -83,7 +83,7 @@ router.post("/roles", async (req, res) => {
 router.put("/roles/:id", async (req, res) => {
   const body = parseWith(roleUpdateSchema, req.body);
   if (!body.success) {
-    res.status(400).json({ error: body.errors });
+    res.status(400).json(errorBody(body.errors, "validation"));
     return;
   }
 
@@ -93,7 +93,7 @@ router.put("/roles/:id", async (req, res) => {
 
     const existing = await prisma.role.findUnique({ where: { id } });
     if (!existing) {
-      res.status(404).json({ error: "Role not found" });
+      res.status(404).json(errorBody("Role not found", "role_not_found"));
       return;
     }
 
@@ -102,7 +102,9 @@ router.put("/roles/:id", async (req, res) => {
         where: { name: sameName(name), NOT: { id } },
       });
       if (conflict) {
-        res.status(409).json({ error: "Role with this name already exists" });
+        res
+          .status(409)
+          .json(errorBody("Role with this name already exists", "role_exists"));
         return;
       }
     }
@@ -130,7 +132,7 @@ router.delete("/roles/:id", async (req, res) => {
 
     const role = await prisma.role.findUnique({ where: { id } });
     if (!role) {
-      res.status(404).json({ error: "Role not found" });
+      res.status(404).json(errorBody("Role not found", "role_not_found"));
       return;
     }
 
@@ -138,9 +140,14 @@ router.delete("/roles/:id", async (req, res) => {
       where: { roleId: id },
     });
     if (positionsCount > 0) {
-      res.status(409).json({
-        error: "Cannot delete role: positions are still using it",
-      });
+      res
+        .status(409)
+        .json(
+          errorBody(
+            "Cannot delete role: positions are still using it",
+            "role_in_use",
+          ),
+        );
       return;
     }
 

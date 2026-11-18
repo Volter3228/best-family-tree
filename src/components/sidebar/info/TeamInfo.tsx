@@ -1,8 +1,12 @@
-import { CalendarDateRangeIcon, InformationCircleIcon } from "@heroicons/react/16/solid";
+import {
+  CalendarDateRangeIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { formatYearRange, type TeamRosterEntry } from "@/utils";
 import { ActivityState, type AccentColor, type Team } from "@/types";
+import { useT } from "@/i18n/useT";
 import InfoSection from "./InfoSection";
 import MemberActivityPill from "./MemberActivityPill";
 import MemberFactTile from "./MemberFactTile";
@@ -29,6 +33,7 @@ const TeamInfo = ({
   onTitleClick,
   color = "blue",
 }: Props) => {
+  const t = useT().teamInfo;
   const colorClasses = COLOR_CLASSES[color];
   const years = formatYearRange({
     start: team.startYear,
@@ -48,7 +53,7 @@ const TeamInfo = ({
           photoUrl={team.photoUrl}
           iconUrl={team.teamType?.iconUrl}
           typeColor={team.teamType?.color}
-          typeName={team.teamType?.name}
+          typeName={team.teamType ? team.teamType.name : undefined}
           name={team.name}
           color={color}
         />
@@ -84,18 +89,24 @@ const TeamInfo = ({
       <div className="mt-5 flex flex-col gap-6">
         {!!team.description && (
           <div className="grid grid-cols-1 gap-3">
-            <MemberFactTile label="Про команду" icon={InformationCircleIcon} color={color}>
-              <span className="whitespace-pre-line font-normal">{team.description}</span>
+            <MemberFactTile
+              label={t.about}
+              icon={InformationCircleIcon}
+              color={color}
+            >
+              <span className="whitespace-pre-line font-normal">
+                {team.description}
+              </span>
             </MemberFactTile>
           </div>
         )}
         {roster.length > 0 && (
           <InfoSection
-            title="Учасники"
+            title={t.members}
             color={color}
             visibleCount={5}
             toggle="bar"
-            expandLabel="Показати всіх"
+            expandLabel={t.showAll}
             listClassName="flex flex-col gap-0.5"
             items={roster.map((entry) => (
               <TeamRosterRow

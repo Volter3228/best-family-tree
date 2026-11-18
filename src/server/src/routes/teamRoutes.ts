@@ -7,7 +7,7 @@ import {
   teamBodySchema,
   teamMembersSchema,
 } from "../utils/catalogValidation.js";
-import { sendRouteError } from "../utils/httpErrors.js";
+import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import {
   TEAM_INCLUDE,
   createTeam,
@@ -48,7 +48,7 @@ router.post("/teams", uploadTeamIcon.single("icon"), async (req, res) => {
 
   try {
     if (!body.success) {
-      res.status(400).json({ error: body.errors });
+      res.status(400).json(errorBody(body.errors, "validation"));
       if (iconUrl) await deleteCloudinaryImage(iconUrl);
       return;
     }
@@ -65,7 +65,7 @@ router.put("/teams/:id", uploadTeamIcon.single("icon"), async (req, res) => {
 
   try {
     if (!body.success) {
-      res.status(400).json({ error: body.errors });
+      res.status(400).json(errorBody(body.errors, "validation"));
       if (uploadedUrl) await deleteCloudinaryImage(uploadedUrl);
       return;
     }
@@ -98,7 +98,7 @@ router.delete("/teams/:id", async (req, res) => {
 router.put("/teams/:id/members", async (req, res) => {
   const body = parseWith(teamMembersSchema, req.body);
   if (!body.success) {
-    res.status(400).json({ error: body.errors });
+    res.status(400).json(errorBody(body.errors, "validation"));
     return;
   }
 

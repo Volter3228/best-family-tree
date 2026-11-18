@@ -7,6 +7,7 @@ import {
   useTeams,
 } from "@/hooks";
 import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
+import { useT } from "@/i18n/useT";
 import apiAddMember from "@/api/addMember";
 import type {
   AccentColor,
@@ -35,6 +36,8 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
   const [formError, setFormError] = useState<string | null>(null);
   const [isMinimal, setIsMinimal] = useState(false);
   const formId = useId();
+  const t = useT().formCommon;
+  const tMember = useT().memberForm;
 
   const { addMember, getMentorsList } = useMembersActions();
   const mentorsList = useMentorsList();
@@ -57,10 +60,17 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
     event.preventDefault();
 
     setErrors({});
-    const validationErrors = validateMemberForm(form, mentorsList, teamTypes, null, {
-      minimal: isMinimal,
-      teams,
-    });
+    const validationErrors = validateMemberForm(
+      form,
+      mentorsList,
+      teamTypes,
+      null,
+      {
+        minimal: isMinimal,
+        teams,
+        t: tMember.validation,
+      },
+    );
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -116,10 +126,10 @@ export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
           onClick={handleResetForm}
           color={color}
         >
-          Очистити
+          {t.clear}
         </ClearButton>
         <SubmitButton isSubmitting={isSubmitting} form={formId} color={color}>
-          {isSubmitting ? "Створюємо..." : "Створити"}
+          {isSubmitting ? t.creating : t.create}
         </SubmitButton>
       </FormFooter>
     </form>

@@ -1,5 +1,4 @@
-// All sign-in copy lives here so English can be added later.
-export const authStrings = {
+export const auth = {
   brand: "BEST Tree",
   methodLabel: "Спосіб входу",
   methodQuestions: "Питання",
@@ -41,10 +40,12 @@ export const authStrings = {
   telegramSignIn: "Увійти через Telegram",
   signInErrors: {
     google_failed: "Не вдалося увійти через Google. Спробуй ще раз",
-    not_verified: "Google не підтвердив цю пошту. Спробуй інший акаунт або вхід за кодом",
+    not_verified:
+      "Google не підтвердив цю пошту. Спробуй інший акаунт або вхід за кодом",
     not_member:
       "Цієї пошти немає в BEST. Спробуй інший акаунт або увійди за кодом на пошту, яку ми знаємо",
-    ambiguous: "Ця пошта записана в кількох учасників. Увійди за кодом або напиши адміну",
+    ambiguous:
+      "Ця пошта записана в кількох учасників. Увійди за кодом або напиши адміну",
     telegram_failed: "Не вдалося увійти через Telegram. Спробуй ще раз",
     telegram_not_member:
       "Цього номера немає в BEST, або ти не поділився ним. Увійди за кодом на пошту і попроси редактора додати твій номер у профіль",

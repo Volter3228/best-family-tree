@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { getPositionPeriod } from "@/utils";
 import type { AccentColor, MemberPosition } from "@/types";
+import { useLocale, useT } from "@/i18n/useT";
 import InfoSection from "./InfoSection";
 import PositionBadge from "./PositionBadge";
 
@@ -18,6 +19,8 @@ const MemberPositions = ({
   canClickPosition,
   color = "blue",
 }: Props) => {
+  const t = useT().memberInfo;
+  const locale = useLocale();
   const sortedPositions = useMemo(
     () =>
       [...positions].sort((a, b) => {
@@ -28,18 +31,18 @@ const MemberPositions = ({
         const aYear = getYear(a);
         const bYear = getYear(b);
         if (aYear === null && bYear === null) {
-          return a.role.name.localeCompare(b.role.name, "uk");
+          return a.role.name.localeCompare(b.role.name, locale);
         }
         if (aYear === null) return 1;
         if (bYear === null) return -1;
         return bYear - aYear;
       }),
-    [positions],
+    [positions, locale],
   );
 
   return (
     <InfoSection
-      title="Посади"
+      title={t.positions}
       color={color}
       visibleCount={3}
       toggle="pill"

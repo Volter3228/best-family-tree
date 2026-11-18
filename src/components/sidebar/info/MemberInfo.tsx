@@ -1,7 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
-import { capitalizeOnlyFirstLetter, getMemberAvatar } from "@/utils";
+import { getMemberAvatar, getStatusLabel } from "@/utils";
 import { Member } from "@/models";
+import { useLocale } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import PhotoOpenButton, {
   useIsPhotoOpen,
 } from "@/components/photoViewer/PhotoOpenButton";
@@ -43,6 +45,8 @@ const MemberInfo = ({
   canClickPosition,
   color = "blue",
 }: Props) => {
+  const dn = useDisplayName();
+  const locale = useLocale();
   const reduced = useSessionStore((s) => isReducedView(s.session));
   const mentor = useMemberById(member.mentorId);
   const mentees = useMentees(member.id);
@@ -74,7 +78,7 @@ const MemberInfo = ({
                 id={member.id}
                 src={getPhotoUrlForViewer(photo)}
                 previewSrc={getPhotoUrlForViewerPreview(photo)}
-                alt={name}
+                alt={dn(name)}
                 roundedClassName="rounded-full"
                 className="block h-full w-full"
               >
@@ -100,7 +104,7 @@ const MemberInfo = ({
             )}
             onClick={() => onMemberNameClick?.(member.id)}
           >
-            {name}
+            {dn(name)}
           </h5>
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span
@@ -110,7 +114,7 @@ const MemberInfo = ({
               )}
             >
               <StatusIcon className="h-4 w-4" />
-              {capitalizeOnlyFirstLetter(status)}
+              {getStatusLabel(status, locale)}
             </span>
             <MemberActivityPill state={activityState} color={color} />
           </div>

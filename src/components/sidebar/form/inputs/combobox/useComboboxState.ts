@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/i18n/useT";
 import type { DropdownOption } from "@/types";
 
 const NEW_OPTION_VALUE = "__new__";
@@ -10,6 +11,7 @@ export const useComboboxState = (
   // False: only existing options can be chosen (no "create" option).
   allowCreate = true,
 ) => {
+  const t = useT().formCommon;
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -50,11 +52,11 @@ export const useComboboxState = (
     if (allowCreate && inputValue.trim() && !isExistingOption) {
       return [
         ...filteredOptions,
-        { value: NEW_OPTION_VALUE, text: `Створити: "${inputValue}"` },
+        { value: NEW_OPTION_VALUE, text: t.createOption(inputValue) },
       ];
     }
     return filteredOptions;
-  }, [filteredOptions, inputValue, isExistingOption, allowCreate]);
+  }, [filteredOptions, inputValue, isExistingOption, allowCreate, t]);
 
   const close = useCallback(() => {
     setIsClosing(true);

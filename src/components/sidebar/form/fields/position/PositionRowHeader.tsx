@@ -1,6 +1,7 @@
 import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -14,13 +15,14 @@ interface Props {
 
 const PositionRowHeader = ({
   summary,
-  removeLabel = "Видалити посаду",
+  removeLabel,
   isExpanded,
   color = "blue",
   onToggle,
   onRemove,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const t = useT().memberForm.positions;
 
   return (
     <div className="flex items-center gap-2">
@@ -49,7 +51,7 @@ const PositionRowHeader = ({
           colorClasses.text,
           colorClasses.hoverAccentBg,
         )}
-        aria-label={removeLabel}
+        aria-label={removeLabel ?? t.remove}
       >
         <XMarkIcon className="h-4 w-4" />
       </button>

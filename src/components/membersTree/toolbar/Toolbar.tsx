@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { LionIcon } from "@/components/icons";
 import { usePanelToggle, useSearchShortcut } from "@/hooks";
-import { authStrings as t } from "@/components/auth/strings";
+import { useT } from "@/i18n/useT";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import { countActiveFilters } from "@/utils/filters";
@@ -35,6 +35,8 @@ const focusSearchInput = () => {
 };
 
 const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
+  const t = useT().auth;
+  const tb = useT().toolbar;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const search = usePanelToggle();
   const filters = usePanelToggle();
@@ -92,14 +94,14 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
           />
           <div className="relative flex items-end gap-1.5 rounded-2xl p-2">
             <ToolbarIconButton
-              title="Пошук"
+              title={tb.search}
               onClick={handleShowSearchClick}
               icon={MagnifyingGlassIcon}
               color="blue"
               isActive={search.isOpen}
             />
             <ToolbarIconButton
-              title="Фільтри"
+              title={tb.filters}
               onClick={handleShowFiltersClick}
               icon={FunnelIcon}
               color="green"
@@ -108,7 +110,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
             />
             <FitViewButton onClick={onFitView} color="orange" />
             <ToolbarIconButton
-              title="Налаштування"
+              title={tb.settings}
               onClick={handleShowSettingsClick}
               icon={Cog6ToothIcon}
               color="green"
@@ -130,7 +132,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
                   className="mx-0.5 h-6 w-px self-center rounded-full bg-foreground/15"
                 />
                 <ToolbarIconButton
-                  title="Керування"
+                  title={tb.manage}
                   onClick={toggleSidebar}
                   icon={PencilSquareIcon}
                   color="blue"
@@ -156,7 +158,11 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         onClose={account.close}
       />
       {editable && (
-        <ManageSidebar isOpen={isSidebarOpen} onClose={closeSidebar} color="blue" />
+        <ManageSidebar
+          isOpen={isSidebarOpen}
+          onClose={closeSidebar}
+          color="blue"
+        />
       )}
     </>
   );

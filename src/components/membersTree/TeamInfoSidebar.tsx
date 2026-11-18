@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
 import { formatYearRange, getTeamRoster } from "@/utils";
+import { useLocale, useT } from "@/i18n/useT";
 import Sidebar from "../sidebar";
 import HeaderChip from "../sidebar/HeaderChip";
 import SidebarMinimizedSummary from "../sidebar/SidebarMinimizedSummary";
@@ -32,6 +33,8 @@ const TeamInfoSidebar = ({
   onTitleClick,
 }: Props) => {
   const { teamId, isOpen, mode } = state;
+  const t = useT().sidebar;
+  const locale = useLocale();
   const [teams] = useTeams();
   const flatMembersList = useMembersList();
 
@@ -41,8 +44,8 @@ const TeamInfoSidebar = ({
   );
   // Kept while the sidebar slides out, so its content (and height) stay put.
   const roster = useMemo(
-    () => (teamId ? getTeamRoster(flatMembersList, teamId) : []),
-    [teamId, flatMembersList],
+    () => (teamId ? getTeamRoster(flatMembersList, teamId, locale) : []),
+    [teamId, flatMembersList, locale],
   );
 
   const editable = useSessionStore((s) => canEdit(s.session));
@@ -55,12 +58,12 @@ const TeamInfoSidebar = ({
       headerTitle={
         mode === "info" ? (
           <HeaderChip icon={UserGroupIcon} color="blue">
-            {team?.teamType?.name ?? "Команда"}
+            {team?.teamType ? team.teamType.name : t.team}
           </HeaderChip>
         ) : (
           team && (
             <HeaderChip icon={PencilIcon} color="blue">
-              Редагувати: {team.name}
+              {t.editing(team.name)}
             </HeaderChip>
           )
         )

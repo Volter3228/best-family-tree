@@ -2,10 +2,9 @@ import { useRef, useCallback } from "react";
 import { ViewfinderCircleIcon } from "@heroicons/react/24/outline";
 import gsap from "gsap";
 import type { AccentColor } from "@/types";
+import { useT } from "@/i18n/useT";
 import useHoverTooltip from "./useHoverTooltip";
 import ToolbarTooltip from "./ToolbarTooltip";
-
-const TITLE = "Центрувати";
 
 interface Props {
   onClick: () => void;
@@ -13,6 +12,7 @@ interface Props {
 }
 
 const FitViewButton = ({ onClick, color }: Props) => {
+  const TITLE = useT().toolbar.fitToScreen;
   const btnRef = useRef<HTMLButtonElement>(null);
   const iconWrapRef = useRef<HTMLSpanElement>(null);
   const { showTooltip, hideTooltip, handlers } = useHoverTooltip();

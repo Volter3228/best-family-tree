@@ -1,4 +1,12 @@
+import type { Locale } from "@/i18n/locale";
+import { displayName } from "@/utils/displayName";
 import { normalize } from "@/utils";
+
+// In EN the shown name is romanized; the original Cyrillic stays searchable.
+export const searchableName = (name: string, locale: Locale): string[] => {
+  const shown = displayName(name, locale);
+  return shown === name ? [name] : [shown, name];
+};
 
 const tokenize = (texts: string[]): string[] =>
   texts.flatMap((text) => normalize(text).split(/\s+/)).filter(Boolean);
@@ -26,8 +34,10 @@ export const rankMatch = (searchable: string[], query: string): number => {
   if (parts.length === 0) return 2;
 
   const tokens = tokenize(searchable);
-  if (parts.every((part) => tokens.some((token) => token.startsWith(part)))) return 0;
-  if (parts.every((part) => tokens.some((token) => token.includes(part)))) return 1;
+  if (parts.every((part) => tokens.some((token) => token.startsWith(part))))
+    return 0;
+  if (parts.every((part) => tokens.some((token) => token.includes(part))))
+    return 1;
   return 2;
 };
 
@@ -35,7 +45,10 @@ export const rankMatch = (searchable: string[], query: string): number => {
  * Sorted, non-overlapping [start, end) ranges in `text` covering the first
  * occurrence of each query word inside each word of the text.
  */
-export const getMatchRanges = (text: string, query: string): Array<[number, number]> => {
+export const getMatchRanges = (
+  text: string,
+  query: string,
+): Array<[number, number]> => {
   const parts = queryParts(query);
   const ranges: Array<[number, number]> = [];
 
@@ -45,7 +58,8 @@ export const getMatchRanges = (text: string, query: string): Array<[number, numb
     if (normalizedWord.length !== word[0].length) continue;
     for (const part of parts) {
       const at = normalizedWord.indexOf(part);
-      if (at >= 0) ranges.push([word.index + at, word.index + at + part.length]);
+      if (at >= 0)
+        ranges.push([word.index + at, word.index + at + part.length]);
     }
   }
 

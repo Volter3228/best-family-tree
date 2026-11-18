@@ -17,7 +17,9 @@ import { MemberFormFields } from "./fields";
 import FormError from "./FormError";
 import { describeSubmitError } from "./describeSubmitError";
 import { isSameFormData } from "@/utils/formDataEquals";
-import { MEMBER_FORM_DEFAULTS, NO_CHANGES_MESSAGE } from "@/constants/form";
+import { MEMBER_FORM_DEFAULTS } from "@/constants/form";
+import { useT } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import { SubmitButton, ClearButton } from "./buttons";
 import { buildEditPayload, getInitialFormData } from "./editMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
@@ -49,6 +51,9 @@ const EditMemberForm = ({
   const [success, showSuccess, hideSuccess] = useTransientMessage();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const formId = useId();
+  const tCommon = useT().formCommon;
+  const t = useT().memberForm;
+  const dn = useDisplayName();
 
   const mentees = useMentees(member.id);
   const { updateMember, reloadMembers, getMentorsList } = useMembersActions();
@@ -76,7 +81,7 @@ const EditMemberForm = ({
     if (
       isSameFormData(buildEditPayload(form), buildEditPayload(initialFormData))
     ) {
-      showSuccess(NO_CHANGES_MESSAGE);
+      showSuccess(tCommon.noChanges);
       return;
     }
 
@@ -85,7 +90,7 @@ const EditMemberForm = ({
       mentorsList,
       teamTypes,
       member,
-      { teams },
+      { teams, t: t.validation },
     );
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -103,7 +108,7 @@ const EditMemberForm = ({
         reloadRoles();
         reloadTeams();
         reloadTeamTypes();
-        showSuccess("Збережено");
+        showSuccess(tCommon.saved);
       }
     } catch (error) {
       const { field, message } = describeSubmitError(
@@ -121,9 +126,7 @@ const EditMemberForm = ({
   // here with the same rule. Refresh everything that showed the member (tree,
   // mentor list, team rosters) after a successful delete.
   const deleteBlockedReason =
-    mentees.length > 0
-      ? `Не можна видалити: перепризначте або видаліть менті (${mentees.length})`
-      : null;
+    mentees.length > 0 ? t.deleteBlocked(mentees.length) : null;
 
   const handleDelete = async () => {
     setIsSubmitting(true);
@@ -142,7 +145,7 @@ const EditMemberForm = ({
     }
   };
 
-  const submitLabel = isSubmitting ? "Зберігаємо..." : "Зберегти";
+  const submitLabel = isSubmitting ? tCommon.saving : tCommon.save;
 
   return (
     <form
@@ -163,21 +166,17 @@ const EditMemberForm = ({
       <FormError message={formError} color={color} />
       <FormFooter>
         <ConfirmDeleteControl
-          label="Видалити учасника"
-          title="Видалити учасника?"
-          message={`Учасника «${member.name}» буде видалено разом з його посадами.`}
+          label={t.deleteMember}
+          title={t.deleteMemberTitle}
+          message={t.deleteMemberMessage(dn(member.name))}
           isConfirming={isConfirmingDelete}
           isSubmitting={isSubmitting}
           blockedReason={deleteBlockedReason}
           onAsk={setIsConfirmingDelete}
           onConfirm={handleDelete}
         />
-        <ClearButton
-          isSubmitting={isSubmitting}
-          onClick={onExit}
-          color={color}
-        >
-          Скасувати
+        <ClearButton isSubmitting={isSubmitting} onClick={onExit} color={color}>
+          {tCommon.cancel}
         </ClearButton>
         <SubmitButton
           isSubmitting={isSubmitting}

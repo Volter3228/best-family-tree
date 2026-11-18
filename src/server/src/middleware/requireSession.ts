@@ -1,3 +1,4 @@
+import { errorBody } from "../utils/httpErrors.js";
 import type { NextFunction, Request, Response } from "express";
 import { sessionFromRequest } from "../auth/sessions.js";
 
@@ -10,7 +11,7 @@ export const requireSession = async (
   try {
     const session = await sessionFromRequest(req);
     if (!session) {
-      res.status(401).json({ error: "Sign in required" });
+      res.status(401).json(errorBody("Sign in required", "sign_in_required"));
       return;
     }
     req.session = session;

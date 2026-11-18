@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { matchesQuery } from "@/hooks/data/useSearchSuggestions";
 import type { AccentColor } from "@/types";
+import { useT } from "@/i18n/useT";
 import { formInputClasses } from "../form/inputs/inputClasses";
 
 interface Props<T> {
@@ -43,17 +44,16 @@ const ManageList = <T,>({
   limit = 50,
   color,
 }: Props<T>) => {
+  const t = useT().manage;
   const [query, setQuery] = useState("");
   const colorClasses = COLOR_CLASSES[color];
 
   const matches = useMemo(() => {
     if (!query.trim()) return items;
-    return items.filter((item) =>
-      matchesQuery(
-        getSearchable ? getSearchable(item) : [getTitle(item)],
-        query,
-      ),
-    );
+    return items.filter((item) => {
+      const texts = getSearchable ? getSearchable(item) : [getTitle(item)];
+      return matchesQuery(texts, query);
+    });
   }, [items, query, getSearchable, getTitle]);
 
   const shown = matches.slice(0, limit);
@@ -67,7 +67,7 @@ const ManageList = <T,>({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Пошук"
+            placeholder={t.search}
             aria-label={searchPlaceholder}
             autoComplete="off"
             className={formInputClasses(color, "pl-9")}
@@ -76,7 +76,7 @@ const ManageList = <T,>({
         <button
           type="button"
           onClick={onCreate}
-          aria-label="Створити"
+          aria-label={t.create}
           className={twMerge(
             "flex h-10 w-10 shrink-0 touch-manipulation items-center justify-center gap-1 whitespace-nowrap rounded-full text-sm font-semibold text-white shadow-sm transition-[box-shadow,scale] duration-200 hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:w-auto sm:px-4",
             colorClasses.accentBg,
@@ -84,7 +84,7 @@ const ManageList = <T,>({
           )}
         >
           <PlusIcon className="h-5 w-5 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Створити</span>
+          <span className="hidden sm:inline">{t.create}</span>
         </button>
       </div>
 
@@ -101,7 +101,7 @@ const ManageList = <T,>({
           </p>
         ) : matches.length === 0 ? (
           <p className="px-2 py-6 text-center text-sm text-foreground/60">
-            Нічого не знайдено за «{query.trim()}».
+            {t.nothingFound(query.trim())}
           </p>
         ) : (
           <ul className="flex flex-col">
@@ -142,7 +142,7 @@ const ManageList = <T,>({
 
         {matches.length > shown.length && (
           <p className="px-2 pt-1 text-center text-xs text-foreground/60">
-            Показано {shown.length} з {matches.length} — уточніть пошук
+            {t.showing(shown.length, matches.length)}
           </p>
         )}
       </div>

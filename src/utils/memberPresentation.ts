@@ -3,12 +3,14 @@ import {
   getPhotoUrlAsRoundAvatar,
 } from "@/libs/cloudinary";
 import { Member } from "@/models";
-import type { AccentColor, RecruitmentSeason, RecruitmentTerm } from "@/types";
-
-const RECRUITMENT_SEASON_LABEL: Record<RecruitmentSeason, string> = {
-  spring: "Весна",
-  autumn: "Осінь",
-};
+import type {
+  AccentColor,
+  MemberStatus,
+  RecruitmentSeason,
+  RecruitmentTerm,
+} from "@/types";
+import type { Locale } from "@/i18n/locale";
+import { messages } from "@/i18n/messages";
 
 const RECRUITMENT_SEASON_EMOJI: Record<RecruitmentSeason, string> = {
   spring: "🌸",
@@ -42,9 +44,10 @@ export const getMemberNodeAvatar = (
 
 export const formatRecruitmentTerm = (
   term: RecruitmentTerm,
-  withEmoji = false,
+  withEmoji: boolean,
+  locale: Locale,
 ): string => {
-  const label = `${RECRUITMENT_SEASON_LABEL[term.season]} ${term.year}`;
+  const label = `${messages[locale].filters.seasons[term.season]} ${term.year}`;
   if (!withEmoji) return label;
 
   const emoji = RECRUITMENT_SEASON_EMOJI[term.season];
@@ -53,8 +56,10 @@ export const formatRecruitmentTerm = (
 
 export const formatMemberRecruitmentSeason = (
   member: Member,
-  withEmoji = false,
-): string => formatRecruitmentTerm(member.getRecruitmentTerm(), withEmoji);
+  withEmoji: boolean,
+  locale: Locale,
+): string =>
+  formatRecruitmentTerm(member.getRecruitmentTerm(), withEmoji, locale);
 
 export const getInitials = (name: string): string => {
   const parts = name.trim().split(/\s+/);
@@ -63,3 +68,8 @@ export const getInitials = (name: string): string => {
   const last = parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "";
   return (first + last).toUpperCase();
 };
+
+export const getStatusLabel = (status: MemberStatus, locale: Locale): string =>
+  messages[locale].filters.statuses[
+    status.toLowerCase() as Lowercase<MemberStatus>
+  ];

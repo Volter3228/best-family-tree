@@ -1,3 +1,4 @@
+import { errorBody } from "../utils/httpErrors.js";
 import type { NextFunction, Request, Response } from "express";
 import { hasAccess } from "../auth/access.js";
 import type { AccessRank } from "../auth/types.js";
@@ -5,11 +6,11 @@ import type { AccessRank } from "../auth/types.js";
 export const requireAccess =
   (needed: AccessRank) => (req: Request, res: Response, next: NextFunction) => {
     if (!req.session) {
-      res.status(401).json({ error: "Sign in required" });
+      res.status(401).json(errorBody("Sign in required", "sign_in_required"));
       return;
     }
     if (!hasAccess(req.session, needed)) {
-      res.status(403).json({ error: "Not allowed" });
+      res.status(403).json(errorBody("Not allowed", "not_allowed"));
       return;
     }
     next();

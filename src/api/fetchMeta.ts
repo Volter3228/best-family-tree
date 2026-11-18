@@ -19,8 +19,7 @@ export async function createTeamType(formData: FormData): Promise<TeamType> {
     true,
   );
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
   return res.json();
 }
@@ -35,8 +34,7 @@ export async function updateTeamType(
     true,
   );
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
   return res.json();
 }
@@ -65,8 +63,7 @@ export async function createRole(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
   return res.json();
 }
@@ -81,8 +78,7 @@ export async function updateRole(
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
   return res.json();
 }
@@ -90,8 +86,7 @@ export async function updateRole(
 export async function deleteRole(id: string): Promise<void> {
   const res = await http(ENDPOINTS.deleteRole(id), { method: "DELETE" });
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
 }
 

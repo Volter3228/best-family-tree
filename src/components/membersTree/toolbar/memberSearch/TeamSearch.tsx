@@ -1,7 +1,8 @@
 import { useId, useMemo } from "react";
 import { useSearchSuggestions } from "@/hooks";
 import { useTreeStore } from "@/store/treeStore";
-import { PARTICIPANT_FORMS, formatCount } from "@/utils";
+import { useLocale, useT } from "@/i18n/useT";
+import type { Locale } from "@/i18n/locale";
 import type { TeamFrame } from "@/types";
 import SearchPanel from "./SearchPanel";
 import TeamSuggestionItem from "./TeamSuggestionItem";
@@ -15,16 +16,16 @@ interface Props {
 
 const getSearchable = (frame: TeamFrame) => [frame.name, frame.teamTypeName];
 
-const compare = (a: TeamFrame, b: TeamFrame) =>
-  a.name.localeCompare(b.name, "uk");
-
-const getSubtitle = (frame: TeamFrame) =>
-  formatCount(frame.nodeIds.length, PARTICIPANT_FORMS);
+const compare = (locale: Locale) => (a: TeamFrame, b: TeamFrame) =>
+  a.name.localeCompare(b.name, locale);
 
 // Team view lists each member once per team, so searching by member is
 // ambiguous; the search box finds team frames instead.
 const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
   const listId = useId();
+  const locale = useLocale();
+  const t = useT().search;
+  const compareFrames = useMemo(() => compare(locale), [locale]);
   const teamFrames = useTreeStore((s) => s.teamFrames);
 
   const {
@@ -38,7 +39,7 @@ const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
   } = useSearchSuggestions({
     items: teamFrames,
     getSearchable,
-    compare,
+    compare: compareFrames,
     onSelect: (frame) => {
       onSearch(frame);
       onClose();
@@ -52,7 +53,7 @@ const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
       isOpen={isOpen}
       isClosing={isClosing}
       query={query}
-      placeholder="Пошук команди..."
+      placeholder={t.teams}
       resultCount={suggestions.length}
       listId={listId}
       activeIndex={activeIndex}
@@ -67,7 +68,7 @@ const TeamSearch = ({ isOpen, isClosing, onClose, onSearch }: Props) => {
             key={frame.teamId}
             id={`${listId}-${i}`}
             frame={frame}
-            subtitle={getSubtitle(frame)}
+            subtitle={t.memberCount(frame.nodeIds.length)}
             query={query}
             isActive={i === activeIndex}
             onHover={() => setActiveIndex(i)}

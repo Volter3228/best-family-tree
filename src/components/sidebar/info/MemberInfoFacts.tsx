@@ -1,4 +1,5 @@
 import { differenceInYears, format } from "date-fns";
+import { enUS } from "date-fns/locale";
 import {
   CalendarDateRangeIcon,
   EnvelopeIcon,
@@ -9,7 +10,10 @@ import {
 } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
-import { formatCount, generateGoogleCalendarLink, YEAR_FORMS } from "@/utils";
+import { generateGoogleCalendarLink } from "@/utils";
+import { useLocale, useT } from "@/i18n/useT";
+import { formatCount } from "@/i18n/plural";
+import { useDisplayName } from "@/utils/displayName";
 import type { Member } from "@/models";
 import type { AccentColor } from "@/types";
 import MemberFactTile from "./MemberFactTile";
@@ -32,10 +36,14 @@ interface Tile {
 // "12.03.2020 · 5 років": the date plus the full years elapsed in the accent.
 // Under one full year the years part is omitted entirely.
 const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
+  const t = useT().memberInfo;
+  const locale = useLocale();
   const years = differenceInYears(new Date(), date);
   return (
     <>
-      {format(date, "dd.LL.yyyy")}
+      {locale === "en"
+        ? format(date, "d MMM yyyy", { locale: enUS })
+        : format(date, "dd.LL.yyyy")}
       {years > 0 && (
         <span
           className={twMerge(
@@ -44,7 +52,7 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
           )}
         >
           {" · "}
-          {formatCount(years, YEAR_FORMS)}
+          {formatCount(locale, years, t.years)}
         </span>
       )}
     </>
@@ -58,6 +66,9 @@ const MemberInfoFacts = ({
   onMemberNameClick,
   color = "blue",
 }: Props) => {
+  const t = useT().memberInfo;
+  const locale = useLocale();
+  const dn = useDisplayName();
   const { birthday, joinedAt, phoneNumbers, email } = member;
   const colorClasses = COLOR_CLASSES[color];
 
@@ -67,7 +78,7 @@ const MemberInfoFacts = ({
       key: "mentor",
       render: (fullWidth) => (
         <MemberFactTile
-          label="Ментор"
+          label={t.mentor}
           icon={StarIcon}
           color={color}
           fullWidth={fullWidth}
@@ -82,7 +93,7 @@ const MemberInfoFacts = ({
             )}
           >
             <MemberMiniAvatar member={mentor} size={24} color={color} />
-            <span className="min-w-0">{mentor.name}</span>
+            <span className="min-w-0">{dn(mentor.name)}</span>
           </span>
         </MemberFactTile>
       ),
@@ -92,7 +103,7 @@ const MemberInfoFacts = ({
     key: "joined",
     render: (fullWidth) => (
       <MemberFactTile
-        label="Учасник з"
+        label={t.memberSince}
         icon={UserPlusIcon}
         color={color}
         fullWidth={fullWidth}
@@ -106,17 +117,17 @@ const MemberInfoFacts = ({
       key: "birthday",
       render: (fullWidth) => (
         <MemberFactTile
-          label="День народження"
+          label={t.birthday}
           icon={GiftIcon}
           color={color}
           fullWidth={fullWidth}
           action={
             <a
-              href={generateGoogleCalendarLink(member)}
+              href={generateGoogleCalendarLink(member, locale)}
               target="_blank"
               rel="noopener noreferrer"
-              title="Додати до календаря"
-              aria-label="Додати до календаря"
+              title={t.addToCalendar}
+              aria-label={t.addToCalendar}
               className={twMerge("block h-5 w-5", colorClasses.text)}
             >
               <CalendarDateRangeIcon />
@@ -133,7 +144,7 @@ const MemberInfoFacts = ({
       key: "phone",
       render: (fullWidth) => (
         <MemberFactTile
-          label="Номер"
+          label={t.phone}
           icon={PhoneIcon}
           color={color}
           fullWidth={fullWidth}

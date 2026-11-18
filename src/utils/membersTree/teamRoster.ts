@@ -1,4 +1,6 @@
 import type { Member } from "@/models";
+import type { Locale } from "@/i18n/locale";
+import { displayName } from "../displayName";
 import { getMemberTeamRoles } from "../positions";
 
 export interface TeamRosterEntry {
@@ -7,10 +9,11 @@ export interface TeamRosterEntry {
   isLeader: boolean;
 }
 
-// Everyone with a position in the team, leaders first, then by name.
+// Everyone with a position in the team, leaders first, then by displayed name.
 export const getTeamRoster = (
   members: Member[],
   teamId: string,
+  locale: Locale,
 ): TeamRosterEntry[] => {
   const roster: TeamRosterEntry[] = [];
   for (const member of members) {
@@ -27,6 +30,9 @@ export const getTeamRoster = (
   return roster.sort(
     (a, b) =>
       Number(b.isLeader) - Number(a.isLeader) ||
-      a.member.name.localeCompare(b.member.name, "uk"),
+      displayName(a.member.name, locale).localeCompare(
+        displayName(b.member.name, locale),
+        locale,
+      ),
   );
 };

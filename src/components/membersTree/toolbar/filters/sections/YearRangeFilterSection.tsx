@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { FILTER_INPUT_CLASSES } from "@/constants/filters";
+import { useT } from "@/i18n/useT";
 import FilterSection from "./FilterSection";
 import ClearButton from "./ClearButton";
 import RangeInputs, { type RangeSlot } from "./RangeInputs";
@@ -71,6 +72,7 @@ const YearRangeFilterSection = ({
   disabled = false,
   leading,
 }: Props) => {
+  const t = useT().filters.dates;
   const inputId = useId();
   const { from, to } = value;
 
@@ -90,8 +92,8 @@ const YearRangeFilterSection = ({
         {leading}
         <RangeInputs
           fromId={inputId}
-          fromPlaceholder="Від"
-          toPlaceholder="До"
+          fromPlaceholder={t.from}
+          toPlaceholder={t.to}
           disabled={disabled}
           renderFrom={(slot) => (
             <YearInput

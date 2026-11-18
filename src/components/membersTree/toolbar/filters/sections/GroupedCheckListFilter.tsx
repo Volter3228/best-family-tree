@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import CheckBox from "@/components/ui/CheckBox";
+import { useLocale, useT } from "@/i18n/useT";
+import type { Locale } from "@/i18n/locale";
 import CheckRow from "./CheckRow";
 import SearchField from "./SearchField";
 
@@ -21,7 +23,8 @@ interface Props {
   searchId?: string;
 }
 
-const byName = (a: string, b: string) => a.localeCompare(b, "uk");
+const byName = (locale: Locale) => (a: string, b: string) =>
+  a.localeCompare(b, locale);
 
 // Groups of checkboxes with one tri-state box per group. Groups start collapsed
 // unless they hold a selection. While searching, matches show in every group.
@@ -32,6 +35,8 @@ const GroupedCheckListFilter = ({
   searchPlaceholder,
   searchId,
 }: Props) => {
+  const locale = useLocale();
+  const t = useT().filters.list;
   const [query, setQuery] = useState("");
   // Only groups the user has toggled; the rest follow their selection.
   const [openByKey, setOpenByKey] = useState<Record<string, boolean>>({});
@@ -43,14 +48,14 @@ const GroupedCheckListFilter = ({
   const rows = useMemo(
     () =>
       groups.map((group) => {
-        const names = [...group.options].sort(byName);
+        const names = [...group.options].sort(byName(locale));
         const matches = isSearching
           ? names.filter((n) => n.toLowerCase().includes(trimmed))
           : names;
         const selectedCount = names.filter((n) => selected.includes(n)).length;
         return { ...group, names, matches, selectedCount };
       }),
-    [groups, selected, isSearching, trimmed],
+    [groups, selected, isSearching, trimmed, locale],
   );
 
   const toggleOption = (option: string) => {
@@ -71,7 +76,9 @@ const GroupedCheckListFilter = ({
     );
   };
 
-  const visibleRows = rows.filter((row) => !isSearching || row.matches.length > 0);
+  const visibleRows = rows.filter(
+    (row) => !isSearching || row.matches.length > 0,
+  );
 
   return (
     <div className="flex flex-col gap-1">
@@ -85,7 +92,7 @@ const GroupedCheckListFilter = ({
       )}
 
       {visibleRows.length === 0 && (
-        <p className="py-2 text-sm text-foreground/60">Нічого не знайдено</p>
+        <p className="py-2 text-sm text-foreground/60">{t.nothingFound}</p>
       )}
 
       {visibleRows.map(({ key, label, names, matches, selectedCount }) => {
@@ -99,7 +106,9 @@ const GroupedCheckListFilter = ({
               <button
                 type="button"
                 role="checkbox"
-                aria-checked={allSelected ? true : noneSelected ? false : "mixed"}
+                aria-checked={
+                  allSelected ? true : noneSelected ? false : "mixed"
+                }
                 onClick={() => toggleGroup(names)}
                 className="group flex rounded focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-green"
               >
@@ -112,7 +121,9 @@ const GroupedCheckListFilter = ({
               <button
                 type="button"
                 aria-expanded={open}
-                onClick={() => setOpenByKey((prev) => ({ ...prev, [key]: !open }))}
+                onClick={() =>
+                  setOpenByKey((prev) => ({ ...prev, [key]: !open }))
+                }
                 className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg text-left text-foreground/60 transition-colors duration-150 hover:text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-green"
               >
                 <span className="min-w-0 flex-1 truncate font-medium text-foreground">

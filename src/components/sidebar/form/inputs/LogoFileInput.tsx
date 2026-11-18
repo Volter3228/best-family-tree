@@ -4,8 +4,9 @@ import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "./inputClasses";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
-import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "@/utils/uploadLimit";
+import { exceedsUploadLimit } from "@/utils/uploadLimit";
 
 interface Props {
   onImageSelect: (file: File | null) => void;
@@ -23,9 +24,10 @@ const LogoFileInput = ({
   image,
   initialImage = null,
   color = "blue",
-  label = "Логотип",
+  label,
   showCheckerboard = true,
 }: Props) => {
+  const t = useT().formCommon;
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImage,
   );
@@ -92,15 +94,24 @@ const LogoFileInput = ({
 
   return (
     <div className="flex flex-col items-center gap-2 w-full">
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+      <label className="text-sm font-semibold text-foreground">
+        {label ?? t.logo}
+      </label>
       <div className="relative w-24 h-24">
         <label className="group cursor-pointer relative block w-full h-full rounded-xl overflow-hidden shadow-lg bg-surface">
           {selectedImage ? (
-            <div className={twMerge("absolute inset-0", showCheckerboard && "bg-checkerboard")}>
+            <div
+              className={twMerge(
+                "absolute inset-0",
+                showCheckerboard && "bg-checkerboard",
+              )}
+            >
               <Image
                 src={selectedImage}
-                alt="Logo"
-                className={showCheckerboard ? "object-contain p-2" : "object-cover"}
+                alt={t.logo}
+                className={
+                  showCheckerboard ? "object-contain p-2" : "object-cover"
+                }
                 fill
               />
             </div>
@@ -133,17 +144,22 @@ const LogoFileInput = ({
           <button
             type="button"
             onClick={handleRemoveImage}
-            className={removeBadgeClasses(color, "absolute right-1 top-1 h-6 w-6 p-1")}
-            aria-label="Remove Logo"
+            className={removeBadgeClasses(
+              color,
+              "absolute right-1 top-1 h-6 w-6 p-1",
+            )}
+            aria-label={t.removeLogo}
           >
             <XMarkIcon />
           </button>
         )}
       </div>
       {tooLarge && (
-        <p role="alert" className="max-w-48 text-center text-sm text-red-500">{UPLOAD_TOO_LARGE_MESSAGE}</p>
+        <p role="alert" className="max-w-48 text-center text-sm text-red-500">
+          {t.fileTooLarge}
+        </p>
       )}
-    </div >
+    </div>
   );
 };
 

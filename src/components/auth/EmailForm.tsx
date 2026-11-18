@@ -4,7 +4,7 @@ import { useState } from "react";
 import SubmitButton from "@/components/sidebar/form/buttons/SubmitButton";
 import TextInput from "@/components/sidebar/form/inputs/TextInput";
 import AuthMessage from "./AuthMessage";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 const EMAIL_SHAPE = /^\S+@\S+\.\S+$/;
 
@@ -15,6 +15,7 @@ interface Props {
 }
 
 const EmailForm = ({ initialEmail, onSubmit }: Props) => {
+  const t = useT().auth;
   const [email, setEmail] = useState(initialEmail);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

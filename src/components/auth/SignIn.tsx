@@ -6,12 +6,13 @@ import gsap from "gsap";
 import { QuestionMarkCircleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useSidebarHeightAnimation } from "@/hooks/sidebar/useSidebarHeightAnimation";
 import { LionIcon } from "@/components/icons";
+import LanguageSwitch from "@/components/ui/LanguageSwitch";
 import SegmentedSwitch from "@/components/ui/SegmentedSwitch";
 import { logout } from "@/api/auth";
 import AccountForm from "./AccountForm";
 import AuthMessage from "./AuthMessage";
 import QuestionsForm from "./QuestionsForm";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 type Method = "questions" | "account";
 
@@ -23,7 +24,14 @@ interface Props {
   telegramEnabled?: boolean;
 }
 
-const SignInCard = ({ expired, error, demo = false, googleEnabled = false, telegramEnabled = false }: Props) => {
+const SignInCard = ({
+  expired,
+  error,
+  demo = false,
+  googleEnabled = false,
+  telegramEnabled = false,
+}: Props) => {
+  const t = useT().auth;
   const [method, setMethod] = useState<Method>("account");
   const [struggled, setStruggled] = useState(false);
   const [showExpired] = useState(expired);
@@ -73,6 +81,7 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
 
   return (
     <main className="fixed inset-0 flex overflow-y-auto px-4 py-6">
+      <LanguageSwitch className="fixed right-4 top-4 z-10" />
       <div className="relative m-auto w-full max-w-sm overflow-hidden rounded-2xl bg-surface/80 p-5 shadow-2xl backdrop-blur-xl">
         <div
           aria-hidden
@@ -116,7 +125,9 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
                 value: "questions",
                 label: t.methodQuestions,
                 color: "orange",
-                icon: <QuestionMarkCircleIcon className="h-[18px] w-[18px] shrink-0" />,
+                icon: (
+                  <QuestionMarkCircleIcon className="h-[18px] w-[18px] shrink-0" />
+                ),
               },
             ]}
           />
@@ -143,7 +154,11 @@ const SignInCard = ({ expired, error, demo = false, googleEnabled = false, teleg
               </div>
               {/* Mounted too, so a half-entered code survives a tab switch. */}
               <div hidden={method !== "account"}>
-                <AccountForm onSuccess={handleSuccess} googleEnabled={googleEnabled} telegramEnabled={telegramEnabled} />
+                <AccountForm
+                  onSuccess={handleSuccess}
+                  googleEnabled={googleEnabled}
+                  telegramEnabled={telegramEnabled}
+                />
               </div>
             </div>
           </div>

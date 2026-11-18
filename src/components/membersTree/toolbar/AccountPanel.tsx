@@ -1,6 +1,7 @@
 import { navigateWithSlide } from "@/utils/navigateWithSlide";
 import { logout } from "@/api/auth";
-import { authStrings as t } from "@/components/auth/strings";
+import { useT } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import { useSessionStore } from "@/store/sessionStore";
 import ToolbarPanel from "./ToolbarPanel";
 
@@ -13,6 +14,8 @@ interface Props {
 // Sign-out confirmation. A personal session also shows who is signed in; a
 // questions session is anonymous, so there is nothing to show.
 const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
+  const t = useT().auth;
+  const dn = useDisplayName();
   const session = useSessionStore((s) => s.session);
 
   if (!isOpen || !session) return null;
@@ -20,7 +23,9 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
   const name =
     session.method === "QUESTIONS"
       ? null
-      : (session.member?.name ?? session.email);
+      : session.member
+        ? dn(session.member.name)
+        : session.email;
 
   const signOut = async () => {
     onClose();

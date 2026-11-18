@@ -13,9 +13,7 @@ export const createEmptyPositionRow = (): PositionFormRow => ({
   id: crypto.randomUUID(),
 });
 
-export const getTeamTypeOptions = (
-  teamTypes: TeamType[],
-): DropdownOption[] =>
+export const getTeamTypeOptions = (teamTypes: TeamType[]): DropdownOption[] =>
   teamTypes.map((teamType) => ({
     value: teamType.id,
     text: teamType.name,
@@ -26,10 +24,17 @@ export const getRoleOptions = (
 ): DropdownOption[] =>
   roles.map((role) => ({ value: role.id, text: role.name }));
 
+// The stored role name for a picked option; typed text stays as typed.
+export const resolveRoleName = (
+  roles: { id: string; name: string }[],
+  roleId: string,
+  text: string,
+): string => roles.find((role) => role.id === roleId)?.name ?? text;
+
 // Names of the selected team type's teams, or of every team when none is chosen.
 export const getTeamOptions = (
   teams: Team[],
-  teamTypeId?: string,
+  teamTypeId: string | undefined,
 ): DropdownOption[] =>
   teams
     .filter((team) => !teamTypeId || team.teamTypeId === teamTypeId)
@@ -38,12 +43,15 @@ export const getTeamOptions = (
 export const getPositionRowSummary = (
   row: PositionFormRow,
   teamTypes: TeamType[],
+  newPositionLabel: string,
 ): string => {
-  const title = row.roleName.trim() || "Нова посада";
-  const context =
-    row.teamName?.trim() ||
-    teamTypes.find((teamType) => teamType.id === row.teamTypeId)?.name ||
-    row.organization?.trim();
+  const roleName = row.roleName.trim();
+  const title = roleName ? roleName : newPositionLabel;
+  const teamName = row.teamName?.trim();
+  const typeName = teamTypes.find(
+    (teamType) => teamType.id === row.teamTypeId,
+  )?.name;
+  const context = teamName || typeName || row.organization?.trim();
   const years = formatYearRange({
     start: row.teamStartYear ?? row.startYear,
     end: row.teamEndYear ?? row.endYear,

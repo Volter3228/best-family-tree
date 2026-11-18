@@ -5,14 +5,10 @@ import RolesPane from "./RolesPane";
 import TeamsPane from "./TeamsPane";
 import type { FilterPaneProps } from "./types";
 
-export const FILTER_CATEGORY_LABELS: Record<FilterCategoryKey, string> = {
-  dates: "Дати",
-  member: "Учасник",
-  teams: "Команди",
-  roles: "Посади",
-};
-
-const PANES: Record<FilterCategoryKey, (props: FilterPaneProps) => React.ReactNode> = {
+const PANES: Record<
+  FilterCategoryKey,
+  (props: FilterPaneProps) => React.ReactNode
+> = {
   dates: (props) => <DatesPane {...props} />,
   member: (props) => <MemberPane {...props} />,
   teams: (props) => <TeamsPane {...props} />,

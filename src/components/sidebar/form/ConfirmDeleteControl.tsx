@@ -2,11 +2,12 @@ import { useEffect, useId, useRef } from "react";
 import { InformationCircleIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { twMerge } from "tailwind-merge";
 import Spinner from "@/components/ui/Spinner";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   label: string;
   // Question in the popover header; defaults to "<label>?". A blocked state
-  // always says "Видалити не можна".
+  // always says "Can't delete" (formCommon.cantDelete).
   title?: string;
   message: string;
   isConfirming: boolean;
@@ -35,14 +36,13 @@ const ConfirmDeleteControl = ({
   const titleId = useId();
   const descriptionId = useId();
   const secondaryRef = useRef<HTMLButtonElement>(null);
+  const t = useT().formCommon;
 
   useEffect(() => {
     if (isConfirming) secondaryRef.current?.focus();
   }, [isConfirming]);
 
-  const heading = blockedReason
-    ? "Видалити не можна"
-    : (title ?? `${label}?`);
+  const heading = blockedReason ? t.cantDelete : (title ?? `${label}?`);
 
   return (
     <>
@@ -92,7 +92,10 @@ const ConfirmDeleteControl = ({
               <p id={titleId} className="text-sm font-semibold text-foreground">
                 {heading}
               </p>
-              <p id={descriptionId} className="mt-0.5 text-sm text-foreground/60">
+              <p
+                id={descriptionId}
+                className="mt-0.5 text-sm text-foreground/60"
+              >
                 {blockedReason ?? message}
               </p>
             </div>
@@ -105,7 +108,7 @@ const ConfirmDeleteControl = ({
               disabled={isSubmitting}
               className="h-10 flex-1 rounded-full bg-foreground/5 text-sm font-semibold text-foreground/80 transition-colors hover:bg-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/30 disabled:opacity-50"
             >
-              {blockedReason ? "Зрозуміло" : "Скасувати"}
+              {blockedReason ? t.gotIt : t.cancel}
             </button>
             {!blockedReason && (
               <button
@@ -117,12 +120,12 @@ const ConfirmDeleteControl = ({
                 {isSubmitting ? (
                   <>
                     <Spinner className="h-4 w-4" />
-                    Видаляємо…
+                    {t.deleting}
                   </>
                 ) : (
                   <>
                     <TrashIcon className="h-4 w-4" />
-                    Видалити
+                    {t.delete}
                   </>
                 )}
               </button>

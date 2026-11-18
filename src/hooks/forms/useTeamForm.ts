@@ -9,7 +9,7 @@ import {
 import { useMembersActions } from "../data/useMembers";
 import { useRoles, useTeamTypes, useTeams } from "../data/useMeta";
 import type { TeamFormData, TeamMemberRow } from "@/types";
-import { NO_CHANGES_MESSAGE } from "@/constants/form";
+import { useT } from "@/i18n/useT";
 import {
   EMPTY_TEAM_FORM,
   buildTeamRequestBody,
@@ -42,6 +42,8 @@ export const useTeamForm = ({
   initialMessage,
 }: Options = {}) => {
   const mode: TeamFormMode = teamId ? "edit" : "create";
+  const tCommon = useT().formCommon;
+  const t = useT().teamForm;
   const selectedTeamId = teamId ?? "";
   const [form, setForm] = useState<TeamFormData>(EMPTY_TEAM_FORM);
   const [isLoading, setIsLoading] = useState(Boolean(teamId));
@@ -129,7 +131,12 @@ export const useTeamForm = ({
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validationError = validateTeamForm(form, mode, teamTypes);
+    const validationError = validateTeamForm(
+      form,
+      mode,
+      teamTypes,
+      t.validation,
+    );
     if (validationError) {
       setError(validationError);
       return;
@@ -140,7 +147,7 @@ export const useTeamForm = ({
       isSameTeamForm(form, savedFormRef.current)
     ) {
       setError(null);
-      showSuccess(NO_CHANGES_MESSAGE);
+      showSuccess(tCommon.noChanges);
       return;
     }
 
@@ -166,15 +173,15 @@ export const useTeamForm = ({
         const reloaded = toTeamFormData(await fetchTeamDetails(saved.id));
         savedFormRef.current = reloaded;
         setForm(reloaded);
-        showSuccess("Збережено");
+        showSuccess(tCommon.saved);
         onSaved?.();
       } else {
         resetForm();
-        showSuccess("Створено");
+        showSuccess(tCommon.created);
         onCreated?.(saved.id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save team");
+      setError(err instanceof Error ? err.message : t.saveFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -190,7 +197,7 @@ export const useTeamForm = ({
       await refreshAfterChange();
       onDeleted?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete team");
+      setError(err instanceof Error ? err.message : t.deleteFailed);
     } finally {
       setIsSubmitting(false);
       setIsConfirmingDelete(false);

@@ -1,4 +1,6 @@
-import { SEASON_OPTIONS } from "@/constants/filters";
+import { useMemo } from "react";
+import { getSeasonOptions } from "@/constants/filters";
+import { useLocale, useT } from "@/i18n/useT";
 import { isReducedView, useSessionStore } from "@/store/sessionStore";
 import { FlowerIcon, MapleLeafIcon } from "@/components/icons/season";
 import {
@@ -9,24 +11,36 @@ import {
 import { greenPillIcon } from "../greenPillIcon";
 import type { FilterPaneProps } from "./types";
 
-const SEASON_PILLS = SEASON_OPTIONS.map((option) => ({
-  ...option,
-  icon: greenPillIcon(option.value === "spring" ? FlowerIcon : MapleLeafIcon),
-}));
+const SEASON_ICONS = {
+  spring: greenPillIcon(FlowerIcon),
+  autumn: greenPillIcon(MapleLeafIcon),
+};
 
 const DatesPane = ({ filters, onChange }: FilterPaneProps) => {
+  const locale = useLocale();
+  const t = useT().filters.dates;
+  const seasonPills = useMemo(
+    () =>
+      getSeasonOptions(locale).map((option) => ({
+        ...option,
+        icon: SEASON_ICONS[option.value],
+      })),
+    [locale],
+  );
   // Birthdays are not sent to a questions session, so there is nothing to filter.
   const reduced = useSessionStore((s) => isReducedView(s.session));
   return (
     <>
       <PillGroupFilterSection
-        title="Сезон вступу"
-        options={SEASON_PILLS}
+        title={t.recruitmentSeason}
+        options={seasonPills}
         selected={filters.joinSeasons}
         onChangeSelected={(joinSeasons) => onChange({ joinSeasons })}
       />
       <JoinYearFilterSection filters={filters} onChange={onChange} />
-      {!reduced && <BirthdayFilterSection filters={filters} onChange={onChange} />}
+      {!reduced && (
+        <BirthdayFilterSection filters={filters} onChange={onChange} />
+      )}
     </>
   );
 };

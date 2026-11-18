@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   src: string;
@@ -15,7 +16,10 @@ interface SkeletonProps {
 }
 
 // Placeholder while the photo loads: a muted disc with a slow highlight sweep
-export const AvatarSkeleton = ({ done, roundedClassName = "rounded-full" }: SkeletonProps) => (
+export const AvatarSkeleton = ({
+  done,
+  roundedClassName = "rounded-full",
+}: SkeletonProps) => (
   <div
     aria-hidden
     className="motion-safe:animate-avatar-fade-in absolute inset-0"
@@ -33,6 +37,7 @@ export const AvatarSkeleton = ({ done, roundedClassName = "rounded-full" }: Skel
 );
 
 const MemberAvatarImageInner = ({ src }: Props) => {
+  const t = useT().formCommon;
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const done = loaded || failed;
@@ -42,7 +47,7 @@ const MemberAvatarImageInner = ({ src }: Props) => {
       <AvatarSkeleton done={done} />
       <Image
         src={src}
-        alt="Avatar"
+        alt={t.avatar}
         className={twMerge(
           "rounded-full shadow-lg transition-[opacity,transform] duration-300 ease-out",
           loaded ? "scale-100 opacity-100" : "scale-[0.98] opacity-0",

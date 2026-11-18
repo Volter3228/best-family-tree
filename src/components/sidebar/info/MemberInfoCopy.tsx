@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { CheckIcon, DocumentDuplicateIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   valueToCopy: string;
@@ -18,6 +19,7 @@ const iconBase =
   "absolute inset-0 h-full w-full transition-all duration-300 ease-out";
 
 const MemberInfoCopy = ({ valueToCopy, color = "blue" }: Props) => {
+  const t = useT().memberInfo;
   const colorClasses = COLOR_CLASSES[color];
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -39,8 +41,8 @@ const MemberInfoCopy = ({ valueToCopy, color = "blue" }: Props) => {
     <button
       type="button"
       onClick={handleCopy}
-      title="Копіювати"
-      aria-label={copied ? "Скопійовано" : "Копіювати"}
+      title={t.copy}
+      aria-label={copied ? t.copied : t.copy}
       className={twMerge(
         "relative ml-1 inline-block h-5 w-5 cursor-pointer align-middle",
         colorClasses.text,

@@ -6,7 +6,8 @@ import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { useRoles } from "@/hooks";
 import type { Role } from "@/types";
-import { formatCount, PARTICIPANT_FORMS } from "@/utils/strings";
+import { useLocale, useT } from "@/i18n/useT";
+import { formatCount } from "@/i18n/plural";
 import RoleForm from "../form/role/RoleForm";
 import ManageList from "./ManageList";
 import ManageNotice from "./ManageNotice";
@@ -14,22 +15,21 @@ import { LIST_VIEW, type ManageTabProps } from "./types";
 import { useEditorTitle } from "./useEditorTitle";
 import { useJustCreated } from "./useJustCreated";
 
-const getSubtitle = (role: Role) => {
-  const parts: string[] = [];
-  const count = role.memberCount;
-  if (count !== undefined) parts.push(formatCount(count, PARTICIPANT_FORMS));
-  return parts.join(" · ") || undefined;
-};
-
 const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
+  const t = useT().manage;
+  const locale = useLocale();
   const [roles] = useRoles();
   const [notice, showNotice] = useTransientMessage();
   const { markCreated, messageFor } = useJustCreated(view);
   const sorted = useMemo(
-    () => [...roles].sort((a, b) => a.name.localeCompare(b.name, "uk")),
-    [roles],
+    () => [...roles].sort((a, b) => a.name.localeCompare(b.name, locale)),
+    [roles, locale],
   );
   const colorClasses = COLOR_CLASSES[color];
+  const getSubtitle = (role: Role) =>
+    role.memberCount === undefined
+      ? undefined
+      : formatCount(locale, role.memberCount, t.memberForms);
 
   const editedName =
     view.kind === "edit"
@@ -37,11 +37,7 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
       : "";
   useEditorTitle(
     onTitle,
-    view.kind === "create"
-      ? "Нова посада"
-      : view.kind === "edit"
-        ? editedName
-        : "",
+    view.kind === "create" ? t.newRole : view.kind === "edit" ? editedName : "",
   );
 
   if (view.kind !== "list") {
@@ -56,7 +52,7 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
           go({ kind: "edit", id: role.id });
         }}
         onDeleted={() => {
-          showNotice("Видалено");
+          showNotice(t.deleted);
           go(LIST_VIEW);
         }}
         onCancel={() => go(LIST_VIEW)}
@@ -71,10 +67,11 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
         items={sorted}
         getKey={(r) => r.id}
         getTitle={(r) => r.name}
+        getSearchable={(r) => [r.name]}
         renderTitleSuffix={(r) =>
           r.isLeaderPosition ? (
             <StarIcon
-              aria-label="Лідерська посада"
+              aria-label={t.leaderRole}
               className={twMerge("h-3.5 w-3.5 shrink-0", colorClasses.text)}
             />
           ) : null
@@ -93,8 +90,8 @@ const RolesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
         )}
         onOpen={(r) => go({ kind: "edit", id: r.id })}
         onCreate={() => go({ kind: "create" })}
-        searchPlaceholder="Пошук посади"
-        emptyText="Посад ще немає — створіть першу."
+        searchPlaceholder={t.searchRoles}
+        emptyText={t.noRoles}
         color={color}
       />
     </div>

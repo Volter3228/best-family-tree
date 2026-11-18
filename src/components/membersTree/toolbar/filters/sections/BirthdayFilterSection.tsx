@@ -1,7 +1,9 @@
 import { useId } from "react";
 import DatePicker from "react-datepicker";
+import { enUS, uk } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 import { toDate, fromDate } from "@/utils";
+import { useLocale, useT } from "@/i18n/useT";
 import { FILTER_INPUT_CLASSES } from "@/constants/filters";
 import { MAX_DATE_BIRTHDAY, MIN_DATE_BIRTHDAY } from "@/constants/form";
 import type { FilterState } from "@/types";
@@ -16,6 +18,8 @@ interface Props {
 }
 
 const BirthdayFilterSection = ({ filters, onChange }: Props) => {
+  const locale = useLocale();
+  const t = useT().filters.dates;
   const { birthdayIncludeYear, birthdayFrom, birthdayTo } = filters;
   // Labels the first date field.
   const firstInputId = useId();
@@ -54,6 +58,7 @@ const BirthdayFilterSection = ({ filters, onChange }: Props) => {
 
   // Common datepicker props
   const pickerProps = {
+    locale: locale === "uk" ? uk : enUS,
     dateFormat: fmt,
     autoComplete: "off" as const,
     showYearDropdown: birthdayIncludeYear,
@@ -69,12 +74,12 @@ const BirthdayFilterSection = ({ filters, onChange }: Props) => {
   };
 
   return (
-    <FilterSection title="День народження" htmlFor={firstInputId}>
+    <FilterSection title={t.birthday} htmlFor={firstInputId}>
       <div className="flex flex-col gap-2">
         <RangeInputs
           fromId={firstInputId}
-          fromPlaceholder="Від"
-          toPlaceholder="До"
+          fromPlaceholder={t.from}
+          toPlaceholder={t.to}
           renderFrom={({ id, placeholder }) => (
             <div className="relative">
               <DatePicker
@@ -86,7 +91,9 @@ const BirthdayFilterSection = ({ filters, onChange }: Props) => {
                 className={inputClass(birthdayFrom)}
                 maxDate={toDateObj ?? maxBound}
               />
-              {birthdayFrom && <ClearButton onClick={handleClear("birthdayFrom")} />}
+              {birthdayFrom && (
+                <ClearButton onClick={handleClear("birthdayFrom")} />
+              )}
             </div>
           )}
           renderTo={({ placeholder }) => (
@@ -99,14 +106,16 @@ const BirthdayFilterSection = ({ filters, onChange }: Props) => {
                 className={inputClass(birthdayTo)}
                 minDate={fromDateObj ?? minBound}
               />
-              {birthdayTo && <ClearButton onClick={handleClear("birthdayTo")} />}
+              {birthdayTo && (
+                <ClearButton onClick={handleClear("birthdayTo")} />
+              )}
             </div>
           )}
         />
         <FilterCheckbox
           checked={birthdayIncludeYear}
           onChange={toggleIncludeYear}
-          label="Враховувати рік"
+          label={t.includeYear}
         />
       </div>
     </FilterSection>

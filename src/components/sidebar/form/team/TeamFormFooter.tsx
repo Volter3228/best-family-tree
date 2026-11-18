@@ -1,5 +1,5 @@
 import type { AccentColor } from "@/types";
-import { formatCount, POSITION_FORMS } from "@/utils/strings";
+import { useT } from "@/i18n/useT";
 import { ClearButton, SubmitButton } from "../buttons";
 import ConfirmDeleteControl from "../ConfirmDeleteControl";
 import FormFooter from "../FormFooter";
@@ -18,7 +18,7 @@ interface Props {
 }
 
 // Edit: trash on the left (its confirmation floats above the row). Then the
-// optional "Скасувати" and the primary action. The row never changes shape.
+// optional "Cancel" and the primary action. The row never changes shape.
 const TeamFormFooter = ({
   isEdit,
   formId,
@@ -30,32 +30,45 @@ const TeamFormFooter = ({
   onCancel,
   onAskDelete,
   onDelete,
-}: Props) => (
-  <FormFooter>
-    {isEdit && (
-      <ConfirmDeleteControl
-        label="Видалити команду"
-        title="Видалити команду?"
-        message={
-          positionsCount > 0
-            ? `Команду та ${formatCount(positionsCount, POSITION_FORMS)} її учасників буде видалено.`
-            : "Команду буде видалено."
-        }
-        isConfirming={isConfirmingDelete}
+}: Props) => {
+  const tCommon = useT().formCommon;
+  const t = useT().teamForm;
+  return (
+    <FormFooter>
+      {isEdit && (
+        <ConfirmDeleteControl
+          label={t.deleteTeam}
+          title={t.deleteTitle}
+          message={
+            positionsCount > 0
+              ? t.deleteWithPositions(positionsCount)
+              : t.deleteMessage
+          }
+          isConfirming={isConfirmingDelete}
+          isSubmitting={isSubmitting}
+          onAsk={onAskDelete}
+          onConfirm={onDelete}
+        />
+      )}
+      {onCancel && (
+        <ClearButton
+          isSubmitting={isSubmitting}
+          onClick={onCancel}
+          color={color}
+        >
+          {tCommon.cancel}
+        </ClearButton>
+      )}
+      <SubmitButton
         isSubmitting={isSubmitting}
-        onAsk={onAskDelete}
-        onConfirm={onDelete}
-      />
-    )}
-    {onCancel && (
-      <ClearButton isSubmitting={isSubmitting} onClick={onCancel} color={color}>
-        Скасувати
-      </ClearButton>
-    )}
-    <SubmitButton isSubmitting={isSubmitting} form={formId} color={color} message={success}>
-      {isEdit ? "Зберегти" : "Створити"}
-    </SubmitButton>
-  </FormFooter>
-);
+        form={formId}
+        color={color}
+        message={success}
+      >
+        {isEdit ? tCommon.save : tCommon.create}
+      </SubmitButton>
+    </FormFooter>
+  );
+};
 
 export default TeamFormFooter;

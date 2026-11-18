@@ -3,11 +3,13 @@ import { DEFAULT_SETTINGS, useSettingsStore } from "@/store/settingsStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import ToolbarPanel from "../ToolbarPanel";
 import PanelResetButton from "../PanelResetButton";
+import { LOCALES, type Locale } from "@/i18n/locale";
+import { useLocale, useT } from "@/i18n/useT";
 import {
-  EDGE_STYLE_OPTIONS,
-  ORIENTATION_OPTIONS,
-  THEME_OPTIONS,
-  TREE_MODE_OPTIONS,
+  edgeStyleOptions,
+  orientationOptions,
+  themeOptions,
+  treeModeOptions,
 } from "./settingsOptions";
 
 interface Props {
@@ -31,6 +33,10 @@ const Section = ({ title, children }: SectionProps) => (
 
 // App-wide preferences. Unlike filters, every change applies immediately.
 const SettingsPanel = ({ isOpen, isClosing }: Props) => {
+  const t = useT().settings;
+  const common = useT().common;
+  const locale = useLocale();
+  const setLocale = useSettingsStore((s) => s.setLocale);
   const theme = useSettingsStore((s) => s.theme);
   const orientation = useSettingsStore((s) => s.orientation);
   const edgeStyle = useSettingsStore((s) => s.edgeStyle);
@@ -58,10 +64,10 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
     <ToolbarPanel isClosing={isClosing} className="flex flex-col max-h-[60vh]">
       <div className="flex items-center justify-between px-3 py-2.5">
         <span className="text-base font-semibold text-foreground">
-          Налаштування
+          {t.title}
         </span>
         <PanelResetButton
-          label="Скинути налаштування"
+          label={t.reset}
           disabled={isDefault}
           onClick={handleReset}
         />
@@ -72,39 +78,51 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
           { "--scroll-color": "var(--accent-green)" } as React.CSSProperties
         }
       >
-        <Section title="Розмітка дерева">
+        <Section title={t.layout}>
           <SegmentedSwitch
-            options={TREE_MODE_OPTIONS}
+            options={treeModeOptions(t)}
             value={treeMode}
             onChange={setTreeMode}
-            ariaLabel="Розмітка дерева"
+            ariaLabel={t.layout}
             color="green"
           />
         </Section>
-        <Section title="Тема">
+        <Section title={t.theme}>
           <SegmentedSwitch
-            options={THEME_OPTIONS}
+            options={themeOptions(t)}
             value={theme}
             onChange={setTheme}
-            ariaLabel="Тема"
+            ariaLabel={t.theme}
             color="green"
           />
         </Section>
-        <Section title="Напрям дерев">
+        <Section title={t.direction}>
           <SegmentedSwitch
-            options={ORIENTATION_OPTIONS}
+            options={orientationOptions(t)}
             value={orientation}
             onChange={setOrientation}
-            ariaLabel="Напрям дерев"
+            ariaLabel={t.direction}
             color="green"
           />
         </Section>
-        <Section title="Стиль ліній">
+        <Section title={t.lineStyle}>
           <SegmentedSwitch
-            options={EDGE_STYLE_OPTIONS}
+            options={edgeStyleOptions(t)}
             value={edgeStyle}
             onChange={setEdgeStyle}
-            ariaLabel="Стиль ліній"
+            ariaLabel={t.lineStyle}
+            color="green"
+          />
+        </Section>
+        <Section title={common.language}>
+          <SegmentedSwitch<Locale>
+            options={LOCALES.map((value) => ({
+              value,
+              label: common.languageNames[value],
+            }))}
+            value={locale}
+            onChange={setLocale}
+            ariaLabel={common.language}
             color="green"
           />
         </Section>

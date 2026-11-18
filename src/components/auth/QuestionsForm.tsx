@@ -13,7 +13,7 @@ import type { AccentColor } from "@/types";
 import { focusAboveKeyboard } from "@/utils/focusAboveKeyboard";
 import AuthMessage from "./AuthMessage";
 import QuestionCard from "./QuestionCard";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 const CARD_COLORS: AccentColor[] = ["blue", "green", "orange"];
 
@@ -23,6 +23,7 @@ interface Props {
 }
 
 const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
+  const t = useT().auth;
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
@@ -38,7 +39,7 @@ const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
     } catch {
       setMessage(t.loadFailed);
     }
-  }, []);
+  }, [t.loadFailed]);
 
   // Prefetched on mount so the cards are ready when the tab is opened.
   // The ref keeps StrictMode's double effect from creating two challenges.

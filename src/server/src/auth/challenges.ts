@@ -1,5 +1,9 @@
 import prisma from "../db/prisma/clientInstance.js";
-import { ConflictError, HttpError, NotFoundError } from "../utils/httpErrors.js";
+import {
+  ConflictError,
+  HttpError,
+  NotFoundError,
+} from "../utils/httpErrors.js";
 import { answerMatches } from "./answerMatching.js";
 import {
   CHALLENGE_TTL_MS,
@@ -42,10 +46,13 @@ const toView = async (challenge: {
 
 const loadChallenge = async (id: string) => {
   const challenge = await prisma.signInChallenge.findUnique({ where: { id } });
-  if (!challenge) throw new NotFoundError("Challenge not found");
+  if (!challenge)
+    throw new NotFoundError("Challenge not found", {
+      code: "challenge_not_found",
+    });
   if (isExpired(challenge)) {
     await prisma.signInChallenge.delete({ where: { id } }).catch(() => {});
-    throw new HttpError(410, "Challenge expired");
+    throw new HttpError(410, "Challenge expired", "challenge_expired");
   }
   return challenge;
 };

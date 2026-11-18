@@ -1,10 +1,17 @@
 import { useMemo } from "react";
 import { useMentorsList } from "@/hooks";
+import { useLocale, useT } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import { useMembersStore } from "@/store/membersStore";
 import { collectDescendantIds } from "@/utils/membersTree";
 import { MIN_DATE_JOIN } from "@/constants/form";
-import { STATUS_OPTIONS } from "@/constants/filters";
-import type { AccentColor, DropdownOption, MemberFormData, MemberStatus } from "@/types";
+import { getStatusOptions } from "@/constants/filters";
+import type {
+  AccentColor,
+  DropdownOption,
+  MemberFormData,
+  MemberStatus,
+} from "@/types";
 import { DateInput, DropdownSelectInput } from "../inputs";
 import FormField from "./FormField";
 import SectionHeading from "./SectionHeading";
@@ -19,10 +26,6 @@ interface Props {
   editedMemberId?: string;
 }
 
-const STATUS_DROPDOWN_OPTIONS: DropdownOption[] = STATUS_OPTIONS.map(
-  ({ value, label }) => ({ value, text: label }),
-);
-
 const MemberBestSection = ({
   form,
   setForm,
@@ -31,6 +34,17 @@ const MemberBestSection = ({
   minimal,
   editedMemberId,
 }: Props) => {
+  const t = useT().memberForm;
+  const dn = useDisplayName();
+  const locale = useLocale();
+  const statusOptions: DropdownOption[] = useMemo(
+    () =>
+      getStatusOptions(locale).map(({ value, label }) => ({
+        value,
+        text: label,
+      })),
+    [locale],
+  );
   const mentorsList = useMentorsList();
   const childrenOf = useMembersStore((s) => s.childrenOf);
 
@@ -45,8 +59,8 @@ const MemberBestSection = ({
 
     return mentorsList
       .filter(({ id }) => !excludedIds.has(id))
-      .map(({ id, name }) => ({ text: name, value: id }));
-  }, [mentorsList, editedMemberId, childrenOf]);
+      .map(({ id, name }) => ({ text: dn(name), value: id }));
+  }, [mentorsList, editedMemberId, childrenOf, dn]);
 
   return (
     <section className="flex flex-col gap-3">
@@ -55,7 +69,7 @@ const MemberBestSection = ({
         <FormField error={errors.joinedAt} color={color}>
           <DateInput
             name="joinedAt"
-            label="День вступу"
+            label={t.joinedAt}
             selected={form.joinedAt}
             onChange={(date) => date && setForm({ ...form, joinedAt: date })}
             placeholder="22.10.2017"
@@ -67,10 +81,12 @@ const MemberBestSection = ({
         <FormField error={errors.status} color={color}>
           <DropdownSelectInput
             name="status"
-            label="Статус"
-            options={STATUS_DROPDOWN_OPTIONS}
-            onSelect={(status) => setForm({ ...form, status: status as MemberStatus })}
-            placeholder="Excluded"
+            label={t.status}
+            options={statusOptions}
+            onSelect={(status) =>
+              setForm({ ...form, status: status as MemberStatus })
+            }
+            placeholder={t.status}
             initialValue={form.status || undefined}
             required
             color={color}
@@ -80,10 +96,10 @@ const MemberBestSection = ({
       <FormField error={errors.mentorId} color={color}>
         <DropdownSelectInput
           name="mentor"
-          label="Ментор"
+          label={t.mentor}
           options={mentorOptions}
           onSelect={(mentorId) => setForm({ ...form, mentorId })}
-          placeholder="Ментор Менторовенко"
+          placeholder={t.mentorPlaceholder}
           autoComplete
           required={!minimal}
           initialValue={form.mentorId || undefined}

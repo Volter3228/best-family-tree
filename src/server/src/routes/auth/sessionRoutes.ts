@@ -8,7 +8,7 @@ import {
 } from "../../auth/sessions.js";
 import { SESSION_COOKIE } from "../../auth/config.js";
 import { buildSessionInfo } from "../../auth/sessionInfo.js";
-import { sendRouteError } from "../../utils/httpErrors.js";
+import { sendRouteError, errorBody } from "../../utils/httpErrors.js";
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.get("/auth/me", async (req, res) => {
   try {
     const session = await sessionFromRequest(req);
     if (!session) {
-      res.status(401).json({ error: "Sign in required" });
+      res.status(401).json(errorBody("Sign in required", "sign_in_required"));
       return;
     }
     // Refresh the cookie Max-Age; the DB expiry slid inside findSession.

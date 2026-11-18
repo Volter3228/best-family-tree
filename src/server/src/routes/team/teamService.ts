@@ -1,5 +1,8 @@
 import prisma from "../../db/prisma/clientInstance.js";
-import type { TeamBody, TeamMembersBody } from "../../utils/catalogValidation.js";
+import type {
+  TeamBody,
+  TeamMembersBody,
+} from "../../utils/catalogValidation.js";
 import {
   ConflictError,
   NotFoundError,
@@ -28,7 +31,10 @@ const assertNameFree = async (
   const taken = await tx.team.findFirst({
     where: { name: sameName(name), ...(exceptId && { NOT: { id: exceptId } }) },
   });
-  if (taken) throw new ConflictError("A team with this name already exists");
+  if (taken)
+    throw new ConflictError("A team with this name already exists", undefined, {
+      code: "team_exists",
+    });
 };
 
 const assertOngoingHasStart = (
@@ -36,7 +42,9 @@ const assertOngoingHasStart = (
   startYear: number | null | undefined,
 ) => {
   if (isOngoing && startYear == null) {
-    throw new ValidationError("An ongoing team needs a start year");
+    throw new ValidationError("An ongoing team needs a start year", {
+      code: "team_start_year_required",
+    });
   }
 };
 
@@ -51,7 +59,8 @@ export const getTeamDetails = async (id: string) => {
       },
     },
   });
-  if (!team) throw new NotFoundError("Team not found");
+  if (!team)
+    throw new NotFoundError("Team not found", { code: "team_not_found" });
   return team;
 };
 
@@ -59,7 +68,10 @@ export const createTeam = (body: TeamBody, photoUrl: string | null) =>
   prisma.$transaction(async (tx) => {
     const teamType = await resolveTeamType(tx, body);
     const name = body.name ?? deriveTeamName(teamType, body.startYear);
-    if (!name) throw new ValidationError("Team name is required");
+    if (!name)
+      throw new ValidationError("Team name is required", {
+        code: "team_name_required",
+      });
     await assertNameFree(tx, name);
     assertOngoingHasStart(body.isOngoing, body.startYear);
 
@@ -88,7 +100,8 @@ export const updateTeam = (
 ) =>
   prisma.$transaction(async (tx) => {
     const existing = await tx.team.findUnique({ where: { id } });
-    if (!existing) throw new NotFoundError("Team not found");
+    if (!existing)
+      throw new NotFoundError("Team not found", { code: "team_not_found" });
     if (body.name && body.name.toLowerCase() !== existing.name.toLowerCase()) {
       await assertNameFree(tx, body.name, id);
     }
@@ -109,7 +122,9 @@ export const updateTeam = (
     assertOngoingHasStart(isOngoing, startYear);
     if (isOngoing) endYear = null;
     if (startYear != null && endYear != null && endYear < startYear) {
-      throw new ValidationError("End year must not be before start year");
+      throw new ValidationError("End year must not be before start year", {
+        code: "team_end_before_start",
+      });
     }
 
     const team = await tx.team.update({
@@ -140,7 +155,8 @@ export const updateTeam = (
 export const deleteTeam = (id: string) =>
   prisma.$transaction(async (tx) => {
     const team = await tx.team.findUnique({ where: { id } });
-    if (!team) throw new NotFoundError("Team not found");
+    if (!team)
+      throw new NotFoundError("Team not found", { code: "team_not_found" });
 
     await tx.memberPosition.deleteMany({ where: { teamId: id } });
     await tx.team.delete({ where: { id } });
@@ -158,11 +174,13 @@ export const syncTeamMembers = (
 ) =>
   prisma.$transaction(async (tx) => {
     const team = await tx.team.findUnique({ where: { id } });
-    if (!team) throw new NotFoundError("Team not found");
+    if (!team)
+      throw new NotFoundError("Team not found", { code: "team_not_found" });
 
     const memberIds = [...new Set(body.members.map((row) => row.memberId))];
     const found = await tx.member.count({ where: { id: { in: memberIds } } });
-    if (found !== memberIds.length) throw new ValidationError("Unknown member");
+    if (found !== memberIds.length)
+      throw new ValidationError("Unknown member", { code: "member_unknown" });
 
     const desired = new Map<string, { memberId: string; roleId: string }>();
     for (const row of body.members) {

@@ -3,6 +3,8 @@ import { canEdit, useSessionStore } from "@/store/sessionStore";
 import type { useSidebar } from "@/hooks";
 import { formatMemberRecruitmentSeason, getMemberSeasonAccent } from "@/utils";
 import { Member } from "@/models";
+import { useLocale, useT } from "@/i18n/useT";
+import { useDisplayName } from "@/utils/displayName";
 import type { AccentColor } from "@/types";
 import Sidebar, { MemberSidebarContent } from "../sidebar";
 import HeaderChip from "../sidebar/HeaderChip";
@@ -27,6 +29,9 @@ const MemberSidebar = ({
   onFocusMemberInTeam,
   onOpenTeamInfo,
 }: Props) => {
+  const t = useT().sidebar;
+  const dn = useDisplayName();
+  const locale = useLocale();
   const editable = useSessionStore((s) => canEdit(s.session, member?.id));
   const isInfo = state.sidebarMode === "info";
   const color: AccentColor =
@@ -40,7 +45,7 @@ const MemberSidebar = ({
         member &&
         !isInfo && (
           <HeaderChip icon={PencilIcon} color={color}>
-            Редагувати: {member.name}
+            {t.editing(dn(member.name))}
           </HeaderChip>
         )
       }
@@ -55,8 +60,8 @@ const MemberSidebar = ({
       minimizedSummary={
         member && (
           <SidebarMinimizedSummary
-            title={member.name}
-            subtitle={formatMemberRecruitmentSeason(member, true)}
+            title={dn(member.name)}
+            subtitle={formatMemberRecruitmentSeason(member, true, locale)}
           />
         )
       }

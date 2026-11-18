@@ -32,7 +32,10 @@ const savePhoneNumbers = async (
   if (phoneNumbers.length === 0) return;
 
   await tx.phoneNumber.createMany({
-    data: phoneNumbers.map((phoneNumber) => ({ phoneNumber, ownerId: memberId })),
+    data: phoneNumbers.map((phoneNumber) => ({
+      phoneNumber,
+      ownerId: memberId,
+    })),
   });
 };
 
@@ -48,7 +51,12 @@ const assertNoMentorCycle = async (
 
   while (currentId && !visited.has(currentId)) {
     if (currentId === memberId) {
-      throw new ValidationError("A member can not be mentored by themself or by one of their mentees");
+      throw new ValidationError(
+        "A member can not be mentored by themself or by one of their mentees",
+        {
+          code: "mentor_cycle",
+        },
+      );
     }
     visited.add(currentId);
     const current: { mentorId: string | null } | null =
@@ -65,7 +73,8 @@ const assertMentorExists = async (tx: MemberTransaction, mentorId: string) => {
     where: { id: mentorId },
     select: { id: true },
   });
-  if (!mentor) throw new ValidationError("Mentor not found");
+  if (!mentor)
+    throw new ValidationError("Mentor not found", { code: "mentor_not_found" });
 };
 
 /** Email and social links must belong to at most one member. */
@@ -87,8 +96,9 @@ const assertUniqueContacts = async (
   const platform = findContactCollision(data, others);
   if (platform) {
     throw new ConflictError(
-      `${contactLabel(platform)} належить іншому учаснику`,
+      `${contactLabel(platform)} belongs to another member`,
       contactField(platform),
+      { code: "contact_taken", params: { platform } },
     );
   }
 };
@@ -106,7 +116,9 @@ export const assertCanEditMembers = async (
   const granted = new Set(grants.map((g) => g.memberId));
   for (const id of memberIds) {
     if (!canEditMember(session, { id, hasGrant: granted.has(id) })) {
-      throw new ForbiddenError("Only an admin can edit this member");
+      throw new ForbiddenError("Only an admin can edit this member", {
+        code: "admin_only_member",
+      });
     }
   }
 };
@@ -170,7 +182,8 @@ export const updateMember = async (
 export const deleteMember = (memberId: string) =>
   prisma.$transaction(async (tx) => {
     const member = await tx.member.findUnique({ where: { id: memberId } });
-    if (!member) throw new NotFoundError("Member not found");
+    if (!member)
+      throw new NotFoundError("Member not found", { code: "member_not_found" });
 
     assertNoMentees(await tx.member.count({ where: { mentorId: memberId } }));
 

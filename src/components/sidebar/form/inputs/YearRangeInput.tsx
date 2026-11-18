@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { formInputClasses } from "./inputClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 import FormCheckbox from "./FormCheckbox";
 import InputLabel from "./InputLabel";
@@ -30,12 +31,13 @@ const YearRangeInput = ({
   onChange,
   min = 1990,
   max = new Date().getFullYear() + 1,
-  startLabel = "Початок",
-  endLabel = "Кінець",
+  startLabel,
+  endLabel,
   ongoing = false,
   onOngoingChange,
   color = "blue",
 }: Props) => {
+  const t = useT().formCommon;
   const inputClassName = formInputClasses(
     color,
     "disabled:cursor-not-allowed disabled:opacity-60",
@@ -65,7 +67,7 @@ const YearRangeInput = ({
   const fields = [
     {
       id: "start",
-      label: startLabel,
+      label: startLabel ?? t.start,
       value: start,
       isDisabled: false,
       onChange: handleStart,
@@ -73,7 +75,7 @@ const YearRangeInput = ({
     },
     {
       id: "end",
-      label: endLabel,
+      label: endLabel ?? t.end,
       value: ongoing ? undefined : end,
       isDisabled: ongoing,
       onChange: handleEnd,
@@ -94,34 +96,34 @@ const YearRangeInput = ({
                 –
               </span>
             )}
-          <div className="flex min-w-0 flex-1 flex-col">
-            <InputLabel
-              label={field.label}
-              htmlFor={`${name}-${field.id}`}
-              required={false}
-              color={color}
-            />
-            <input
-              id={`${name}-${field.id}`}
-              name={`${name}-${field.id}`}
-              type="number"
-              min={min}
-              max={max}
-              value={field.value ?? ""}
-              placeholder={field.isDisabled ? "..." : String(max - 1)}
-              disabled={field.isDisabled}
-              onChange={(event) => field.onChange(event.target.value)}
-              onBlur={field.onBlur}
-              className={inputClassName}
-            />
-          </div>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <InputLabel
+                label={field.label}
+                htmlFor={`${name}-${field.id}`}
+                required={false}
+                color={color}
+              />
+              <input
+                id={`${name}-${field.id}`}
+                name={`${name}-${field.id}`}
+                type="number"
+                min={min}
+                max={max}
+                value={field.value ?? ""}
+                placeholder={field.isDisabled ? "..." : String(max - 1)}
+                disabled={field.isDisabled}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={field.onBlur}
+                className={inputClassName}
+              />
+            </div>
           </Fragment>
         ))}
       </div>
       {onOngoingChange && (
         <FormCheckbox
           checked={ongoing}
-          label="Триває зараз"
+          label={t.ongoingNow}
           color={color}
           onChange={onOngoingChange}
         />

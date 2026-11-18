@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { useTeamForm } from "@/hooks/forms";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 import TeamFormContent from "./TeamFormContent";
 
@@ -44,6 +45,7 @@ const TeamForm = ({
     removeMemberRow,
   } = useTeamForm({ teamId, onCreated, onSaved, onDeleted, initialMessage });
   const formId = useId();
+  const t = useT().formCommon;
 
   return (
     <form
@@ -53,7 +55,7 @@ const TeamForm = ({
       noValidate
     >
       {isLoading ? (
-        <p className="text-sm text-foreground/60">Завантажуємо...</p>
+        <p className="text-sm text-foreground/60">{t.loading}</p>
       ) : (
         <TeamFormContent
           mode={mode}

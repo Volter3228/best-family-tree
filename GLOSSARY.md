@@ -23,7 +23,7 @@ A baby who applied for and received full membership. Full members and alumni can
 _Avoid_: Active member
 
 **Alumnus**:
-A full member who retired from the organisation.
+A full member who retired from the organisation. The UI label for this status is "Alumni".
 _Avoid_: Former member, ex-member
 
 **Activity state**:
@@ -35,7 +35,7 @@ A full member (or alumnus) who guides newer members. Mentorship forms the family
 _Avoid_: Parent, supervisor
 
 **Mentee**:
-A member guided by a mentor.
+A member guided by a mentor. Listed under "Mentees" in English.
 _Avoid_: Child, newbie
 
 **Sparse record**:
@@ -52,16 +52,16 @@ _Avoid_: Required fields (adding a new member still requires them)
 A named group of members, optionally limited to a period.
 
 **Team type**:
-A category of teams (for example a project, a board, an event kind) with its own colour and icon.
+A category of teams (for example a project, a board, an event kind) with its own colour and icon. Its kind is Event or Other; the non-event kind is labelled "Other" in English.
 
 **Event**:
 A team type that happens at a point in time rather than continuously. When it has no own name it is called "<type> <start year>".
 
 **Role**:
-What a member does in a team, for example leader. Shown in the UI as «Посада» (plural «Посади»); the code keeps `Role`.
+What a member does in a team, for example leader. Shown in the UI as «Посада» (plural «Посади») in Ukrainian and "Role" in English; the code keeps `Role`.
 
 **Position**:
-One member holding one role in one team (or organisation) for a period.
+One member holding one role in one team (or organisation) for a period. Shown as "Position" in English.
 _Avoid_: Membership, assignment
 
 ## Views
@@ -124,3 +124,13 @@ _Avoid_: OTP, PIN, token
 **Demo mode**:
 A deployment switch (`DEMO_MODE=true`) for the public showcase, run on an anonymized copy of the data. Anyone can sign in: the questions are easy and any email address gets a code, which makes them an Editor. Every edit is refused ("У демо зміни не зберігаються"), so nothing changes.
 _Avoid_: Sandbox (edits are refused, not kept in the browser), test mode
+
+## Language
+
+**Locale**:
+The UI language, `uk` or `en`, chosen by the user. Defaults from the browser and is stored in a cookie.
+_Avoid_: Lang, i18n
+
+**Display name**:
+A member name or family group name as shown to the user. In English a member name is romanized from Ukrainian by the official 2010 transliteration; family groups have fixed English names. Team, team type and role names are catalog entries and are shown exactly as stored in both languages. The stored name always stays Ukrainian.
+_Avoid_: Transliteration, English name

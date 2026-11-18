@@ -4,6 +4,7 @@ import {
   FacebookIcon,
   LinkedinIcon,
 } from "@/components/icons/social";
+import { useT } from "@/i18n/useT";
 import type { MemberFormData, AccentColor } from "@/types";
 import TextInput from "../inputs/TextInput";
 import FormField from "./FormField";
@@ -22,9 +23,10 @@ const SocialMediaFormFields = ({
   errors,
   color = "blue",
 }: Props) => {
+  const t = useT().memberForm;
   return (
     <section className="flex flex-col gap-3">
-      <SectionHeading title="Соцмережі" color={color} />
+      <SectionHeading title={t.socials} color={color} />
       <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
         <FormField error={errors.telegramLink} color={color}>
           <TextInput

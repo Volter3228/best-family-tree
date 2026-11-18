@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { InformationCircleIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   children: React.ReactNode;
@@ -24,7 +25,8 @@ interface Pos {
 /** Small (i) button; click or tap opens a bubble with the text above it.
  * The bubble is portalled to <body> with fixed coordinates, so no parent's
  * overflow or stacking context can clip or cover it. */
-const InfoBubble = ({ children, label = "Інформація", className }: Props) => {
+const InfoBubble = ({ children, label, className }: Props) => {
+  const t = useT().ui;
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<Pos | null>(null);
@@ -76,7 +78,7 @@ const InfoBubble = ({ children, label = "Інформація", className }: Pro
     <span ref={ref} className={twMerge("relative inline-flex", className)}>
       <button
         type="button"
-        aria-label={label}
+        aria-label={label ?? t.infoLabel}
         aria-expanded={open}
         onClick={toggle}
         className="rounded-full text-accent-blue transition-opacity hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60"

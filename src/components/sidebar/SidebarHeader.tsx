@@ -6,6 +6,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { twMerge } from "tailwind-merge";
+import { useT } from "@/i18n/useT";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { SidebarMode, AccentColor } from "@/types";
 
@@ -39,6 +40,7 @@ const SidebarHeader = ({
   onEditClick,
   onBackClick,
 }: Props) => {
+  const t = useT().sidebar;
   const colorClasses = COLOR_CLASSES[color];
 
   return (
@@ -61,7 +63,7 @@ const SidebarHeader = ({
           <button
             onClick={onBackClick}
             className={twMerge(colorClasses.text, iconButton)}
-            title="Назад"
+            title={t.back}
           >
             <ArrowLeftIcon className="h-5 w-5" />
           </button>
@@ -81,7 +83,7 @@ const SidebarHeader = ({
           type="button"
           onClick={onExpand}
           className="min-w-0 flex-1 text-left md:hidden"
-          aria-label="Розгорнути"
+          aria-label={t.expand}
         >
           {minimizedSummary}
         </button>
@@ -91,7 +93,7 @@ const SidebarHeader = ({
           <button
             onClick={onExpand}
             className={twMerge(colorClasses.text, iconButton, "md:hidden")}
-            title="Розгорнути"
+            title={t.expand}
           >
             <ChevronUpIcon className="h-5 w-5" />
           </button>
@@ -104,7 +106,7 @@ const SidebarHeader = ({
               iconButton,
               isMinimized && "max-md:hidden",
             )}
-            title="Редагувати"
+            title={t.edit}
           >
             <PencilIcon className="h-5 w-5" />
           </button>
@@ -112,7 +114,7 @@ const SidebarHeader = ({
         <button
           onClick={onClose}
           className={twMerge(colorClasses.text, iconButton)}
-          title="Закрити"
+          title={t.close}
         >
           <XMarkIcon className="h-5 w-5" />
         </button>

@@ -5,6 +5,7 @@ import {
   MagnifyingGlassPlusIcon,
   XMarkIcon,
 } from "@heroicons/react/16/solid";
+import { useT } from "@/i18n/useT";
 
 // Theme tokens: dark glass on dark themes, light glass with dark text on light ones.
 export const GLASS =
@@ -18,22 +19,25 @@ interface HeaderProps {
   onClose: () => void;
 }
 
-export const ViewerHeader = ({ alt, closeBtnRef, onClose }: HeaderProps) => (
-  <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))]">
-    <span className={`rounded-full px-3 py-1.5 text-sm ${GLASS}`}>{alt}</span>
-    <div className="pointer-events-auto">
-      <button
-        ref={closeBtnRef}
-        type="button"
-        aria-label="Закрити"
-        onClick={onClose}
-        className={`${BUTTON} ${GLASS}`}
-      >
-        <XMarkIcon className="h-5 w-5" />
-      </button>
+export const ViewerHeader = ({ alt, closeBtnRef, onClose }: HeaderProps) => {
+  const t = useT().photoViewer;
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      <span className={`rounded-full px-3 py-1.5 text-sm ${GLASS}`}>{alt}</span>
+      <div className="pointer-events-auto">
+        <button
+          ref={closeBtnRef}
+          type="button"
+          aria-label={t.close}
+          onClick={onClose}
+          className={`${BUTTON} ${GLASS}`}
+        >
+          <XMarkIcon className="h-5 w-5" />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface ToolbarProps {
   toolbarRef: Ref<HTMLDivElement>;
@@ -52,43 +56,46 @@ export const ViewerToolbar = ({
   interactive,
   onStep,
   onReset,
-}: ToolbarProps) => (
-  <div
-    ref={toolbarRef}
-    className="pointer-events-none absolute inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] flex justify-center"
-  >
+}: ToolbarProps) => {
+  const t = useT().photoViewer;
+  return (
     <div
-      className={`flex items-center gap-1 rounded-full p-1 ${GLASS} ${interactive ? "pointer-events-auto" : "pointer-events-none"}`}
+      ref={toolbarRef}
+      className="pointer-events-none absolute inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] flex justify-center"
     >
-      <button
-        type="button"
-        aria-label="Зменшити"
-        onClick={() => onStep(-1)}
-        className={BUTTON}
+      <div
+        className={`flex items-center gap-1 rounded-full p-1 ${GLASS} ${interactive ? "pointer-events-auto" : "pointer-events-none"}`}
       >
-        <MagnifyingGlassMinusIcon className="h-5 w-5" />
-      </button>
-      <span className="min-w-12 text-center text-sm tabular-nums">
-        {Math.round(scale * 100)}%
-      </span>
-      <button
-        type="button"
-        aria-label="Збільшити"
-        onClick={() => onStep(1)}
-        className={BUTTON}
-      >
-        <MagnifyingGlassPlusIcon className="h-5 w-5" />
-      </button>
-      {scaled && (
         <button
           type="button"
-          aria-label="Скинути масштаб"
-          onClick={onReset}
+          aria-label={t.zoomOut}
+          onClick={() => onStep(-1)}
           className={BUTTON}
         >
-          <ArrowsPointingInIcon className="h-5 w-5" />
+          <MagnifyingGlassMinusIcon className="h-5 w-5" />
         </button>
-      )}
+        <span className="min-w-12 text-center text-sm tabular-nums">
+          {Math.round(scale * 100)}%
+        </span>
+        <button
+          type="button"
+          aria-label={t.zoomIn}
+          onClick={() => onStep(1)}
+          className={BUTTON}
+        >
+          <MagnifyingGlassPlusIcon className="h-5 w-5" />
+        </button>
+        {scaled && (
+          <button
+            type="button"
+            aria-label={t.resetZoom}
+            onClick={onReset}
+            className={BUTTON}
+          >
+            <ArrowsPointingInIcon className="h-5 w-5" />
+          </button>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};

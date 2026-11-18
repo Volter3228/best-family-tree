@@ -1,9 +1,11 @@
 import DatePicker from "react-datepicker";
+import { enUS, uk } from "date-fns/locale";
 import { CalendarDaysIcon } from "@heroicons/react/16/solid";
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { formInputClasses } from "./inputClasses";
+import { useLocale } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 
 interface Props {
@@ -34,6 +36,7 @@ const DateInput = ({
   color = "blue",
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const locale = useLocale();
 
   return (
     <div className="transition-all">
@@ -48,6 +51,7 @@ const DateInput = ({
         name={name}
         onChange={onChange}
         selected={selected}
+        locale={locale === "uk" ? uk : enUS}
         dateFormat={["dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy"]}
         showYearDropdown
         yearDropdownItemNumber={40}

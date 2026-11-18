@@ -5,6 +5,8 @@ import {
   MemberStatus,
   ActivityState,
 } from "@/types";
+import type { Locale } from "@/i18n/locale";
+import { messages } from "@/i18n/messages";
 
 export const MEMBER_STATUSES: MemberStatus[] = [
   MemberStatus.Observer,
@@ -43,29 +45,41 @@ export const EMPTY_FILTER_STATE: FilterState = {
   teamOnlyOngoing: false,
 };
 
-// Checkbox groups filter sections options
-export const SEASON_OPTIONS: { value: RecruitmentSeason; label: string }[] = [
-  { value: "spring", label: "Весна" },
-  { value: "autumn", label: "Осінь" },
-];
+// Checkbox groups filter sections options. The constants carry the Ukrainian
+// labels; use the getters to follow the current locale.
+const buildOptions = (locale: Locale) => {
+  const t = messages[locale].filters;
+  return {
+    seasons: [
+      { value: "spring", label: t.seasons.spring },
+      { value: "autumn", label: t.seasons.autumn },
+    ] as { value: RecruitmentSeason; label: string }[],
+    statuses: [
+      { value: MemberStatus.Observer, label: t.statuses.observer },
+      { value: MemberStatus.Baby, label: t.statuses.baby },
+      { value: MemberStatus.Full, label: t.statuses.full },
+      { value: MemberStatus.Alumni, label: t.statuses.alumni },
+    ] as { value: MemberStatus; label: string }[],
+    genders: [
+      { value: Gender.Male, label: t.genders.male },
+      { value: Gender.Female, label: t.genders.female },
+    ] as { value: Gender; label: string }[],
+    activity: [
+      { value: ActivityState.Active, label: t.activity.active },
+      { value: ActivityState.Inactive, label: t.activity.inactive },
+      { value: ActivityState.Excluded, label: t.activity.excluded },
+    ] as { value: ActivityState; label: string }[],
+  };
+};
 
-export const STATUS_OPTIONS: { value: MemberStatus; label: string }[] = [
-  { value: MemberStatus.Observer, label: "Observer" },
-  { value: MemberStatus.Baby, label: "Baby" },
-  { value: MemberStatus.Full, label: "Full" },
-  { value: MemberStatus.Alumni, label: "Alumni" },
-];
-
-export const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-  { value: Gender.Male, label: "Чоловіча" },
-  { value: Gender.Female, label: "Жіноча" },
-];
-
-export const ACTIVITY_OPTIONS: { value: ActivityState; label: string }[] = [
-  { value: ActivityState.Active, label: "Active" },
-  { value: ActivityState.Inactive, label: "Inactive" },
-  { value: ActivityState.Excluded, label: "Excluded" },
-];
+export const getSeasonOptions = (locale: Locale) =>
+  buildOptions(locale).seasons;
+export const getStatusOptions = (locale: Locale) =>
+  buildOptions(locale).statuses;
+export const getGenderOptions = (locale: Locale) =>
+  buildOptions(locale).genders;
+export const getActivityOptions = (locale: Locale) =>
+  buildOptions(locale).activity;
 
 // Styles
 // One look for every text field in the filters panel. Callers add pl-9 (search

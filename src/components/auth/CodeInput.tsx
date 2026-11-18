@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
 import { applyDigits, backspaceAt, CODE_LENGTH } from "./codeDigits";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 // Two boxes per brand colour, like the pairs in the email.
 const PAIR_COLORS: AccentColor[] = ["blue", "green", "orange"];
@@ -18,6 +18,7 @@ interface Props {
 }
 
 const CodeInput = ({ digits, onChange, onEnter, disabled }: Props) => {
+  const t = useT().auth;
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
   const focus = (index: number) => refs.current[index]?.focus();

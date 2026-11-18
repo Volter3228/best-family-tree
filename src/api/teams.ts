@@ -1,11 +1,11 @@
 import { http } from "@/libs/http";
+import { toApiError } from "./ApiError";
 import { ENDPOINTS } from "@/constants/endpoints";
 import type { Team, TeamDetails } from "@/types";
 
 const parse = async <T>(res: Response): Promise<T> => {
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.error || `HTTP Error! Status: ${res.status}`);
+    throw await toApiError(res);
   }
   return res.status === 204 ? (undefined as T) : res.json();
 };
@@ -15,11 +15,7 @@ export const fetchTeamDetails = async (id: string) =>
 
 export const createTeam = async (formData: FormData) =>
   parse<Team>(
-    await http(
-      ENDPOINTS.createTeam,
-      { method: "POST", body: formData },
-      true,
-    ),
+    await http(ENDPOINTS.createTeam, { method: "POST", body: formData }, true),
   );
 
 export const updateTeam = async (id: string, formData: FormData) =>

@@ -2,19 +2,21 @@ import { useId, useState } from "react";
 import { CheckIcon, PlusIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
+import type { Messages } from "@/i18n/messages";
 import type { AccentColor } from "@/types";
 import ColorPickerPanel from "./ColorPickerPanel";
 
-const PRESETS = [
-  { value: "#f97316", name: "Помаранчевий" },
-  { value: "#ef4444", name: "Червоний" },
-  { value: "#eab308", name: "Жовтий" },
-  { value: "#22c55e", name: "Зелений" },
-  { value: "#14b8a6", name: "Бірюзовий" },
-  { value: "#0ea5e9", name: "Блакитний" },
-  { value: "#6366f1", name: "Індиго" },
-  { value: "#a855f7", name: "Фіолетовий" },
-] as const;
+const PRESETS: { value: string; name: keyof Messages["ui"]["colorNames"] }[] = [
+  { value: "#f97316", name: "orange" },
+  { value: "#ef4444", name: "red" },
+  { value: "#eab308", name: "yellow" },
+  { value: "#22c55e", name: "green" },
+  { value: "#14b8a6", name: "teal" },
+  { value: "#0ea5e9", name: "sky" },
+  { value: "#6366f1", name: "indigo" },
+  { value: "#a855f7", name: "purple" },
+];
 
 const FALLBACK = "#6366f1";
 
@@ -30,7 +32,8 @@ const swatchBase =
   "relative flex h-8 w-8 items-center justify-center rounded-full transition-transform duration-150 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 // Preset swatches plus a "custom" swatch that expands an inline picker.
-const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: Props) => {
+const ColorField = ({ value, onChange, color = "blue", label }: Props) => {
+  const t = useT().ui;
   const colorClasses = COLOR_CLASSES[color];
   const isPreset = PRESETS.some((p) => p.value === value);
   const isCustom = !!value && !isPreset;
@@ -44,7 +47,7 @@ const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: P
     <div className="flex w-full flex-col">
       <div className="mb-1.5 flex items-center justify-between">
         <span id={labelId} className="text-sm font-semibold text-foreground">
-          {label}
+          {label ?? t.colorLabel}
         </span>
         {value && (
           <button
@@ -60,7 +63,7 @@ const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: P
               colorClasses.focusVisibleRingSoft,
             )}
           >
-            Скинути
+            {t.reset}
           </button>
         )}
       </div>
@@ -77,11 +80,17 @@ const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: P
               type="button"
               role="radio"
               aria-checked={selected}
-              aria-label={preset.name}
-              title={preset.name}
+              aria-label={t.colorNames[preset.name]}
+              title={t.colorNames[preset.name]}
               onClick={() => onChange(preset.value)}
-              className={twMerge(swatchBase, selected && "ring-2 ring-offset-2 ring-offset-surface")}
-              style={{ backgroundColor: preset.value, ...(selected ? ringStyle(preset.value) : {}) }}
+              className={twMerge(
+                swatchBase,
+                selected && "ring-2 ring-offset-2 ring-offset-surface",
+              )}
+              style={{
+                backgroundColor: preset.value,
+                ...(selected ? ringStyle(preset.value) : {}),
+              }}
             >
               {selected && <CheckIcon className="h-4 w-4 text-white" />}
             </button>
@@ -90,10 +99,13 @@ const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: P
         <button
           type="button"
           aria-expanded={open}
-          aria-label="Свій колір"
-          title="Свій колір"
+          aria-label={t.customColor}
+          title={t.customColor}
           onClick={() => setOpen((o) => !o)}
-          className={twMerge(swatchBase, isCustom && "ring-2 ring-offset-2 ring-offset-surface")}
+          className={twMerge(
+            swatchBase,
+            isCustom && "ring-2 ring-offset-2 ring-offset-surface",
+          )}
           style={
             isCustom
               ? { backgroundColor: value, ...ringStyle(value) }
@@ -118,7 +130,11 @@ const ColorField = ({ value, onChange, color = "blue", label = "Колір" }: P
       >
         <div className="overflow-hidden" inert={!open}>
           <div className="pt-3">
-            <ColorPickerPanel value={value ?? FALLBACK} onChange={onChange} color={color} />
+            <ColorPickerPanel
+              value={value ?? FALLBACK}
+              onChange={onChange}
+              color={color}
+            />
           </div>
         </div>
       </div>

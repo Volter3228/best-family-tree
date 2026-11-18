@@ -6,9 +6,6 @@ export const MAX_DATE_BIRTHDAY = endOfYear(subYears(new Date(), 16));
 export const MIN_DATE_BIRTHDAY = new Date(1980, 0, 1);
 export const MIN_DATE_JOIN = new Date(2002, 0, 1);
 
-/* Shown instead of sending an edit that changes nothing. */
-export const NO_CHANGES_MESSAGE = "Немає змін";
-
 export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   firstName: "",
   lastName: "",

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { useTeams, useTeamTypes } from "@/hooks";
 import type { Team, TeamType } from "@/types";
+import { useLocale, useT } from "@/i18n/useT";
 import TeamForm from "../form/team/TeamForm";
 import TeamTile from "../form/team/TeamTile";
 import ManageList from "./ManageList";
@@ -18,10 +19,10 @@ const groupRank = (team: Team, type: TeamType | null) =>
   team.isOngoing ? (type?.isEvent ? 0 : 1) : 2;
 
 // Newest period first (start, then end); the type never groups the list.
-const byPeriodDesc = (a: Team, b: Team) =>
+const byPeriodDesc = (a: Team, b: Team, locale: string) =>
   (b.startYear ?? 0) - (a.startYear ?? 0) ||
   (b.endYear ?? 0) - (a.endYear ?? 0) ||
-  a.name.localeCompare(b.name, "uk");
+  a.name.localeCompare(b.name, locale);
 
 // "2020 – 2021", "2021 – …", a single year alone.
 const formatTeamYears = ({
@@ -39,10 +40,12 @@ const formatTeamYears = ({
 };
 
 const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
+  const t = useT().manage;
+  const locale = useLocale();
   const [teams] = useTeams();
   const [teamTypes] = useTeamTypes();
   const [notice, showNotice] = useTransientMessage();
-  // The team just created: its editor opens with a "Створено" bubble.
+  // The team just created: its editor opens with a "Created" bubble.
   const { markCreated, messageFor } = useJustCreated(view);
 
   const typeOf = (team: Team) => resolveType(team, teamTypes);
@@ -52,22 +55,25 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
       [...teams].sort(
         (a, b) =>
           groupRank(a, resolveType(a, teamTypes)) -
-            groupRank(b, resolveType(b, teamTypes)) || byPeriodDesc(a, b),
+            groupRank(b, resolveType(b, teamTypes)) ||
+          byPeriodDesc(a, b, locale),
       ),
-    [teams, teamTypes],
+    [teams, teamTypes, locale],
   );
 
   const editedName =
     view.kind === "edit"
-      ? teams.find((t) => t.id === view.id)?.name
+      ? teams.find((team) => team.id === view.id)?.name
       : undefined;
   useEditorTitle(
     onTitle,
     view.kind === "list"
       ? ""
       : view.kind === "create"
-        ? "Нова команда"
-        : (editedName ?? ""),
+        ? t.newTeam
+        : editedName
+          ? editedName
+          : "",
   );
 
   if (view.kind === "create") {
@@ -91,7 +97,7 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
         initialMessage={messageFor(view.id)}
         onCancel={() => go(LIST_VIEW)}
         onDeleted={() => {
-          showNotice("Видалено");
+          showNotice(t.deleted);
           go(LIST_VIEW);
         }}
       />
@@ -103,35 +109,35 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
       <ManageNotice message={notice} />
       <ManageList
         items={sorted}
-        getKey={(t) => t.id}
-        getTitle={(t) => t.name}
-        getSubtitle={(t) =>
+        getKey={(team) => team.id}
+        getTitle={(team) => team.name}
+        getSubtitle={(team) =>
           [
-            typeOf(t)?.name,
+            typeOf(team)?.name ?? "",
             formatTeamYears({
-              start: t.startYear,
-              end: t.endYear,
-              ongoing: t.isOngoing,
+              start: team.startYear,
+              end: team.endYear,
+              ongoing: team.isOngoing,
             }),
           ]
             .filter(Boolean)
             .join(" · ") || undefined
         }
-        getSearchable={(t) => [t.name, typeOf(t)?.name ?? ""]}
-        renderLeading={(t) => (
+        getSearchable={(team) => [team.name, typeOf(team)?.name ?? ""]}
+        renderLeading={(team) => (
           <TeamTile
-            name={t.name}
-            photoUrl={t.photoUrl}
-            iconUrl={typeOf(t)?.iconUrl}
-            typeColor={typeOf(t)?.color}
+            name={team.name}
+            photoUrl={team.photoUrl}
+            iconUrl={typeOf(team)?.iconUrl}
+            typeColor={typeOf(team)?.color}
             color={color}
             className="h-10 w-10"
           />
         )}
-        onOpen={(t) => go({ kind: "edit", id: t.id })}
+        onOpen={(team) => go({ kind: "edit", id: team.id })}
         onCreate={() => go({ kind: "create" })}
-        searchPlaceholder="Пошук команди"
-        emptyText="Команд ще немає — створіть першу."
+        searchPlaceholder={t.searchTeams}
+        emptyText={t.noTeams}
         color={color}
       />
     </div>

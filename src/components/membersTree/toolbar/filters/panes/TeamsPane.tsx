@@ -1,5 +1,6 @@
 import { useId, useMemo } from "react";
 import { useTeamTypes } from "@/hooks";
+import { useT } from "@/i18n/useT";
 import {
   FilterSection,
   GroupedCheckListFilter,
@@ -11,32 +12,33 @@ import type { FilterPaneProps } from "./types";
 const TeamsPane = ({ filters, onChange }: FilterPaneProps) => {
   const [teamTypes] = useTeamTypes();
   const searchId = useId();
+  const t = useT().filters.teams;
 
   const groups = useMemo<CheckGroup[]>(
     () =>
       [
         {
           key: "events",
-          label: "Івенти",
+          label: t.events,
           options: teamTypes.filter((t) => t.isEvent).map((t) => t.name),
         },
         {
           key: "other",
-          label: "Інше",
+          label: t.other,
           options: teamTypes.filter((t) => !t.isEvent).map((t) => t.name),
         },
       ].filter((group) => group.options.length > 0),
-    [teamTypes],
+    [teamTypes, t],
   );
 
   return (
     <>
       <TeamPeriodFilterSection filters={filters} onChange={onChange} />
-      <FilterSection title="Типи команд" htmlFor={searchId}>
+      <FilterSection title={t.teamTypes} htmlFor={searchId}>
         <GroupedCheckListFilter
           groups={groups}
           searchId={searchId}
-          searchPlaceholder="Знайти тип команди"
+          searchPlaceholder={t.findTeamType}
           selected={filters.teamTypeNames}
           onChange={(teamTypeNames) => onChange({ teamTypeNames })}
         />

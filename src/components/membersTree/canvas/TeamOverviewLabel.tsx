@@ -8,11 +8,7 @@ import {
 } from "pixi.js";
 import { useTick } from "@pixi/react";
 import { useTheme } from "@/context/ThemeContext";
-import {
-  useCanvasTheme,
-  useCardHover,
-  useTapWithoutDrag,
-} from "@/hooks";
+import { useCanvasTheme, useCardHover, useTapWithoutDrag } from "@/hooks";
 import {
   getReadableColor,
   getTeamBadgeBackground,
@@ -151,8 +147,8 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
 
     hoverRef.current = hoverChanging
       ? hoverRef.current +
-      (target - hoverRef.current) *
-      (1 - Math.exp(-ticker.deltaMS / HOVER_SMOOTHING_MS))
+        (target - hoverRef.current) *
+          (1 - Math.exp(-ticker.deltaMS / HOVER_SMOOTHING_MS))
       : target;
     const hover = hoverRef.current;
 
@@ -179,7 +175,8 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
     );
     const grow = Math.min(
       Math.max(
-        TEAM_HOVER_TEXT_SCREEN_PX / (textScale * TEAM_OVERVIEW_FONT_SIZE * scale),
+        TEAM_HOVER_TEXT_SCREEN_PX /
+          (textScale * TEAM_OVERVIEW_FONT_SIZE * scale),
         1,
       ),
       TEAM_HOVER_MAX_SCALE,
@@ -191,7 +188,10 @@ const TeamOverviewLabel = ({ frame, onFrameClick }: Props) => {
     if (cardRef.current) cardRef.current.alpha = hover * 0.97;
   });
 
-  const handleTap = useCallback(() => onFrameClick(frame), [frame, onFrameClick]);
+  const handleTap = useCallback(
+    () => onFrameClick(frame),
+    [frame, onFrameClick],
+  );
   const tap = useTapWithoutDrag(handleTap);
 
   return (

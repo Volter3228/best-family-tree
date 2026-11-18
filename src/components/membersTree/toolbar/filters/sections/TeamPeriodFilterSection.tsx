@@ -1,3 +1,4 @@
+import { useT } from "@/i18n/useT";
 import type { FilterState } from "@/types";
 import YearRangeFilterSection from "./YearRangeFilterSection";
 import FilterCheckbox from "./FilterCheckbox";
@@ -7,9 +8,10 @@ interface Props {
   onChange: (patch: Partial<FilterState>) => void;
 }
 
-// Teams whose years overlap the chosen year(s). "Активні зараз" keeps only
+// Teams whose years overlap the chosen year(s). "Active now" keeps only
 // teams still running, which makes the years meaningless, so it greys them out.
 const TeamPeriodFilterSection = ({ filters, onChange }: Props) => {
+  const t = useT().filters.teams;
   const { teamOnlyOngoing } = filters;
 
   const toggleOngoing = () => {
@@ -22,17 +24,19 @@ const TeamPeriodFilterSection = ({ filters, onChange }: Props) => {
 
   return (
     <YearRangeFilterSection
-      title="Період активності"
+      title={t.activityPeriod}
       disabled={teamOnlyOngoing}
       leading={
         <FilterCheckbox
           checked={teamOnlyOngoing}
           onChange={toggleOngoing}
-          label="Активні зараз"
+          label={t.activeNow}
         />
       }
       value={{ from: filters.teamYearFrom, to: filters.teamYearTo }}
-      onChange={({ from, to }) => onChange({ teamYearFrom: from, teamYearTo: to })}
+      onChange={({ from, to }) =>
+        onChange({ teamYearFrom: from, teamYearTo: to })
+      }
     />
   );
 };

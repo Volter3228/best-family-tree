@@ -21,7 +21,8 @@ describe("resolveTeamType", () => {
       resolveTeamType(makeTx(), { teamTypeName: "Табір" }),
     ).rejects.toMatchObject({
       status: 400,
-      message: "Тип команди «Табір» не знайдено",
+      message: 'Team type "Табір" not found',
+      code: "team_type_not_found",
     });
   });
 

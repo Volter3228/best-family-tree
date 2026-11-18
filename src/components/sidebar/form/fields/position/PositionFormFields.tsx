@@ -3,6 +3,7 @@ import { PlusIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { useTeamTypes, useRoles, useTeams } from "@/hooks";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor, PositionFormRow } from "@/types";
 import {
   getTeamTypeOptions,
@@ -32,6 +33,7 @@ const PositionFormFields = ({
   const [teamTypes] = useTeamTypes();
   const [roles] = useRoles();
   const [teams] = useTeams();
+  const t = useT().memberForm.positions;
   const { expandedRows, updateRow, addRow, removeRow, toggleRow } =
     usePositionRows(positions, onChange);
 
@@ -49,13 +51,14 @@ const PositionFormFields = ({
 
   const handleTeamTypeSelect = (id: string, value: string) => {
     const row = positions.find((position) => position.id === id);
-    const patch = row && getTeamTypeSelectionPatch(teams, row, value, teamTypes);
+    const patch =
+      row && getTeamTypeSelectionPatch(teams, row, value, teamTypes);
     if (patch) updateRow(id, patch);
   };
 
   return (
     <section className="flex w-full flex-col gap-3">
-      <SectionHeading title="Посади" count={positions.length} color={color} />
+      <SectionHeading title={t.title} count={positions.length} color={color} />
       {positions.map((row) => (
         <PositionRow
           key={row.id}
@@ -65,6 +68,7 @@ const PositionFormFields = ({
           teamTypeOptions={teamTypeOptions}
           teamOptions={getTeamOptions(teams, row.teamTypeId)}
           roleOptions={roleOptions}
+          roles={roles}
           isExpanded={expandedRows.has(row.id)}
           color={color}
           onToggle={() => toggleRow(row.id)}
@@ -87,7 +91,7 @@ const PositionFormFields = ({
         )}
       >
         <PlusIcon className="h-4 w-4" />
-        Додати посаду
+        {t.add}
       </button>
     </section>
   );

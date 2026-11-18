@@ -6,7 +6,7 @@ import CodeForm from "./CodeForm";
 import EmailForm from "./EmailForm";
 import GoogleButton from "./GoogleButton";
 import TelegramButton from "./TelegramButton";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -16,7 +16,12 @@ interface Props {
   telegramEnabled?: boolean;
 }
 
-const AccountForm = ({ onSuccess, googleEnabled = false, telegramEnabled = false }: Props) => {
+const AccountForm = ({
+  onSuccess,
+  googleEnabled = false,
+  telegramEnabled = false,
+}: Props) => {
+  const t = useT().auth;
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [cooldown, setCooldown] = useState(0);

@@ -5,25 +5,11 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import CategoryRail from "@/components/ui/CategoryRail";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 import type { ManageTab } from "./types";
 
 const ICON_CLASS = "h-5 w-5";
-
-export const MANAGE_TAB_LABELS: Record<ManageTab, string> = {
-  members: "Учасники",
-  teams: "Команди",
-  types: "Типи команд",
-  roles: "Посади",
-};
-
-// Names of one item of each tab, for the editor header.
-export const MANAGE_TAB_TITLES: Record<ManageTab, string> = {
-  members: "Учасники",
-  teams: "Команди",
-  types: "Типи команд",
-  roles: "Посади",
-};
 
 const ITEMS = [
   { key: "members", icon: <UserIcon className={ICON_CLASS} /> },
@@ -38,17 +24,20 @@ interface Props {
   color: AccentColor;
 }
 
-const ManageRail = ({ active, onSelect, color }: Props) => (
-  <CategoryRail
-    color={color}
-    active={active}
-    onSelect={onSelect}
-    className="sticky top-0 self-start"
-    items={ITEMS.map((item) => ({
-      ...item,
-      label: MANAGE_TAB_LABELS[item.key],
-    }))}
-  />
-);
+const ManageRail = ({ active, onSelect, color }: Props) => {
+  const t = useT().manage;
+  return (
+    <CategoryRail
+      color={color}
+      active={active}
+      onSelect={onSelect}
+      className="sticky top-0 self-start"
+      items={ITEMS.map((item) => ({
+        ...item,
+        label: t.tabs[item.key],
+      }))}
+    />
+  );
+};
 
 export default ManageRail;

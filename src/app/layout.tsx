@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { cookies, headers } from "next/headers";
+import LocaleProvider from "@/i18n/LocaleProvider";
+import { LOCALE_COOKIE, detectLocale, isLocale } from "@/i18n/locale";
 import { ThemeProvider } from "@/context/ThemeContext";
 import AuroraBackground from "@/components/ui/AuroraBackground";
 import { themeInitScript } from "@/utils/themeInitScript";
@@ -13,7 +16,7 @@ import "../styles/datepicker-overrides.css";
 import "../styles/color-picker.css";
 
 const nunito = Nunito({
-  subsets: ["cyrillic-ext"],
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
   display: "swap",
 });
 
@@ -28,13 +31,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieLocale = (await cookies()).get(LOCALE_COOKIE)?.value;
+  const locale = isLocale(cookieLocale)
+    ? cookieLocale
+    : detectLocale((await headers()).get("accept-language"));
   return (
-    <html lang="uk" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${nunito.className} antialiased`}
         suppressHydrationWarning
@@ -42,10 +49,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script dangerouslySetInnerHTML={{ __html: slideInScript }} />
         <AuroraBackground />
-        <ThemeProvider>
-          <div className="page-root relative z-1">{children}</div>
-          <div id="datepicker-portal" />
-        </ThemeProvider>
+        <LocaleProvider locale={locale}>
+          <ThemeProvider>
+            <div className="page-root relative z-1">{children}</div>
+            <div id="datepicker-portal" />
+          </ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

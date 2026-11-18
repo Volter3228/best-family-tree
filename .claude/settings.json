@@ -1,4 +1,5 @@
 {
+  "timeZone": "Europe/Kyiv",
   "permissions": {
     "allow": [
       "Bash(npm run typecheck)",

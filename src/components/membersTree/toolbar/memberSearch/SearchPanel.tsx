@@ -2,6 +2,7 @@ import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { removeBadgeClasses } from "@/components/sidebar/form/inputs/inputClasses";
+import { useT } from "@/i18n/useT";
 import ToolbarPanel from "../ToolbarPanel";
 
 interface Props {
@@ -37,6 +38,7 @@ const SearchPanel = ({
   onClose,
   children,
 }: Props) => {
+  const t = useT().search;
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,7 +98,7 @@ const SearchPanel = ({
         {query && (
           <button
             type="button"
-            aria-label="Очистити пошук"
+            aria-label={t.clear}
             onMouseDown={(e) => e.preventDefault()}
             onClick={clear}
             className={removeBadgeClasses("blue", "h-6 w-6 shrink-0")}
@@ -107,7 +109,7 @@ const SearchPanel = ({
       </div>
       {hiddenCount > 0 && (
         <p className="px-4 pb-2 text-xs text-foreground/60">
-          Ще {hiddenCount} приховано фільтрами
+          {t.hiddenByFilters(hiddenCount)}
         </p>
       )}
       {/* Reveal animates grid rows on the wrapper, so the scrolling ul is never
@@ -136,7 +138,7 @@ const SearchPanel = ({
       </div>
       {isEmpty && (
         <div className="px-3 py-3 text-center text-sm text-foreground/80">
-          Нима таких...
+          {t.nothingFound}
         </div>
       )}
     </ToolbarPanel>

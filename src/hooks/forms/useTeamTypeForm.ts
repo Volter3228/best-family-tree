@@ -4,9 +4,8 @@ import { ApiError } from "@/api/ApiError";
 import { deleteTeamType } from "@/api/fetchMeta";
 import { useTeamTypes } from "../data/useMeta";
 import type { TeamType, TeamTypeFormData } from "@/types";
-import { NO_CHANGES_MESSAGE } from "@/constants/form";
 import { isSameFormData } from "@/utils/formDataEquals";
-import { formatCount, pluralizeUk, TEAM_FORMS } from "@/utils/strings";
+import { useT, useLocale } from "@/i18n/useT";
 import { useTransientMessage } from "./useTransientMessage";
 
 export type TeamTypeFormMode = "create" | "edit";
@@ -14,14 +13,6 @@ export type TeamTypeFormMode = "create" | "edit";
 // The list endpoint adds how many teams use each type.
 export const teamTypeTeamCount = (teamType: TeamType) =>
   teamType._count?.teams ?? 0;
-
-// "1 команда використовує", "3 команди використовують": the verb and the
-// pronoun agree with the count.
-export const teamsInUseMessage = (teams: number) => {
-  const verb = pluralizeUk(teams, ["використовує", "використовують", "використовують"]);
-  const them = pluralizeUk(teams, ["її", "їх", "їх"]);
-  return `Тип ${verb} ${formatCount(teams, TEAM_FORMS)} — спершу змініть ${them}`;
-};
 
 const EMPTY_FORM: TeamTypeFormData = {
   name: "",
@@ -37,10 +28,11 @@ const toFormData = (teamType: TeamType): TeamTypeFormData => ({
   icon: teamType.iconUrl || null,
 });
 
-const byName = (a: TeamType, b: TeamType) => a.name.localeCompare(b.name, "uk");
-
 // Update responses leave out the team count; keep the one the list had.
-const keepCount = (updated: TeamType, previous: TeamType | undefined): TeamType => {
+const keepCount = (
+  updated: TeamType,
+  previous: TeamType | undefined,
+): TeamType => {
   const count = previous?._count;
   return count ? { ...updated, _count: count } : updated;
 };
@@ -81,6 +73,11 @@ export const useTeamTypeForm = (
   { onCreated, onDeleted }: Callbacks = {},
 ) => {
   const mode: TeamTypeFormMode = teamTypeId ? "edit" : "create";
+  const tCommon = useT().formCommon;
+  const t = useT().teamTypeForm;
+  const locale = useLocale();
+  const byName = (a: TeamType, b: TeamType) =>
+    a.name.localeCompare(b.name, locale);
   const [teamTypes, setTeamTypes, reloadTeamTypes] = useTeamTypes();
   const selectedType = useMemo(
     () => teamTypes.find((teamType) => teamType.id === teamTypeId) ?? null,
@@ -116,7 +113,7 @@ export const useTeamTypeForm = (
     event.preventDefault();
 
     if (!form.name.trim()) {
-      setError("Назва обов'язкова");
+      setError(t.nameRequired);
       return;
     }
 
@@ -130,7 +127,7 @@ export const useTeamTypeForm = (
       )
     ) {
       setError(null);
-      showSuccess(NO_CHANGES_MESSAGE);
+      showSuccess(tCommon.noChanges);
       return;
     }
 
@@ -155,17 +152,17 @@ export const useTeamTypeForm = (
         );
         savedFormRef.current = toFormData(updated);
         setForm(savedFormRef.current);
-        showSuccess("Збережено");
+        showSuccess(tCommon.saved);
       } else {
         const created = await createTeamType(
           buildTeamTypeFormData(form, "create"),
         );
         setTeamTypes([...teamTypes, created].sort(byName));
-        showSuccess("Створено");
+        showSuccess(tCommon.created);
         onCreated?.(created.id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Не вдалося зберегти тип");
+      setError(err instanceof Error ? err.message : t.saveFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -187,12 +184,12 @@ export const useTeamTypeForm = (
       const inUse = err instanceof ApiError && err.status === 409;
       setError(
         teams > 0
-          ? teamsInUseMessage(teams)
+          ? t.inUse(teams)
           : inUse
-            ? "Тип використовують команди — спершу змініть їх"
+            ? t.usedByTeams
             : err instanceof Error
-            ? err.message
-            : "Не вдалося видалити тип",
+              ? err.message
+              : t.deleteFailed,
       );
     } finally {
       setIsDeleting(false);

@@ -7,7 +7,7 @@ import {
 import CategoryRail from "@/components/ui/CategoryRail";
 import type { FilterCategoryKey, FilterState } from "@/types";
 import { FILTER_CATEGORY_KEYS, isCategoryActive } from "@/utils/filters";
-import { FILTER_CATEGORY_LABELS } from "./panes/FilterCategoryPane";
+import { useT } from "@/i18n/useT";
 
 const ICON_CLASS = "h-5 w-5";
 
@@ -25,18 +25,21 @@ interface Props {
 }
 
 // Vertical tab list of the filter categories.
-const FilterCategoryRail = ({ active, filters, onSelect }: Props) => (
-  <CategoryRail
-    color="green"
-    active={active}
-    onSelect={onSelect}
-    items={FILTER_CATEGORY_KEYS.map((key) => ({
-      key,
-      label: FILTER_CATEGORY_LABELS[key],
-      icon: CATEGORY_ICONS[key],
-      marker: isCategoryActive(filters, key),
-    }))}
-  />
-);
+const FilterCategoryRail = ({ active, filters, onSelect }: Props) => {
+  const labels = useT().filters.categories;
+  return (
+    <CategoryRail
+      color="green"
+      active={active}
+      onSelect={onSelect}
+      items={FILTER_CATEGORY_KEYS.map((key) => ({
+        key,
+        label: labels[key],
+        icon: CATEGORY_ICONS[key],
+        marker: isCategoryActive(filters, key),
+      }))}
+    />
+  );
+};
 
 export default FilterCategoryRail;

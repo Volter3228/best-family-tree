@@ -3,6 +3,7 @@ import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { getInitials, getMemberAvatar } from "@/utils";
 import type { Member } from "@/models";
 import type { AccentColor } from "@/types";
+import { useDisplayName } from "@/utils/displayName";
 
 interface Props {
   member: Member;
@@ -13,7 +14,13 @@ interface Props {
 }
 
 // Round photo, or the initials on the accent colour when there is none.
-const MemberMiniAvatar = ({ member, size, color = "blue", className }: Props) => {
+const MemberMiniAvatar = ({
+  member,
+  size,
+  color = "blue",
+  className,
+}: Props) => {
+  const dn = useDisplayName();
   const avatar = getMemberAvatar(member, {
     width: Math.round(size * 2),
     height: Math.round(size * 2),
@@ -40,7 +47,7 @@ const MemberMiniAvatar = ({ member, size, color = "blue", className }: Props) =>
       {/* Trim the line box to the capitals so they sit at the optical
           centre; the font's line box leaves more room below than above. */}
       <span className="leading-none [text-box:trim-both_cap_alphabetic]">
-        {getInitials(member.name)}
+        {getInitials(dn(member.name))}
       </span>
     </span>
   );

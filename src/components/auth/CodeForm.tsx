@@ -6,7 +6,7 @@ import { verifyEmailCode } from "@/api/auth";
 import AuthMessage from "./AuthMessage";
 import CodeInput from "./CodeInput";
 import { emptyDigits, isComplete } from "./codeDigits";
-import { authStrings as t } from "./strings";
+import { useT } from "@/i18n/useT";
 
 interface Props {
   email: string;
@@ -16,7 +16,14 @@ interface Props {
   onSuccess: () => void;
 }
 
-const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props) => {
+const CodeForm = ({
+  email,
+  cooldown,
+  onResend,
+  onChangeEmail,
+  onSuccess,
+}: Props) => {
+  const t = useT().auth;
   const [digits, setDigits] = useState(emptyDigits);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -47,7 +54,10 @@ const CodeForm = ({ email, cooldown, onResend, onChangeEmail, onSuccess }: Props
       setDigits(emptyDigits());
       setBusy(false);
       // Inputs are disabled while busy; focus once they are enabled again.
-      window.setTimeout(() => document.getElementById("code-digit-0")?.focus(), 0);
+      window.setTimeout(
+        () => document.getElementById("code-digit-0")?.focus(),
+        0,
+      );
     } catch {
       setMessage(t.requestFailed);
       setBusy(false);

@@ -2,6 +2,7 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { EyeDropperIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
 
 interface EyeDropperApi {
@@ -17,12 +18,14 @@ interface Props {
 // Saturation/hue picker with a hex field. Expands inline inside ColorField.
 const ColorPickerPanel = ({ value, onChange, color }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
+  const t = useT().ui;
   const canPick = typeof window !== "undefined" && "EyeDropper" in window;
 
   const pickFromScreen = async () => {
     try {
-      const EyeDropper = (window as unknown as { EyeDropper: new () => EyeDropperApi })
-        .EyeDropper;
+      const EyeDropper = (
+        window as unknown as { EyeDropper: new () => EyeDropperApi }
+      ).EyeDropper;
       const { sRGBHex } = await new EyeDropper().open();
       onChange(sRGBHex.toLowerCase());
     } catch {
@@ -31,7 +34,12 @@ const ColorPickerPanel = ({ value, onChange, color }: Props) => {
   };
 
   return (
-    <div className={twMerge("flex flex-col gap-3 rounded-2xl p-3", colorClasses.softBg)}>
+    <div
+      className={twMerge(
+        "flex flex-col gap-3 rounded-2xl p-3",
+        colorClasses.softBg,
+      )}
+    >
       <HexColorPicker
         className="color-picker"
         color={value}
@@ -48,7 +56,7 @@ const ColorPickerPanel = ({ value, onChange, color }: Props) => {
           alpha={false}
           color={value}
           onChange={(next) => onChange(next.toLowerCase())}
-          aria-label="Hex-код кольору"
+          aria-label={t.hexCode}
           className={twMerge(
             "block h-10 w-full min-w-0 rounded-xl border bg-surface px-3 text-sm uppercase tabular-nums text-foreground transition-colors focus:outline-none focus:ring-2",
             colorClasses.softBorder,
@@ -61,8 +69,8 @@ const ColorPickerPanel = ({ value, onChange, color }: Props) => {
           <button
             type="button"
             onClick={pickFromScreen}
-            aria-label="Вибрати колір на екрані"
-            title="Піпетка"
+            aria-label={t.pickFromScreen}
+            title={t.eyedropper}
             className={twMerge(
               "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors focus:outline-none focus-visible:ring-2",
               colorClasses.text,

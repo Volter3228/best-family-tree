@@ -7,7 +7,7 @@ import {
   validateMemberUpdate,
   validateSparseMemberBody,
 } from "../utils/memberUpdateValidation.js";
-import { sendRouteError } from "../utils/httpErrors.js";
+import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import {
   parsePhoneNumbers,
   parsePositionsPayload,
@@ -32,11 +32,13 @@ router.get("/member/:id", async (req, res) => {
     });
 
     if (!member) {
-      res.status(404).json({ error: "Member not found" });
+      res.status(404).json(errorBody("Member not found", "member_not_found"));
       return;
     }
 
-    res.status(200).json(toMemberResponse(serializeMember(member), req.session!));
+    res
+      .status(200)
+      .json(toMemberResponse(serializeMember(member), req.session!));
   } catch (error) {
     console.error("Failed to fetch member:", error);
     res.status(500).json({ error: "Failed to fetch member" });
@@ -60,7 +62,7 @@ router.post(
       : validateMemberBody(req.body);
     if (!validation.success) {
       await discardUpload();
-      res.status(400).json({ error: validation.errors });
+      res.status(400).json(errorBody(validation.errors, "validation"));
       return;
     }
 
@@ -83,7 +85,9 @@ router.post(
         uploadedPhoto || null,
         sparse,
       );
-      res.status(201).json(toMemberResponse(serializeMember(newMember), req.session!));
+      res
+        .status(201)
+        .json(toMemberResponse(serializeMember(newMember), req.session!));
     } catch (error) {
       await discardUpload();
       sendRouteError(res, error, "Failed to create member");
@@ -100,9 +104,9 @@ router.put(
     const discardUpload = async () => {
       if (uploadedPhoto) await deleteCloudinaryImage(uploadedPhoto);
     };
-    const reject = async (status: number, error: string) => {
+    const reject = async (status: number, error: string, code: string) => {
       await discardUpload();
-      res.status(status).json({ error });
+      res.status(status).json(errorBody(error, code));
     };
 
     try {
@@ -112,7 +116,7 @@ router.put(
       });
 
       if (!existingMember) {
-        await reject(404, "Member not found");
+        await reject(404, "Member not found", "member_not_found");
         return;
       }
 
@@ -130,7 +134,7 @@ router.put(
         phoneNumbers: existingMember.phoneNumbers.map((p) => p.phoneNumber),
       });
       if (!validation.success) {
-        await reject(400, validation.errors);
+        await reject(400, validation.errors, "validation");
         return;
       }
 
@@ -169,7 +173,9 @@ router.put(
       if (oldPhotoUrl && photoUrl !== oldPhotoUrl) {
         await deleteCloudinaryImage(oldPhotoUrl);
       }
-      res.status(200).json(toMemberResponse(serializeMember(updatedMember), req.session!));
+      res
+        .status(200)
+        .json(toMemberResponse(serializeMember(updatedMember), req.session!));
     } catch (error) {
       sendRouteError(res, error, "Failed to update member");
     }

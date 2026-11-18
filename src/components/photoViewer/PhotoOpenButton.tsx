@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { ArrowsPointingOutIcon } from "@heroicons/react/16/solid";
 import { usePhotoViewerStore } from "@/store/photoViewerStore";
+import { useT } from "@/i18n/useT";
 import { loadImageAspect } from "./imageAspect";
 
 interface Props {
@@ -36,6 +37,7 @@ const PhotoOpenButton = ({
   className,
   children,
 }: Props) => {
+  const t = useT().photoViewer;
   const open = usePhotoViewerStore((s) => s.open);
   const isOpen = useIsPhotoOpen(id);
 
@@ -47,7 +49,7 @@ const PhotoOpenButton = ({
   return (
     <button
       type="button"
-      aria-label="Відкрити фото"
+      aria-label={t.open}
       className={twMerge(
         "group relative cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-blue",
         roundedClassName,

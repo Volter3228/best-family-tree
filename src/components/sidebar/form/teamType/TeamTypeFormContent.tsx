@@ -1,19 +1,15 @@
 import type { Dispatch, SetStateAction } from "react";
 import ChipGroup from "@/components/ui/ChipGroup";
 import ColorField from "@/components/ui/color/ColorField";
+import { useT } from "@/i18n/useT";
 import type { AccentColor, TeamType, TeamTypeFormData } from "@/types";
-import { teamsInUseMessage, teamTypeTeamCount, type TeamTypeFormMode } from "@/hooks/forms";
+import { teamTypeTeamCount, type TeamTypeFormMode } from "@/hooks/forms";
 import { TextInput } from "../inputs";
 import { ClearButton, SubmitButton } from "../buttons";
 import ConfirmDeleteControl from "../ConfirmDeleteControl";
 import FormFooter from "../FormFooter";
 import FormMessages from "../FormMessages";
 import TeamTypeIdentityTile from "./TeamTypeIdentityTile";
-
-const KIND_OPTIONS = [
-  { value: "event", label: "Івент" },
-  { value: "permanent", label: "Інше" },
-] as const;
 
 interface Props {
   mode: TeamTypeFormMode;
@@ -50,19 +46,25 @@ const TeamTypeFormContent = ({
   onDelete,
   onCancel,
 }: Props) => {
+  const tCommon = useT().formCommon;
+  const t = useT().teamTypeForm;
+  const kindOptions = [
+    { value: "event", label: t.kindEvent },
+    { value: "other", label: t.kindOther },
+  ] as const;
   if (mode === "edit" && !selectedType) return null;
 
   const isEdit = mode === "edit";
   const submitLabel = isSubmitting
     ? isEdit
-      ? "Зберігаємо..."
-      : "Створюємо..."
+      ? tCommon.saving
+      : tCommon.creating
     : isEdit
-      ? "Зберегти"
-      : "Створити";
+      ? tCommon.save
+      : tCommon.create;
   // Types that teams still use cannot be deleted; say so before asking.
   const teams = selectedType ? teamTypeTeamCount(selectedType) : 0;
-  const blockedReason = teams > 0 ? teamsInUseMessage(teams) : null;
+  const blockedReason = teams > 0 ? t.inUse(teams) : null;
 
   return (
     <>
@@ -78,10 +80,10 @@ const TeamTypeFormContent = ({
         <div className="min-w-0 flex-1">
           <TextInput
             name="teamTypeName"
-            label="Назва"
+            label={tCommon.name}
             value={form.name}
             onChange={(name) => setForm((prev) => ({ ...prev, name }))}
-            placeholder="EJF"
+            placeholder={t.namePlaceholder}
             required
             color={color}
           />
@@ -89,11 +91,13 @@ const TeamTypeFormContent = ({
       </div>
 
       <div className="flex flex-col">
-        <span className="mb-1.5 text-sm font-semibold text-foreground">Вид</span>
+        <span className="mb-1.5 text-sm font-semibold text-foreground">
+          {t.kind}
+        </span>
         <ChipGroup
-          label="Вид"
-          options={KIND_OPTIONS}
-          value={form.isEvent ? "event" : "permanent"}
+          label={t.kind}
+          options={kindOptions}
+          value={form.isEvent ? "event" : "other"}
           onChange={(kind) =>
             setForm((prev) => ({ ...prev, isEvent: kind === "event" }))
           }
@@ -112,9 +116,9 @@ const TeamTypeFormContent = ({
       <FormFooter>
         {isEdit && selectedType && (
           <ConfirmDeleteControl
-            label="Видалити"
-            title="Видалити тип команди?"
-            message={`Видалити «${selectedType.name}»? Цю дію не можна скасувати.`}
+            label={tCommon.delete}
+            title={t.deleteTitle}
+            message={t.deleteMessage(selectedType.name)}
             isConfirming={isConfirmingDelete}
             isSubmitting={isDeleting}
             blockedReason={blockedReason}
@@ -122,8 +126,12 @@ const TeamTypeFormContent = ({
             onConfirm={onDelete}
           />
         )}
-        <ClearButton isSubmitting={isSubmitting} onClick={onCancel} color={color}>
-          Скасувати
+        <ClearButton
+          isSubmitting={isSubmitting}
+          onClick={onCancel}
+          color={color}
+        >
+          {tCommon.cancel}
         </ClearButton>
         <SubmitButton
           isSubmitting={isSubmitting}

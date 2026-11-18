@@ -8,26 +8,62 @@ const ORANGE = "#f08400";
 
 const MINUTES = CODE_TTL_MS / 60_000;
 
+export type EmailLocale = "uk" | "en";
+
+const minutesLabel = (locale: EmailLocale, n: number) => {
+  const category = new Intl.PluralRules(locale).select(n);
+  if (locale === "en") return category === "one" ? "minute" : "minutes";
+  if (category === "one") return "хвилину";
+  if (category === "few") return "хвилини";
+  return "хвилин";
+};
+
+const COPY = {
+  uk: {
+    subject: (code: string) => `${code} — код для входу в BEST Tree`,
+    yourCode: "Твій код для входу",
+    valid: (n: number) =>
+      `Він діє ${n} ${minutesLabel("uk", n)} і спрацює один раз.`,
+    ignore: "Якщо ти не просив(-ла) код, просто проігноруй цей лист.",
+  },
+  en: {
+    subject: (code: string) => `${code} — your BEST Tree sign-in code`,
+    yourCode: "Your sign-in code",
+    valid: (n: number) =>
+      `It's valid for ${n} ${minutesLabel("en", n)} and works once.`,
+    ignore: "If you didn't request this code, just ignore this email.",
+  },
+} as const;
+
 const escapeHtml = (value: string) =>
   value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** `123456` -> ["12", "34", "56"], one pair per brand colour. */
-const pairs = (code: string) => [code.slice(0, 2), code.slice(2, 4), code.slice(4, 6)];
+const pairs = (code: string) => [
+  code.slice(0, 2),
+  code.slice(2, 4),
+  code.slice(4, 6),
+];
 
-export const renderSignInCodeEmail = (code: string, clientOrigin: string) => {
+export const renderSignInCodeEmail = (
+  code: string,
+  clientOrigin: string,
+  locale: EmailLocale = "uk",
+) => {
+  const copy = COPY[locale];
   if (!/^\d{6}$/.test(code)) throw new Error("Sign-in code must be six digits");
   const [a, b, c] = pairs(code);
   const logo = `${escapeHtml(clientOrigin.replace(/\/$/, ""))}/images/best-logo.png`;
 
-  const subject = `${code} — код для входу в BEST Tree`;
+  const subject = copy.subject(code);
 
   const text = [
     "BEST Tree",
     "",
-    `Твій код для входу: ${code}`,
+    `${copy.yourCode}: ${code}`,
     "",
-    `Він діє ${MINUTES} хвилин і спрацює один раз.`,
-    "Якщо ти не просив(-ла) код, просто проігноруй цей лист.",
+    copy.valid(MINUTES),
+    copy.ignore,
   ].join("\n");
 
   const digit = (value: string, color: string, darkColor: string) =>
@@ -35,7 +71,7 @@ export const renderSignInCodeEmail = (code: string, clientOrigin: string) => {
   const dot = `<td class="muted" style="font:700 28px/1 Arial,sans-serif;color:#9ca3af;padding:0 10px;">·</td>`;
 
   const html = `<!doctype html>
-<html lang="uk">
+<html lang="${locale}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -57,7 +93,7 @@ export const renderSignInCodeEmail = (code: string, clientOrigin: string) => {
 </style>
 </head>
 <body class="bg" style="margin:0;padding:0;background:#f3f4f6;">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Твій код для входу: ${code}</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${copy.yourCode}: ${code}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="bg" style="background:#f3f4f6;">
 <tr><td align="center" style="padding:24px 12px;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card" style="max-width:420px;background:#ffffff;border-radius:16px;overflow:hidden;">
@@ -73,7 +109,7 @@ export const renderSignInCodeEmail = (code: string, clientOrigin: string) => {
       <div class="text" style="font:700 22px/1.3 Arial,Helvetica,sans-serif;color:#111827;margin-top:12px;">BEST Tree</div>
     </td></tr>
     <tr><td align="center" class="text" style="padding:8px 24px 0;font:400 15px/1.5 Arial,Helvetica,sans-serif;color:#111827;">
-      Твій код для входу
+      ${copy.yourCode}
     </td></tr>
     <tr><td align="center" style="padding:16px 24px;">
       <table role="presentation" cellpadding="0" cellspacing="0" class="code-box" style="background:#f3f4f6;border-radius:12px;"><tr><td style="padding:16px 18px;">
@@ -83,8 +119,8 @@ export const renderSignInCodeEmail = (code: string, clientOrigin: string) => {
       </td></tr></table>
     </td></tr>
     <tr><td align="center" class="muted" style="padding:0 24px 28px;font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#6b7280;">
-      Він діє ${MINUTES} хвилин і спрацює один раз.<br>
-      Якщо ти не просив(-ла) код, просто проігноруй цей лист.
+      ${copy.valid(MINUTES)}<br>
+      ${copy.ignore}
     </td></tr>
   </table>
 </td></tr>

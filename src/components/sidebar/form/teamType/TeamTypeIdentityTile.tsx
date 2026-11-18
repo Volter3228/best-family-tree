@@ -3,8 +3,9 @@ import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "../inputs/inputClasses";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
+import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
-import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "@/utils/uploadLimit";
+import { exceedsUploadLimit } from "@/utils/uploadLimit";
 import TeamTypeMark from "./TeamTypeMark";
 
 interface Props {
@@ -30,6 +31,8 @@ const TeamTypeIdentityTile = ({
   onError,
   accent = "blue",
 }: Props) => {
+  const t = useT().teamTypeForm;
+  const common = useT().formCommon;
   const inputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -55,7 +58,7 @@ const TeamTypeIdentityTile = ({
     event.target.value = "";
     if (!file) return;
     if (exceedsUploadLimit(file)) {
-      onError(UPLOAD_TOO_LARGE_MESSAGE);
+      onError(common.fileTooLarge);
       return;
     }
     onError(null);
@@ -78,7 +81,7 @@ const TeamTypeIdentityTile = ({
     <div className="relative h-20 w-20 shrink-0">
       <button
         type="button"
-        aria-label="Змінити іконку"
+        aria-label={t.changeIcon}
         onClick={() => inputRef.current?.click()}
         className={twMerge(
           "group relative block h-full w-full touch-manipulation overflow-hidden rounded-2xl border transition-colors focus:outline-none focus:ring-2",
@@ -114,9 +117,12 @@ const TeamTypeIdentityTile = ({
       {icon && (
         <button
           type="button"
-          aria-label="Прибрати іконку"
+          aria-label={t.removeIcon}
           onClick={handleRemove}
-          className={removeBadgeClasses(accent, "absolute right-1 top-1 h-6 w-6")}
+          className={removeBadgeClasses(
+            accent,
+            "absolute right-1 top-1 h-6 w-6",
+          )}
         >
           <XMarkIcon className="h-3.5 w-3.5" />
         </button>

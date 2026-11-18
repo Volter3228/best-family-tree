@@ -76,8 +76,12 @@ export const useTreeLayout = () => {
 
   // Layout computation
   useEffect(() => {
-    const { members, byId: membersMap, childrenOf, rootIds } =
-      useMembersStore.getState();
+    const {
+      members,
+      byId: membersMap,
+      childrenOf,
+      rootIds,
+    } = useMembersStore.getState();
     if (members.length === 0) return;
 
     // Build the unfiltered graph for the selected layout mode, then keep
@@ -178,7 +182,11 @@ export const useTreeLayout = () => {
 
     requestLayout("elk", {
       nodeIds: finalNodes.map((node) => node.id),
-      edges: finalEdges.map(({ id, source, target }) => ({ id, source, target })),
+      edges: finalEdges.map(({ id, source, target }) => ({
+        id,
+        source,
+        target,
+      })),
       direction,
     })
       .then((positions) => {

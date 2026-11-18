@@ -19,7 +19,9 @@ export const parsePositionsPayload = (raw: unknown): PositionInput[] | null => {
   try {
     parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
   } catch {
-    throw new ValidationError("Positions must be valid JSON");
+    throw new ValidationError("Positions must be valid JSON", {
+      code: "positions_invalid",
+    });
   }
 
   const result = z.array(positionSchema).safeParse(parsed);

@@ -1,5 +1,8 @@
 import { format, getYear, isBefore, addYears, startOfDay } from "date-fns";
 import { Member } from "@/models";
+import type { Locale } from "@/i18n/locale";
+import { messages } from "@/i18n/messages";
+import { displayName } from "./displayName";
 
 const getClosestBirthday = (birthday: Date): Date => {
   const currentYear = getYear(new Date());
@@ -17,14 +20,19 @@ const getClosestBirthday = (birthday: Date): Date => {
     : birthdayThisYear;
 };
 
-export const generateGoogleCalendarLink = (member: Member): string => {
+export const generateGoogleCalendarLink = (
+  member: Member,
+  locale: Locale,
+): string => {
   if (!member.birthday) return "";
   const closestBirthdayDate = getClosestBirthday(member.birthday);
   const startDate = format(closestBirthdayDate, "yyyyMMdd");
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: `🎉День Народження - ${member.name}🎉`,
+    text: messages[locale].memberInfo.calendarTitle(
+      displayName(member.name, locale),
+    ),
     dates: `${startDate}/${startDate}`,
     details: "",
     recur: "RRULE:FREQ=YEARLY", // Yearly event
