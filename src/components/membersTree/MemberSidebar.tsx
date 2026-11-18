@@ -1,5 +1,6 @@
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
+import { useManageStore } from "@/store/manageStore";
 import type { useSidebar } from "@/hooks";
 import { formatMemberRecruitmentSeason, getMemberSeasonAccent } from "@/utils";
 import { Member } from "@/models";
@@ -33,6 +34,10 @@ const MemberSidebar = ({
   const dn = useDisplayName();
   const locale = useLocale();
   const editable = useSessionStore((s) => canEdit(s.session, member?.id));
+  const manageStack = useManageStore((s) =>
+    s.isOpen ? (s.isFront ? "behind" : "front") : undefined,
+  );
+  const sendManageBack = useManageStore((s) => s.sendBack);
   const isInfo = state.sidebarMode === "info";
   const color: AccentColor =
     isInfo && member ? getMemberSeasonAccent(member) : "blue";
@@ -65,6 +70,8 @@ const MemberSidebar = ({
           />
         )
       }
+      stack={manageStack}
+      onBringForward={sendManageBack}
       className="z-10"
       color={color}
     >

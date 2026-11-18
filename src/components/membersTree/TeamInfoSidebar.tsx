@@ -1,5 +1,6 @@
 import { PencilIcon, UserGroupIcon } from "@heroicons/react/16/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
+import { useManageStore } from "@/store/manageStore";
 import { useMemo, useRef } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
@@ -49,6 +50,10 @@ const TeamInfoSidebar = ({
   );
 
   const editable = useSessionStore((s) => canEdit(s.session));
+  const manageStack = useManageStore((s) =>
+    s.isOpen ? (s.isFront ? "behind" : "front") : undefined,
+  );
+  const sendManageBack = useManageStore((s) => s.sendBack);
   const containerRef = useRef<HTMLDivElement>(null);
   useSidebarSwitchAnimation(containerRef, teamId ?? "", mode);
 
@@ -88,6 +93,8 @@ const TeamInfoSidebar = ({
           />
         )
       }
+      stack={manageStack}
+      onBringForward={sendManageBack}
       className="z-10"
     >
       <div ref={containerRef}>

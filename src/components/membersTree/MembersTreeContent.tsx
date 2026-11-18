@@ -204,6 +204,7 @@ const MembersTreeContent = ({ members }: Props) => {
         onFitView={handleFitView}
         onSearch={handleSearch}
         onTeamSearch={handleFrameClick}
+        isInfoOpen={memberSidebar.isSidebarOpen || teamInfo.isOpen}
       />
       <MemberSidebar
         state={memberSidebar}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
+import { useManageStore } from "@/store/manageStore";
 
 /**
  * The team info sidebar shares its slot with the member sidebar: opening one
@@ -27,6 +28,7 @@ export const useTeamInfoSidebar = (
   const open = useCallback(
     (nextTeamId: string) => {
       clearTimeout(expandTimerRef.current);
+      useManageStore.getState().sendBack();
       closeMemberSidebar();
       setTeamId(nextTeamId);
       setMode("info");

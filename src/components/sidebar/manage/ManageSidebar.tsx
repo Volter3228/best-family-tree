@@ -28,12 +28,21 @@ const CLOSE_RESET_MS = 350;
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  // Set while an info sidebar is open too.
+  stack?: "front" | "behind";
+  onBringForward: () => void;
   color?: AccentColor;
 }
 
 // Everything that creates, edits or removes data: a rail of tabs, each a
 // searchable list that drills into an editor.
-const ManageSidebar = ({ isOpen, onClose, color = "blue" }: Props) => {
+const ManageSidebar = ({
+  isOpen,
+  onClose,
+  stack,
+  onBringForward,
+  color = "blue",
+}: Props) => {
   const t = useT().manage;
   const [tab, setTab] = useState<ManageTab>("members");
   const [view, setView] = useState<ManageView>(LIST_VIEW);
@@ -88,6 +97,8 @@ const ManageSidebar = ({ isOpen, onClose, color = "blue" }: Props) => {
       isOpen={isOpen}
       color={color}
       onClose={onClose}
+      stack={stack}
+      onBringForward={onBringForward}
       onBackClick={() => go(LIST_VIEW)}
     >
       <div className="flex gap-3">

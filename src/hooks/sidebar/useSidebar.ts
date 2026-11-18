@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
+import { useManageStore } from "@/store/manageStore";
 
 // Matches the sidebar's slide-out transition.
 const CLOSE_ANIMATION_MS = 300;
@@ -26,6 +27,7 @@ export const useSidebar = (
 
   useEffect(() => {
     if (selectedMember) {
+      useManageStore.getState().sendBack();
       cancelPendingClose();
       setIsOpen(true);
       setMode("info");
@@ -38,6 +40,7 @@ export const useSidebar = (
   const selectMember = useCallback(
     (id: string | null) => {
       if (id) {
+        useManageStore.getState().sendBack();
         cancelPendingClose();
         setIsOpen(true);
         setIsMinimized(false);

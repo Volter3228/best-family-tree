@@ -8,4 +8,5 @@ export const sidebar = {
   close: "Close",
   editing: (name: string) => `Edit: ${name}`,
   team: "Team",
+  bringForward: "Back to the card",
 } satisfies Messages["sidebar"];

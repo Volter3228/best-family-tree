@@ -6,4 +6,5 @@ export const sidebar = {
   close: "Закрити",
   editing: (name: string) => `Редагувати: ${name}`,
   team: "Команда",
+  bringForward: "Повернутися до картки",
 };

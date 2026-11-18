@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { memo } from "react";
 import { ManageSidebar } from "@/components/sidebar";
 import {
   PencilSquareIcon,
@@ -11,6 +11,7 @@ import { usePanelToggle, useSearchShortcut } from "@/hooks";
 import { useT } from "@/i18n/useT";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useFiltersStore } from "@/store/filtersStore";
+import { useManageStore } from "@/store/manageStore";
 import { countActiveFilters } from "@/utils/filters";
 import type { TeamFrame } from "@/types";
 import { SearchBar } from "./memberSearch";
@@ -25,6 +26,8 @@ interface Props {
   onFitView: () => void;
   onSearch: (memberId: string) => void;
   onTeamSearch: (frame: TeamFrame) => void;
+  // A member or team info sidebar is open: Manage stacks with it.
+  isInfoOpen: boolean;
 }
 
 // Ctrl+F while search is already open: refocus its input and select the query.
@@ -34,10 +37,17 @@ const focusSearchInput = () => {
   input?.select();
 };
 
-const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
+const Toolbar = ({ onFitView, onSearch, onTeamSearch, isInfoOpen }: Props) => {
   const t = useT().auth;
   const tb = useT().toolbar;
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const manage = useManageStore();
+  const isSidebarOpen = manage.isOpen;
+  const closeSidebar = manage.close;
+  const manageStack = isInfoOpen
+    ? manage.isFront
+      ? "front"
+      : "behind"
+    : undefined;
   const search = usePanelToggle();
   const filters = usePanelToggle();
   const settings = usePanelToggle();
@@ -50,8 +60,13 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
   const sessionLoaded = useSessionStore((s) => s.loaded);
   const editable = canEdit(session);
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const closeSidebar = () => setIsSidebarOpen(false);
+  // While stacked behind info, the button brings Manage forward (the only way
+  // back on mobile, where the stacked sidebar is hidden).
+  const toggleSidebar = !isSidebarOpen
+    ? manage.open
+    : manageStack === "behind"
+      ? manage.bringForward
+      : closeSidebar;
 
   const handleShowSearchClick = () =>
     search.toggle(() => {
@@ -161,6 +176,8 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch }: Props) => {
         <ManageSidebar
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
+          stack={manageStack}
+          onBringForward={manage.bringForward}
           color="blue"
         />
       )}
