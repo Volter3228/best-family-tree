@@ -13,5 +13,6 @@ export const memberInfo = {
   copy: "Копіювати",
   copied: "Скопійовано",
   years: { one: "рік", few: "роки", many: "років", other: "років" },
+  yearsShort: "р.",
   calendarTitle: (name: string) => `🎉День Народження - ${name}🎉`,
 };

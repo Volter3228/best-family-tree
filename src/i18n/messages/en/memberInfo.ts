@@ -15,5 +15,6 @@ export const memberInfo = {
   copy: "Copy",
   copied: "Copied",
   years: { one: "year", few: "years", many: "years", other: "years" },
+  yearsShort: "y.",
   calendarTitle: (name: string) => `🎉 Birthday - ${name} 🎉`,
 } satisfies Messages["memberInfo"];

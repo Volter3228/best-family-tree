@@ -42,3 +42,11 @@ export const useDisplayFamilyName = (): ((name: string) => string) => {
     [locale],
   );
 };
+
+// "Юра Горбаль" → "Ю. Горбаль": first letter of the first word, then the last word.
+export const abbreviateName = (full: string): string => {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length < 2) return full.trim();
+  const [first] = Array.from(parts[0]);
+  return `${first}. ${parts[parts.length - 1]}`;
+};

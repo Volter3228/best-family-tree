@@ -13,7 +13,8 @@ import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { generateGoogleCalendarLink } from "@/utils";
 import { useLocale, useT } from "@/i18n/useT";
 import { formatCount } from "@/i18n/plural";
-import { useDisplayName } from "@/utils/displayName";
+import { useIsMobileScreen } from "@/hooks/membersTree/useTreeDirection";
+import { abbreviateName, useDisplayName } from "@/utils/displayName";
 import type { Member } from "@/models";
 import type { AccentColor } from "@/types";
 import MemberFactTile from "./MemberFactTile";
@@ -39,6 +40,7 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
   const t = useT().memberInfo;
   const locale = useLocale();
   const years = differenceInYears(new Date(), date);
+  const mobile = useIsMobileScreen();
   return (
     <>
       {locale === "en"
@@ -52,7 +54,9 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
           )}
         >
           {" · "}
-          {formatCount(locale, years, t.years)}
+          {mobile
+            ? `${years} ${t.yearsShort}`
+            : formatCount(locale, years, t.years)}
         </span>
       )}
     </>
@@ -69,6 +73,7 @@ const MemberInfoFacts = ({
   const t = useT().memberInfo;
   const locale = useLocale();
   const dn = useDisplayName();
+  const mobile = useIsMobileScreen();
   const { birthday, joinedAt, phoneNumbers, email } = member;
   const colorClasses = COLOR_CLASSES[color];
 
@@ -93,7 +98,9 @@ const MemberInfoFacts = ({
             )}
           >
             <MemberMiniAvatar member={mentor} size={24} color={color} />
-            <span className="min-w-0">{dn(mentor.name)}</span>
+            <span className={twMerge("min-w-0", mobile && "block truncate")}>
+              {mobile ? abbreviateName(dn(mentor.name)) : dn(mentor.name)}
+            </span>
           </span>
         </MemberFactTile>
       ),

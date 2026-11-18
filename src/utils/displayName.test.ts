@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { displayFamilyName } from "./displayName";
+import { abbreviateName, displayFamilyName } from "./displayName";
 import { romanize } from "./transliterate";
 
 describe("displayFamilyName", () => {
@@ -21,5 +21,16 @@ describe("displayFamilyName", () => {
 
   it("leaves uk unchanged", () => {
     expect(displayFamilyName("Кролики", "uk")).toBe("Кролики");
+  });
+});
+
+describe("abbreviateName", () => {
+  it.each([
+    ["Юра Горбаль", "Ю. Горбаль"],
+    ["  Anna   Glazunova ", "A. Glazunova"],
+    ["Оксана Петро Магіс", "О. Магіс"],
+    ["Madonna", "Madonna"],
+  ])("abbreviates %s", (full, short) => {
+    expect(abbreviateName(full)).toBe(short);
   });
 });
