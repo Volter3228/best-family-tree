@@ -20,7 +20,12 @@ import {
 export type ChallengeView = {
   id: string;
   swapsLeft: number;
-  questions: { id: string; prompt: string; solved: boolean }[];
+  questions: {
+    id: string;
+    prompt: string;
+    promptEn: string | null;
+    solved: boolean;
+  }[];
 };
 
 const toView = async (challenge: {
@@ -31,16 +36,20 @@ const toView = async (challenge: {
 }): Promise<ChallengeView> => {
   const rows = await prisma.signInQuestion.findMany({
     where: { id: { in: challenge.questionIds } },
-    select: { id: true, prompt: true },
+    select: { id: true, prompt: true, promptEn: true },
   });
   return {
     id: challenge.id,
     swapsLeft: challenge.swapsLeft,
-    questions: challenge.questionIds.map((id) => ({
-      id,
-      prompt: rows.find((r) => r.id === id)?.prompt ?? "",
-      solved: challenge.solvedQuestionIds.includes(id),
-    })),
+    questions: challenge.questionIds.map((id) => {
+      const row = rows.find((r) => r.id === id);
+      return {
+        id,
+        prompt: row?.prompt ?? "",
+        promptEn: row?.promptEn ?? null,
+        solved: challenge.solvedQuestionIds.includes(id),
+      };
+    }),
   };
 };
 

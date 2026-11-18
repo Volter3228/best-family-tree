@@ -13,7 +13,7 @@ import type { AccentColor } from "@/types";
 import { focusAboveKeyboard } from "@/utils/focusAboveKeyboard";
 import AuthMessage from "./AuthMessage";
 import QuestionCard from "./QuestionCard";
-import { useT } from "@/i18n/useT";
+import { useLocale, useT } from "@/i18n/useT";
 
 const CARD_COLORS: AccentColor[] = ["blue", "green", "orange"];
 
@@ -24,6 +24,7 @@ interface Props {
 
 const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
   const t = useT().auth;
+  const locale = useLocale();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
@@ -172,7 +173,7 @@ const QuestionsForm = ({ onStruggle, onSuccess }: Props) => {
             <QuestionCard
               key={q.id}
               index={i}
-              prompt={q.prompt}
+              prompt={locale === "en" && q.promptEn ? q.promptEn : q.prompt}
               value={answers[q.id] ?? ""}
               color={CARD_COLORS[i]}
               solved={q.solved}

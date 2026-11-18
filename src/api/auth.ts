@@ -19,6 +19,7 @@ export interface SessionInfo {
 export interface ChallengeQuestion {
   id: string;
   prompt: string;
+  promptEn: string | null;
   solved: boolean;
 }
 
