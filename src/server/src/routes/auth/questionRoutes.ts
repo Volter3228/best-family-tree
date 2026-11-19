@@ -1,25 +1,21 @@
 import { Router, type Request } from "express";
-import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import {
   createChallenge,
   swapChallengeQuestion,
   verifyAnswers,
 } from "../../auth/challenges.js";
+import { limiter } from "../../auth/rateLimit.js";
 import { createSession, setSessionCookie } from "../../auth/sessions.js";
 import { sendRouteError } from "../../utils/httpErrors.js";
 
 const router = Router();
 
 // The only limit: failed verifies per IP, like a password lockout.
-const failedVerifyLimit = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 10,
+const failedVerifyLimit = limiter(10, 15 * 60 * 1000, undefined, {
   // Only wrong answers (401) count; expired challenges and bad bodies do not.
   requestWasSuccessful: (_req, res) => res.statusCode !== 401,
   skipSuccessfulRequests: true,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
   handler: (req, res) => {
     const resetTime = (req as Request & { rateLimit?: { resetTime?: Date } })
       .rateLimit?.resetTime;

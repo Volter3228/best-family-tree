@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
-import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import type { AuthMethod } from "../../db/prisma/generated/client.js";
 import { callbackErrorRedirect } from "../../auth/googleSignIn.js";
 import { finishLogin, isProviderEnabled, startLogin, type OidcProvider } from "../../auth/oidc.js";
+import { limiter } from "../../auth/rateLimit.js";
 import { createSession, setSessionCookie } from "../../auth/sessions.js";
 
 export type OidcDecision =
@@ -23,18 +23,13 @@ export const createOidcRouter = (
     res.status(404).json({ error: "Not found" });
   };
 
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 10,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
-    keyGenerator: (req) => ipKeyGenerator(req.ip ?? "unknown"),
+  const startLimit = limiter(10, 15 * 60 * 1000, undefined, {
     handler: (_req, res) => {
       res.redirect(302, `/login?error=${provider}_failed`);
     },
   });
 
-  router.get(`/auth/${provider}/start`, enabled, limiter, async (_req: Request, res: Response) => {
+  router.get(`/auth/${provider}/start`, enabled, startLimit, async (_req: Request, res: Response) => {
     try {
       res.redirect(302, (await startLogin(res, provider, { scope })).href);
     } catch (error) {

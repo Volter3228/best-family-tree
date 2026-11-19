@@ -1,5 +1,4 @@
 import { Router, type Request, type Response } from "express";
-import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import { authSecret, isDemoMode } from "../../auth/config.js";
 import {
@@ -9,6 +8,7 @@ import {
 } from "../../auth/emailCodes.js";
 import { loadEmailIdentity, prismaCodeStore } from "../../auth/emailSignIn.js";
 import { normalizeEmail } from "../../auth/eligibility.js";
+import { ipKey, limiter } from "../../auth/rateLimit.js";
 import { getMailer } from "../../auth/mailer/index.js";
 import {
   renderSignInCodeEmail,
@@ -35,25 +35,6 @@ const bodyEmail = (req: Request) => {
   return typeof raw === "string" ? normalizeEmail(raw) : "";
 };
 
-const limiter = (
-  limit: number,
-  windowMs: number,
-  key: (req: Request) => string,
-) =>
-  rateLimit({
-    windowMs,
-    limit,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
-    keyGenerator: key,
-    handler: (_req, res) => {
-      res
-        .status(429)
-        .json({ error: "Too many requests", code: "too_many_requests" });
-    },
-  });
-
-const ipKey = (req: Request) => ipKeyGenerator(req.ip ?? "unknown");
 const emailKey = (req: Request) => bodyEmail(req) || ipKey(req);
 
 // The public demo sends a code to any address, so its daily cap per IP is lower.

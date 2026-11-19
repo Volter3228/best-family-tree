@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatZodErrors } from "./catalogValidation.js";
 import { memberBodySchema } from "./validation.js";
 
 // Updates are lenient about fields the stored record never had (old records
@@ -32,10 +33,7 @@ export const validateSparseMemberBody = (
   const result = sparseMemberBodySchema.safeParse(body);
   if (result.success) return { success: true, data: result.data };
 
-  const errors = result.error.issues
-    .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-    .join("; ");
-  return { success: false, errors };
+  return { success: false, errors: formatZodErrors(result.error) };
 };
 
 export interface ExistingMember {
@@ -96,10 +94,7 @@ export const validateMemberUpdate = (
   | { success: false; errors: string } => {
   const result = memberUpdateBodySchema.safeParse(body);
   if (!result.success) {
-    const errors = result.error.issues
-      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-      .join("; ");
-    return { success: false, errors };
+    return { success: false, errors: formatZodErrors(result.error) };
   }
 
   const cleared = findClearedFields(existing, result.data);

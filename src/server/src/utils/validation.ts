@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatZodErrors } from "./catalogValidation.js";
 
 const isValidDate = (val: string) => !isNaN(Date.parse(val));
 
@@ -51,9 +52,5 @@ export const validateMemberBody = (
     return { success: true, data: result.data };
   }
 
-  const errors = result.error.issues
-    .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-    .join("; ");
-
-  return { success: false, errors };
+  return { success: false, errors: formatZodErrors(result.error) };
 };

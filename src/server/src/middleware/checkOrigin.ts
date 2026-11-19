@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-
-const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+import { WRITE_METHODS } from "./writeMethods.js";
 
 /** Refuses writes whose Origin is present and not the client origin. */
 export const checkOrigin = (

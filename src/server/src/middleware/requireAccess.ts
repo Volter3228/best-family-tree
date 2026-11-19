@@ -2,6 +2,7 @@ import { errorBody } from "../utils/httpErrors.js";
 import type { NextFunction, Request, Response } from "express";
 import { hasAccess } from "../auth/access.js";
 import type { AccessRank } from "../auth/types.js";
+import { WRITE_METHODS } from "./writeMethods.js";
 
 export const requireAccess =
   (needed: AccessRank) => (req: Request, res: Response, next: NextFunction) => {
@@ -15,8 +16,6 @@ export const requireAccess =
     }
     next();
   };
-
-const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 /** Every write to the API needs an Editor, whatever the route. */
 export const requireEditorForWrites = (
