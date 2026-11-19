@@ -1,13 +1,21 @@
 import { Router, type Response } from "express";
 import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
-import { deleteCloudinaryImage } from "../libs/cloudinary.js";
+import {
+  deleteCloudinaryImage,
+  deleteReplacedImage,
+} from "../libs/cloudinary.js";
 import {
   parseWith,
   teamTypeBodySchema,
   teamTypeUpdateSchema,
 } from "../utils/catalogValidation.js";
-import { sendRouteError, errorBody } from "../utils/httpErrors.js";
+import {
+  ConflictError,
+  NotFoundError,
+  sendRouteError,
+  errorBody,
+} from "../utils/httpErrors.js";
 import { sameName } from "../utils/names.js";
 
 const router = Router();
@@ -90,9 +98,10 @@ router.put(
   "/team-types/:id",
   uploadTeamTypeIcon.single("icon"),
   async (req, res) => {
+    const uploadedIcon = req.file?.path;
     const body = parseWith(teamTypeUpdateSchema, req.body);
     if (!body.success) {
-      await rejectUpload(res, 400, body.errors, "validation", req.file?.path);
+      await rejectUpload(res, 400, body.errors, "validation", uploadedIcon);
       return;
     }
 
@@ -107,7 +116,7 @@ router.put(
           404,
           "Team type not found",
           "team_type_not_found",
-          req.file?.path,
+          uploadedIcon,
         );
         return;
       }
@@ -122,24 +131,16 @@ router.put(
             409,
             "Team type with this name already exists",
             "team_type_exists",
-            req.file?.path,
+            uploadedIcon,
           );
           return;
         }
       }
 
+      // A new file replaces the icon, an empty "icon" field removes it.
       let iconUrl = existing.iconUrl;
-      if (req.file?.path) {
-        iconUrl = req.file.path;
-        if (existing.iconUrl) {
-          await deleteCloudinaryImage(existing.iconUrl);
-        }
-      } else if (req.body.icon === "") {
-        iconUrl = null;
-        if (existing.iconUrl) {
-          await deleteCloudinaryImage(existing.iconUrl);
-        }
-      }
+      if (uploadedIcon) iconUrl = uploadedIcon;
+      else if (req.body.icon === "") iconUrl = null;
 
       const updated = await prisma.teamType.update({
         where: { id },
@@ -154,8 +155,11 @@ router.put(
         },
       });
 
+      // The old icon goes only once the new data is safely stored.
+      await deleteReplacedImage(existing.iconUrl, iconUrl);
       res.status(200).json(updated);
     } catch (error) {
+      if (uploadedIcon) await deleteCloudinaryImage(uploadedIcon);
       sendRouteError(res, error, "Failed to update team type");
     }
   },
@@ -165,35 +169,30 @@ router.delete("/team-types/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const teamsCount = await prisma.team.count({
-      where: { teamTypeId: id },
+    // Check and delete in one transaction, so a team added meanwhile blocks it.
+    const iconUrl = await prisma.$transaction(async (tx) => {
+      const teamType = await tx.teamType.findUnique({ where: { id } });
+      if (!teamType)
+        throw new NotFoundError("Team type not found", {
+          code: "team_type_not_found",
+        });
+
+      const teamsCount = await tx.team.count({
+        where: { teamTypeId: id },
+      });
+      if (teamsCount > 0)
+        throw new ConflictError(
+          "Cannot delete team type: teams are still referencing it",
+          undefined,
+          { code: "team_type_in_use" },
+        );
+
+      await tx.teamType.delete({ where: { id } });
+      return teamType.iconUrl;
     });
 
-    if (teamsCount > 0) {
-      res
-        .status(409)
-        .json(
-          errorBody(
-            "Cannot delete team type: teams are still referencing it",
-            "team_type_in_use",
-          ),
-        );
-      return;
-    }
-
-    const teamType = await prisma.teamType.findUnique({ where: { id } });
-    if (!teamType) {
-      res
-        .status(404)
-        .json(errorBody("Team type not found", "team_type_not_found"));
-      return;
-    }
-
-    if (teamType.iconUrl) {
-      await deleteCloudinaryImage(teamType.iconUrl);
-    }
-
-    await prisma.teamType.delete({ where: { id } });
+    // The icon goes only after the row is gone.
+    if (iconUrl) await deleteCloudinaryImage(iconUrl);
     res.status(204).send();
   } catch (error) {
     sendRouteError(res, error, "Failed to delete team type");
