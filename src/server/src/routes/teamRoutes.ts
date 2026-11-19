@@ -87,7 +87,7 @@ router.put("/teams/:id", uploadTeamIcon.single("icon"), async (req, res) => {
 
 router.delete("/teams/:id", async (req, res) => {
   try {
-    const team = await deleteTeam(req.params.id);
+    const team = await deleteTeam(req.params.id, req.session!);
     if (team.photoUrl) await deleteCloudinaryImage(team.photoUrl);
     res.status(204).send();
   } catch (error) {

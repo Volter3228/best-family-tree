@@ -152,11 +152,21 @@ export const updateTeam = (
   });
 
 /** Removes the team together with its members' positions in it. */
-export const deleteTeam = (id: string) =>
+export const deleteTeam = (id: string, session: Session) =>
   prisma.$transaction(async (tx) => {
     const team = await tx.team.findUnique({ where: { id } });
     if (!team)
       throw new NotFoundError("Team not found", { code: "team_not_found" });
+
+    const holders = await tx.memberPosition.findMany({
+      where: { teamId: id },
+      select: { memberId: true },
+      distinct: ["memberId"],
+    });
+    await assertCanEditMembers(
+      session,
+      holders.map((holder) => holder.memberId),
+    );
 
     await tx.memberPosition.deleteMany({ where: { teamId: id } });
     await tx.team.delete({ where: { id } });

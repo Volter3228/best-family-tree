@@ -8,7 +8,7 @@ import {
 } from "@/api/teams";
 import { useMembersActions } from "../data/useMembers";
 import { useRoles, useTeamTypes, useTeams } from "../data/useMeta";
-import type { TeamFormData, TeamMemberRow } from "@/types";
+import type { Team, TeamFormData, TeamMemberRow } from "@/types";
 import { useT } from "@/i18n/useT";
 import {
   EMPTY_TEAM_FORM,
@@ -53,6 +53,9 @@ export const useTeamForm = ({
   const [success, showSuccess, hideSuccess] = useTransientMessage();
   // The team as the server last returned it; edits that match it are not sent.
   const savedFormRef = useRef<TeamFormData | null>(null);
+  // Create mode: the team saved before the roster request failed, so a retry
+  // updates it instead of hitting 409 team_exists.
+  const createdTeamRef = useRef<Team | null>(null);
 
   const [teams, setTeams, reloadTeams] = useTeams();
   const [teamTypes, , reloadTeamTypes] = useTeamTypes();
@@ -92,6 +95,7 @@ export const useTeamForm = ({
   }, [mode, selectedTeamId]);
 
   const resetForm = () => {
+    createdTeamRef.current = null;
     setForm(EMPTY_TEAM_FORM);
     setError(null);
     hideSuccess();
@@ -155,11 +159,17 @@ export const useTeamForm = ({
     setError(null);
     hideSuccess();
 
+    let savedTeam: Team | null = null;
     try {
+      const pending = createdTeamRef.current;
       const saved =
         mode === "edit" && selectedTeamId
           ? await updateTeam(selectedTeamId, buildTeamRequestBody(form, mode))
-          : await createTeam(buildTeamRequestBody(form, mode));
+          : pending
+            ? await updateTeam(pending.id, buildTeamRequestBody(form, "edit"))
+            : await createTeam(buildTeamRequestBody(form, mode));
+      savedTeam = saved;
+      if (mode === "create") createdTeamRef.current = saved;
 
       if (mode === "edit" || form.members.length > 0) {
         await setTeamMembers(saved.id, toTeamMembersBody(form.members));
@@ -182,6 +192,14 @@ export const useTeamForm = ({
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t.saveFailed);
+      // The team itself may already be saved: show it in the list.
+      if (savedTeam) {
+        const team = savedTeam;
+        if (mode === "create") {
+          setTeams([...teams.filter((item) => item.id !== team.id), team]);
+        }
+        refreshAfterChange();
+      }
     } finally {
       setIsSubmitting(false);
     }
