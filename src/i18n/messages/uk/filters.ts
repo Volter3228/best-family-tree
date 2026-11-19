@@ -56,7 +56,7 @@ export const filters = {
     other: "Інше",
     teamTypes: "Типи команд",
     findTeamType: "Знайти тип команди",
-    activityPeriod: "Період активності",
+    activityPeriod: "Роки активності",
     activeNow: "Активні зараз",
   },
   roles: {

@@ -40,7 +40,7 @@ export const filters = {
     other: "Other",
     teamTypes: "Team types",
     findTeamType: "Find team type",
-    activityPeriod: "Activity period",
+    activityPeriod: "Activity years",
     activeNow: "Active now",
   },
   roles: {

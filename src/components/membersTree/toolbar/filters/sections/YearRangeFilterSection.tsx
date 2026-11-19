@@ -1,10 +1,8 @@
 import { useId, type ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
-import { FILTER_INPUT_CLASSES } from "@/constants/filters";
 import { useT } from "@/i18n/useT";
 import FilterSection from "./FilterSection";
-import ClearButton from "./ClearButton";
-import RangeInputs, { type RangeSlot } from "./RangeInputs";
+import RangeInputs from "./RangeInputs";
+import YearInput from "./YearInput";
 
 interface YearRangeValue {
   from: number | null;
@@ -21,48 +19,6 @@ interface Props {
   leading?: ReactNode;
 }
 
-const parseYear = (raw: string): number | null => {
-  const digits = raw.replace(/\D/g, "");
-  return digits ? Number(digits) : null;
-};
-
-interface YearInputProps extends RangeSlot {
-  value: number | null;
-  onChange: (value: number | null) => void;
-  onBlur?: (value: number | null) => void;
-  onClear: () => void;
-}
-
-const YearInput = ({
-  id,
-  placeholder,
-  value,
-  disabled,
-  onChange,
-  onBlur,
-  onClear,
-}: YearInputProps) => (
-  <div className="relative">
-    <input
-      id={id}
-      type="text"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      placeholder={placeholder}
-      value={value ?? ""}
-      disabled={disabled}
-      onChange={(e) => onChange(parseYear(e.target.value))}
-      onBlur={(e) => onBlur?.(parseYear(e.target.value))}
-      className={twMerge(
-        FILTER_INPUT_CLASSES,
-        value !== null && !disabled && "pr-8",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-      )}
-    />
-    {value !== null && !disabled && <ClearButton onClick={onClear} />}
-  </div>
-);
-
 // A from/to year range with open ends (an empty bound means "no limit").
 // One filled year is an exact match.
 const YearRangeFilterSection = ({
@@ -76,13 +32,15 @@ const YearRangeFilterSection = ({
   const inputId = useId();
   const { from, to } = value;
 
-  // A range typed the wrong way round is fixed once the field loses focus.
+  // Leaving a field applies its year; a range typed the wrong way round
+  // collapses to that year.
   const handleBlur = (field: "from" | "to") => (year: number | null) => {
-    if (year === null) return;
-    if (field === "from" && to !== null && year > to) {
-      onChange({ from: year, to: year });
-    } else if (field === "to" && from !== null && year < from) {
-      onChange({ from: year, to: year });
+    if (field === "from") {
+      const inverted = year !== null && to !== null && year > to;
+      onChange({ from: year, to: inverted ? year : to });
+    } else {
+      const inverted = year !== null && from !== null && year < from;
+      onChange({ from: inverted ? year : from, to: year });
     }
   };
 
@@ -101,7 +59,6 @@ const YearRangeFilterSection = ({
               value={from}
               onChange={(year) => onChange({ from: year, to })}
               onBlur={handleBlur("from")}
-              onClear={() => onChange({ from: null, to })}
             />
           )}
           renderTo={(slot) => (
@@ -110,7 +67,6 @@ const YearRangeFilterSection = ({
               value={to}
               onChange={(year) => onChange({ from, to: year })}
               onBlur={handleBlur("to")}
-              onClear={() => onChange({ from, to: null })}
             />
           )}
         />
