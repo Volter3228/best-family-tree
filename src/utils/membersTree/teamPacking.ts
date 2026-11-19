@@ -1,9 +1,6 @@
 import { TEAM_FRAME_GAP, TEAM_PACK_ASPECT } from "@/constants/canvas";
 import type { Direction } from "@/types";
 
-// Extra space before the first frame of a new lane, on top of the usual gap.
-const LANE_GAP = TEAM_FRAME_GAP;
-
 interface Size {
   width: number;
   height: number;
@@ -16,23 +13,27 @@ interface Placement extends Size {
 
 // Shelf packing in reading order: frames go left to right and wrap at the
 // given width. Lanes follow each other in the same rows (a lane does not start
-// a new row); an extra gap marks where a new lane begins.
-const shelfPack = (lanes: Size[][], maxWidth: number): Placement[] => {
+// a new row); an extra gap (the same size again) marks where a new lane begins.
+const shelfPack = (
+  lanes: Size[][],
+  maxWidth: number,
+  gap: number,
+): Placement[] => {
   const placed: Placement[] = [];
   let x = 0;
   let y = 0;
   let rowHeight = 0;
 
   lanes.forEach((lane, laneIndex) => {
-    if (laneIndex > 0 && x > 0) x += LANE_GAP;
+    if (laneIndex > 0 && x > 0) x += gap;
     for (const { width, height } of lane) {
       if (x > 0 && x + width > maxWidth) {
-        y += rowHeight + TEAM_FRAME_GAP;
+        y += rowHeight + gap;
         x = 0;
         rowHeight = 0;
       }
       placed.push({ x, y, width, height });
-      x += width + TEAM_FRAME_GAP;
+      x += width + gap;
       rowHeight = Math.max(rowHeight, height);
     }
   });
@@ -51,10 +52,13 @@ const scorePacking = (placed: Placement[]) => {
   );
 };
 
-const computePacking = (lanes: Size[][]): { x: number; y: number }[] => {
+const computePacking = (
+  lanes: Size[][],
+  gap: number,
+): { x: number; y: number }[] => {
   const sizes = lanes.flat();
   const area = sizes.reduce(
-    (sum, s) => sum + (s.width + TEAM_FRAME_GAP) * (s.height + TEAM_FRAME_GAP),
+    (sum, s) => sum + (s.width + gap) * (s.height + gap),
     0,
   );
   const maxFrameWidth = Math.max(...sizes.map((s) => s.width));
@@ -66,7 +70,7 @@ const computePacking = (lanes: Size[][]): { x: number; y: number }[] => {
       maxFrameWidth,
       Math.sqrt(area * TEAM_PACK_ASPECT) * factor,
     );
-    const placed = shelfPack(lanes, maxWidth);
+    const placed = shelfPack(lanes, maxWidth, gap);
     const score = scorePacking(placed);
     if (score < bestScore) {
       bestScore = score;
@@ -81,12 +85,13 @@ const computePacking = (lanes: Size[][]): { x: number; y: number }[] => {
 const computeDirectedPacking = (
   lanes: Size[][],
   direction: Direction,
+  gap: number,
 ): { x: number; y: number }[] => {
-  if (direction === "TB") return computePacking(lanes);
+  if (direction === "TB") return computePacking(lanes, gap);
   const transposed = lanes.map((lane) =>
     lane.map(({ width, height }) => ({ width: height, height: width })),
   );
-  return computePacking(transposed).map(({ x, y }) => ({ x: y, y: x }));
+  return computePacking(transposed, gap).map(({ x, y }) => ({ x: y, y: x }));
 };
 
 let lastPacking: { key: string; positions: { x: number; y: number }[] } | null =
@@ -112,7 +117,18 @@ export const packLanes = (
       .map((lane) => lane.map((s) => s.width + "x" + s.height).join(","))
       .join("|");
   if (lastPacking?.key === key) return lastPacking.positions;
-  const positions = computeDirectedPacking(lanes, direction);
+  const positions = computeDirectedPacking(lanes, direction, TEAM_FRAME_GAP);
   lastPacking = { key, positions };
   return positions;
 };
+
+/**
+ * Pack boxes in the given order with the same screen-like aspect search as
+ * `packLanes` (one lane, no cache). Returns each box's top-left corner.
+ */
+export const packBoxes = (
+  sizes: Size[],
+  direction: Direction,
+  gap: number,
+): { x: number; y: number }[] =>
+  sizes.length === 0 ? [] : computeDirectedPacking([sizes], direction, gap);
