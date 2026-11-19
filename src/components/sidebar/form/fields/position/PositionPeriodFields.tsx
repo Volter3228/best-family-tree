@@ -1,3 +1,4 @@
+import { FOUNDER_JOIN_YEAR } from "@/constants/member";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { formatYearRange } from "@/utils";
@@ -63,6 +64,7 @@ const PositionPeriodFields = ({
         }
         color={color}
         {...yearLimits}
+        min={FOUNDER_JOIN_YEAR}
       />
     );
   }

@@ -1,3 +1,4 @@
+import { FOUNDER_JOIN_YEAR } from "@/constants/member";
 import { useT } from "@/i18n/useT";
 import type { AccentColor, DropdownOption } from "@/types";
 import type { SuggestTeamForm } from "@/utils/suggestChanges";
@@ -73,6 +74,7 @@ const TeamSuggestFields = ({
       <FormField error={errors.years} color={color}>
         <YearRangeInput
           name="teamYears"
+          min={FOUNDER_JOIN_YEAR}
           start={form.startYear}
           end={form.endYear}
           ongoing={form.isOngoing}

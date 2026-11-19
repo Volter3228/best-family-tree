@@ -38,8 +38,18 @@ export const fieldLabelKey = (field: string, kind: "member" | "team") =>
 
 const LOCALE_TAG: Record<Locale, string> = { uk: "uk-UA", en: "en-GB" };
 
+export const PHONE_FIELDS = [
+  "phone:add",
+  "phone:remove",
+  "phone:replace",
+] as const;
+
+export const isPhoneField = (field: string) =>
+  (PHONE_FIELDS as readonly string[]).includes(field);
+
+// The stored value may carry a time part.
 export const formatDay = (value: string, locale: Locale) => {
-  const date = new Date(`${value}T00:00:00`);
+  const date = new Date(`${value.slice(0, 10)}T00:00:00`);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString(LOCALE_TAG[locale], {
     day: "numeric",

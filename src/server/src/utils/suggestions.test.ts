@@ -5,7 +5,6 @@ import {
   exceedsPendingCap,
   isStale,
   revertedFields,
-  supersededFilter,
   type MemberSnapshot,
   type TeamSnapshot,
 } from "./suggestions.js";
@@ -181,32 +180,25 @@ describe("phone replace and supersede", () => {
     expect(isStale(row, ["+1", "+2"])).toBe(true);
   });
 
-  it("keys superseded rows by field or phone value", () => {
-    expect(
-      supersededFilter({ field: "email", fromValue: "a", toValue: "b" }),
-    ).toEqual({ field: "email" });
-    expect(
-      supersededFilter({ field: "phone:add", fromValue: null, toValue: "+2" }),
-    ).toEqual({ field: "phone:add", toValue: "+2" });
-    expect(
-      supersededFilter({
-        field: "phone:replace",
-        fromValue: "+1",
-        toValue: "+2",
-      }),
-    ).toEqual({
-      field: { in: ["phone:replace", "phone:remove"] },
-      fromValue: "+1",
-    });
-  });
-
   it("finds fields set back to their current value", () => {
     expect(
       revertedFields(
-        [{ field: "email" }, { field: "status" }, { field: "phoneNumbers" }],
+        [{ field: "email" }, { field: "status" }],
         [{ field: "status", fromValue: "A", toValue: "B" }],
       ),
     ).toEqual(["email"]);
+  });
+
+  it("clears all pending phone rows whenever phoneNumbers is sent", () => {
+    const phones = ["phone:add", "phone:remove", "phone:replace"];
+    expect(revertedFields([{ field: "phoneNumbers" }], [])).toEqual(phones);
+    const rows = diffMemberSuggestion(member, [
+      { field: "phoneNumbers", value: JSON.stringify(member.phoneNumbers) },
+    ]);
+    expect(rows).toEqual([]);
+    expect(
+      revertedFields([{ field: "phoneNumbers" }, { field: "email" }], rows),
+    ).toEqual(["email", ...phones]);
   });
 });
 

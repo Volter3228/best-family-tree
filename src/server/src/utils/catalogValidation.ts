@@ -3,6 +3,8 @@ import { normalizeName, normalizeRoleName } from "./names.js";
 
 const HEX_COLOR = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const MIN_YEAR = 1990;
+// Teams belong to the organisation, which was founded in 2002.
+export const MIN_TEAM_YEAR = 2002;
 
 // JSON payloads may send null for "nothing"; keep only `undefined`.
 const optional = <T extends z.ZodType>(schema: T) =>
@@ -37,11 +39,16 @@ const year = z
   .min(MIN_YEAR, `Year must be ${MIN_YEAR} or later`)
   .max(new Date().getFullYear() + 1, "Year is too far in the future");
 
+const teamYear = year.min(
+  MIN_TEAM_YEAR,
+  `Year must be ${MIN_TEAM_YEAR} or later`,
+);
+
 // Years arrive as numbers (JSON) or strings (multipart).
 const yearField = z.preprocess(
   (value) =>
     value === "" ? null : typeof value === "string" ? Number(value) : value,
-  year.nullish(),
+  teamYear.nullish(),
 );
 
 const booleanLike = z.union([
@@ -111,8 +118,8 @@ export const positionSchema = z
   .object({
     ...roleRef,
     ...teamRef,
-    teamStartYear: optional(year),
-    teamEndYear: optional(year),
+    teamStartYear: optional(teamYear),
+    teamEndYear: optional(teamYear),
     // Only for positions without a team.
     organization: optionalName("Organization", 80),
     startYear: optional(year),

@@ -24,7 +24,6 @@ import PendingBlock from "./PendingBlock";
 import TeamSuggestFields, {
   type TeamSuggestErrorKey,
 } from "./TeamSuggestFields";
-import { applyTeamPending } from "./prefill";
 import { buildPendingRows } from "./pendingRows";
 import { useSuggestions, withoutPending } from "./useSuggestions";
 
@@ -70,10 +69,9 @@ const TeamSuggestForm = ({
   // A newly picked logo, saved together with the suggestions on submit.
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const { pending, pendingFields, isSubmitting, error, run } = useSuggestions({
+  const { pending, isSubmitting, error, run } = useSuggestions({
     targetId: team.id,
     fetchMine: fetchMyTeamSuggestions,
-    onFirstLoad: (rows) => setForm((prev) => applyTeamPending(prev, rows)),
   });
 
   const teamTypeOptions = useMemo(
@@ -81,8 +79,8 @@ const TeamSuggestForm = ({
     [teamTypes],
   );
   const changes = useMemo(
-    () => withoutPending(buildTeamChanges(team, form, pendingFields), pending),
-    [team, form, pendingFields, pending],
+    () => withoutPending(buildTeamChanges(team, form), pending),
+    [team, form, pending],
   );
   const pendingRows = useMemo(() => {
     const labels: Record<string, string> = {

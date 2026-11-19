@@ -2,7 +2,7 @@ export const account = {
   title: "Акаунт",
   guest: "Гість",
   levels: {
-    VIEWER: "Глядач",
+    VIEWER: "Користувач",
     EDITOR: "Редактор",
     ADMIN: "Адмін",
   },

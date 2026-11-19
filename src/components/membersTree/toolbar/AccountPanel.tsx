@@ -92,10 +92,8 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
             {treeMember && <NameBadge member={treeMember} />}
           </p>
           <p className="truncate text-xs text-foreground/60">
-            {[
-              getStatusLabel(person.status as MemberStatus, locale),
-              a.levels[session.level],
-            ].join(" · ")}
+            {getStatusLabel(person.status as MemberStatus, locale)}
+            {session.level !== "VIEWER" && ` · ${a.levels[session.level]}`}
           </p>
         </div>
       </div>

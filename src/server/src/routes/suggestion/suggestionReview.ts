@@ -8,6 +8,7 @@ import {
   ValidationError,
 } from "../../utils/httpErrors.js";
 import { teamBodySchema, parseWith } from "../../utils/catalogValidation.js";
+import { CONTACT_FIELDS } from "../../utils/suggestionFields.js";
 import {
   isPhoneField,
   isStale,
@@ -41,13 +42,6 @@ type Suggestion = NonNullable<
 >;
 
 const DATE_FIELDS = ["birthday", "joinedAt"];
-const CONTACT_FIELDS = [
-  "email",
-  "telegramLink",
-  "instagramLink",
-  "facebookLink",
-  "linkedinLink",
-];
 
 const applyMemberField = async (
   tx: MemberTransaction,

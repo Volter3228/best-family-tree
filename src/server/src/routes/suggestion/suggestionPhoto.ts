@@ -38,6 +38,7 @@ export const assertCanSuggestPhoto = async (
       code: `${target.kind}_not_found`,
     });
   }
+  await assertUnderPendingCap(session, target);
 };
 
 const currentPhoto = async (target: SuggestionTarget) =>
@@ -61,7 +62,6 @@ export const createPhotoSuggestion = async (
   target: SuggestionTarget,
   uploadedUrl: string,
 ) => {
-  await assertUnderPendingCap(session, target);
   const fromValue = await currentPhoto(target);
   const own = {
     status: "PENDING" as const,

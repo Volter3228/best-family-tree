@@ -54,14 +54,19 @@ const YearRangeInput = ({
     onChange(start, toYear(value));
   };
 
-  // On blur, drop the *other* year if the range became inconsistent, mirroring
-  // the previous keystroke-time behaviour but only once editing is finished.
+  const clamp = (year: number | undefined) =>
+    year === undefined ? undefined : Math.min(max, Math.max(min, year));
+
+  // On blur, pull an out-of-range year to the nearest allowed one, then drop
+  // the *other* year if the range became inconsistent.
   const validateStart = () => {
-    if (start && end && start > end) onChange(start, undefined);
+    const s = clamp(start);
+    onChange(s, s && end && s > end ? undefined : end);
   };
 
   const validateEnd = () => {
-    if (start && end && start > end) onChange(undefined, end);
+    const e = clamp(end);
+    onChange(start && e && start > e ? undefined : start, e);
   };
 
   const fields = [

@@ -11,6 +11,7 @@ import { getMemberAvatar } from "@/utils";
 import { buildMemberChanges, toDay } from "@/utils/suggestChanges";
 import { getStatusOptions } from "@/constants/filters";
 import { useLocale, useT } from "@/i18n/useT";
+import { formatDay } from "../../manage/suggestionFormat";
 import { useDisplayName } from "@/utils/displayName";
 import { useSessionStore } from "@/store/sessionStore";
 import InfoBubble from "@/components/ui/InfoBubble";
@@ -24,8 +25,7 @@ import FormError from "../FormError";
 import FormFooter from "../FormFooter";
 import MemberSuggestFields from "./MemberSuggestFields";
 import PendingBlock from "./PendingBlock";
-import { applyMemberPending } from "./prefill";
-import { buildPendingRows, formatDay } from "./pendingRows";
+import { buildPendingRows } from "./pendingRows";
 import { useSuggestions, withoutPending } from "./useSuggestions";
 
 interface Props {
@@ -69,10 +69,9 @@ const MemberSuggestForm = ({
   // Removing one's own saved photo is allowed (privacy).
   const [removePhoto, setRemovePhoto] = useState(false);
 
-  const { pending, pendingFields, isSubmitting, error, run } = useSuggestions({
+  const { pending, isSubmitting, error, run } = useSuggestions({
     targetId: member.id,
     fetchMine: fetchMyMemberSuggestions,
-    onFirstLoad: (rows) => setForm((prev) => applyMemberPending(prev, rows)),
   });
 
   useEffect(() => {
@@ -86,8 +85,8 @@ const MemberSuggestForm = ({
 
   const changes = useMemo(
     () =>
-      withoutPending(buildMemberChanges(member, form, pendingFields), pending),
-    [member, form, pendingFields, pending],
+      withoutPending(buildMemberChanges(member, form), pending),
+    [member, form, pending],
   );
 
   const pendingRows = useMemo(() => {
@@ -112,7 +111,7 @@ const MemberSuggestForm = ({
       (field) => labels[field] ?? field,
       (field, value) => {
         if (field === "birthday" || field === "joinedAt")
-          return formatDay(value);
+          return formatDay(value, locale);
         if (field === "status") {
           return statuses.find((item) => item.value === value)?.label ?? value;
         }

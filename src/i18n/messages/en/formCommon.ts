@@ -23,6 +23,8 @@ export const formCommon = {
   removeLogo: "Remove logo",
   avatar: "Avatar",
   removeAvatar: "Remove avatar",
+  changePhoto: "Change photo",
+  addPhoto: "Add photo",
   fileTooLarge: "Photo is too large. Maximum 10 MB.",
   start: "Start",
   end: "End",

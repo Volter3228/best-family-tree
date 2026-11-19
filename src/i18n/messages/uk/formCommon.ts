@@ -21,6 +21,8 @@ export const formCommon = {
   removeLogo: "Прибрати логотип",
   avatar: "Аватар",
   removeAvatar: "Прибрати аватар",
+  changePhoto: "Змінити фото",
+  addPhoto: "Додати фото",
   fileTooLarge: "Фото завелике. Максимум 10 МБ.",
   start: "Початок",
   end: "Кінець",

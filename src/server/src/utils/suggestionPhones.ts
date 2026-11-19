@@ -58,31 +58,20 @@ export const isPhoneStale = (
   return !list.includes(row.fromValue!) || list.includes(row.toValue!);
 };
 
-/** Prisma filter for this author's pending rows that a new row supersedes. */
-export const supersededFilter = (row: SuggestionRow) => {
-  if (row.field === PHONE_ADD) {
-    return { field: PHONE_ADD, toValue: row.toValue };
-  }
-  if (isPhoneField(row.field)) {
-    return {
-      field: { in: [PHONE_REPLACE, PHONE_REMOVE] },
-      fromValue: row.fromValue,
-    };
-  }
-  return { field: row.field };
-};
-
-/** Plain fields the author sent that need no change: their pending row is a reverted one. */
+/**
+ * Plain fields the author sent that need no change: their pending row is a reverted one.
+ * Sending "phoneNumbers" always clears all of the author's pending phone rows.
+ */
 export const revertedFields = (
   changes: { field: string }[],
   rows: SuggestionRow[],
 ) => {
   const kept = new Set(rows.map((r) => r.field));
-  return [
-    ...new Set(
-      changes
-        .map((c) => c.field)
-        .filter((f) => f !== "phoneNumbers" && !kept.has(f)),
-    ),
-  ];
+  const fields = changes
+    .map((c) => c.field)
+    .filter((f) => f !== "phoneNumbers" && !kept.has(f));
+  if (changes.some((c) => c.field === "phoneNumbers")) {
+    fields.push(PHONE_ADD, PHONE_REMOVE, PHONE_REPLACE);
+  }
+  return [...new Set(fields)];
 };

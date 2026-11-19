@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import type { PendingSuggestion } from "@/api/selfService";
 import type { Messages } from "@/i18n/messages";
 
@@ -13,11 +12,6 @@ export interface PendingRow {
 const parseDay = (value: string) => {
   const [year, month, day] = value.slice(0, 10).split("-").map(Number);
   return new Date(year, month - 1, day);
-};
-
-export const formatDay = (value: string) => {
-  const date = parseDay(value);
-  return Number.isNaN(date.getTime()) ? value : format(date, "dd.MM.yyyy");
 };
 
 export { parseDay };

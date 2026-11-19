@@ -20,7 +20,7 @@ const LEAVE_MS = 300;
 
 const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
   const t = useT().review;
-  const { updateMember, getMentorsList } = useMembersActions();
+  const { updateMember, getMentorsList, reloadMembers } = useMembersActions();
   const [, , reloadTeams] = useTeams();
   const [items, setItems] = useState<SuggestionDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -110,15 +110,20 @@ const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
         if (item.field === "name" || item.field === "status") mentors = true;
       }
       setTimeout(async () => {
-        for (const id of memberIds) {
-          const member = await fetchMemberById(id).catch(() => null);
-          if (member) updateMember(member);
+        if (teams) {
+          // Members embed team data, so the full reload covers the per-member fetches.
+          reloadTeams();
+          reloadMembers();
+        } else {
+          const fetched = await Promise.all(
+            [...memberIds].map((id) => fetchMemberById(id).catch(() => null)),
+          );
+          for (const member of fetched) if (member) updateMember(member);
         }
         if (mentors) getMentorsList();
-        if (teams) reloadTeams();
       }, LEAVE_MS + 50);
     },
-    [updateMember, getMentorsList, reloadTeams],
+    [updateMember, getMentorsList, reloadTeams, reloadMembers],
   );
 
   const act = async (id: string, kind: ReviewKind, force = false) => {

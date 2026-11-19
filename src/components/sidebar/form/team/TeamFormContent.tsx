@@ -1,3 +1,4 @@
+import { FOUNDER_JOIN_YEAR } from "@/constants/member";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { useMembersList, useRoles } from "@/hooks";
 import { useT } from "@/i18n/useT";
@@ -151,6 +152,7 @@ const TeamFormContent = ({
       <FormSection title={t.period} color={color}>
         <YearRangeInput
           name="teamYears"
+          min={FOUNDER_JOIN_YEAR}
           start={form.startYear}
           end={form.endYear}
           ongoing={form.isOngoing}

@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import LionIcon from "@/components/icons/Lion";
 import { XMarkIcon } from "@heroicons/react/16/solid";
+import { CameraIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "./inputClasses";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
@@ -113,11 +114,15 @@ const AvatarFileInput = ({
           />
           <div
             className={twMerge(
-              "absolute inset-0 rounded-full transition-all duration-200 ease-in-out",
-              colorClasses.hoverSurfaceBg,
-              "group-hover:opacity-50 opacity-0",
+              "absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-black/45 text-white opacity-0 select-none border-4 transition-opacity duration-200 ease-in-out group-hover:opacity-100 group-focus-within:opacity-100",
+              colorClasses.border,
             )}
-          />
+          >
+            <CameraIcon className="h-7 w-7" />
+            <span className="px-3 text-center text-xs font-semibold leading-tight">
+              {selectedImage ? t.changePhoto : t.addPhoto}
+            </span>
+          </div>
         </label>
         {selectedImage &&
           (!keepInitial || selectedImage !== initialImage || onRemoveSaved) && (

@@ -6,7 +6,7 @@ import { memberBodySchema } from "./validation.js";
 // A normalizer returns the canonical string, or null when the value is invalid.
 export type Normalizer = (value: string) => string | null;
 
-const MIN_YEAR = 1990;
+import { MIN_TEAM_YEAR as MIN_YEAR } from "./catalogValidation.js";
 
 const text =
   (max: number): Normalizer =>
@@ -84,3 +84,11 @@ export const cannotEmpty = (field: string) =>
     code: "cannot_empty",
     params: { field },
   });
+
+export const CONTACT_FIELDS = [
+  "email",
+  "telegramLink",
+  "instagramLink",
+  "facebookLink",
+  "linkedinLink",
+];

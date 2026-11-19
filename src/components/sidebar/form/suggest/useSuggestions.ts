@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/api/ApiError";
 import type { PendingSuggestion, SuggestionChange } from "@/api/selfService";
 import { useT } from "@/i18n/useT";
@@ -6,27 +6,15 @@ import { useT } from "@/i18n/useT";
 interface Options {
   targetId: string;
   fetchMine: (id: string) => Promise<PendingSuggestion[]>;
-  // Runs once with the first loaded rows, to prefill the form with them.
-  onFirstLoad?: (rows: PendingSuggestion[]) => void;
 }
-
-const PHONE_ROWS = ["phone:add", "phone:remove", "phone:replace"];
 
 // Pending suggestions of the signed-in user for one record, plus a runner
 // that tracks the submit state and maps server errors to friendly messages.
-export const useSuggestions = ({
-  targetId,
-  fetchMine,
-  onFirstLoad,
-}: Options) => {
+export const useSuggestions = ({ targetId, fetchMine }: Options) => {
   const t = useT().suggest;
   const [pending, setPending] = useState<PendingSuggestion[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const onFirstLoadRef = useRef(onFirstLoad);
-  useEffect(() => {
-    onFirstLoadRef.current = onFirstLoad;
-  });
 
   useEffect(() => {
     let stale = false;
@@ -34,23 +22,12 @@ export const useSuggestions = ({
       .then((rows) => {
         if (stale) return;
         setPending(rows);
-        onFirstLoadRef.current?.(rows);
       })
       .catch(() => undefined);
     return () => {
       stale = true;
     };
   }, [fetchMine, targetId]);
-
-  const pendingFields = useMemo(
-    () =>
-      new Set(
-        pending.map(({ field }) =>
-          PHONE_ROWS.includes(field) ? "phoneNumbers" : field,
-        ),
-      ),
-    [pending],
-  );
 
   const run = useCallback(
     async (action: () => Promise<void>) => {
@@ -71,7 +48,7 @@ export const useSuggestions = ({
     [t],
   );
 
-  return { pending, pendingFields, isSubmitting, error, run };
+  return { pending, isSubmitting, error, run };
 };
 
 // A change already waiting for review with the same value is not sent again.

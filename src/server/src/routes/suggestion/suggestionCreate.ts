@@ -15,10 +15,10 @@ import {
   diffMemberSuggestion,
   diffTeamSuggestion,
   revertedFields,
-  supersededFilter,
   type SuggestionChange,
   type SuggestionRow,
 } from "../../utils/suggestions.js";
+import { CONTACT_FIELDS } from "../../utils/suggestionFields.js";
 import {
   assertUnderPendingCap,
   authorWhere,
@@ -32,14 +32,6 @@ import {
 } from "../member/memberService.js";
 
 export type { SuggestionTarget };
-
-const CONTACT_FIELDS = [
-  "email",
-  "telegramLink",
-  "instagramLink",
-  "facebookLink",
-  "linkedinLink",
-];
 
 const checkMemberRows = async (memberId: string, rows: SuggestionRow[]) => {
   const mentorId = rows.find((r) => r.field === "mentorId")?.toValue;
@@ -166,7 +158,7 @@ export const createSuggestionBatch = async (
       where: {
         ...own,
         OR: [
-          ...rows.map(supersededFilter),
+          { field: { in: [...new Set(rows.map((r) => r.field))] } },
           ...(reverted.length > 0 ? [{ field: { in: reverted } }] : []),
         ],
       },
