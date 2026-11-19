@@ -2,7 +2,6 @@ import React from "react";
 import CloseButton from "@/components/ui/CloseButton";
 import {
   PencilIcon,
-  ChatBubbleLeftEllipsisIcon,
   ArrowLeftIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/solid";
@@ -127,7 +126,7 @@ const SidebarHeader = ({
             title={tSuggest.action}
             aria-label={tSuggest.action}
           >
-            <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />
+            <PencilIcon className="h-5 w-5" />
           </button>
         )}
         <CloseButton
