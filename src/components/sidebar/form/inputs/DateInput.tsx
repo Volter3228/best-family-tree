@@ -1,5 +1,6 @@
 import DatePicker from "react-datepicker";
 import { enUS, uk } from "date-fns/locale";
+import type { Locale } from "date-fns";
 import { CalendarDaysIcon } from "@heroicons/react/16/solid";
 import InputLabel from "./InputLabel";
 import { twMerge } from "tailwind-merge";
@@ -21,6 +22,18 @@ interface Props {
   onChange: (date: Date | null) => void;
   color?: AccentColor;
 }
+
+// date-fns Ukrainian month names are lowercase; the picker should show them capitalized.
+const capitalize = (value: string) =>
+  value.charAt(0).toLocaleUpperCase("uk") + value.slice(1);
+const ukCapitalizedMonths: Locale = {
+  ...uk,
+  localize: {
+    ...uk.localize,
+    month: (...args: Parameters<typeof uk.localize.month>) =>
+      capitalize(uk.localize.month(...args)),
+  },
+};
 
 const DateInput = ({
   id,
@@ -51,7 +64,7 @@ const DateInput = ({
         name={name}
         onChange={onChange}
         selected={selected}
-        locale={locale === "uk" ? uk : enUS}
+        locale={locale === "uk" ? ukCapitalizedMonths : enUS}
         dateFormat={["dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy"]}
         showYearDropdown
         yearDropdownItemNumber={40}
