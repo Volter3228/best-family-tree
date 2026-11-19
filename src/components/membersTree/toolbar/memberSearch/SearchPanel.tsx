@@ -1,4 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
+import CloseButton from "@/components/ui/CloseButton";
 import { twMerge } from "tailwind-merge";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { removeBadgeClasses } from "@/components/sidebar/form/inputs/inputClasses";
@@ -96,15 +97,13 @@ const SearchPanel = ({
           )}
         />
         {query && (
-          <button
-            type="button"
-            aria-label={t.clear}
+          <CloseButton
+            label={t.clear}
             onMouseDown={(e) => e.preventDefault()}
             onClick={clear}
+            iconClassName="h-3.5 w-3.5 stroke-2"
             className={removeBadgeClasses("blue", "h-6 w-6 shrink-0")}
-          >
-            <XMarkIcon className="h-3.5 w-3.5 stroke-2" />
-          </button>
+          />
         )}
       </div>
       {hiddenCount > 0 && (

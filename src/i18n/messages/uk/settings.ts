@@ -1,6 +1,7 @@
 export const settings = {
   title: "Налаштування",
   reset: "Скинути налаштування",
+  close: "Закрити налаштування",
   layout: "Розмітка",
   theme: "Тема",
   direction: "Напрям дерев",

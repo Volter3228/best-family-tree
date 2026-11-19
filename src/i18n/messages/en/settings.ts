@@ -3,6 +3,7 @@ import type { Messages } from "../types";
 export const settings = {
   title: "Settings",
   reset: "Reset settings",
+  close: "Close settings",
   layout: "Layout",
   theme: "Theme",
   direction: "Tree direction",

@@ -1,9 +1,9 @@
 import type { Ref } from "react";
+import CloseButton from "@/components/ui/CloseButton";
 import {
   ArrowsPointingInIcon,
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
-  XMarkIcon,
 } from "@heroicons/react/16/solid";
 import { useT } from "@/i18n/useT";
 
@@ -25,15 +25,12 @@ export const ViewerHeader = ({ alt, closeBtnRef, onClose }: HeaderProps) => {
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))]">
       <span className={`rounded-full px-3 py-1.5 text-sm ${GLASS}`}>{alt}</span>
       <div className="pointer-events-auto">
-        <button
+        <CloseButton
           ref={closeBtnRef}
-          type="button"
-          aria-label={t.close}
+          label={t.close}
           onClick={onClose}
           className={`${BUTTON} ${GLASS}`}
-        >
-          <XMarkIcon className="h-5 w-5" />
-        </button>
+        />
       </div>
     </div>
   );

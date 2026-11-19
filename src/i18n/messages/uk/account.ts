@@ -1,5 +1,6 @@
 export const account = {
   title: "Акаунт",
+  close: "Закрити акаунт",
   guest: "Гість",
   levels: {
     VIEWER: "Користувач",

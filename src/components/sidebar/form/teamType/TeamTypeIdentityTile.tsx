@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import CloseButton from "@/components/ui/CloseButton";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "../inputs/inputClasses";
@@ -115,17 +116,15 @@ const TeamTypeIdentityTile = ({
         onChange={handleChange}
       />
       {icon && (
-        <button
-          type="button"
-          aria-label={t.removeIcon}
+        <CloseButton
+          label={t.removeIcon}
           onClick={handleRemove}
+          iconClassName="h-3.5 w-3.5"
           className={removeBadgeClasses(
             accent,
             "absolute right-1 top-1 h-6 w-6",
           )}
-        >
-          <XMarkIcon className="h-3.5 w-3.5" />
-        </button>
+        />
       )}
     </div>
   );

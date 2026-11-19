@@ -1,4 +1,5 @@
 import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/16/solid";
+import CloseButton from "@/components/ui/CloseButton";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { useT } from "@/i18n/useT";
@@ -43,18 +44,16 @@ const PositionRowHeader = ({
           {summary}
         </span>
       </button>
-      <button
-        type="button"
+      <CloseButton
+        label={removeLabel ?? t.remove}
         onClick={onRemove}
+        iconClassName="h-4 w-4"
         className={twMerge(
           "shrink-0 rounded-lg p-1 transition-all duration-200 hover:scale-110",
           colorClasses.text,
           colorClasses.hoverAccentBg,
         )}
-        aria-label={removeLabel ?? t.remove}
-      >
-        <XMarkIcon className="h-4 w-4" />
-      </button>
+      />
     </div>
   );
 };

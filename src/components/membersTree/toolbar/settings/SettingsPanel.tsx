@@ -3,6 +3,7 @@ import { DEFAULT_SETTINGS, useSettingsStore } from "@/store/settingsStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import ToolbarPanel from "../ToolbarPanel";
 import PanelResetButton from "../PanelResetButton";
+import PanelCloseButton from "../PanelCloseButton";
 import { LOCALES, type Locale } from "@/i18n/locale";
 import { useLocale, useT } from "@/i18n/useT";
 import {
@@ -15,6 +16,7 @@ import {
 interface Props {
   isOpen: boolean;
   isClosing: boolean;
+  onClose: () => void;
 }
 
 interface SectionProps {
@@ -32,7 +34,7 @@ const Section = ({ title, children }: SectionProps) => (
 );
 
 // App-wide preferences. Unlike filters, every change applies immediately.
-const SettingsPanel = ({ isOpen, isClosing }: Props) => {
+const SettingsPanel = ({ isOpen, isClosing, onClose }: Props) => {
   const t = useT().settings;
   const common = useT().common;
   const locale = useLocale();
@@ -66,11 +68,14 @@ const SettingsPanel = ({ isOpen, isClosing }: Props) => {
         <span className="text-base font-semibold text-foreground">
           {t.title}
         </span>
-        <PanelResetButton
-          label={t.reset}
-          disabled={isDefault}
-          onClick={handleReset}
-        />
+        <div className="flex items-center gap-1.5">
+          <PanelResetButton
+            label={t.reset}
+            disabled={isDefault}
+            onClick={handleReset}
+          />
+          <PanelCloseButton label={t.close} onClick={onClose} />
+        </div>
       </div>
       <div
         className="overflow-y-auto overscroll-contain overflow-x-hidden flex-1 transparent"

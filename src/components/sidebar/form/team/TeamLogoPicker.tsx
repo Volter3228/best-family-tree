@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import CloseButton from "@/components/ui/CloseButton";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import { removeBadgeClasses } from "../inputs/inputClasses";
@@ -107,17 +108,15 @@ const TeamLogoPicker = ({
           />
         </label>
         {photoUrl && (
-          <button
-            type="button"
+          <CloseButton
+            label={t.removePhoto}
             onClick={remove}
-            aria-label={t.removePhoto}
+            iconClassName="h-3.5 w-3.5"
             className={removeBadgeClasses(
               color,
               "absolute -right-1.5 -top-1.5 h-5 w-5",
             )}
-          >
-            <XMarkIcon className="h-3.5 w-3.5" />
-          </button>
+          />
         )}
       </div>
       {tooLarge && (

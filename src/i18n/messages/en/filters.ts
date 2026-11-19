@@ -4,6 +4,7 @@ import type { Messages } from "../types";
 export const filters = {
   title: "Filters",
   clear: "Clear filters",
+  close: "Close filters",
   cancel: "Cancel",
   show: (count: number) => `Show ${count}`,
   memberCount: (n: number) =>

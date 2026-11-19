@@ -1,9 +1,6 @@
 import { useState } from "react";
-import {
-  ArrowRightIcon,
-  CheckIcon,
-  XMarkIcon,
-} from "@heroicons/react/16/solid";
+import CloseButton from "@/components/ui/CloseButton";
+import { ArrowRightIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { twMerge } from "tailwind-merge";
 import type { SuggestionDto } from "@/api/suggestionReview";
 import Spinner from "@/components/ui/Spinner";
@@ -154,19 +151,16 @@ const SuggestionRow = ({
               <CheckIcon className="h-5 w-5" />
             )}
           </button>
-          <button
-            type="button"
+          <CloseButton
+            label={t.reject}
             onClick={onReject}
             disabled={s.locked || busy}
-            aria-label={t.reject}
             title={s.locked ? undefined : t.reject}
             className={twMerge(
               ICON_BUTTON,
               "text-red-500 hover:bg-red-500/10 focus-visible:ring-red-500/60",
             )}
-          >
-            <XMarkIcon className="h-5 w-5" />
-          </button>
+          />
         </span>
       </div>
     </CollapseOut>

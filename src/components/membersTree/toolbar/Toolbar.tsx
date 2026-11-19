@@ -165,8 +165,16 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch, isInfoOpen }: Props) => {
         onSearch={onSearch}
         onTeamSearch={onTeamSearch}
       />
-      <FiltersPanel isOpen={filters.isOpen} isClosing={filters.isClosing} />
-      <SettingsPanel isOpen={settings.isOpen} isClosing={settings.isClosing} />
+      <FiltersPanel
+        isOpen={filters.isOpen}
+        isClosing={filters.isClosing}
+        onClose={filters.close}
+      />
+      <SettingsPanel
+        isOpen={settings.isOpen}
+        isClosing={settings.isClosing}
+        onClose={settings.close}
+      />
       <AccountPanel
         isOpen={account.isOpen}
         isClosing={account.isClosing}

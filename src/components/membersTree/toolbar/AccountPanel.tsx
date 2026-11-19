@@ -26,6 +26,7 @@ import type { MemberStatus } from "@/types";
 import ToolbarPanel from "./ToolbarPanel";
 import AccountRoles from "./AccountRoles";
 import NameBadgePicker from "./NameBadgePicker";
+import PanelCloseButton from "./PanelCloseButton";
 
 interface Props {
   isOpen: boolean;
@@ -65,7 +66,7 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
   let header: React.ReactNode = null;
   if (person) {
     header = (
-      <div className="flex items-center gap-3 px-3 pt-3 pb-2">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         {treeMember ? (
           person.photo ? (
             <PhotoOpenButton
@@ -100,7 +101,7 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
     );
   } else {
     header = (
-      <p className="truncate px-3 pt-3 pb-2 text-sm font-semibold">
+      <p className="min-w-0 flex-1 truncate text-sm font-semibold">
         {isQuestions ? a.guest : session.email}
       </p>
     );
@@ -108,7 +109,10 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
 
   return (
     <ToolbarPanel isClosing={isClosing} className="max-w-[23rem]">
-      {header}
+      <div className="flex items-center gap-2 px-3 pt-3 pb-2">
+        {header}
+        <PanelCloseButton label={a.close} onClick={onClose} color="blue" />
+      </div>
       {person && (
         <>
           <AccountRoles member={person} readOnly={session.demo} />

@@ -1,10 +1,10 @@
 import React from "react";
+import CloseButton from "@/components/ui/CloseButton";
 import {
   PencilIcon,
   ChatBubbleLeftEllipsisIcon,
   ArrowLeftIcon,
   ChevronUpIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { twMerge } from "tailwind-merge";
 import { useT } from "@/i18n/useT";
@@ -130,13 +130,12 @@ const SidebarHeader = ({
             <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />
           </button>
         )}
-        <button
+        <CloseButton
+          label={t.close}
           onClick={onClose}
           className={twMerge(colorClasses.text, iconButton)}
           title={t.close}
-        >
-          <XMarkIcon className="h-5 w-5" />
-        </button>
+        />
       </div>
     </div>
   );

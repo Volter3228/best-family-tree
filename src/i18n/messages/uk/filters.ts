@@ -23,6 +23,7 @@ const teamForms = {
 export const filters = {
   title: "Фільтри",
   clear: "Очистити фільтри",
+  close: "Закрити фільтри",
   cancel: "Скасувати",
   show: (count: number) => `Показати ${count}`,
   memberCount: (n: number) => `${n} ${plural("uk", n, memberForms)}`,

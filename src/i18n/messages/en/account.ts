@@ -2,6 +2,7 @@ import type { Messages } from "../types";
 
 export const account = {
   title: "Account",
+  close: "Close account",
   guest: "Guest",
   levels: {
     VIEWER: "Viewer",

@@ -14,10 +14,11 @@ import { useDraftFilterCount } from "./useDraftFilterCount";
 interface Props {
   isOpen: boolean;
   isClosing: boolean;
+  onClose: () => void;
 }
 
 // Fixed height: switching categories must not resize the panel.
-const FiltersPanel = ({ isOpen, isClosing }: Props) => {
+const FiltersPanel = ({ isOpen, isClosing, onClose }: Props) => {
   const draftFilters = useFiltersStore((s) => s.draftFilters);
   const setDraftFilters = useFiltersStore((s) => s.setDraftFilters);
   const applyFilters = useFiltersStore((s) => s.applyFilters);
@@ -60,6 +61,7 @@ const FiltersPanel = ({ isOpen, isClosing }: Props) => {
         isTeamView={appliedFilters.treeMode === "team"}
         canReset={canReset}
         onReset={resetFilters}
+        onClose={onClose}
       />
       <div className="flex min-h-0 flex-1 pl-3 pr-1.5">
         <FilterCategoryRail

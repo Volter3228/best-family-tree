@@ -1,4 +1,5 @@
 import { useT } from "@/i18n/useT";
+import PanelCloseButton from "../PanelCloseButton";
 import PanelResetButton from "../PanelResetButton";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   // Some criteria (not just the layout) are set, so there is something to clear.
   canReset: boolean;
   onReset: () => void;
+  onClose: () => void;
 }
 
 const FiltersHeader = ({
@@ -15,6 +17,7 @@ const FiltersHeader = ({
   isTeamView,
   canReset,
   onReset,
+  onClose,
 }: Props) => {
   const t = useT().filters;
   return (
@@ -30,11 +33,14 @@ const FiltersHeader = ({
           {isTeamView ? t.teamCount(shownCount) : t.memberCount(shownCount)}
         </span>
       </div>
-      <PanelResetButton
-        label={t.clear}
-        disabled={!canReset}
-        onClick={onReset}
-      />
+      <div className="flex items-center gap-1.5">
+        <PanelResetButton
+          label={t.clear}
+          disabled={!canReset}
+          onClick={onReset}
+        />
+        <PanelCloseButton label={t.close} onClick={onClose} />
+      </div>
     </div>
   );
 };
