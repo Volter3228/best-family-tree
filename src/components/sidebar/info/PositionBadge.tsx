@@ -55,7 +55,13 @@ const PositionBadge = ({ position, onClick, featured = false }: Props) => {
     ? {
         borderColor: "transparent",
         borderWidth: 1.5,
-        "--featured-glow": borderColor,
+        // Dark theme: a lighter glow colour plus an extra soft halo.
+        "--featured-glow": isDarkTheme
+          ? `color-mix(in srgb, ${borderColor} 75%, white)`
+          : borderColor,
+        filter: isDarkTheme
+          ? `drop-shadow(0 0 5px color-mix(in srgb, ${borderColor} 45%, transparent))`
+          : undefined,
         background: `linear-gradient(${bgColor}, ${bgColor}) padding-box, linear-gradient(135deg, ${borderColor}, ${rimEnd}) border-box`,
       }
     : undefined;
