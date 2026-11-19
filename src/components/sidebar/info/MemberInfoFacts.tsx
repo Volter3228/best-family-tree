@@ -34,7 +34,17 @@ interface Tile {
   render: (fullWidth: boolean) => React.ReactNode;
 }
 
-// "12.03.2020 · 5 років": the date plus the full years elapsed in the accent.
+// "12 Mar 2020", "12 Бер. 2020": the month is always its first three letters, capitalized.
+const formatJoinedDate = (date: Date, locale: "en" | "uk") => {
+  const dateLocale = locale === "en" ? enUS : uk;
+  const day = format(date, "d", { locale: dateLocale });
+  const month = format(date, "LLLL", { locale: dateLocale }).slice(0, 3);
+  const year = format(date, "yyyy", { locale: dateLocale });
+  const abbr = `${month.charAt(0).toUpperCase()}${month.slice(1)}`;
+  return `${day} ${abbr}${locale === "uk" ? "." : ""} ${year}`;
+};
+
+// "12 Mar 2020 · 5 років": the date plus the full years elapsed in the accent.
 // Under one full year the years part is omitted entirely.
 const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
   const t = useT().memberInfo;
@@ -43,7 +53,7 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
   const mobile = useIsMobileScreen();
   return (
     <>
-      {format(date, "d MMM yyyy", { locale: locale === "en" ? enUS : uk })}
+      {formatJoinedDate(date, locale)}
       {years > 0 && (
         <span
           className={twMerge(
