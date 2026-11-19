@@ -5,6 +5,8 @@ export const manage = {
     teams: "Команди",
     types: "Типи команд",
     roles: "Посади",
+    suggestions: "Пропозиції",
+    access: "Доступ",
   },
   search: "Пошук",
   create: "Створити",

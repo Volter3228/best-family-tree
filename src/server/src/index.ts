@@ -11,6 +11,10 @@ import teamTypeRoutes from "./routes/teamTypeRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import familyGroupRoutes from "./routes/familyGroupRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+import suggestionRoutes from "./routes/suggestionRoutes.js";
+import suggestionPhotoRoutes from "./routes/suggestionPhotoRoutes.js";
+import accessRoutes from "./routes/accessRoutes.js";
 import questionRoutes from "./routes/auth/questionRoutes.js";
 import emailRoutes from "./routes/auth/emailRoutes.js";
 import googleRoutes from "./routes/auth/googleRoutes.js";
@@ -69,9 +73,16 @@ app.use("/api", googleRoutes);
 app.use("/api", telegramRoutes);
 
 app.use("/api", requireSession);
+// Suggestions are the one write a demo visitor may make.
+const DEMO_SUGGESTION_POST = /^POST \/(members|teams)\/[^/]+\/suggestions$/;
 // Demo mode: sessions are synthetic and the database stays read-only.
 app.use("/api", (req, res, next) => {
-  if (isDemoMode() && req.method !== "GET" && req.method !== "HEAD") {
+  if (
+    isDemoMode() &&
+    req.method !== "GET" &&
+    req.method !== "HEAD" &&
+    !DEMO_SUGGESTION_POST.test(`${req.method} ${req.path}`)
+  ) {
     res
       .status(403)
       .json(errorBody("Changes aren't saved in the demo", "demo_readonly"));
@@ -79,8 +90,14 @@ app.use("/api", (req, res, next) => {
   }
   next();
 });
-app.use("/api", requireEditorForWrites);
 app.use(trackWrites);
+// These routers check their own access: suggestions and self-service edits
+// are open to non-editors, grants to Admins.
+app.use("/api", profileRoutes);
+app.use("/api", suggestionRoutes);
+app.use("/api", suggestionPhotoRoutes);
+app.use("/api", accessRoutes);
+app.use("/api", requireEditorForWrites);
 app.use("/api", familyTreeRoutes);
 app.use("/api", memberRoutes);
 app.use("/api", mentorRoutes);

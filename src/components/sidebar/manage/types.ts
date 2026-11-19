@@ -1,11 +1,10 @@
 import type { AccentColor } from "@/types";
 
-export type ManageTab = "members" | "teams" | "types" | "roles";
+export type ManageTab =
+  "members" | "teams" | "types" | "roles" | "suggestions" | "access";
 
 export type ManageView =
-  | { kind: "list" }
-  | { kind: "create" }
-  | { kind: "edit"; id: string };
+  { kind: "list" } | { kind: "create" } | { kind: "edit"; id: string };
 
 export const LIST_VIEW: ManageView = { kind: "list" };
 
@@ -19,4 +18,6 @@ export interface ManageTabProps {
   // Closes the whole sidebar (members close it after creating).
   onClose: () => void;
   color: AccentColor;
+  // Re-reads the pending suggestions count shown on the rail.
+  refreshCount: () => void;
 }

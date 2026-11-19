@@ -1,12 +1,17 @@
 import { Router } from "express";
 import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
-import { deleteCloudinaryImage } from "../libs/cloudinary.js";
+import {
+  deleteCloudinaryImage,
+  deleteReplacedImage,
+  discardUpload,
+} from "../libs/cloudinary.js";
 import {
   parseWith,
   teamBodySchema,
   teamMembersSchema,
 } from "../utils/catalogValidation.js";
+import { pendingPhotoUrls } from "./suggestion/suggestionPhoto.js";
 import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import {
   TEAM_INCLUDE,
@@ -19,6 +24,9 @@ import {
 
 const router = Router();
 const uploadTeamIcon = uploadMiddleware("best-family-tree/teams");
+const replaceTeamIcon = uploadMiddleware("best-family-tree/teams", {
+  namePrefix: (req) => `team-${req.params.id}`,
+});
 
 router.get("/teams", async (req, res) => {
   try {
@@ -59,14 +67,22 @@ router.post("/teams", uploadTeamIcon.single("icon"), async (req, res) => {
   }
 });
 
-router.put("/teams/:id", uploadTeamIcon.single("icon"), async (req, res) => {
+router.put("/teams/:id", replaceTeamIcon.single("icon"), async (req, res) => {
   const uploadedUrl = req.file?.path;
   const body = parseWith(teamBodySchema, req.body);
+  const discard = async () => {
+    if (!uploadedUrl) return;
+    const current = await prisma.team.findUnique({
+      where: { id: req.params.id },
+      select: { photoUrl: true },
+    });
+    await discardUpload(uploadedUrl, current?.photoUrl);
+  };
 
   try {
     if (!body.success) {
       res.status(400).json(errorBody(body.errors, "validation"));
-      if (uploadedUrl) await deleteCloudinaryImage(uploadedUrl);
+      await discard();
       return;
     }
 
@@ -77,18 +93,23 @@ router.put("/teams/:id", uploadTeamIcon.single("icon"), async (req, res) => {
       body.data,
       icon,
     );
-    if (unusedIconUrl) await deleteCloudinaryImage(unusedIconUrl);
+    await deleteReplacedImage(unusedIconUrl, team.photoUrl);
     res.status(200).json(team);
   } catch (error) {
-    if (uploadedUrl) await deleteCloudinaryImage(uploadedUrl);
+    await discard();
     sendRouteError(res, error, "Failed to update team");
   }
 });
 
 router.delete("/teams/:id", async (req, res) => {
   try {
+    const suggested = await pendingPhotoUrls({
+      kind: "team",
+      id: req.params.id,
+    });
     const team = await deleteTeam(req.params.id, req.session!);
     if (team.photoUrl) await deleteCloudinaryImage(team.photoUrl);
+    for (const url of suggested) await deleteCloudinaryImage(url);
     res.status(204).send();
   } catch (error) {
     sendRouteError(res, error, "Failed to delete team");

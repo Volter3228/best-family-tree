@@ -17,6 +17,10 @@ interface Props {
   // Label of the "bar" toggle while collapsed.
   expandLabel?: string;
   color?: AccentColor;
+  // Total shown after the title when it differs from items.length.
+  count?: number;
+  // Sits after the heading; wraps under it when it does not fit.
+  headerExtra?: React.ReactNode;
 }
 
 // "Title · count" label with a list below it; the items past `visibleCount`
@@ -29,6 +33,8 @@ const InfoSection = ({
   toggle,
   expandLabel,
   color = "blue",
+  count,
+  headerExtra,
 }: Props) => {
   const t = useT().sidebar;
   const [open, setOpen] = useState(false);
@@ -58,12 +64,15 @@ const InfoSection = ({
       ref={sectionRef}
       className="member-info-row flex scroll-mb-4 flex-col gap-2"
     >
-      <h3 className="text-base">
-        <span className={twMerge("font-semibold", colorClasses.text)}>
-          {title}
-        </span>
-        <span className="text-foreground/50"> · {items.length}</span>
-      </h3>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <h3 className="text-base">
+          <span className={twMerge("font-semibold", colorClasses.text)}>
+            {title}
+          </span>
+          <span className="text-foreground/50"> · {count ?? items.length}</span>
+        </h3>
+        {headerExtra}
+      </div>
       <div className={listClassName}>
         {head}
         {toggle === "pill" && open && tail}

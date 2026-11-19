@@ -10,9 +10,17 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<MemberFormData>>;
   errors: Partial<Record<keyof MemberFormData, string>>;
   color: AccentColor;
+  // Adding a full record demands both; editing only what is already stored.
+  required?: boolean;
 }
 
-const MemberContactsSection = ({ form, setForm, errors, color }: Props) => {
+const MemberContactsSection = ({
+  form,
+  setForm,
+  errors,
+  color,
+  required = false,
+}: Props) => {
   const t = useT().memberForm;
   return (
     <section className="flex flex-col gap-3">
@@ -21,6 +29,7 @@ const MemberContactsSection = ({ form, setForm, errors, color }: Props) => {
         <TextInput
           name="email"
           label="Email"
+          required={required}
           value={form.email}
           onChange={(email) => setForm({ ...form, email })}
           placeholder="kak.pukiv.worst@ukr.net"
@@ -32,6 +41,7 @@ const MemberContactsSection = ({ form, setForm, errors, color }: Props) => {
         <TextInput
           name="phoneNumber"
           label={t.phoneNumber}
+          required={required}
           value={form.phoneNumber}
           onChange={(phoneNumber) => setForm({ ...form, phoneNumber })}
           placeholder="+380674947207"

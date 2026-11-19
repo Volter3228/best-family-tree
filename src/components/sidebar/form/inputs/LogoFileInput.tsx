@@ -12,6 +12,9 @@ interface Props {
   onImageSelect: (file: File | null) => void;
   image: string | File | null;
   initialImage: string | null;
+  // Removing a picked logo brings back the saved one; a saved logo itself
+  // has no remove button.
+  keepInitial?: boolean;
   color?: AccentColor;
   label?: string;
   // Checkerboard backdrop behind the logo (shows transparent PNGs clearly).
@@ -23,6 +26,7 @@ const LogoFileInput = ({
   onImageSelect,
   image,
   initialImage = null,
+  keepInitial = false,
   color = "blue",
   label,
   showCheckerboard = true,
@@ -82,7 +86,7 @@ const LogoFileInput = ({
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
-    setSelectedImage(null);
+    setSelectedImage(keepInitial ? initialImage : null);
     onImageSelect(null);
 
     if (fileInputRef.current) {
@@ -140,7 +144,7 @@ const LogoFileInput = ({
             )}
           />
         </label>
-        {selectedImage && (
+        {selectedImage && !(keepInitial && selectedImage === initialImage) && (
           <button
             type="button"
             onClick={handleRemoveImage}

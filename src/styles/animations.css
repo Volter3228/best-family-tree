@@ -84,44 +84,27 @@
   }
 }
 
-/* Sign in / sign out: the page slides off the screen (class set before
-   navigating) and the next one slides in from the opposite corner, as if
-   both pages sat on one big canvas. The aurora background stays put. */
-.page-root {
-  --slide-x: 100vw;
-  --slide-y: 100vh;
-}
+/* Sign out: the tree fades out (class set before navigating) and the sign-in
+   page fades in. The aurora background stays put underneath. */
 html[class*="page-leaving"] .page-root,
 html[data-enter] .page-root {
   height: 100dvh;
 }
-html.page-leaving-ne .page-root {
-  transform: translate(var(--slide-x), calc(-1 * var(--slide-y)));
-  transition: transform 550ms cubic-bezier(0.55, 0, 0.9, 0.4);
+html.page-leaving-fade .page-root {
+  opacity: 0;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 1, 1);
 }
-html.page-leaving-sw .page-root {
-  transform: translate(calc(-1 * var(--slide-x)), var(--slide-y));
-  transition: transform 550ms cubic-bezier(0.55, 0, 0.9, 0.4);
-}
-@keyframes slide-in-from-sw {
+@keyframes page-fade-in {
   from {
-    transform: translate(calc(-1 * var(--slide-x)), var(--slide-y));
+    opacity: 0;
   }
 }
-@keyframes slide-in-from-ne {
-  from {
-    transform: translate(var(--slide-x), calc(-1 * var(--slide-y)));
-  }
-}
-html[data-enter="sw"] .page-root {
-  animation: slide-in-from-sw 650ms cubic-bezier(0.1, 0.6, 0.3, 1);
-}
-html[data-enter="ne"] .page-root {
-  animation: slide-in-from-ne 650ms cubic-bezier(0.1, 0.6, 0.3, 1);
+html[data-enter="fade"] .page-root {
+  animation: page-fade-in 500ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* Signing in: the card lifts away and softly dissolves, then the tree settles
-   into place from slightly zoomed in. Only the sign-out uses the slide. */
+   into place from slightly zoomed in. */
 html.page-leaving-zoom .page-root {
   opacity: 0;
   transform: scale(1.06);
@@ -140,4 +123,106 @@ html.page-leaving-zoom .page-root {
 }
 html[data-enter="zoom"] .page-root {
   animation: zoom-settle 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Featured role badge: a flickering glow plus a light sweep every 6s. */
+.featured-shimmer {
+  position: relative;
+  overflow: hidden;
+  /* --featured-glow is the team type colour, set inline by PositionBadge.
+     Three glow "tongues" wander around the badge on a slow, uneven path. */
+  animation: featured-burn 9s ease-in-out infinite;
+}
+
+@keyframes featured-burn {
+  0% {
+    box-shadow:
+      0px -3px 12px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 23%, transparent),
+      -4px 1px 9px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 15%, transparent),
+      3px 2px 10px -2px color-mix(in srgb, var(--featured-glow, var(--foreground)) 12%, transparent);
+  }
+  11% {
+    box-shadow:
+      3px -5px 15px 1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 28%, transparent),
+      -2px -2px 8px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 13%, transparent),
+      -3px 3px 12px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 14%, transparent);
+  }
+  23% {
+    box-shadow:
+      -2px -6px 13px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 25%, transparent),
+      4px 0px 11px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 18%, transparent),
+      1px 4px 9px -2px color-mix(in srgb, var(--featured-glow, var(--foreground)) 11%, transparent);
+  }
+  36% {
+    box-shadow:
+      -4px -2px 16px 1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 29%, transparent),
+      2px -4px 9px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 14%, transparent),
+      4px 2px 13px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 13%, transparent);
+  }
+  48% {
+    box-shadow:
+      1px 2px 12px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 22%, transparent),
+      -5px -3px 12px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 16%, transparent),
+      2px -5px 10px -2px color-mix(in srgb, var(--featured-glow, var(--foreground)) 14%, transparent);
+  }
+  61% {
+    box-shadow:
+      4px -1px 15px 1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 26%, transparent),
+      -1px 4px 10px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 13%, transparent),
+      -4px -4px 12px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 15%, transparent);
+  }
+  74% {
+    box-shadow:
+      -1px -6px 14px 1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 29%, transparent),
+      5px 2px 10px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 16%, transparent),
+      -3px 1px 9px -2px color-mix(in srgb, var(--featured-glow, var(--foreground)) 12%, transparent);
+  }
+  87% {
+    box-shadow:
+      -3px 1px 13px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 24%, transparent),
+      1px -5px 12px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 15%, transparent),
+      4px 3px 11px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 13%, transparent);
+  }
+  100% {
+    box-shadow:
+      0px -3px 12px 0px color-mix(in srgb, var(--featured-glow, var(--foreground)) 23%, transparent),
+      -4px 1px 9px -1px color-mix(in srgb, var(--featured-glow, var(--foreground)) 15%, transparent),
+      3px 2px 10px -2px color-mix(in srgb, var(--featured-glow, var(--foreground)) 12%, transparent);
+  }
+}
+
+.featured-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.55) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  /* One ~1.1s sweep, then a pause: a 6s cycle. */
+  animation: featured-shimmer-sweep 3s ease-out 0.3s infinite;
+}
+
+@keyframes featured-shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  18%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-shimmer {
+    animation: none;
+  }
+  .featured-shimmer::after {
+    animation: none;
+    display: none;
+  }
 }

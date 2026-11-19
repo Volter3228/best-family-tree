@@ -97,59 +97,65 @@ export const updateTeam = (
   id: string,
   body: TeamBody,
   icon: string | null | undefined,
-) =>
-  prisma.$transaction(async (tx) => {
-    const existing = await tx.team.findUnique({ where: { id } });
-    if (!existing)
-      throw new NotFoundError("Team not found", { code: "team_not_found" });
-    if (body.name && body.name.toLowerCase() !== existing.name.toLowerCase()) {
-      await assertNameFree(tx, body.name, id);
-    }
+) => prisma.$transaction((tx) => updateTeamIn(tx, id, body, icon));
 
-    // undefined keeps the type, null clears it.
-    const teamType =
-      body.teamTypeId === null
-        ? null
-        : body.teamTypeId || body.teamTypeName
-          ? await resolveTeamType(tx, body)
-          : undefined;
+export const updateTeamIn = async (
+  tx: MemberTransaction,
+  id: string,
+  body: TeamBody,
+  icon: string | null | undefined,
+) => {
+  const existing = await tx.team.findUnique({ where: { id } });
+  if (!existing)
+    throw new NotFoundError("Team not found", { code: "team_not_found" });
+  if (body.name && body.name.toLowerCase() !== existing.name.toLowerCase()) {
+    await assertNameFree(tx, body.name, id);
+  }
 
-    const startYear =
-      body.startYear === undefined ? existing.startYear : body.startYear;
-    const isOngoing =
-      body.isOngoing === undefined ? existing.isOngoing : body.isOngoing;
-    let endYear = body.endYear === undefined ? existing.endYear : body.endYear;
-    assertOngoingHasStart(isOngoing, startYear);
-    if (isOngoing) endYear = null;
-    if (startYear != null && endYear != null && endYear < startYear) {
-      throw new ValidationError("End year must not be before start year", {
-        code: "team_end_before_start",
-      });
-    }
+  // undefined keeps the type, null clears it.
+  const teamType =
+    body.teamTypeId === null
+      ? null
+      : body.teamTypeId || body.teamTypeName
+        ? await resolveTeamType(tx, body)
+        : undefined;
 
-    const team = await tx.team.update({
-      where: { id },
-      data: {
-        name: body.name ?? existing.name,
-        description:
-          body.description === undefined
-            ? existing.description
-            : body.description,
-        teamTypeId:
-          teamType === undefined ? existing.teamTypeId : (teamType?.id ?? null),
-        startYear,
-        endYear,
-        isOngoing,
-        ...(icon !== undefined && { photoUrl: icon }),
-      },
-      include: TEAM_INCLUDE,
+  const startYear =
+    body.startYear === undefined ? existing.startYear : body.startYear;
+  const isOngoing =
+    body.isOngoing === undefined ? existing.isOngoing : body.isOngoing;
+  let endYear = body.endYear === undefined ? existing.endYear : body.endYear;
+  assertOngoingHasStart(isOngoing, startYear);
+  if (isOngoing) endYear = null;
+  if (startYear != null && endYear != null && endYear < startYear) {
+    throw new ValidationError("End year must not be before start year", {
+      code: "team_end_before_start",
     });
+  }
 
-    return {
-      team,
-      unusedIconUrl: icon !== undefined ? existing.photoUrl : null,
-    };
+  const team = await tx.team.update({
+    where: { id },
+    data: {
+      name: body.name ?? existing.name,
+      description:
+        body.description === undefined
+          ? existing.description
+          : body.description,
+      teamTypeId:
+        teamType === undefined ? existing.teamTypeId : (teamType?.id ?? null),
+      startYear,
+      endYear,
+      isOngoing,
+      ...(icon !== undefined && { photoUrl: icon }),
+    },
+    include: TEAM_INCLUDE,
   });
+
+  return {
+    team,
+    unusedIconUrl: icon !== undefined ? existing.photoUrl : null,
+  };
+};
 
 /** Removes the team together with its members' positions in it. */
 export const deleteTeam = (id: string, session: Session) =>

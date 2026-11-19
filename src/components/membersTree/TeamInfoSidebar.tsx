@@ -1,4 +1,8 @@
-import { PencilIcon, UserGroupIcon } from "@heroicons/react/16/solid";
+import {
+  PencilIcon,
+  PencilSquareIcon,
+  UserGroupIcon,
+} from "@heroicons/react/16/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useManageStore } from "@/store/manageStore";
 import { useMemo, useRef } from "react";
@@ -9,6 +13,7 @@ import { useLocale, useT } from "@/i18n/useT";
 import Sidebar from "../sidebar";
 import HeaderChip from "../sidebar/HeaderChip";
 import SidebarMinimizedSummary from "../sidebar/SidebarMinimizedSummary";
+import TeamSuggestForm from "../sidebar/form/suggest/TeamSuggestForm";
 import TeamForm from "../sidebar/form/team/TeamForm";
 import TeamInfo from "../sidebar/info/TeamInfo";
 
@@ -35,6 +40,7 @@ const TeamInfoSidebar = ({
 }: Props) => {
   const { teamId, isOpen, mode } = state;
   const t = useT().sidebar;
+  const tSuggest = useT().suggest;
   const locale = useLocale();
   const [teams] = useTeams();
   const flatMembersList = useMembersList();
@@ -50,6 +56,12 @@ const TeamInfoSidebar = ({
   );
 
   const editable = useSessionStore((s) => canEdit(s.session));
+  const session = useSessionStore((s) => s.session);
+  const canSuggest = !!session && session.method !== "QUESTIONS" && !editable;
+  const isMember =
+    !!session?.memberId &&
+    roster.some((entry) => entry.member.id === session.memberId);
+  const isSuggest = mode === "suggest";
   const manageStack = useManageStore((s) =>
     s.isOpen ? (s.isFront ? "behind" : "front") : undefined,
   );
@@ -67,17 +79,26 @@ const TeamInfoSidebar = ({
           </HeaderChip>
         ) : (
           team && (
-            <HeaderChip icon={PencilIcon} color="blue">
-              {t.editing(team.name)}
+            <HeaderChip
+              icon={isSuggest ? PencilSquareIcon : PencilIcon}
+              color="blue"
+            >
+              {isSuggest
+                ? tSuggest.suggesting(team.name)
+                : t.editing(team.name)}
             </HeaderChip>
           )
         )
       }
       floatingHeader={mode === "info"}
-      mode={mode}
+      mode={isSuggest ? "edit" : mode}
       isOpen={isOpen}
       onClose={state.close}
       onEditClick={editable ? state.startEdit : undefined}
+      onSuggestClick={canSuggest ? state.startSuggest : undefined}
+      notice={state.notice}
+      // Suggesting keeps the card as tall as the info view was.
+      fillHeight={isSuggest}
       onBackClick={state.backToInfo}
       isMinimized={state.isMinimized}
       onMinimizedChange={state.setMinimized}
@@ -116,6 +137,17 @@ const TeamInfoSidebar = ({
                 }
               }}
               onTitleClick={onTitleClick}
+            />
+          ) : isSuggest ? (
+            <TeamSuggestForm
+              key={teamId}
+              team={team}
+              canChangeLogo={isMember}
+              onExit={state.backToInfo}
+              onDone={(message) => {
+                state.showNotice(message);
+                state.backToInfo();
+              }}
             />
           ) : (
             <TeamForm

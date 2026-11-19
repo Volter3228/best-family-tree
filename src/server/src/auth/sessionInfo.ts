@@ -7,7 +7,34 @@ export const buildSessionInfo = async (session: Session) => {
   const member = session.memberId
     ? await prisma.member.findUnique({
         where: { id: session.memberId },
-        select: { id: true, name: true, photo: true },
+        select: {
+          id: true,
+          name: true,
+          photo: true,
+          status: true,
+          featuredPositionId: true,
+          nameBadgeTeamId: true,
+          positions: {
+            select: {
+              id: true,
+              organization: true,
+              startYear: true,
+              endYear: true,
+              role: { select: { name: true, isLeaderPosition: true } },
+              team: {
+                select: {
+                  id: true,
+                  name: true,
+                  photoUrl: true,
+                  startYear: true,
+                  endYear: true,
+                  teamType: { select: { iconUrl: true, color: true } },
+                },
+              },
+            },
+            orderBy: { createdAt: "asc" },
+          },
+        },
       })
     : null;
   // Editors can not edit other grant holders, so the client hides those
@@ -25,6 +52,26 @@ export const buildSessionInfo = async (session: Session) => {
     level: session.level,
     memberId: session.memberId,
     email: session.email,
-    member,
+    member: member && {
+      id: member.id,
+      name: member.name,
+      photo: member.photo,
+      status: member.status,
+      featuredPositionId: member.featuredPositionId,
+      nameBadgeTeamId: member.nameBadgeTeamId,
+      positions: member.positions.map((p) => ({
+        id: p.id,
+        roleName: p.role.name,
+        isLeaderPosition: p.role.isLeaderPosition,
+        teamId: p.team?.id ?? null,
+        teamName: p.team?.name ?? null,
+        teamPhotoUrl: p.team?.photoUrl ?? null,
+        teamTypeIconUrl: p.team?.teamType?.iconUrl ?? null,
+        teamTypeColor: p.team?.teamType?.color ?? null,
+        organization: p.organization,
+        startYear: p.team ? p.team.startYear : p.startYear,
+        endYear: p.team ? p.team.endYear : p.endYear,
+      })),
+    },
   };
 };

@@ -1,5 +1,7 @@
 import {
   BriefcaseIcon,
+  InboxIcon,
+  KeyIcon,
   PuzzlePieceIcon,
   UserGroupIcon,
   UserIcon,
@@ -16,15 +18,25 @@ const ITEMS = [
   { key: "teams", icon: <UserGroupIcon className={ICON_CLASS} /> },
   { key: "types", icon: <PuzzlePieceIcon className={ICON_CLASS} /> },
   { key: "roles", icon: <BriefcaseIcon className={ICON_CLASS} /> },
+  { key: "suggestions", icon: <InboxIcon className={ICON_CLASS} /> },
+  { key: "access", icon: <KeyIcon className={ICON_CLASS} /> },
 ] as const satisfies readonly { key: ManageTab; icon: React.ReactNode }[];
 
 interface Props {
   active: ManageTab;
   onSelect: (tab: ManageTab) => void;
   color: AccentColor;
+  isAdmin: boolean;
+  pendingCount: number;
 }
 
-const ManageRail = ({ active, onSelect, color }: Props) => {
+const ManageRail = ({
+  active,
+  onSelect,
+  color,
+  isAdmin,
+  pendingCount,
+}: Props) => {
   const t = useT().manage;
   return (
     <CategoryRail
@@ -32,10 +44,13 @@ const ManageRail = ({ active, onSelect, color }: Props) => {
       active={active}
       onSelect={onSelect}
       className="sticky top-0 self-start"
-      items={ITEMS.map((item) => ({
-        ...item,
-        label: t.tabs[item.key],
-      }))}
+      items={ITEMS.filter((item) => isAdmin || item.key !== "access").map(
+        (item) => ({
+          ...item,
+          label: t.tabs[item.key],
+          badge: item.key === "suggestions" ? pendingCount : undefined,
+        }),
+      )}
     />
   );
 };

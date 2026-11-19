@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
 import { useManageStore } from "@/store/manageStore";
+import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 
 // Matches the sidebar's slide-out transition.
 const CLOSE_ANIMATION_MS = 300;
@@ -14,6 +15,9 @@ export const useSidebar = (
   const [mode, setMode] = useState<SidebarMode>("info");
   // Mobile only: the card is collapsed to a bar above the toolbar.
   const [isMinimized, setIsMinimized] = useState(false);
+  // Mode requested together with a selection; the selection effect applies it.
+  const pendingModeRef = useRef<SidebarMode | null>(null);
+  const [notice, showNotice] = useTransientMessage();
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // A pending close must not wipe a selection made while the card slides out.
@@ -25,15 +29,19 @@ export const useSidebar = (
 
   useEffect(() => cancelPendingClose, [cancelPendingClose]);
 
+  // Keyed by id: a reload hands over a new object for the same member and
+  // must not reset the mode or bring this sidebar in front of the manage one.
+  const selectedId = selectedMember?.id ?? null;
   useEffect(() => {
-    if (selectedMember) {
+    if (selectedId) {
       useManageStore.getState().sendBack();
       cancelPendingClose();
       setIsOpen(true);
-      setMode("info");
+      setMode(pendingModeRef.current ?? "info");
+      pendingModeRef.current = null;
       setIsMinimized(false);
     }
-  }, [selectedMember, cancelPendingClose]);
+  }, [selectedId, cancelPendingClose]);
 
   // Selecting a member (even the one already selected) shows the sidebar
   // expanded; the effect above only reacts to a different member.
@@ -48,6 +56,16 @@ export const useSidebar = (
       storeSelectMember(id);
     },
     [storeSelectMember, cancelPendingClose],
+  );
+
+  // Selects a member and opens the sidebar straight in the given mode.
+  const openInMode = useCallback(
+    (id: string, nextMode: SidebarMode) => {
+      if (selectedMember?.id === id) setMode(nextMode);
+      else pendingModeRef.current = nextMode;
+      selectMember(id);
+    },
+    [selectedMember, selectMember],
   );
 
   const onClose = useCallback(() => {
@@ -65,6 +83,7 @@ export const useSidebar = (
   }, [storeSelectMember, cancelPendingClose]);
 
   const onEditClick = () => setMode("edit");
+  const onSuggestClick = () => setMode("suggest");
   const onBackToInfoClick = () => setMode("info");
 
   return {
@@ -73,8 +92,12 @@ export const useSidebar = (
     isSidebarMinimized: isMinimized,
     onMinimizedChange: setIsMinimized,
     selectMember,
+    openInMode,
+    notice,
+    showNotice,
     onClose,
     onEditClick,
+    onSuggestClick,
     onBackToInfoClick,
   };
 };

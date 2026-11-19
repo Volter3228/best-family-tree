@@ -46,6 +46,7 @@ Subagents start with no context, and every token they spend re-discovering thing
 - When you edit a non-generated file over 250 lines, split it as part of that change. Do not do unrelated refactors.
 - Ask before schema or migration changes, data-changing scripts, or anything irreversible. For other doubts, ask when the answer would change the outcome; otherwise state your assumption and proceed.
 - Add comments only when it's very important and can help in the future code maintenance.
+- Year and date ranges shown in the UI use an en dash with a space on each side: `2019 – 2022`, never `2019–2022` or `2019-2022`.
 
 ## Run & browser testing (WSL2 + Windows Chrome)
 

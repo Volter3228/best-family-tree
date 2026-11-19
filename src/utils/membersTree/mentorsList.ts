@@ -6,6 +6,10 @@ export const getUpdatedMentorsList = (
   member: { id: string; name: string; status: MemberStatus },
   operation: "add" | "update" = "add",
 ) => {
+  // Not fetched yet: patching it would leave a one-item list that forms
+  // mistake for the loaded one and never refetch.
+  if (mentorsList.length === 0) return mentorsList;
+
   const shouldBeMentor = MENTOR_STATUSES.includes(member.status);
 
   if (operation === "add") {

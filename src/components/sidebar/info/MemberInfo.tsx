@@ -21,6 +21,7 @@ import MemberActivityPill from "./MemberActivityPill";
 import MemberInfoActions from "./MemberInfoActions";
 import MemberInfoCover from "./MemberInfoCover";
 import MemberInfoFacts from "./MemberInfoFacts";
+import NameBadge from "./NameBadge";
 import MemberPositions from "./MemberPositions";
 import MenteesGrid from "./MenteesGrid";
 
@@ -105,6 +106,7 @@ const MemberInfo = ({
             onClick={() => onMemberNameClick?.(member.id)}
           >
             {dn(name)}
+            <NameBadge member={member} />
           </h5>
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span
@@ -132,6 +134,7 @@ const MemberInfo = ({
         {member.positions.length > 0 && (
           <MemberPositions
             positions={member.positions}
+            featuredPositionId={member.featuredPositionId}
             onPositionClick={onPositionClick}
             canClickPosition={canClickPosition}
             color={color}

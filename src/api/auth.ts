@@ -5,6 +5,20 @@ import { ENDPOINTS } from "@/constants/endpoints";
 export type AccessLevel = "VIEWER" | "EDITOR" | "ADMIN";
 export type AuthMethod = "QUESTIONS" | "EMAIL" | "GOOGLE" | "TELEGRAM";
 
+export interface SessionPosition {
+  id: string;
+  roleName: string;
+  isLeaderPosition: boolean;
+  teamId: string | null;
+  teamName: string | null;
+  teamPhotoUrl: string | null;
+  teamTypeIconUrl: string | null;
+  teamTypeColor: string | null;
+  organization: string | null;
+  startYear: number | null;
+  endYear: number | null;
+}
+
 export interface SessionInfo {
   demo: boolean;
   method: AuthMethod;
@@ -13,7 +27,15 @@ export interface SessionInfo {
   // Grant holders an Editor may not edit (themselves excluded by canEdit).
   lockedMemberIds?: string[];
   email?: string | null;
-  member?: { id: string; name: string; photo: string | null } | null;
+  member?: {
+    id: string;
+    name: string;
+    photo: string | null;
+    status: "OBSERVER" | "BABY" | "FULL" | "ALUMNI";
+    featuredPositionId: string | null;
+    nameBadgeTeamId: string | null;
+    positions: SessionPosition[];
+  } | null;
 }
 
 export interface ChallengeQuestion {

@@ -6,7 +6,7 @@ import { LOCALE_COOKIE, detectLocale, isLocale } from "@/i18n/locale";
 import { ThemeProvider } from "@/context/ThemeContext";
 import AuroraBackground from "@/components/ui/AuroraBackground";
 import { themeInitScript } from "@/utils/themeInitScript";
-import { slideInScript } from "@/utils/navigateWithSlide";
+import { pageEnterScript } from "@/utils/navigateWithTransition";
 import "./globals.css";
 import "../styles/background.css";
 import "../styles/animations.css";
@@ -47,7 +47,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <script dangerouslySetInnerHTML={{ __html: slideInScript }} />
+        <script dangerouslySetInnerHTML={{ __html: pageEnterScript }} />
         <AuroraBackground />
         <LocaleProvider locale={locale}>
           <ThemeProvider>

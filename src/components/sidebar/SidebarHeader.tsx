@@ -1,6 +1,7 @@
 import React from "react";
 import {
   PencilIcon,
+  ChatBubbleLeftEllipsisIcon,
   ArrowLeftIcon,
   ChevronUpIcon,
   XMarkIcon,
@@ -21,6 +22,8 @@ interface Props {
   onExpand: () => void;
   onClose: () => void;
   onEditClick?: () => void;
+  // Takes the edit button's slot for viewers who may only suggest changes.
+  onSuggestClick?: () => void;
   onBackClick?: () => void;
 }
 
@@ -38,9 +41,11 @@ const SidebarHeader = ({
   onExpand,
   onClose,
   onEditClick,
+  onSuggestClick,
   onBackClick,
 }: Props) => {
   const t = useT().sidebar;
+  const tSuggest = useT().suggest;
   const colorClasses = COLOR_CLASSES[color];
 
   return (
@@ -109,6 +114,20 @@ const SidebarHeader = ({
             title={t.edit}
           >
             <PencilIcon className="h-5 w-5" />
+          </button>
+        )}
+        {mode === "info" && !onEditClick && onSuggestClick && (
+          <button
+            onClick={onSuggestClick}
+            className={twMerge(
+              colorClasses.text,
+              iconButton,
+              isMinimized && "max-md:hidden",
+            )}
+            title={tSuggest.action}
+            aria-label={tSuggest.action}
+          >
+            <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />
           </button>
         )}
         <button

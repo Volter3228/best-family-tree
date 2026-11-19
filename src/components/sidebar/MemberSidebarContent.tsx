@@ -10,12 +10,14 @@ import { getMemberById } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import type { SidebarMode, AccentColor } from "@/types";
 import { EditMemberForm } from "./form";
+import MemberSuggestForm from "./form/suggest/MemberSuggestForm";
 import MemberInfo from "./info";
 
 interface Props {
   member: Member;
   sidebarMode: SidebarMode;
   onEditExit: () => void;
+  onSuggestDone?: (message: string) => void;
   onDeleted?: () => void;
   color?: AccentColor;
   isTeamView?: boolean;
@@ -30,6 +32,7 @@ const MemberSidebarContent = ({
   member,
   sidebarMode,
   onEditExit,
+  onSuggestDone,
   onDeleted,
   color = "blue",
   isTeamView = false,
@@ -38,7 +41,7 @@ const MemberSidebarContent = ({
   onOpenTeamInfo,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const prevViewRef = useRef<"info" | "edit">(sidebarMode);
+  const prevViewRef = useRef<SidebarMode>(sidebarMode);
 
   const { selectMember } = useMembersActions();
   const { focusNode } = useViewportAnimation();
@@ -69,7 +72,7 @@ const MemberSidebarContent = ({
         activeChild,
         {
           opacity: 0,
-          x: sidebarMode === "edit" ? 20 : -20,
+          x: sidebarMode !== "info" ? 20 : -20,
         },
         {
           opacity: 1,
@@ -96,10 +99,10 @@ const MemberSidebarContent = ({
           onPositionClick={
             isTeamView
               ? (position) =>
-                position.teamId &&
-                onFocusMemberInTeam?.(position.teamId, member.id)
+                  position.teamId &&
+                  onFocusMemberInTeam?.(position.teamId, member.id)
               : (position) =>
-                position.teamId && onOpenTeamInfo?.(position.teamId)
+                  position.teamId && onOpenTeamInfo?.(position.teamId)
           }
           canClickPosition={(position) =>
             !!position.teamId &&
@@ -107,6 +110,17 @@ const MemberSidebarContent = ({
               ? !!canFocusMemberInTeam?.(position.teamId, member.id)
               : !!onOpenTeamInfo)
           }
+          color={color}
+        />
+      ) : sidebarMode === "suggest" ? (
+        <MemberSuggestForm
+          key={member.id}
+          member={member}
+          onExit={onEditExit}
+          onDone={(message) => {
+            onSuggestDone?.(message);
+            onEditExit();
+          }}
           color={color}
         />
       ) : (

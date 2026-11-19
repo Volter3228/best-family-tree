@@ -16,6 +16,8 @@ model MemberPosition {
   role   Role   @relation(fields: [roleId], references: [id])
   team   Team?  @relation(fields: [teamId], references: [id])
 
+  featuredBy Member? @relation("FeaturedPosition")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

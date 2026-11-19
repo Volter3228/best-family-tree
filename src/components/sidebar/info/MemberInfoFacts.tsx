@@ -1,5 +1,5 @@
 import { differenceInYears, format } from "date-fns";
-import { enUS } from "date-fns/locale";
+import { enUS, uk } from "date-fns/locale";
 import {
   CalendarDateRangeIcon,
   EnvelopeIcon,
@@ -43,9 +43,7 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
   const mobile = useIsMobileScreen();
   return (
     <>
-      {locale === "en"
-        ? format(date, "d MMM yyyy", { locale: enUS })
-        : format(date, "dd.LL.yyyy")}
+      {format(date, "d MMM yyyy", { locale: locale === "en" ? enUS : uk })}
       {years > 0 && (
         <span
           className={twMerge(

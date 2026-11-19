@@ -7,6 +7,8 @@ export const manage = {
     teams: "Teams",
     types: "Team types",
     roles: "Roles",
+    suggestions: "Suggestions",
+    access: "Access",
   },
   search: "Search",
   create: "Create",

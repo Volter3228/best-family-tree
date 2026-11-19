@@ -1,5 +1,5 @@
 export const memberInfo = {
-  mentees: "Діти",
+  mentees: "Менті",
   showAll: "Показати всіх",
   positions: "Посади",
   showInTeam: "Показати в команді",

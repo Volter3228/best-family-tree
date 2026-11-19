@@ -34,7 +34,13 @@ const TeamTypeMark = ({ name, iconSrc, color, className }: Props) => {
       }
     >
       {iconSrc ? (
-        <Image src={iconSrc} alt="" fill sizes="80px" className="object-contain p-2" />
+        <Image
+          src={iconSrc}
+          alt=""
+          fill
+          sizes="80px"
+          className="object-contain p-2"
+        />
       ) : initials ? (
         initials
       ) : (

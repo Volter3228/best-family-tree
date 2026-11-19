@@ -15,6 +15,10 @@ import { teamInfo } from "./teamInfo";
 import { filters } from "./filters";
 import { search } from "./search";
 import { photoViewer, toolbar } from "./toolbar";
+import { account } from "./account";
+import { suggest } from "./suggest";
+import { review } from "./review";
+import { access } from "./access";
 
 export const uk = {
   formCommon,
@@ -35,4 +39,8 @@ export const uk = {
   search,
   photoViewer,
   toolbar,
+  account,
+  suggest,
+  review,
+  access,
 };

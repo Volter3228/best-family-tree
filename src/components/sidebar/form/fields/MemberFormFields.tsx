@@ -75,6 +75,7 @@ const MemberFormFields = ({
         setForm={setForm}
         errors={errors}
         color={color}
+        required={mode === "add" && !minimal}
       />
       <SocialMediaFields
         form={form}

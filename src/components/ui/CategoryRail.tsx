@@ -9,6 +9,8 @@ export interface RailItem<K extends string> {
   icon: React.ReactNode;
   // Small dot in the corner (e.g. "this category has criteria").
   marker?: boolean;
+  // Count pill on the icon's top-right corner; hidden at 0.
+  badge?: number;
 }
 
 interface Props<K extends string> {
@@ -62,7 +64,7 @@ const CategoryRail = <K extends string>({
             onClick={() => onSelect(item.key)}
             onKeyDown={handleKeyDown(index)}
             className={twMerge(
-              "relative flex w-14 shrink-0 touch-manipulation flex-col items-center gap-1 rounded-2xl py-2 transition-colors duration-200 focus:outline-none focus-visible:ring-2",
+              "relative flex w-[3.75rem] shrink-0 touch-manipulation flex-col items-center gap-1 rounded-2xl py-2 transition-colors duration-200 focus:outline-none focus-visible:ring-2",
               colorClasses.focusVisibleRingSoft,
               selected
                 ? `${colorClasses.accentBg} text-white`
@@ -70,9 +72,30 @@ const CategoryRail = <K extends string>({
             )}
           >
             {item.icon}
-            <span className="text-[11px] font-medium leading-tight">
+            <span className="px-0.5 text-[10px] font-medium leading-tight">
               {item.label}
             </span>
+            {!!item.badge && (
+              <span
+                aria-label={String(item.badge)}
+                className={twMerge(
+                  "absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none ring-2",
+                  selected
+                    ? "bg-white"
+                    : `${colorClasses.accentBg} text-white ring-surface`,
+                )}
+                style={
+                  selected
+                    ? ({
+                        "--tw-ring-color": `var(--accent-${color})`,
+                        color: `var(--accent-${color})`,
+                      } as React.CSSProperties)
+                    : undefined
+                }
+              >
+                {item.badge > 99 ? "99+" : item.badge}
+              </span>
+            )}
             {item.marker && (
               <span
                 aria-hidden

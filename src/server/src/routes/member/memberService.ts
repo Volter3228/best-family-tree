@@ -41,7 +41,7 @@ const savePhoneNumbers = async (
 
 // A member can not be their own mentor or the mentor of one of their mentors:
 // the family tree (and every walker over it) assumes there are no cycles.
-const assertNoMentorCycle = async (
+export const assertNoMentorCycle = async (
   tx: MemberTransaction,
   memberId: string,
   mentorId: string,
@@ -68,7 +68,10 @@ const assertNoMentorCycle = async (
   }
 };
 
-const assertMentorExists = async (tx: MemberTransaction, mentorId: string) => {
+export const assertMentorExists = async (
+  tx: MemberTransaction,
+  mentorId: string,
+) => {
   const mentor = await tx.member.findUnique({
     where: { id: mentorId },
     select: { id: true },
@@ -78,7 +81,7 @@ const assertMentorExists = async (tx: MemberTransaction, mentorId: string) => {
 };
 
 /** Email and social links must belong to at most one member. */
-const assertUniqueContacts = async (
+export const assertUniqueContacts = async (
   tx: MemberTransaction,
   data: Parameters<typeof findContactCollision>[0],
   excludeId?: string,

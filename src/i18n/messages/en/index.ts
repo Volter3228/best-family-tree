@@ -16,6 +16,10 @@ import { teamInfo } from "./teamInfo";
 import { filters } from "./filters";
 import { search } from "./search";
 import { photoViewer, toolbar } from "./toolbar";
+import { account } from "./account";
+import { suggest } from "./suggest";
+import { review } from "./review";
+import { access } from "./access";
 
 export const en = {
   formCommon,
@@ -36,4 +40,8 @@ export const en = {
   search,
   photoViewer,
   toolbar,
+  account,
+  suggest,
+  review,
+  access,
 } satisfies Messages;

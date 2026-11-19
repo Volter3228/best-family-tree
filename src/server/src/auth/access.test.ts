@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { canEditMember, hasAccess } from "./access.js";
+import {
+  canEditMember,
+  canManageGrant,
+  canSelfServe,
+  canSuggest,
+  hasAccess,
+  isOwnGrant,
+} from "./access.js";
 import { toMemberResponse } from "./reducedView.js";
 import type { Session } from "./types.js";
 
@@ -53,5 +60,38 @@ describe("toMemberResponse", () => {
       phoneNumbers: [],
     });
     expect(toMemberResponse(member, { method: "EMAIL" })).toBe(member);
+  });
+});
+
+describe("suggestions and self service", () => {
+  it("anonymous questions sessions can not suggest", () => {
+    expect(canSuggest(session({ method: "QUESTIONS", memberId: null }))).toBe(
+      false,
+    );
+    expect(canSuggest(session({ method: "GOOGLE" }))).toBe(true);
+  });
+
+  it("self service needs a personal session with a member", () => {
+    expect(canSelfServe(session({ method: "QUESTIONS" }))).toBe(false);
+    expect(canSelfServe(session({ method: "EMAIL", memberId: null }))).toBe(
+      false,
+    );
+    expect(canSelfServe(session({ method: "TELEGRAM" }))).toBe(true);
+  });
+
+  it("recognises an admin's own grant", () => {
+    expect(isOwnGrant(session({ memberId: "me" }), "me")).toBe(true);
+    expect(isOwnGrant(session({ memberId: "me" }), "other")).toBe(false);
+    expect(isOwnGrant(session({ memberId: null }), "other")).toBe(false);
+  });
+});
+
+describe("canManageGrant", () => {
+  it("lets admins manage editors and new grants but not other admins", () => {
+    const admin = session({ level: "ADMIN" });
+    expect(canManageGrant(admin, "EDITOR")).toBe(true);
+    expect(canManageGrant(admin, null)).toBe(true);
+    expect(canManageGrant(admin, "ADMIN")).toBe(false);
+    expect(canManageGrant(session({ level: "EDITOR" }), "EDITOR")).toBe(false);
   });
 });

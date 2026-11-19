@@ -1,6 +1,6 @@
 "use client";
 
-import { navigateWithSlide } from "@/utils/navigateWithSlide";
+import { navigateWithTransition } from "@/utils/navigateWithTransition";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { QuestionMarkCircleIcon, UserIcon } from "@heroicons/react/24/outline";
@@ -77,7 +77,7 @@ const SignInCard = ({
   }, [error]);
 
   // A full navigation so the server component sees the new cookie.
-  const handleSuccess = () => navigateWithSlide("/", "zoom");
+  const handleSuccess = () => navigateWithTransition("/", "zoom");
 
   return (
     <main className="fixed inset-0 flex overflow-y-auto px-4 py-6">

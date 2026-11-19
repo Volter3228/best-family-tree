@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useT } from "@/i18n/useT";
 import type { DropdownOption } from "@/types";
+import { filterOptionsByQuery } from "@/utils/filterOptions";
 
 const NEW_OPTION_VALUE = "__new__";
 
@@ -15,6 +16,8 @@ export const useComboboxState = (
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  // The full list stays visible until the user types.
+  const [hasTyped, setHasTyped] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -31,11 +34,8 @@ export const useComboboxState = (
   }, [initialValue, options]);
 
   const filteredOptions = useMemo(
-    () =>
-      options.filter((option) =>
-        option.text.toLowerCase().includes(inputValue.toLowerCase()),
-      ),
-    [options, inputValue],
+    () => (hasTyped ? filterOptionsByQuery(options, inputValue) : options),
+    [options, inputValue, hasTyped],
   );
 
   const isExistingOption = useMemo(
@@ -49,14 +49,14 @@ export const useComboboxState = (
   // Existing matches come first (the first one is focused by default); the
   // "create" option is last, so it is only focused when nothing else matches.
   const allOptions = useMemo(() => {
-    if (allowCreate && inputValue.trim() && !isExistingOption) {
+    if (allowCreate && hasTyped && inputValue.trim() && !isExistingOption) {
       return [
         ...filteredOptions,
         { value: NEW_OPTION_VALUE, text: t.createOption(inputValue) },
       ];
     }
     return filteredOptions;
-  }, [filteredOptions, inputValue, isExistingOption, allowCreate, t]);
+  }, [filteredOptions, inputValue, isExistingOption, hasTyped, allowCreate, t]);
 
   const close = useCallback(() => {
     setIsClosing(true);
@@ -68,6 +68,7 @@ export const useComboboxState = (
 
   const selectOption = useCallback(
     (option: DropdownOption) => {
+      setHasTyped(false);
       if (option.value === NEW_OPTION_VALUE) {
         onSelect("", inputValue);
       } else {
@@ -160,7 +161,10 @@ export const useComboboxState = (
   };
 
   useEffect(() => {
-    if (!isOpen) setActiveIndex(0);
+    if (!isOpen) {
+      setActiveIndex(0);
+      setHasTyped(false);
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -172,7 +176,10 @@ export const useComboboxState = (
     setIsOpen,
     isClosing,
     inputValue,
-    setInputValue,
+    setInputValue: (text: string) => {
+      setHasTyped(true);
+      setInputValue(text);
+    },
     activeIndex,
     allOptions,
     close,

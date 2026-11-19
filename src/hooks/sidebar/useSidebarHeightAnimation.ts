@@ -45,7 +45,8 @@ export function useSidebarHeightAnimation(
 
       // Content appearing in an empty card, or any change while the sidebar
       // slides, takes its full height at once.
-      const instant = (lastHeightRef.current ?? 0) < 1 || !canAnimateRef.current;
+      const instant =
+        (lastHeightRef.current ?? 0) < 1 || !canAnimateRef.current;
       lastHeightRef.current = height;
       if (instant) {
         heightTweenRef.current?.kill();
@@ -54,7 +55,12 @@ export function useSidebarHeightAnimation(
       }
 
       heightTweenRef.current?.kill();
-      outer.classList.add("sidebar-height-animating");
+      // While growing, the box is briefly shorter than its content, which
+      // would flash a scrollbar. Hide it only when the end state fits;
+      // otherwise the scrollbar is needed anyway and stays visible.
+      const maxHeight = parseFloat(getComputedStyle(outer).maxHeight);
+      const willScroll = height > maxHeight + 1;
+      outer.classList.toggle("sidebar-height-animating", !willScroll);
       heightTweenRef.current = gsap.to(outer, {
         height,
         duration: 0.4,

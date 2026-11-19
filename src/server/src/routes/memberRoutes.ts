@@ -1,7 +1,11 @@
 import { Router } from "express";
 import prisma from "../db/prisma/clientInstance.js";
 import uploadMiddleware from "../middleware/uploadMiddleware.js";
-import { deleteCloudinaryImage } from "../libs/cloudinary.js";
+import {
+  deleteCloudinaryImage,
+  deleteReplacedImage,
+  discardUpload as discardStoredUpload,
+} from "../libs/cloudinary.js";
 import { validateMemberBody } from "../utils/index.js";
 import {
   validateMemberUpdate,
@@ -20,9 +24,14 @@ import {
   updateMember,
 } from "./member/memberService.js";
 import { toMemberResponse } from "../auth/reducedView.js";
+import { pendingPhotoUrls } from "./suggestion/suggestionPhoto.js";
+import { guardMemberEdit } from "./member/memberGuards.js";
 
 const router = Router();
 const uploadMemberPhoto = uploadMiddleware("best-family-tree/members");
+const replaceMemberPhoto = uploadMiddleware("best-family-tree/members", {
+  namePrefix: (req) => `member-${req.params.id}`,
+});
 
 router.get("/member/:id", async (req, res) => {
   try {
@@ -97,13 +106,13 @@ router.post(
 
 router.put(
   "/members/:id",
-  uploadMemberPhoto.single("photo"),
+  guardMemberEdit,
+  replaceMemberPhoto.single("photo"),
   async (req, res) => {
     const { id } = req.params;
     const uploadedPhoto = req.file?.path;
-    const discardUpload = async () => {
-      if (uploadedPhoto) await deleteCloudinaryImage(uploadedPhoto);
-    };
+    let storedPhoto: string | null = null;
+    const discardUpload = () => discardStoredUpload(uploadedPhoto, storedPhoto);
     const reject = async (status: number, error: string, code: string) => {
       await discardUpload();
       res.status(status).json(errorBody(error, code));
@@ -115,6 +124,7 @@ router.put(
         include: { phoneNumbers: true },
       });
 
+      storedPhoto = existingMember?.photo ?? null;
       if (!existingMember) {
         await reject(404, "Member not found", "member_not_found");
         return;
@@ -170,9 +180,7 @@ router.put(
       }
 
       // The old photo goes only once the new data is safely stored.
-      if (oldPhotoUrl && photoUrl !== oldPhotoUrl) {
-        await deleteCloudinaryImage(oldPhotoUrl);
-      }
+      await deleteReplacedImage(oldPhotoUrl, photoUrl);
       res
         .status(200)
         .json(toMemberResponse(serializeMember(updatedMember), req.session!));
@@ -185,8 +193,11 @@ router.put(
 router.delete("/members/:id", async (req, res) => {
   try {
     await assertCanEditMember(req.session!, req.params.id);
+    const target = { kind: "member" as const, id: req.params.id };
+    const suggested = await pendingPhotoUrls(target);
     const photoUrl = await deleteMember(req.params.id);
     if (photoUrl) await deleteCloudinaryImage(photoUrl);
+    for (const url of suggested) await deleteCloudinaryImage(url);
     res.status(204).send();
   } catch (error) {
     sendRouteError(res, error, "Failed to delete member");

@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchSuggestionCount } from "@/api/suggestionReview";
+import { useSessionStore } from "@/store/sessionStore";
 import Sidebar from "../Sidebar";
 import type { AccentColor } from "@/types";
 import { useT } from "@/i18n/useT";
+import AccessTab from "./AccessTab";
 import ManagePane from "./ManagePane";
 import ManageRail from "./ManageRail";
 import MembersTab from "./MembersTab";
 import RolesTab from "./RolesTab";
+import SuggestionsTab from "./SuggestionsTab";
 import TeamTypesTab from "./TeamTypesTab";
 import TeamsTab from "./TeamsTab";
 import {
@@ -20,6 +24,8 @@ const TABS: Record<ManageTab, React.ComponentType<ManageTabProps>> = {
   teams: TeamsTab,
   types: TeamTypesTab,
   roles: RolesTab,
+  suggestions: SuggestionsTab,
+  access: AccessTab,
 };
 
 // Matches the sidebar's slide-out, so the reset is not seen.
@@ -47,12 +53,24 @@ const ManageSidebar = ({
   const [tab, setTab] = useState<ManageTab>("members");
   const [view, setView] = useState<ManageView>(LIST_VIEW);
   const [itemTitle, setItemTitle] = useState("");
+  const isAdmin = useSessionStore((s) => s.session?.level === "ADMIN");
+  const [pendingCount, setPendingCount] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
   const go = useCallback((next: ManageView) => {
     setDirection(next.kind === "list" ? -1 : 1);
     setView(next);
   }, []);
+
+  const refreshCount = useCallback(() => {
+    fetchSuggestionCount()
+      .then(setPendingCount)
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) refreshCount();
+  }, [isOpen, refreshCount]);
 
   const selectTab = useCallback((next: ManageTab) => {
     setTab(next);
@@ -102,7 +120,13 @@ const ManageSidebar = ({
       onBackClick={() => go(LIST_VIEW)}
     >
       <div className="flex gap-3">
-        <ManageRail active={tab} onSelect={selectTab} color={color} />
+        <ManageRail
+          active={tab}
+          onSelect={selectTab}
+          color={color}
+          isAdmin={isAdmin}
+          pendingCount={pendingCount}
+        />
         <ManagePane screen={`${tab}:${view.kind}`} direction={direction}>
           <div className="@container pt-1">
             <Tab
@@ -112,6 +136,7 @@ const ManageSidebar = ({
               onTitle={setItemTitle}
               onClose={onClose}
               color={color}
+              refreshCount={refreshCount}
             />
           </div>
         </ManagePane>

@@ -22,6 +22,13 @@ model Member {
   mentor             Member?          @relation("MentorMentees", fields: [mentorId], references: [id])
   mentees            Member[]         @relation("MentorMentees")
   positions          MemberPosition[]
+  suggestions        EditSuggestion[]
+
+  // Display choices the member makes about themselves.
+  featuredPositionId String?         @unique
+  featuredPosition   MemberPosition? @relation("FeaturedPosition", fields: [featuredPositionId], references: [id], onDelete: SetNull)
+  nameBadgeTeamId    String?
+  nameBadgeTeam      Team?           @relation("NameBadgeTeam", fields: [nameBadgeTeamId], references: [id], onDelete: SetNull)
   phoneNumbers       PhoneNumber[]
 
   createdAt DateTime @default(now())

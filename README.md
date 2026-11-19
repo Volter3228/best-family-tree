@@ -178,6 +178,48 @@ npm run db:backup-prod                              # dated dump of production i
 npm run db:restore-local -- <file.dump> --yes       # replaces your LOCAL best_family_tree with it
 ```
 
+### Automated backups (GitHub Actions)
+
+The "Database backup" workflow (`.github/workflows/backup.yml`) runs every day at 02:30 UTC on a
+temporary GitHub machine. It:
+
+1. dumps the production Neon database with the same `pg_dump` flags as `db:backup-prod`
+   (sign-in sessions, challenges and codes are skipped);
+2. checks the dump can be read back (`pg_restore --list`); a broken dump fails the run and GitHub
+   emails you;
+3. encrypts it with GPG (AES256) using your passphrase, because it holds personal data;
+4. keeps the encrypted file as a workflow artifact (`best-tree-backup`) for 30 days, so the last
+   30 daily backups are always available.
+
+Neon's free plan keeps only about 6 hours of history, so this is the real safety net. Keep running
+`npm run db:backup-prod` before deploys that contain a migration as well.
+
+**Setup (once).** Secrets are stored encrypted in the repo settings; only workflows can read them
+and GitHub masks them in logs. In GitHub open the repo, Settings, Secrets and variables, Actions,
+New repository secret, and add:
+
+| Secret | Where to get it |
+|---|---|
+| `NEON_DATABASE_URL` | The Neon **direct** (not pooled) connection string: the contents of `~/.config/best-tree/neon-prod.url`, or Neon console, project, Connect, direct connection. |
+| `BACKUP_PASSPHRASE` | A long random string you create, e.g. `openssl rand -base64 32`. Save it in a password manager first: without it the backups cannot be decrypted, and nobody can recover it. |
+
+**Schedule.** GitHub runs scheduled workflows only from the default branch, so the daily run
+starts once `backup.yml` is on `master`. Test it once by hand: Actions tab, Database backup, Run
+workflow (about a minute); the run page then lists the `best-tree-backup` artifact.
+
+**Restore.** Download the artifact zip from a run page, unzip it, then:
+
+```bash
+gpg --decrypt best-tree-<date>.dump.gpg > best-tree.dump   # asks for BACKUP_PASSPHRASE
+npm run db:restore-local -- best-tree.dump --yes           # loads it into your LOCAL database
+```
+
+Restoring into production is a separate, deliberate step.
+
+**Cost and access.** About a minute of Actions time a day and a small artifact, well within the
+free tier. Anyone with access to the repo can download the artifacts, but they are encrypted:
+only the passphrase holder can read them.
+
 ## Project Structure
 
 ```

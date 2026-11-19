@@ -163,6 +163,12 @@ await prisma.$transaction(
       });
     }
 
+    // Suggestions carry real names and contacts; profile choices point at real data.
+    await tx.editSuggestion.deleteMany();
+    await tx.member.updateMany({
+      data: { featuredPositionId: null, nameBadgeTeamId: null },
+    });
+
     // Sign-in data goes entirely, questions and their answers included.
     await tx.authSession.deleteMany();
     await tx.signInChallenge.deleteMany();

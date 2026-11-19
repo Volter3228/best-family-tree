@@ -13,6 +13,11 @@ interface Props {
   onImageSelect: (file: File | null) => void;
   image: string | File | null;
   initialImage: string | null;
+  // Removing a picked photo brings back the saved one; a saved photo itself
+  // has no remove button.
+  keepInitial?: boolean;
+  // With keepInitial: the saved photo gets a remove button too, reported here.
+  onRemoveSaved?: () => void;
   color?: AccentColor;
 }
 
@@ -20,6 +25,8 @@ const AvatarFileInput = ({
   onImageSelect,
   image,
   initialImage = null,
+  keepInitial = false,
+  onRemoveSaved,
   color = "blue",
 }: Props) => {
   const t = useT().formCommon;
@@ -60,8 +67,14 @@ const AvatarFileInput = ({
 
   const handleRemoveImage = () => {
     setTooLarge(false);
-    setSelectedImage(null);
-    onImageSelect(null);
+    if (keepInitial && selectedImage !== initialImage) {
+      setSelectedImage(initialImage);
+      onImageSelect(null);
+    } else {
+      setSelectedImage(null);
+      if (keepInitial) onRemoveSaved?.();
+      else onImageSelect(null);
+    }
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -106,19 +119,20 @@ const AvatarFileInput = ({
             )}
           />
         </label>
-        {selectedImage && (
-          <button
-            type="button"
-            onClick={handleRemoveImage}
-            className={removeBadgeClasses(
-              color,
-              "absolute right-1 top-1 h-6 w-6 p-1",
-            )}
-            aria-label={t.removeAvatar}
-          >
-            <XMarkIcon />
-          </button>
-        )}
+        {selectedImage &&
+          (!keepInitial || selectedImage !== initialImage || onRemoveSaved) && (
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className={removeBadgeClasses(
+                color,
+                "absolute right-1 top-1 h-6 w-6 p-1",
+              )}
+              aria-label={t.removeAvatar}
+            >
+              <XMarkIcon />
+            </button>
+          )}
       </div>
       {tooLarge && (
         <p role="alert" className="max-w-48 text-center text-sm text-red-500">

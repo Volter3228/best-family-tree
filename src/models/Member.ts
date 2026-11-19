@@ -5,6 +5,7 @@ import {
   type RecruitmentSeason,
   type RecruitmentTerm,
   type MemberPosition,
+  type NameBadge,
   ActivityState,
   MemberStatus,
 } from "@/types";
@@ -57,6 +58,8 @@ export default class Member {
   createdAt: Date;
   updatedAt: Date;
   positions: MemberPosition[];
+  featuredPositionId: string | null;
+  nameBadge: NameBadge | null;
   private readonly recruitmentTerm: RecruitmentTerm;
   private readonly birthdayToday: boolean;
 
@@ -81,6 +84,8 @@ export default class Member {
     createdAt,
     updatedAt,
     positions,
+    featuredPositionId,
+    nameBadge,
   }: MemberType) {
     this.id = id;
     this.birthday = birthday ? new Date(birthday) : null;
@@ -102,6 +107,8 @@ export default class Member {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.positions = positions || [];
+    this.featuredPositionId = featuredPositionId ?? null;
+    this.nameBadge = nameBadge ?? null;
     this.recruitmentTerm = getRecruitmentTerm(joinedAt);
     this.birthdayToday = isBirthdayToday(name, this.birthday);
   }

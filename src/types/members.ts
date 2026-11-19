@@ -19,6 +19,13 @@ export enum Gender {
   Female = "FEMALE",
 }
 
+export type NameBadge = {
+  teamId: string;
+  name: string;
+  iconUrl: string | null;
+  color: string | null;
+};
+
 export type Member = {
   id: string;
   name: string;
@@ -40,6 +47,8 @@ export type Member = {
   updatedAt: Date;
   phoneNumbers: string[];
   positions?: MemberPosition[];
+  featuredPositionId?: string | null;
+  nameBadge?: NameBadge | null;
 };
 
 export type MentorsListItem = {

@@ -1,0 +1,70 @@
+name: Database backup
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Check secrets
+        run: |
+          missing=0
+          for name in DATABASE_URL BACKUP_PASSPHRASE; do
+            if [ -z "${!name}" ]; then
+              case "$name" in
+                DATABASE_URL) secret=NEON_DATABASE_URL ;;
+                *) secret=$name ;;
+              esac
+              echo "::error::Repository secret $secret is not set (Settings > Secrets and variables > Actions)."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Dump database
+        run: |
+          umask 077
+          file="best-tree-$(date -u +%Y-%m-%d-%H%M).dump"
+          echo "BACKUP_FILE=$file" >> "$GITHUB_ENV"
+          # Short-lived sign-in tables are skipped: nobody needs them back.
+          docker run --rm -e DATABASE_URL postgres:17-alpine \
+            sh -c 'pg_dump -Fc --no-owner --no-acl \
+              --exclude-table-data=auth_sessions \
+              --exclude-table-data=sign_in_challenges \
+              --exclude-table-data=email_sign_in_codes \
+              "$DATABASE_URL"' > "$file"
+
+      - name: Verify dump
+        run: |
+          # A dump that cannot be listed cannot be restored either.
+          docker run --rm -i postgres:17-alpine pg_restore --list < "$BACKUP_FILE" > /dev/null
+
+      - name: Encrypt and remove plaintext
+        run: |
+          umask 077
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 --symmetric --cipher-algo AES256 \
+            -o "$BACKUP_FILE.gpg" "$BACKUP_FILE"
+          rm -f "$BACKUP_FILE"
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: best-tree-backup
+          path: ${{ env.BACKUP_FILE }}.gpg
+          retention-days: 30
+          if-no-files-found: error

@@ -7,6 +7,7 @@ import {
   type RefObject,
 } from "react";
 import type { DropdownOption } from "@/types";
+import { filterOptionsByQuery } from "@/utils/filterOptions";
 
 export const useDropdown = (
   options: DropdownOption[],
@@ -24,6 +25,8 @@ export const useDropdown = (
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  // The full list stays visible until the user types.
+  const [hasTyped, setHasTyped] = useState(false);
   const [activeOptionIndex, setActiveOptionIndex] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,16 +42,15 @@ export const useDropdown = (
 
   const filteredOptions = useMemo(
     () =>
-      autoComplete
-        ? options.filter((opt) =>
-          opt.text.toLowerCase().includes(inputValue.toLowerCase()),
-        )
+      autoComplete && hasTyped
+        ? filterOptionsByQuery(options, inputValue)
         : options,
-    [autoComplete, options, inputValue],
+    [autoComplete, options, inputValue, hasTyped],
   );
 
   const handleSelect = useCallback(
     (opt?: DropdownOption) => {
+      setHasTyped(false);
       if (opt) {
         onSelect(opt.value);
         setInputValue(opt.text);
@@ -142,7 +144,10 @@ export const useDropdown = (
 
   // Reset active index on dropdown close
   useEffect(() => {
-    if (!isOpen) setActiveOptionIndex(0);
+    if (!isOpen) {
+      setActiveOptionIndex(0);
+      setHasTyped(false);
+    }
   }, [isOpen]);
 
   // Reset active index after filtering options
@@ -166,7 +171,10 @@ export const useDropdown = (
     filteredOptions,
     activeOptionIndex,
     inputValue,
-    setInputValue,
+    setInputValue: (text: string) => {
+      setHasTyped(true);
+      setInputValue(text);
+    },
     handleSelect,
     handleKeyDown,
     handleClose,

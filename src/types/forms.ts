@@ -64,7 +64,7 @@ export type TeamTypeFormData = {
 
 export type MemberFormMode = "add" | "edit";
 
-export type SidebarMode = "info" | "edit";
+export type SidebarMode = "info" | "edit" | "suggest";
 
 export type DropdownOption = {
   text: string;

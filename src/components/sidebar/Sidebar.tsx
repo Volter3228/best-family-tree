@@ -8,14 +8,15 @@ import React, {
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
-import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { SidebarMode, AccentColor } from "@/types";
 import { useSidebarHeightAnimation, useSidebarChromeHeights } from "@/hooks";
 import { SidebarFooterContext } from "./SidebarFooterContext";
 import SidebarBehindCover from "./SidebarBehindCover";
 import SidebarFooter from "./SidebarFooter";
 import SidebarHandle from "./SidebarHandle";
+import SidebarCoverTint from "./SidebarCoverTint";
 import SidebarHeader from "./SidebarHeader";
+import SidebarNotice from "./SidebarNotice";
 import { useFrontSheetWidth } from "./useFrontSheetWidth";
 import "./styles/sidebar.css";
 
@@ -36,6 +37,9 @@ interface Props {
   color?: AccentColor;
   onClose: () => void;
   onEditClick?: () => void;
+  onSuggestClick?: () => void;
+  // Floating confirmation at the bottom of the card, e.g. after a suggestion.
+  notice?: string | null;
   onBackClick?: () => void;
   // Mobile only: lets the user collapse the card to a bar above the toolbar.
   // Without a handler (and in edit mode) the card cannot be minimized.
@@ -60,6 +64,8 @@ const Sidebar = ({
   color = "blue",
   onClose,
   onEditClick,
+  onSuggestClick,
+  notice,
   onBackClick,
   isMinimized: minimizedRequested = false,
   onMinimizedChange,
@@ -123,7 +129,10 @@ const Sidebar = ({
   );
   useSidebarChromeHeights(cardElement, headerElement, footerElement);
 
-  const expand = useCallback(() => onMinimizedChange?.(false), [onMinimizedChange]);
+  const expand = useCallback(
+    () => onMinimizedChange?.(false),
+    [onMinimizedChange],
+  );
 
   return (
     <div
@@ -149,21 +158,12 @@ const Sidebar = ({
           isBehind && "md:scale-[.96]",
         )}
       >
+        {notice && <SidebarNotice message={notice} />}
         {isBehind && onBringForward && (
           <SidebarBehindCover onClick={onBringForward} />
         )}
         {headerFloats && (
-          // The cover's tint, painted here rather than inside the scroller:
-          // content cannot paint under the scrollbar gutter, which left a
-          // seam at the right edge. Follows the scroll like the content.
-          <div
-            ref={setCoverTint}
-            aria-hidden
-            className={twMerge(
-              "pointer-events-none absolute inset-x-0 top-0 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] bg-linear-to-b from-current/20 to-transparent [mask-image:linear-gradient(to_bottom,black_60%,transparent)]",
-              COLOR_CLASSES[color].text,
-            )}
-          />
+          <SidebarCoverTint tintRef={setCoverTint} color={color} />
         )}
         <div
           ref={setHeaderElement}
@@ -195,6 +195,7 @@ const Sidebar = ({
             onExpand={expand}
             onClose={onClose}
             onEditClick={onEditClick}
+            onSuggestClick={onSuggestClick}
             onBackClick={onBackClick}
           />
         </div>

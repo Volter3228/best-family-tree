@@ -1,0 +1,32 @@
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// One suggested change of one field of a member or a team (exactly one of
+// memberId / teamId is set). Rows sent together share a batchId.
+model EditSuggestion {
+  id             String           @id @default(cuid())
+  batchId        String
+  memberId       String?
+  teamId         String?
+  field          String
+  fromValue      String?
+  toValue        String?
+  authorMemberId String?
+  authorEmail    String?
+  status         SuggestionStatus @default(PENDING)
+  reviewerId     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  member Member? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([authorMemberId, status])
+  @@index([memberId])
+  @@index([teamId])
+  @@map("edit_suggestions")
+}

@@ -38,7 +38,7 @@ const focusSearchInput = () => {
 };
 
 const Toolbar = ({ onFitView, onSearch, onTeamSearch, isInfoOpen }: Props) => {
-  const t = useT().auth;
+  const ta = useT().account;
   const tb = useT().toolbar;
   const manage = useManageStore();
   const isSidebarOpen = manage.isOpen;
@@ -133,7 +133,7 @@ const Toolbar = ({ onFitView, onSearch, onTeamSearch, isInfoOpen }: Props) => {
             />
             {session && (
               <ToolbarIconButton
-                title={t.logout}
+                title={ta.title}
                 onClick={handleShowAccountClick}
                 icon={LionIcon}
                 color="blue"

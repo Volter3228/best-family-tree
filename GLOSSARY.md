@@ -43,7 +43,7 @@ A member for whom some data is missing (old or migrated records). Sparse records
 _Avoid_: Broken record, incomplete member
 
 **Completeness rule**:
-Editing a member may add data and may change data, but may never empty a field that already has a value; fields that were never filled stay optional.
+Editing a member may add data and may change data, but may never empty a field that already has a value; fields that were never filled stay optional. One exception: members may remove their own photo.
 _Avoid_: Required fields (adding a new member still requires them)
 
 ## Teams
@@ -122,8 +122,22 @@ The six digits emailed for a Personal sign-in. Valid for 10 minutes, usable once
 _Avoid_: OTP, PIN, token
 
 **Demo mode**:
-A deployment switch (`DEMO_MODE=true`) for the public showcase, run on an anonymized copy of the data. Anyone can sign in: the questions are easy and any email address gets a code, which makes them an Editor. Every edit is refused ("У демо зміни не зберігаються"), so nothing changes.
+A deployment switch (`DEMO_MODE=true`) for the public showcase, run on an anonymized copy of the data. Anyone can sign in: the questions are easy and any email address gets a code, which makes them an Editor. Every edit is refused ("У демо зміни не зберігаються"), so nothing changes; only suggestions can be sent, and they are never applied.
 _Avoid_: Sandbox (edits are refused, not kept in the browser), test mode
+
+## Contributions
+
+**Suggestion**:
+A proposed change to one field of a member or a team, sent by anyone with a Personal sign-in and applied only when an Editor or Admin approves it. Fields sent together form one batch, but each is approved or rejected on its own. A suggestion may add or change a value, never empty it. Photos are never suggested.
+_Avoid_: Request, proposal, edit request
+
+**Featured role**:
+The one position a member chooses to highlight; it is shown first in their roles, across the whole row.
+_Avoid_: Main position, pinned role
+
+**Name badge**:
+The logo of one of the member's own teams, chosen by the member and shown right after their name.
+_Avoid_: Team icon, flair
 
 ## Language
 

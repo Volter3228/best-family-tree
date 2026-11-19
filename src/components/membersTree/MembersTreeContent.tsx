@@ -14,6 +14,7 @@ import {
   useTeamInfoSidebar,
   useResolvedDirection,
 } from "@/hooks";
+import { useProfileOpenRequest } from "@/hooks/sidebar/useProfileOpenRequest";
 import { getMemberById } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -129,6 +130,16 @@ const MembersTreeContent = ({ members }: Props) => {
     },
     [selectMember, focusNode],
   );
+
+  useProfileOpenRequest({
+    openInMode: memberSidebar.openInMode,
+    openTeam: teamInfo.open,
+    closeTeam: teamInfo.close,
+    focusNode,
+    focusFrame,
+    rememberTeamFor,
+    isTeamView,
+  });
 
   useSyncMembers(members);
   useTreeLayout();
