@@ -21,8 +21,16 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "BEST Family Tree",
-  description: "Vouchik's Pet Project",
+  title: "BEST Tree",
+  metadataBase: new URL("https://best-tree.app"),
+  description: "It's more like trees, but whatever",
+  openGraph: {
+    type: "website",
+    siteName: "BEST Tree",
+    title: "BEST Tree",
+    description: "It's more like trees, but whatever",
+  },
+  twitter: { card: "summary_large_image" },
   icons: {
     icon: [
       { media: "(prefers-color-scheme: light)", url: "/images/lion.svg" },
