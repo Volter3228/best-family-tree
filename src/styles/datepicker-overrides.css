@@ -124,6 +124,11 @@
       transparent) !important;
 }
 
+.react-datepicker__day:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
 .react-datepicker__day--today {
   font-weight: 700;
   color: var(--datepicker-accent, var(--foreground)) !important;
