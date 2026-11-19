@@ -17,7 +17,7 @@ import { useIsMobileScreen } from "@/hooks/membersTree/useTreeDirection";
 import { abbreviateName, useDisplayName } from "@/utils/displayName";
 import type { Member } from "@/models";
 import type { AccentColor } from "@/types";
-import MemberFactTile from "./MemberFactTile";
+import MemberFactTile, { tileActionCircle } from "./MemberFactTile";
 import MemberInfoCopy from "./MemberInfoCopy";
 import MemberMiniAvatar from "./MemberMiniAvatar";
 
@@ -143,9 +143,9 @@ const MemberInfoFacts = ({
               rel="noopener noreferrer"
               title={t.addToCalendar}
               aria-label={t.addToCalendar}
-              className={twMerge("block h-5 w-5", colorClasses.text)}
+              className={twMerge(tileActionCircle, colorClasses.text)}
             >
-              <CalendarDateRangeIcon />
+              <CalendarDateRangeIcon className="h-4 w-4" />
             </a>
           }
         >

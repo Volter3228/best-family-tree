@@ -17,6 +17,10 @@ interface Props {
   color?: AccentColor;
 }
 
+// Round chip like the sidebar header buttons, so tile actions read as buttons.
+export const tileActionCircle =
+  "flex h-7 w-7 items-center justify-center rounded-full bg-surface/70 backdrop-blur transition-colors duration-200 hover:bg-surface";
+
 const MemberFactTile = ({
   label,
   icon: Icon,
@@ -41,20 +45,24 @@ const MemberFactTile = ({
         fullWidth && "col-span-2",
       )}
     >
-      <span className={twMerge("flex items-center gap-1.5 text-sm text-foreground/60", action && "pr-7")}>
+      <span
+        className={twMerge(
+          "flex items-center gap-1.5 text-sm text-foreground/60",
+          action && "pr-7",
+        )}
+      >
         <Icon className={twMerge("h-4 w-4 shrink-0", colorClasses.text)} />
         <span className="truncate">{label}</span>
       </span>
       <span
         className={twMerge(
           "mt-1 block min-w-0 text-base font-semibold",
-          action && "pr-7",
           breakAll && "break-all",
         )}
       >
         {children}
       </span>
-      {action && <span className="absolute right-2.5 top-2.5">{action}</span>}
+      {action && <span className="absolute right-1.5 top-1.5">{action}</span>}
     </Root>
   );
 };

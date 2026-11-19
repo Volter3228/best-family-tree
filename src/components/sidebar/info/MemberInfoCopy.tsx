@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { CheckIcon, DocumentDuplicateIcon } from "@heroicons/react/16/solid";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
+import { tileActionCircle } from "./MemberFactTile";
 import { useT } from "@/i18n/useT";
 
 interface Props {
@@ -43,24 +44,22 @@ const MemberInfoCopy = ({ valueToCopy, color = "blue" }: Props) => {
       onClick={handleCopy}
       title={t.copy}
       aria-label={copied ? t.copied : t.copy}
-      className={twMerge(
-        "relative ml-1 inline-block h-5 w-5 cursor-pointer align-middle",
-        colorClasses.text,
-      )}
+      className={twMerge("cursor-pointer", tileActionCircle, colorClasses.text)}
     >
-      <DocumentDuplicateIcon
-        className={twMerge(
-          iconBase,
-          "pb-0.5",
-          copied ? "scale-50 -rotate-90 opacity-0" : "scale-100 opacity-100",
-        )}
-      />
-      <CheckIcon
-        className={twMerge(
-          iconBase,
-          copied ? "scale-100 opacity-100" : "scale-50 rotate-90 opacity-0",
-        )}
-      />
+      <span className="relative h-4 w-4">
+        <DocumentDuplicateIcon
+          className={twMerge(
+            iconBase,
+            copied ? "scale-50 -rotate-90 opacity-0" : "scale-100 opacity-100",
+          )}
+        />
+        <CheckIcon
+          className={twMerge(
+            iconBase,
+            copied ? "scale-100 opacity-100" : "scale-50 rotate-90 opacity-0",
+          )}
+        />
+      </span>
     </button>
   );
 };
