@@ -5,13 +5,16 @@ import {
   swapChallengeQuestion,
   verifyAnswers,
 } from "../../auth/challenges.js";
-import { limiter } from "../../auth/rateLimit.js";
+import { ipKey, limiter } from "../../auth/rateLimit.js";
 import { createSession, setSessionCookie } from "../../auth/sessions.js";
 import { sendRouteError } from "../../utils/httpErrors.js";
 
 const router = Router();
 
-// The only limit: failed verifies per IP, like a password lockout.
+// Challenge creation writes a DB row, so cap it per IP.
+const challengeLimit = limiter(30, 15 * 60 * 1000, ipKey);
+
+// Failed verifies per IP, like a password lockout.
 const failedVerifyLimit = limiter(10, 15 * 60 * 1000, undefined, {
   // Only wrong answers (401) count; expired challenges and bad bodies do not.
   requestWasSuccessful: (_req, res) => res.statusCode !== 401,
@@ -22,9 +25,7 @@ const failedVerifyLimit = limiter(10, 15 * 60 * 1000, undefined, {
     const retryAfterSeconds = resetTime
       ? Math.max(1, Math.ceil((resetTime.getTime() - Date.now()) / 1000))
       : 900;
-    res
-      .status(429)
-      .json({ error: "Too many attempts", retryAfterSeconds });
+    res.status(429).json({ error: "Too many attempts", retryAfterSeconds });
   },
 });
 
@@ -34,7 +35,7 @@ const verifySchema = z.object({
 });
 const swapSchema = z.object({ questionId: z.string().min(1) });
 
-router.post("/auth/questions/challenge", async (_req, res) => {
+router.post("/auth/questions/challenge", challengeLimit, async (_req, res) => {
   try {
     res.status(200).json(await createChallenge());
   } catch (error) {
@@ -42,20 +43,24 @@ router.post("/auth/questions/challenge", async (_req, res) => {
   }
 });
 
-router.post("/auth/questions/challenge/:id/swap", async (req, res) => {
-  const body = swapSchema.safeParse(req.body);
-  if (!body.success) {
-    res.status(400).json({ error: "Invalid body" });
-    return;
-  }
-  try {
-    res
-      .status(200)
-      .json(await swapChallengeQuestion(req.params.id, body.data.questionId));
-  } catch (error) {
-    sendRouteError(res, error, "Failed to swap question");
-  }
-});
+router.post(
+  "/auth/questions/challenge/:id/swap",
+  challengeLimit,
+  async (req, res) => {
+    const body = swapSchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid body" });
+      return;
+    }
+    try {
+      res
+        .status(200)
+        .json(await swapChallengeQuestion(req.params.id, body.data.questionId));
+    } catch (error) {
+      sendRouteError(res, error, "Failed to swap question");
+    }
+  },
+);
 
 router.post("/auth/questions/verify", failedVerifyLimit, async (req, res) => {
   const body = verifySchema.safeParse(req.body);
@@ -64,7 +69,10 @@ router.post("/auth/questions/verify", failedVerifyLimit, async (req, res) => {
     return;
   }
   try {
-    const result = await verifyAnswers(body.data.challengeId, body.data.answers);
+    const result = await verifyAnswers(
+      body.data.challengeId,
+      body.data.answers,
+    );
     if (!result.complete) {
       // 401 counts toward the lockout only when something was actually wrong.
       res.status(result.wrong.length > 0 ? 401 : 200).json({
