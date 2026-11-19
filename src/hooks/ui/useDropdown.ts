@@ -50,7 +50,6 @@ export const useDropdown = (
 
   const handleSelect = useCallback(
     (opt?: DropdownOption) => {
-      setHasTyped(false);
       if (opt) {
         onSelect(opt.value);
         setInputValue(opt.text);
