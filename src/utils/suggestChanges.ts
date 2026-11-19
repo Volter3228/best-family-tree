@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import type { SuggestionChange } from "@/api/selfService";
+import { normalizePhone } from "@/utils/phone";
 
 // A suggestion may change or add a value, never empty one: a field the form
 // left blank is simply not sent (the form reports it as an error instead).
@@ -72,7 +73,7 @@ export const buildMemberChanges = (
     add(field, form[field].trim(), member[field]);
   }
 
-  const phone = form.phoneNumber.trim();
+  const phone = normalizePhone(form.phoneNumber);
   if (
     phone &&
     (phone !== member.phoneNumbers[0] || pendingFields.has("phoneNumbers"))

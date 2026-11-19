@@ -6,6 +6,7 @@ import {
 import { MEMBER_STATUSES } from "@/constants/member";
 import { messages, type Messages } from "@/i18n/messages";
 import type { Member } from "@/models";
+import { normalizePhone } from "@/utils/phone";
 import { getRowPeriod } from "../fields/position/positionFormUtils";
 import type {
   MemberFormData,
@@ -137,7 +138,6 @@ const validateMemberForm = (
     joinedAt,
     status,
     mentorId,
-    phoneNumber,
     email,
     telegramLink,
     instagramLink,
@@ -145,6 +145,7 @@ const validateMemberForm = (
     linkedinLink,
   } = form;
 
+  const phoneNumber = normalizePhone(form.phoneNumber);
   const storedValues = stored && getStoredFieldValues(stored);
   // Adding: everything is required. Editing: only what is already stored.
   // Minimal record (old member): only the name and join date are demanded.

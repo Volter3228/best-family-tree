@@ -1,4 +1,5 @@
 import type { MemberFormData } from "@/types";
+import { normalizePhone } from "@/utils/phone";
 
 export const buildMemberFormData = (
   form: MemberFormData,
@@ -13,7 +14,10 @@ export const buildMemberFormData = (
       formData.append(key, value.toISOString());
     } else if (value !== undefined && value !== null) {
       if (key === "phoneNumber") {
-        formData.append("phoneNumbers", JSON.stringify(value ? [value] : []));
+        formData.append(
+          "phoneNumbers",
+          JSON.stringify(value ? [normalizePhone(String(value))] : []),
+        );
       } else if (key === "photo") {
         if (value instanceof File) {
           formData.append(key, value);
