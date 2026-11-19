@@ -1,4 +1,4 @@
-import { Gender, MemberStatus } from "@/types";
+import { ActivityState, Gender, MemberStatus } from "@/types";
 
 export type PositionFormRow = {
   id: string;
@@ -43,6 +43,7 @@ export type MemberFormData = {
   joinedAt: Date | null;
   mentorId: string;
   status: MemberStatus | null;
+  activityState: ActivityState;
   // Optional; once stored it is never cleared from the form.
   gender: Gender | null;
   phoneNumber: string;

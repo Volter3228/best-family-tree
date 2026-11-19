@@ -5,9 +5,10 @@ import { useDisplayName } from "@/utils/displayName";
 import { useMembersStore } from "@/store/membersStore";
 import { collectDescendantIds } from "@/utils/membersTree";
 import { MIN_DATE_JOIN } from "@/constants/form";
-import { getStatusOptions } from "@/constants/filters";
+import { getActivityOptions, getStatusOptions } from "@/constants/filters";
 import type {
   AccentColor,
+  ActivityState,
   DropdownOption,
   MemberFormData,
   MemberStatus,
@@ -40,6 +41,14 @@ const MemberBestSection = ({
   const statusOptions: DropdownOption[] = useMemo(
     () =>
       getStatusOptions(locale).map(({ value, label }) => ({
+        value,
+        text: label,
+      })),
+    [locale],
+  );
+  const activityOptions: DropdownOption[] = useMemo(
+    () =>
+      getActivityOptions(locale).map(({ value, label }) => ({
         value,
         text: label,
       })),
@@ -78,6 +87,19 @@ const MemberBestSection = ({
             color={color}
           />
         </FormField>
+        <FormField error={errors.mentorId} color={color}>
+          <DropdownSelectInput
+            name="mentor"
+            label={t.mentor}
+            options={mentorOptions}
+            onSelect={(mentorId) => setForm({ ...form, mentorId })}
+            placeholder={t.mentorPlaceholder}
+            autoComplete
+            required={!minimal}
+            initialValue={form.mentorId || undefined}
+            color={color}
+          />
+        </FormField>
         <FormField error={errors.status} color={color}>
           <DropdownSelectInput
             name="status"
@@ -92,20 +114,24 @@ const MemberBestSection = ({
             color={color}
           />
         </FormField>
+        <FormField error={errors.activityState} color={color}>
+          <DropdownSelectInput
+            name="activityState"
+            label={t.activityState}
+            options={activityOptions}
+            onSelect={(activityState) =>
+              setForm({
+                ...form,
+                activityState: activityState as ActivityState,
+              })
+            }
+            placeholder={t.activityState}
+            initialValue={form.activityState}
+            required
+            color={color}
+          />
+        </FormField>
       </div>
-      <FormField error={errors.mentorId} color={color}>
-        <DropdownSelectInput
-          name="mentor"
-          label={t.mentor}
-          options={mentorOptions}
-          onSelect={(mentorId) => setForm({ ...form, mentorId })}
-          placeholder={t.mentorPlaceholder}
-          autoComplete
-          required={!minimal}
-          initialValue={form.mentorId || undefined}
-          color={color}
-        />
-      </FormField>
     </section>
   );
 };

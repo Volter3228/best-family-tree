@@ -14,6 +14,7 @@ export const getInitialFormData = (member: Member): MemberFormData => {
     joinedAt: member.joinedAt ? new Date(member.joinedAt) : null,
     mentorId: member.mentorId || "",
     status: member.status || "",
+    activityState: member.activityState,
     gender: member.gender,
     phoneNumber: member.phoneNumbers[0] || "",
     email: member.email || "",

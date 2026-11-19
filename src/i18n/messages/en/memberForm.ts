@@ -20,6 +20,7 @@ export const memberForm = {
   gender: "Gender",
   joinedAt: "Join date",
   status: "Status",
+  activityState: "Activity state",
   mentor: "Mentor",
   mentorPlaceholder: "Mentor Mentorovenko",
   contacts: "Contacts",

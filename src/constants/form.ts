@@ -1,5 +1,5 @@
 import { endOfYear, subYears } from "date-fns";
-import type { MemberFormData } from "@/types";
+import { ActivityState, type MemberFormData } from "@/types";
 
 /* Date Input */
 export const MAX_DATE_BIRTHDAY = endOfYear(subYears(new Date(), 16));
@@ -13,6 +13,7 @@ export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   joinedAt: null,
   mentorId: "",
   status: null,
+  activityState: ActivityState.Active,
   gender: null,
   phoneNumber: "",
   email: "",

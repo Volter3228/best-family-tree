@@ -19,6 +19,7 @@ export const memberForm = {
   gender: "Стать",
   joinedAt: "День вступу",
   status: "Статус",
+  activityState: "Стан активності",
   mentor: "Ментор",
   mentorPlaceholder: "Ментор Менторовенко",
   contacts: "Контакти",

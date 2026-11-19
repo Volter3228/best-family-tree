@@ -29,6 +29,12 @@ export const memberBodySchema = z.object({
   status: z.enum(["OBSERVER", "BABY", "FULL", "ALUMNI"], {
     error: "Invalid status value",
   }),
+  // Optional: when omitted, the stored (or default Active) state is kept.
+  activityState: z
+    .enum(["ACTIVE", "INACTIVE", "EXCLUDED"], {
+      error: "Invalid activity state value",
+    })
+    .optional(),
   email: z.string().email("Invalid email").or(z.literal("")).optional(),
   phoneNumbers: z
     .string()

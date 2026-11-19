@@ -88,6 +88,7 @@ const buildSharedFields = (
 ) => {
   const {
     status,
+    activityState,
     gender,
     email,
     telegramLink,
@@ -99,6 +100,7 @@ const buildSharedFields = (
   return {
     email: email || null,
     status,
+    activityState,
     // undefined (not null) leaves a stored gender untouched.
     gender: gender || undefined,
     photo: photoUrl,
