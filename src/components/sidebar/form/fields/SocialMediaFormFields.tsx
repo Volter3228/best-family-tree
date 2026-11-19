@@ -8,7 +8,7 @@ import { useT } from "@/i18n/useT";
 import type { MemberFormData, AccentColor } from "@/types";
 import TextInput from "../inputs/TextInput";
 import FormField from "./FormField";
-import SectionHeading from "./SectionHeading";
+import SocialsHeading from "./SocialsHeading";
 
 interface Props {
   form: MemberFormData;
@@ -26,7 +26,7 @@ const SocialMediaFormFields = ({
   const t = useT().memberForm;
   return (
     <section className="flex flex-col gap-3">
-      <SectionHeading title={t.socials} color={color} />
+      <SocialsHeading color={color} />
       <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
         <FormField error={errors.telegramLink} color={color}>
           <TextInput

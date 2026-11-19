@@ -23,6 +23,7 @@ import type {
   MemberFormData,
   MemberStatus,
 } from "@/types";
+import SocialsHeading from "../fields/SocialsHeading";
 import FormField from "../fields/FormField";
 import { DateInput, DropdownSelectInput, TextInput } from "../inputs";
 
@@ -204,6 +205,7 @@ const MemberSuggestFields = ({
           color={color}
         />
       </FormField>
+      <SocialsHeading color={color} />
       <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
         {SOCIALS.map(({ key, label, placeholder, icon }) => (
           <FormField key={key} error={errors[key]} color={color}>

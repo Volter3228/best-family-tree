@@ -24,6 +24,8 @@ export const memberForm = {
   contacts: "Контакти",
   phoneNumber: "Номер телефону",
   socials: "Соцмережі",
+  socialsHint:
+    "Повне посилання або лише нікнейм, наприклад Vouchik або https://t.me/Vouchik. Символ @ на початку теж підійде.",
   positions: {
     title: "Посади",
     add: "Додати посаду",

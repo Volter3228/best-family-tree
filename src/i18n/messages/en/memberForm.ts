@@ -25,6 +25,8 @@ export const memberForm = {
   contacts: "Contacts",
   phoneNumber: "Phone number",
   socials: "Social media",
+  socialsHint:
+    "Paste a full link or just the username, e.g. Vouchik or https://t.me/Vouchik. A leading @ is fine too.",
   positions: {
     title: "Positions",
     add: "Add position",
