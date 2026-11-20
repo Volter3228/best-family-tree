@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { LionIcon } from "@/components/icons";
 import { getMemberAvatar, getStatusLabel } from "@/utils";
@@ -57,9 +58,18 @@ const MemberInfo = ({
   const colorClasses = COLOR_CLASSES[color];
   const StatusIcon = STATUS_ICONS[status];
   const photoOpen = useIsPhotoOpen(member.id);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // The sidebar's scroller outlives this component, so reset it when another member is shown.
+  useEffect(() => {
+    rootRef.current?.closest(".sidebar-content")?.scrollTo({ top: 0 });
+  }, [member.id]);
 
   return (
-    <div className="flex flex-col transition-opacity duration-300">
+    <div
+      ref={rootRef}
+      className="flex flex-col transition-opacity duration-300"
+    >
       <MemberInfoCover member={member} color={color} />
       <div className="-mt-16 flex flex-col items-center gap-3">
         <div

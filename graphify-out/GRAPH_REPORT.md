@@ -1,17 +1,17 @@
-# Graph Report - best-family-tree  (2026-11-19)
+# Graph Report - best-family-tree  (2026-11-20)
 
 ## Corpus Check
-- 744 files · ~224,858 words
+- 744 files · ~224,928 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 33 file(s) not represented in the graph (top: .prisma 10, (none) 7, .css 7)
 
 ## Summary
-- 3433 nodes · 10275 edges · 142 communities (133 shown, 9 thin omitted)
+- 3433 nodes · 10276 edges · 142 communities (133 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 101 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b298b0ad`
+- Built from commit: `03bb6366`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -159,7 +159,7 @@
 ## God Nodes (most connected - your core abstractions)
 1. `useT()` - 214 edges
 2. `AccentColor` - 188 edges
-3. `react` - 170 edges
+3. `react` - 171 edges
 4. `tailwind-merge` - 97 edges
 5. `Member` - 76 edges
 6. `useLocale()` - 73 edges
@@ -743,7 +743,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `uk/index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07965860597439545 - nodes in this community are weakly interconnected._
 - **Why does `react` connect `react` to `react`, `pixi.js`, `ThemeContext.tsx`, `useDashedPathAnimation.ts`, `bakeParams.ts`, `teamLayout.ts`, `ref_vitest`, `membersStore.ts`, `TeamFrame`, `useMeta.ts`, `PositionFormFields.tsx`, `useTreeLayout.ts`, `layout.tsx`, `src/types/index.ts`, `GenderFormField.tsx`, `TeamSearch.tsx`, `TeamLogo.tsx`, `YearRangeInput.tsx`, `package.json`, `MemberSuggestFields.tsx`, `Member`, `utils/membersTree/index.ts`, `TeamFrame`, `Toolbar.tsx`, `SuggestionsTab.tsx`, `useTeamForm.ts`, `DropdownOption`, `Member`, `pixi.js`, `useCardAnimation.ts`, `useCanvasTheme.ts`, `searchShortcut.ts`, `constants/filters.ts`, `BirthdayFilterSection.tsx`, `constants/canvas/index.ts`, `api/auth.ts`, `TeamTypeFormContent.tsx`, `Sidebar.tsx`, `gsap`, `MemberSidebar.tsx`, `useT.ts`, `EditMemberForm.tsx`, `useProgressiveIds.ts`, `PhotoViewer.tsx`, `FilterState`, `MemberSuggestForm.tsx`, `AccountPanel.tsx`, `TeamTypeIdentityTile.tsx`, `http`, `PhotoViewer.tsx`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
 - **Should `pixi.js` be split into smaller, more focused modules?**
   _Cohesion score 0.10826210826210826 - nodes in this community are weakly interconnected._
 - **Why does `Constructor options` connect `Common Mistakes` to `ref_vitest`?**

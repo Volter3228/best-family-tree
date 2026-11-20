@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfo.tsx": {
-    "mtime": 1795100422.2327862,
-    "seen": 1795101343.4111888,
-    "ast_hash": "92d6fd376bb94c6da26f4e22dc93cc6d",
+    "mtime": 1795166942.5876453,
+    "seen": 1795166951.6868768,
+    "ast_hash": "bb60f567c88aa129d5512c8e1a393d81",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/MemberInfoCopy.tsx": {
@@ -726,9 +726,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/info/PositionBadge.tsx": {
-    "mtime": 1795100422.233146,
-    "seen": 1795101343.4114866,
-    "ast_hash": "ba557016c55782e55168e9b67d01cc40",
+    "mtime": 1795119561.603709,
+    "seen": 1795166951.687184,
+    "ast_hash": "28a936babf4ed717e9c127c2cfa7bf4d",
     "semantic_hash": ""
   },
   "src/components/sidebar/info/TeamInfo.tsx": {
@@ -3402,9 +3402,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/form/fields/MemberBestSection.tsx": {
-    "mtime": 1795119158.342546,
-    "seen": 1795119198.8490624,
-    "ast_hash": "6cdc6537cdb16fb8fe3c376621152efc",
+    "mtime": 1795119296.1413069,
+    "seen": 1795166951.6847491,
+    "ast_hash": "6bbd62f899716d54601cc2a4257f3ef1",
     "semantic_hash": ""
   },
   "src/components/sidebar/form/fields/MemberContactsSection.tsx": {
