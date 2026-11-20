@@ -35,6 +35,7 @@ interface Props {
   onPositionClick?: (position: MemberPosition) => void;
   canClickPosition?: (position: MemberPosition) => boolean;
   color?: AccentColor;
+  hasBack?: boolean;
 }
 
 const MemberInfo = ({
@@ -46,6 +47,7 @@ const MemberInfo = ({
   onPositionClick,
   canClickPosition,
   color = "blue",
+  hasBack = false,
 }: Props) => {
   const dn = useDisplayName();
   const locale = useLocale();
@@ -70,7 +72,7 @@ const MemberInfo = ({
       ref={rootRef}
       className="flex flex-col transition-opacity duration-300"
     >
-      <MemberInfoCover member={member} color={color} />
+      <MemberInfoCover member={member} color={color} hasBack={hasBack} />
       <div className="-mt-16 flex flex-col items-center gap-3">
         <div
           className={twMerge(

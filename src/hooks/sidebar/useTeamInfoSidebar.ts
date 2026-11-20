@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
 import { useManageStore } from "@/store/manageStore";
 
@@ -9,8 +8,9 @@ import { useManageStore } from "@/store/manageStore";
  * vanish during the slide-out animation.
  */
 export const useTeamInfoSidebar = (
-  selectedMember: Member | null,
+  isMemberSidebarOpen: boolean,
   closeMemberSidebar: () => void,
+  hideMemberSidebar: () => void,
 ) => {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -19,15 +19,16 @@ export const useTeamInfoSidebar = (
   const [isMinimized, setIsMinimized] = useState(false);
   // Member whose sidebar this team was opened from; powers the back arrow.
   const [returnMemberId, setReturnMemberId] = useState<string | null>(null);
+  // That member stays selected until this sidebar closes.
+  const keepsSelectionRef = useRef(false);
 
-  // Keyed by id: a members reload must not close the team sidebar.
-  const selectedId = selectedMember?.id ?? null;
   useEffect(() => {
-    if (selectedId) {
+    if (isMemberSidebarOpen) {
+      keepsSelectionRef.current = false;
       setIsOpen(false);
       setReturnMemberId(null);
     }
-  }, [selectedId]);
+  }, [isMemberSidebarOpen]);
 
   const expandTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(expandTimerRef.current), []);
@@ -36,22 +37,29 @@ export const useTeamInfoSidebar = (
     (nextTeamId: string, fromMemberId: string | null = null) => {
       clearTimeout(expandTimerRef.current);
       useManageStore.getState().sendBack();
-      closeMemberSidebar();
+      keepsSelectionRef.current = !!fromMemberId;
+      if (fromMemberId) hideMemberSidebar();
+      else closeMemberSidebar();
       setTeamId(nextTeamId);
       setReturnMemberId(fromMemberId);
       setMode("info");
       setIsMinimized(false);
       setIsOpen(true);
     },
-    [closeMemberSidebar],
+    [closeMemberSidebar, hideMemberSidebar],
   );
 
   // Stays minimized while sliding out, then expands once off screen.
   const close = useCallback(() => {
     setIsOpen(false);
+    // Drops the selection kept for the member this team was opened from.
+    if (keepsSelectionRef.current) {
+      keepsSelectionRef.current = false;
+      closeMemberSidebar();
+    }
     clearTimeout(expandTimerRef.current);
     expandTimerRef.current = setTimeout(() => setIsMinimized(false), 300);
-  }, []);
+  }, [closeMemberSidebar]);
 
   const startEdit = useCallback(() => setMode("edit"), []);
   const startSuggest = useCallback(() => setMode("suggest"), []);

@@ -15,11 +15,13 @@ import {
   useResolvedDirection,
 } from "@/hooks";
 import { useProfileOpenRequest } from "@/hooks/sidebar/useProfileOpenRequest";
+import { useSidebarBack } from "@/hooks/sidebar/useSidebarBack";
+import { useTeamFrameClicks } from "@/hooks/membersTree/useTeamFrameClicks";
 import { getMemberById } from "@/store/membersStore";
 import { useFiltersStore } from "@/store/filtersStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useTreeStore } from "@/store/treeStore";
-import type { Member as MemberType, TeamFrame } from "@/types";
+import type { Member as MemberType } from "@/types";
 import { getRenderResolution } from "@/utils";
 import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
@@ -52,7 +54,11 @@ const MembersTreeContent = ({ members }: Props) => {
   const memberSidebar = useSidebar(selectedMember, selectMemberInStore);
   const { selectMember, onClose: handleSidebarClose } = memberSidebar;
 
-  const teamInfo = useTeamInfoSidebar(selectedMember, handleSidebarClose);
+  const teamInfo = useTeamInfoSidebar(
+    memberSidebar.isSidebarOpen,
+    handleSidebarClose,
+    memberSidebar.hide,
+  );
 
   const filteredMemberIds = useFiltersStore((s) => s.filteredMemberIds);
   const appliedFilters = useFiltersStore((s) => s.appliedFilters);
@@ -93,27 +99,13 @@ const MembersTreeContent = ({ members }: Props) => {
   const highlightedTeamId =
     teamInfo.isOpen && teamInfo.teamId ? teamInfo.teamId : selectedTeamId;
 
-  // Clicking a team's badge only opens its info (no fit-to-view); clicking its
-  // square when zoomed out (or via the toolbar) fits it in view and opens info.
-  const handleBadgeClick = useCallback(
-    (frame: TeamFrame) => {
-      teamInfo.open(frame.teamId);
-    },
-    [teamInfo.open],
-  );
-
-  const handleFrameClick = useCallback(
-    (frame: TeamFrame) => {
-      focusFrame(frame);
-      teamInfo.open(frame.teamId);
-    },
-    [focusFrame, teamInfo.open],
-  );
-
-  const handleTeamTitleClick = useCallback(() => {
-    const frame = teamFrames.find((item) => item.teamId === teamInfo.teamId);
-    if (frame) focusFrame(frame);
-  }, [teamFrames, teamInfo.teamId, focusFrame]);
+  const { handleBadgeClick, handleFrameClick, handleTeamTitleClick } =
+    useTeamFrameClicks({
+      teamFrames,
+      openTeamId: teamInfo.teamId,
+      openTeam: teamInfo.open,
+      focusFrame,
+    });
 
   // In grid/family view a roster row always selects the member (if they have
   // a node on the canvas), regardless of the layout type. Mirrors the member
@@ -131,19 +123,15 @@ const MembersTreeContent = ({ members }: Props) => {
     [selectMember, focusNode],
   );
 
-  // Back from a team opened through a member's position badge.
-  const handleBackToMember = useCallback(
-    (memberId: string) => {
-      handleSelectMember(memberId);
-      teamInfo.close();
-    },
-    [handleSelectMember, teamInfo.close],
-  );
-
-  const handleOpenTeamFromMember = useCallback(
-    (teamId: string) => teamInfo.open(teamId, selectedId),
-    [teamInfo.open, selectedId],
-  );
+  const back = useSidebarBack({
+    teamInfo,
+    selectedId,
+    isTeamView,
+    teamFrames,
+    canSelectMember,
+    selectMember: handleSelectMember,
+    focusMemberInTeam,
+  });
 
   useProfileOpenRequest({
     openInMode: memberSidebar.openInMode,
@@ -203,11 +191,7 @@ const MembersTreeContent = ({ members }: Props) => {
           <SharpAvatarTracker />
           {/* A render group of its own: panning the viewport then moves one
               transform instead of recomputing every node's world transform. */}
-          <pixiContainer
-            ref={sceneRef}
-            isRenderGroup
-            label="tree-render-group"
-          >
+          <pixiContainer ref={sceneRef} isRenderGroup label="tree-render-group">
             <MembersTreeScene
               treeMode={treeMode}
               direction={direction}
@@ -237,16 +221,17 @@ const MembersTreeContent = ({ members }: Props) => {
         isTeamView={isTeamView}
         canFocusMemberInTeam={canFocusMemberInTeam}
         onFocusMemberInTeam={focusMemberInTeam}
-        onOpenTeamInfo={handleOpenTeamFromMember}
+        onOpenTeamInfo={back.openTeamFromMember}
+        onBack={back.canBackToTeam ? back.backToTeam : undefined}
       />
       <TeamInfoSidebar
         state={teamInfo}
         canFocusMemberInTeam={canFocusMemberInTeam}
-        onFocusMemberInTeam={focusMemberInTeam}
+        onFocusMemberInTeam={back.focusMemberFromTeam}
         canSelectMember={canSelectMember}
         onSelectMember={handleSelectMember}
         onTitleClick={isTeamView ? handleTeamTitleClick : undefined}
-        onBack={handleBackToMember}
+        onBack={back.canBackToMember ? back.backToMember : undefined}
       />
     </div>
   );

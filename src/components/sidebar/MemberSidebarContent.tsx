@@ -25,6 +25,7 @@ interface Props {
   // Opens the team info sidebar for a position's team. Used in grid/family
   // view, where the badge cannot focus the member inside their team.
   onOpenTeamInfo?: (teamId: string) => void;
+  hasBack?: boolean;
 }
 
 const MemberSidebarContent = ({
@@ -37,6 +38,7 @@ const MemberSidebarContent = ({
   canFocusMemberInTeam,
   onFocusMemberInTeam,
   onOpenTeamInfo,
+  hasBack,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevViewRef = useRef<SidebarMode>(sidebarMode);
@@ -109,6 +111,7 @@ const MemberSidebarContent = ({
               : !!onOpenTeamInfo)
           }
           color={color}
+          hasBack={hasBack}
         />
       ) : sidebarMode === "suggest" ? (
         <MemberSuggestForm

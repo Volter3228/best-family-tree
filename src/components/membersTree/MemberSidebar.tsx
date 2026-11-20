@@ -19,6 +19,8 @@ interface Props {
   canFocusMemberInTeam: (teamId: string, memberId: string) => boolean;
   onFocusMemberInTeam: (teamId: string, memberId: string) => void;
   onOpenTeamInfo: (teamId: string) => void;
+  // Goes back to the team whose roster this member was opened from.
+  onBack?: () => void;
 }
 
 // Info / edit sidebar of the selected member. The info card wears the
@@ -30,6 +32,7 @@ const MemberSidebar = ({
   canFocusMemberInTeam,
   onFocusMemberInTeam,
   onOpenTeamInfo,
+  onBack,
 }: Props) => {
   const t = useT().sidebar;
   const tSuggest = useT().suggest;
@@ -75,7 +78,8 @@ const MemberSidebar = ({
       onClose={state.onClose}
       onEditClick={editable ? state.onEditClick : undefined}
       onSuggestClick={canSuggest ? state.onSuggestClick : undefined}
-      onBackClick={state.onBackToInfoClick}
+      onBackClick={isInfo && onBack ? onBack : state.onBackToInfoClick}
+      canGoBack={isInfo && !!onBack}
       isMinimized={state.isSidebarMinimized}
       onMinimizedChange={state.onMinimizedChange}
       minimizedSummary={
@@ -101,6 +105,7 @@ const MemberSidebar = ({
           canFocusMemberInTeam={canFocusMemberInTeam}
           onFocusMemberInTeam={onFocusMemberInTeam}
           onOpenTeamInfo={onOpenTeamInfo}
+          hasBack={isInfo && !!onBack}
           onDeleted={state.onClose}
         />
       )}

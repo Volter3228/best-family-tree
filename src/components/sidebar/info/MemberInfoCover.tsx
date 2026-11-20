@@ -8,6 +8,8 @@ import SeasonChip from "./SeasonChip";
 interface Props {
   member: Member;
   color?: AccentColor;
+  // The sidebar header shows a back arrow on the chip's row.
+  hasBack?: boolean;
 }
 
 // Seasonal band behind the season chip and the top of the avatar. It bleeds
@@ -15,7 +17,11 @@ interface Props {
 // (see the floating-header layer there) so it can reach under the scrollbar.
 // The chip lives here, not in the floating header, so it scrolls away with the
 // cover. The motif is aria-hidden itself; the chip stays readable.
-const MemberInfoCover = ({ member, color = "blue" }: Props) => (
+const MemberInfoCover = ({
+  member,
+  color = "blue",
+  hasBack = false,
+}: Props) => (
   <div
     className={twMerge(
       "relative -mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]",
@@ -24,7 +30,14 @@ const MemberInfoCover = ({ member, color = "blue" }: Props) => (
   >
     <SeasonMotif season={member.getRecruitmentTerm().season} />
     {/* Same row as the sidebar header's title: pt-4, or below the mobile handle. */}
-    <div className="absolute inset-x-0 top-0 flex px-4 pt-4 max-md:pt-10">
+    {/* With a back arrow, starts where the header's title does (after the
+        arrow and its gap). */}
+    <div
+      className={twMerge(
+        "absolute inset-x-0 top-0 flex px-4 pt-4 max-md:pt-10",
+        hasBack && "pl-[3.75rem]",
+      )}
+    >
       <SeasonChip member={member} color={color} />
     </div>
   </div>

@@ -80,6 +80,13 @@ export const useSidebar = (
     }, CLOSE_ANIMATION_MS);
   }, [storeSelectMember, cancelPendingClose]);
 
+  // Slides the card out but keeps the member selected (their team is shown
+  // in the same slot meanwhile).
+  const hide = useCallback(() => {
+    cancelPendingClose();
+    setIsOpen(false);
+  }, [cancelPendingClose]);
+
   const onEditClick = () => setMode("edit");
   const onSuggestClick = () => setMode("suggest");
   const onBackToInfoClick = () => setMode("info");
@@ -92,6 +99,7 @@ export const useSidebar = (
     selectMember,
     openInMode,
     onClose,
+    hide,
     onEditClick,
     onSuggestClick,
     onBackToInfoClick,
