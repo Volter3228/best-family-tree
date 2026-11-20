@@ -96,7 +96,6 @@ const TeamInfoSidebar = ({
       onClose={state.close}
       onEditClick={editable ? state.startEdit : undefined}
       onSuggestClick={canSuggest ? state.startSuggest : undefined}
-      notice={state.notice}
       // Suggesting keeps the card as tall as the info view was.
       fillHeight={isSuggest}
       onBackClick={state.backToInfo}
@@ -144,10 +143,6 @@ const TeamInfoSidebar = ({
               team={team}
               canChangeLogo={isMember}
               onExit={state.backToInfo}
-              onDone={(message) => {
-                state.showNotice(message);
-                state.backToInfo();
-              }}
             />
           ) : (
             <TeamForm

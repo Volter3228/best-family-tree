@@ -17,7 +17,6 @@ interface Props {
   member: Member;
   sidebarMode: SidebarMode;
   onEditExit: () => void;
-  onSuggestDone?: (message: string) => void;
   onDeleted?: () => void;
   color?: AccentColor;
   isTeamView?: boolean;
@@ -32,7 +31,6 @@ const MemberSidebarContent = ({
   member,
   sidebarMode,
   onEditExit,
-  onSuggestDone,
   onDeleted,
   color = "blue",
   isTeamView = false,
@@ -117,10 +115,6 @@ const MemberSidebarContent = ({
           key={member.id}
           member={member}
           onExit={onEditExit}
-          onDone={(message) => {
-            onSuggestDone?.(message);
-            onEditExit();
-          }}
           color={color}
         />
       ) : (

@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import Spinner from "@/components/ui/Spinner";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import type { AccentColor } from "@/types";
-import SuccessBubble from "../SuccessBubble";
 
 interface Props {
   isSubmitting?: boolean;
@@ -11,7 +11,7 @@ interface Props {
   children: Readonly<React.ReactNode>;
   color?: AccentColor;
   disabled?: boolean;
-  // Floats above the button, centred on it, after a successful save.
+  // Shown inside the button (green, with a tick) after a successful save.
   message?: string | null;
 }
 
@@ -23,6 +23,11 @@ const SubmitButton = ({
   disabled = false,
   message,
 }: Props) => {
+  const isDone = !!message && !isSubmitting;
+  // Keeps the text while the button fades back, so it doesn't blink empty.
+  const [shownMessage, setShownMessage] = useState(message);
+  if (message && message !== shownMessage) setShownMessage(message);
+
   return (
     <div className="relative flex-1">
       <button
@@ -39,7 +44,29 @@ const SubmitButton = ({
         {isSubmitting && <Spinner className="h-5 w-5 mr-2" />}
         {children}
       </button>
-      {message && <SuccessBubble message={message} />}
+      {/* Green layer wiped in diagonally with a soft edge, and back out. */}
+      <span
+        aria-hidden
+        data-active={isDone}
+        className="success-wipe pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full bg-accent-green px-3 text-sm font-semibold text-white"
+      >
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4 shrink-0"
+        >
+          <path d="M4 10.5l4 4 8-9" />
+        </svg>
+        <span className="truncate">{shownMessage}</span>
+      </span>
+      {/* Always mounted: screen readers announce a live region only on change. */}
+      <span role="status" className="sr-only">
+        {isDone ? message : ""}
+      </span>
     </div>
   );
 };

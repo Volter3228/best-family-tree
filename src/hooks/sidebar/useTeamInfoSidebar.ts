@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
 import { useManageStore } from "@/store/manageStore";
-import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 
 /**
  * The team info sidebar shares its slot with the member sidebar: opening one
@@ -18,7 +17,6 @@ export const useTeamInfoSidebar = (
   const [mode, setMode] = useState<SidebarMode>("info");
   // Mobile only: the card is collapsed to a bar above the toolbar.
   const [isMinimized, setIsMinimized] = useState(false);
-  const [notice, showNotice] = useTransientMessage();
 
   // Keyed by id: a members reload must not close the team sidebar.
   const selectedId = selectedMember?.id ?? null;
@@ -55,8 +53,6 @@ export const useTeamInfoSidebar = (
 
   return {
     teamId,
-    notice,
-    showNotice,
     isOpen,
     mode,
     isMinimized,

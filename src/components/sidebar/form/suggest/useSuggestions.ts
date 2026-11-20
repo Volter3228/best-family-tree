@@ -29,6 +29,15 @@ export const useSuggestions = ({ targetId, fetchMine }: Options) => {
     };
   }, [fetchMine, targetId]);
 
+  // Re-read after a submit so the new suggestions show up as awaiting review.
+  const refresh = useCallback(
+    () =>
+      fetchMine(targetId)
+        .then(setPending)
+        .catch(() => undefined),
+    [fetchMine, targetId],
+  );
+
   const run = useCallback(
     async (action: () => Promise<void>) => {
       setError(null);
@@ -48,7 +57,7 @@ export const useSuggestions = ({ targetId, fetchMine }: Options) => {
     [t],
   );
 
-  return { pending, isSubmitting, error, run };
+  return { pending, isSubmitting, error, run, refresh };
 };
 
 // A change already waiting for review with the same value is not sent again.

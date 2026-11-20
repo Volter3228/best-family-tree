@@ -1,4 +1,5 @@
 import { FormEvent, useId, useMemo, useState } from "react";
+import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { useMembersActions, useTeamTypes, useTeams } from "@/hooks";
 import {
   fetchMyTeamSuggestions,
@@ -32,8 +33,6 @@ interface Props {
   // The viewer holds a position in this team, so they may change its logo.
   canChangeLogo: boolean;
   onExit: () => void;
-  // The suggestion went through; the sidebar returns to the info view.
-  onDone: (message: string) => void;
   color?: AccentColor;
 }
 
@@ -50,7 +49,6 @@ const TeamSuggestForm = ({
   team,
   canChangeLogo,
   onExit,
-  onDone,
   color = "blue",
 }: Props) => {
   const t = useT().suggest;
@@ -66,10 +64,11 @@ const TeamSuggestForm = ({
   const [errors, setErrors] = useState<
     Partial<Record<TeamSuggestErrorKey, string>>
   >({});
+  const [success, showSuccess] = useTransientMessage();
   // A newly picked logo, saved together with the suggestions on submit.
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const { pending, isSubmitting, error, run } = useSuggestions({
+  const { pending, isSubmitting, error, run, refresh } = useSuggestions({
     targetId: team.id,
     fetchMine: fetchMyTeamSuggestions,
   });
@@ -138,11 +137,15 @@ const TeamSuggestForm = ({
         await uploadTeamPhoto(team.id, logoFile);
         await Promise.all([reloadTeams(), reloadMembers()]);
       }
+      // Inside the action so the button stays busy until the form is settled.
+      await refresh();
     });
     if (!ok) return;
-    if (savesDirectly && logoFile && (changes.length === 0 || withdrawn)) {
-      onDone(tCommon.saved);
-    } else onDone(withdrawn ? t.withdrawn : t.done);
+    const savedLogo = savesDirectly && !!logoFile;
+    setLogoFile(null);
+    if (savedLogo && (changes.length === 0 || withdrawn)) {
+      showSuccess(tCommon.saved);
+    } else showSuccess(withdrawn ? t.withdrawn : t.done);
   };
 
   return (
@@ -186,6 +189,7 @@ const TeamSuggestForm = ({
           form={formId}
           color={color}
           disabled={!hasChanges && !hasErrors}
+          message={success}
         >
           {isSubmitting ? t.submitting : t.submit}
         </SubmitButton>

@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useId, useMemo, useState } from "react";
+import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { useMembersActions, useMentorsList } from "@/hooks";
 import {
   fetchMyMemberSuggestions,
@@ -31,8 +32,6 @@ import { useSuggestions, withoutPending } from "./useSuggestions";
 interface Props {
   member: Member;
   onExit: () => void;
-  // The suggestion went through; the sidebar returns to the info view.
-  onDone: (message: string) => void;
   color?: AccentColor;
 }
 
@@ -44,12 +43,7 @@ const FORM_KEYS: Record<string, (keyof MemberFormData)[]> = {
   phoneNumbers: ["phoneNumber"],
 };
 
-const MemberSuggestForm = ({
-  member,
-  onExit,
-  onDone,
-  color = "blue",
-}: Props) => {
+const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
   const t = useT().suggest;
   const tMember = useT().memberForm;
   const tCommon = useT().formCommon;
@@ -64,12 +58,13 @@ const MemberSuggestForm = ({
     getInitialFormData(member),
   );
   const [errors, setErrors] = useState<Errors>({});
+  const [success, showSuccess] = useTransientMessage();
   // A newly picked photo, saved together with the suggestions on submit.
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   // Removing one's own saved photo is allowed (privacy).
   const [removePhoto, setRemovePhoto] = useState(false);
 
-  const { pending, isSubmitting, error, run } = useSuggestions({
+  const { pending, isSubmitting, error, run, refresh } = useSuggestions({
     targetId: member.id,
     fetchMine: fetchMyMemberSuggestions,
   });
@@ -170,11 +165,15 @@ const MemberSuggestForm = ({
         await removeMyPhoto();
         updateMember(member.clone({ photo: null }));
       }
+      // Inside the action so the button stays busy until the form is settled.
+      await refresh();
     });
     if (!ok) return;
+    setPhotoFile(null);
+    setRemovePhoto(false);
     if (savesDirectly && photoChanged && (changes.length === 0 || withdrawn)) {
-      onDone(tCommon.saved);
-    } else onDone(withdrawn ? t.withdrawn : t.done);
+      showSuccess(tCommon.saved);
+    } else showSuccess(withdrawn ? t.withdrawn : t.done);
   };
 
   return (
@@ -228,6 +227,7 @@ const MemberSuggestForm = ({
           form={formId}
           color={color}
           disabled={!hasChanges && !hasErrors}
+          message={success}
         >
           {isSubmitting ? t.submitting : t.submit}
         </SubmitButton>

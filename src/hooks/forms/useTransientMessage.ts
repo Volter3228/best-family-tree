@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const VISIBLE_MS = 2000;
+const VISIBLE_MS = 1600;
 
 // A message that hides itself after a moment. Showing it again, even with the
 // same text, restarts the countdown.

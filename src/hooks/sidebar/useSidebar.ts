@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Member } from "@/models";
 import type { SidebarMode } from "@/types";
 import { useManageStore } from "@/store/manageStore";
-import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 
 // Matches the sidebar's slide-out transition.
 const CLOSE_ANIMATION_MS = 300;
@@ -17,7 +16,6 @@ export const useSidebar = (
   const [isMinimized, setIsMinimized] = useState(false);
   // Mode requested together with a selection; the selection effect applies it.
   const pendingModeRef = useRef<SidebarMode | null>(null);
-  const [notice, showNotice] = useTransientMessage();
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // A pending close must not wipe a selection made while the card slides out.
@@ -93,8 +91,6 @@ export const useSidebar = (
     onMinimizedChange: setIsMinimized,
     selectMember,
     openInMode,
-    notice,
-    showNotice,
     onClose,
     onEditClick,
     onSuggestClick,

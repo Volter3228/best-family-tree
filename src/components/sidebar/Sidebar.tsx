@@ -16,7 +16,6 @@ import SidebarFooter from "./SidebarFooter";
 import SidebarHandle from "./SidebarHandle";
 import SidebarCoverTint from "./SidebarCoverTint";
 import SidebarHeader from "./SidebarHeader";
-import SidebarNotice from "./SidebarNotice";
 import { useFrontSheetWidth } from "./useFrontSheetWidth";
 import "./styles/sidebar.css";
 
@@ -38,8 +37,6 @@ interface Props {
   onClose: () => void;
   onEditClick?: () => void;
   onSuggestClick?: () => void;
-  // Floating confirmation at the bottom of the card, e.g. after a suggestion.
-  notice?: string | null;
   onBackClick?: () => void;
   // Mobile only: lets the user collapse the card to a bar above the toolbar.
   // Without a handler (and in edit mode) the card cannot be minimized.
@@ -65,7 +62,6 @@ const Sidebar = ({
   onClose,
   onEditClick,
   onSuggestClick,
-  notice,
   onBackClick,
   isMinimized: minimizedRequested = false,
   onMinimizedChange,
@@ -158,7 +154,6 @@ const Sidebar = ({
           isBehind && "md:scale-[.96]",
         )}
       >
-        {notice && <SidebarNotice message={notice} />}
         {isBehind && onBringForward && (
           <SidebarBehindCover onClick={onBringForward} />
         )}
