@@ -52,12 +52,12 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
   const years = differenceInYears(new Date(), date);
   const mobile = useIsMobileScreen();
   return (
-    <>
+    <span className="whitespace-nowrap text-[15px] sm:text-base">
       {formatJoinedDate(date, locale)}
       {years > 0 && (
         <span
           className={twMerge(
-            "whitespace-nowrap text-sm font-medium",
+            "text-xs font-medium sm:text-sm",
             COLOR_CLASSES[color].text,
           )}
         >
@@ -67,7 +67,7 @@ const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
             : formatCount(locale, years, t.years)}
         </span>
       )}
-    </>
+    </span>
   );
 };
 
