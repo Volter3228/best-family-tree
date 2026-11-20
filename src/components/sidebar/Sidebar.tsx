@@ -38,6 +38,7 @@ interface Props {
   onEditClick?: () => void;
   onSuggestClick?: () => void;
   onBackClick?: () => void;
+  canGoBack?: boolean;
   // Mobile only: lets the user collapse the card to a bar above the toolbar.
   // Without a handler (and in edit mode) the card cannot be minimized.
   isMinimized?: boolean;
@@ -63,6 +64,7 @@ const Sidebar = ({
   onEditClick,
   onSuggestClick,
   onBackClick,
+  canGoBack,
   isMinimized: minimizedRequested = false,
   onMinimizedChange,
   minimizedSummary,
@@ -192,6 +194,7 @@ const Sidebar = ({
             onEditClick={onEditClick}
             onSuggestClick={onSuggestClick}
             onBackClick={onBackClick}
+            canGoBack={canGoBack}
           />
         </div>
         <div

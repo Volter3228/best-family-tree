@@ -27,6 +27,8 @@ interface Props {
   onSelectMember: (memberId: string) => void;
   // Fits the team in view (clicking its name). Only set in team view.
   onTitleClick?: () => void;
+  // Goes back to the member whose sidebar the team was opened from.
+  onBack: (memberId: string) => void;
 }
 
 // Info / edit sidebar of the team picked through its badge or square.
@@ -37,8 +39,9 @@ const TeamInfoSidebar = ({
   canSelectMember,
   onSelectMember,
   onTitleClick,
+  onBack,
 }: Props) => {
-  const { teamId, isOpen, mode } = state;
+  const { teamId, isOpen, mode, returnMemberId } = state;
   const t = useT().sidebar;
   const tSuggest = useT().suggest;
   const locale = useLocale();
@@ -98,7 +101,12 @@ const TeamInfoSidebar = ({
       onSuggestClick={canSuggest ? state.startSuggest : undefined}
       // Suggesting keeps the card as tall as the info view was.
       fillHeight={isSuggest}
-      onBackClick={state.backToInfo}
+      onBackClick={
+        mode === "info" && returnMemberId
+          ? () => onBack(returnMemberId)
+          : state.backToInfo
+      }
+      canGoBack={mode === "info" && !!returnMemberId}
       isMinimized={state.isMinimized}
       onMinimizedChange={state.setMinimized}
       minimizedSummary={

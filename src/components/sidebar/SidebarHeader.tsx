@@ -24,6 +24,8 @@ interface Props {
   // Takes the edit button's slot for viewers who may only suggest changes.
   onSuggestClick?: () => void;
   onBackClick?: () => void;
+  // Shows the back arrow outside edit mode (e.g. back to where we came from).
+  canGoBack?: boolean;
 }
 
 // Soft round chip: stays readable over a cover image and the plain card alike.
@@ -42,10 +44,12 @@ const SidebarHeader = ({
   onEditClick,
   onSuggestClick,
   onBackClick,
+  canGoBack = false,
 }: Props) => {
   const t = useT().sidebar;
   const tSuggest = useT().suggest;
   const colorClasses = COLOR_CLASSES[color];
+  const hasBack = mode === "edit" || canGoBack;
 
   return (
     <div
@@ -63,7 +67,7 @@ const SidebarHeader = ({
           isMinimized && "max-md:hidden",
         )}
       >
-        {mode === "edit" && (
+        {hasBack && (
           <button
             onClick={onBackClick}
             className={twMerge(colorClasses.text, iconButton)}
@@ -76,7 +80,7 @@ const SidebarHeader = ({
           className={twMerge(
             "pointer-events-none flex min-w-0",
             // The back button's gap already spaces it.
-            typeof title === "string" && mode !== "edit" && "ml-2",
+            typeof title === "string" && !hasBack && "ml-2",
           )}
         >
           {title}

@@ -131,6 +131,20 @@ const MembersTreeContent = ({ members }: Props) => {
     [selectMember, focusNode],
   );
 
+  // Back from a team opened through a member's position badge.
+  const handleBackToMember = useCallback(
+    (memberId: string) => {
+      handleSelectMember(memberId);
+      teamInfo.close();
+    },
+    [handleSelectMember, teamInfo.close],
+  );
+
+  const handleOpenTeamFromMember = useCallback(
+    (teamId: string) => teamInfo.open(teamId, selectedId),
+    [teamInfo.open, selectedId],
+  );
+
   useProfileOpenRequest({
     openInMode: memberSidebar.openInMode,
     openTeam: teamInfo.open,
@@ -223,7 +237,7 @@ const MembersTreeContent = ({ members }: Props) => {
         isTeamView={isTeamView}
         canFocusMemberInTeam={canFocusMemberInTeam}
         onFocusMemberInTeam={focusMemberInTeam}
-        onOpenTeamInfo={teamInfo.open}
+        onOpenTeamInfo={handleOpenTeamFromMember}
       />
       <TeamInfoSidebar
         state={teamInfo}
@@ -232,6 +246,7 @@ const MembersTreeContent = ({ members }: Props) => {
         canSelectMember={canSelectMember}
         onSelectMember={handleSelectMember}
         onTitleClick={isTeamView ? handleTeamTitleClick : undefined}
+        onBack={handleBackToMember}
       />
     </div>
   );

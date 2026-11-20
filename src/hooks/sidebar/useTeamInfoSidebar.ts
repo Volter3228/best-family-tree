@@ -17,22 +17,28 @@ export const useTeamInfoSidebar = (
   const [mode, setMode] = useState<SidebarMode>("info");
   // Mobile only: the card is collapsed to a bar above the toolbar.
   const [isMinimized, setIsMinimized] = useState(false);
+  // Member whose sidebar this team was opened from; powers the back arrow.
+  const [returnMemberId, setReturnMemberId] = useState<string | null>(null);
 
   // Keyed by id: a members reload must not close the team sidebar.
   const selectedId = selectedMember?.id ?? null;
   useEffect(() => {
-    if (selectedId) setIsOpen(false);
+    if (selectedId) {
+      setIsOpen(false);
+      setReturnMemberId(null);
+    }
   }, [selectedId]);
 
   const expandTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(expandTimerRef.current), []);
 
   const open = useCallback(
-    (nextTeamId: string) => {
+    (nextTeamId: string, fromMemberId: string | null = null) => {
       clearTimeout(expandTimerRef.current);
       useManageStore.getState().sendBack();
       closeMemberSidebar();
       setTeamId(nextTeamId);
+      setReturnMemberId(fromMemberId);
       setMode("info");
       setIsMinimized(false);
       setIsOpen(true);
@@ -53,6 +59,7 @@ export const useTeamInfoSidebar = (
 
   return {
     teamId,
+    returnMemberId,
     isOpen,
     mode,
     isMinimized,
