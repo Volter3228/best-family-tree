@@ -39,8 +39,8 @@ services:
     command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run serve"
     volumes:
       - ./src/server:/app
-      - /app/node_modules
-      - /app/dist
+      - backend_node_modules:/app/node_modules
+      - backend_dist:/app/dist
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,9 +65,9 @@ services:
       - ./src:/app/src
       - ./public:/app/public
       - ./next.config.mjs:/app/next.config.mjs
-      - /app/src/server
-      - /app/node_modules
-      - /app/.next
+      - frontend_src_server:/app/src/server
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
     depends_on:
       - backend
     networks:
@@ -75,6 +75,11 @@ services:
 
 volumes:
   postgres_data:
+  backend_node_modules:
+  backend_dist:
+  frontend_src_server:
+  frontend_node_modules:
+  frontend_next:
 
 networks:
   app-network:
