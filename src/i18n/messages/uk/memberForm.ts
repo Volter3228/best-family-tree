@@ -39,7 +39,7 @@ export const memberForm = {
     rolePlaceholder: "Президент",
     role: "Посада",
     leader: "Лідер",
-    teamPeriod: (years: string) => `Період команди: ${years || "не вказано"}`,
+    teamPeriod: (years: string) => `Роки команди: ${years || "не вказано"}`,
     activityStart: "Початок діяльності",
     activityEnd: "Кінець діяльності",
     organization: "Організація",
