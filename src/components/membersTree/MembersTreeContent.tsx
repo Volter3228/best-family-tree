@@ -35,9 +35,10 @@ const EVENT_FEATURES = { globalMove: false } as const;
 
 interface Props {
   members: MemberType[];
+  showToolbar: boolean;
 }
 
-const MembersTreeContent = ({ members }: Props) => {
+const MembersTreeContent = ({ members, showToolbar }: Props) => {
   const nodes = useTreeStore((s) => s.nodes);
   const edges = useTreeStore((s) => s.edges);
   const teamFrames = useTreeStore((s) => s.teamFrames);
@@ -209,12 +210,14 @@ const MembersTreeContent = ({ members }: Props) => {
           </pixiContainer>
         </Viewport>
       </Application>
-      <Toolbar
-        onFitView={handleFitView}
-        onSearch={handleSearch}
-        onTeamSearch={handleFrameClick}
-        isInfoOpen={memberSidebar.isSidebarOpen || teamInfo.isOpen}
-      />
+      {showToolbar && (
+        <Toolbar
+          onFitView={handleFitView}
+          onSearch={handleSearch}
+          onTeamSearch={handleFrameClick}
+          isInfoOpen={memberSidebar.isSidebarOpen || teamInfo.isOpen}
+        />
+      )}
       <MemberSidebar
         state={memberSidebar}
         member={selectedMember}

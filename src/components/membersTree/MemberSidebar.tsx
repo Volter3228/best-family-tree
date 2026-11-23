@@ -81,6 +81,7 @@ const MemberSidebar = ({
       onBackClick={isInfo && onBack ? onBack : state.onBackToInfoClick}
       canGoBack={isInfo && !!onBack}
       isMinimized={state.isSidebarMinimized}
+      instantMinimize={state.isMinimizeInstant}
       onMinimizedChange={state.onMinimizedChange}
       minimizedSummary={
         member && (

@@ -64,7 +64,7 @@ const AccessRow = ({ grant, isSelf, busy, error, onRemove, color }: Props) => {
           {grant.level === "ADMIN" ? t.admin : t.editor}
         </span>
         {locked ? (
-          <span className="h-11 w-11 shrink-0" aria-hidden />
+          !mobile && <span className="h-11 w-11 shrink-0" aria-hidden />
         ) : (
           <ConfirmDeleteControl
             label={t.remove}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { PlusIcon } from "@heroicons/react/16/solid";
 import {
   fetchGrants,
   removeGrant,
@@ -113,7 +114,7 @@ const AccessTab = ({ color }: ManageTabProps) => {
       <p className="px-1 pb-3 text-xs text-foreground/60">{t.info}</p>
 
       <section className="flex flex-wrap items-center gap-2 rounded-2xl bg-foreground/[0.03] p-3 ring-1 ring-foreground/10">
-        <div className="min-w-0 flex-[1_1_10rem]">
+        <div className="min-w-0 flex-1">
           <ComboboxInput
             key={pickerKey}
             name="access-member"
@@ -131,14 +132,21 @@ const AccessTab = ({ color }: ManageTabProps) => {
           type="button"
           onClick={add}
           disabled={!pickedId || adding}
+          aria-label={t.add}
           className={twMerge(
-            "flex h-10 shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold text-white shadow-sm transition-[box-shadow,scale] hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-50",
+            "flex h-10 w-10 shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-full text-sm sm:w-auto sm:px-5 font-semibold text-white shadow-sm transition-[box-shadow,scale] hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-50",
             colorClasses.accentBg,
             colorClasses.focusVisibleRing,
           )}
         >
-          {adding && <Spinner className="h-4 w-4" />}
-          {adding ? t.adding : t.add}
+          {adding ? (
+            <Spinner className="h-4 w-4" />
+          ) : (
+            <PlusIcon className="h-5 w-5 sm:hidden" />
+          )}
+          <span className="hidden sm:inline">
+            {adding ? t.adding : t.add}
+          </span>
         </button>
         {addError && (
           <p className="basis-full text-xs text-red-500">{addError}</p>

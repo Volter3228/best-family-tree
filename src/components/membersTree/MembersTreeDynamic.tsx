@@ -8,9 +8,12 @@ import { useTreeStore } from "@/store/treeStore";
 import { useSessionStore } from "@/store/sessionStore";
 import type { Member as MemberType } from "@/types";
 
-const MembersTree = dynamic(() => import("@/components/membersTree/MembersTree"), {
-  ssr: false,
-});
+const MembersTree = dynamic(
+  () => import("@/components/membersTree/MembersTree"),
+  {
+    ssr: false,
+  },
+);
 
 interface Props {
   members: MemberType[];
@@ -21,14 +24,17 @@ const EXIT_MS = 1100;
 
 type TreeState = ReturnType<typeof useTreeStore.getState>;
 
-const isTreeReady = (s: TreeState) => s.layoutMode !== null || s.nodes.length > 0;
+const isTreeReady = (s: TreeState) =>
+  s.layoutMode !== null || s.nodes.length > 0;
 
 const MembersTreeDynamic = ({ members }: Props) => {
   useEffect(() => {
     void useSessionStore.getState().load();
   }, []);
   const [phase, setPhase] = useState<"loading" | "exiting" | "done">(() =>
-    members.length === 0 || isTreeReady(useTreeStore.getState()) ? "done" : "loading",
+    members.length === 0 || isTreeReady(useTreeStore.getState())
+      ? "done"
+      : "loading",
   );
   useEffect(() => {
     if (phase !== "loading") return;
@@ -49,7 +55,7 @@ const MembersTreeDynamic = ({ members }: Props) => {
 
   return (
     <>
-      <MembersTree members={members} />
+      <MembersTree members={members} showToolbar={phase !== "loading"} />
       <PhotoViewer />
       {phase !== "done" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">

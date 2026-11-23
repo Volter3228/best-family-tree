@@ -43,6 +43,8 @@ interface Props {
   // Without a handler (and in edit mode) the card cannot be minimized.
   isMinimized?: boolean;
   onMinimizedChange?: (minimized: boolean) => void;
+  // Skips the collapse animation (a minimize the user did not drag).
+  instantMinimize?: boolean;
   minimizedSummary?: React.ReactNode;
   // Two open sidebars stack: the one behind steps aside so its edge stays
   // visible (fully hidden on mobile), and that edge brings it forward.
@@ -67,6 +69,7 @@ const Sidebar = ({
   canGoBack,
   isMinimized: minimizedRequested = false,
   onMinimizedChange,
+  instantMinimize = false,
   minimizedSummary,
   stack,
   onBringForward,
@@ -156,6 +159,7 @@ const Sidebar = ({
           "relative flex max-h-full min-h-0 w-full origin-left flex-col overflow-hidden rounded-2xl bg-surface/80 backdrop-blur-xl pointer-events-auto transition-[scale] duration-300",
           isOpen ? "shadow-[-15px_0_36px_2px_rgba(0,0,0,0.2)]" : "shadow-none",
           isBehind && "md:scale-[.96]",
+          instantMinimize && "[&_*]:!transition-none",
         )}
       >
         {isBehind && onBringForward && (

@@ -17,6 +17,24 @@ export const useSidebar = (
   // Mode requested together with a selection; the selection effect applies it.
   const pendingModeRef = useRef<SidebarMode | null>(null);
   const pendingMinimizedRef = useRef(false);
+  // Set while a programmatic minimize runs, so the card snaps to the bar
+  // instead of visibly collapsing.
+  const [isMinimizeInstant, setIsMinimizeInstant] = useState(false);
+  const instantTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markInstant = useCallback(() => {
+    if (instantTimerRef.current) clearTimeout(instantTimerRef.current);
+    setIsMinimizeInstant(true);
+    instantTimerRef.current = setTimeout(() => {
+      instantTimerRef.current = null;
+      setIsMinimizeInstant(false);
+    }, 100);
+  }, []);
+  useEffect(
+    () => () => {
+      if (instantTimerRef.current) clearTimeout(instantTimerRef.current);
+    },
+    [],
+  );
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // A pending close must not wipe a selection made while the card slides out.
@@ -38,10 +56,11 @@ export const useSidebar = (
       setIsOpen(true);
       setMode(pendingModeRef.current ?? "info");
       pendingModeRef.current = null;
+      if (pendingMinimizedRef.current) markInstant();
       setIsMinimized(pendingMinimizedRef.current);
       pendingMinimizedRef.current = false;
     }
-  }, [selectedId, cancelPendingClose]);
+  }, [selectedId, cancelPendingClose, markInstant]);
 
   // Selecting a member (even the one already selected) shows the sidebar
   // expanded; the effect above only reacts to a different member.
@@ -68,9 +87,12 @@ export const useSidebar = (
         pendingMinimizedRef.current = minimized;
       }
       selectMember(id);
-      if (same) setIsMinimized(minimized);
+      if (same) {
+        if (minimized) markInstant();
+        setIsMinimized(minimized);
+      }
     },
-    [selectedMember, selectMember],
+    [selectedMember, selectMember, markInstant],
   );
 
   const onClose = useCallback(() => {
@@ -102,6 +124,7 @@ export const useSidebar = (
     isSidebarOpen: isOpen,
     sidebarMode: mode,
     isSidebarMinimized: isMinimized,
+    isMinimizeInstant,
     onMinimizedChange: setIsMinimized,
     selectMember,
     openInMode,

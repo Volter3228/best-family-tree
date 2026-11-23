@@ -9,9 +9,10 @@ let didRegisterPixiPlugins = false;
 
 interface Props {
   members: MemberType[];
+  showToolbar: boolean;
 }
 
-const MembersTree = ({ members }: Props) => {
+const MembersTree = ({ members, showToolbar }: Props) => {
   const [isReady, setIsReady] = useState(didRegisterPixiPlugins);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ const MembersTree = ({ members }: Props) => {
 
   if (!isReady) return null;
 
-  return <MembersTreeContent members={members} />;
+  return <MembersTreeContent members={members} showToolbar={showToolbar} />;
 };
 
 export default MembersTree;

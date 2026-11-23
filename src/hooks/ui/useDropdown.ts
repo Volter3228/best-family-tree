@@ -40,13 +40,22 @@ export const useDropdown = (
     setInputValue(getInitialText());
   }, [initialValue, options]);
 
-  const filteredOptions = useMemo(
+  const liveOptions = useMemo(
     () =>
       autoComplete && hasTyped
         ? filterOptionsByQuery(options, inputValue)
         : options,
     [autoComplete, options, inputValue, hasTyped],
   );
+  const liveOptionsRef = useRef(liveOptions);
+  useEffect(() => {
+    liveOptionsRef.current = liveOptions;
+  }, [liveOptions]);
+  // Options shown when closing began, so reverting the text can't re-open an empty menu mid-fade.
+  const [frozenOptions, setFrozenOptions] = useState<DropdownOption[] | null>(
+    null,
+  );
+  const filteredOptions = frozenOptions ?? liveOptions;
 
   const handleSelect = useCallback(
     (opt?: DropdownOption) => {
@@ -72,10 +81,12 @@ export const useDropdown = (
   );
 
   const handleClose = useCallback(() => {
+    setFrozenOptions(liveOptionsRef.current);
     setIsClosing(true);
     closeTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setIsClosing(false);
+      setFrozenOptions(null);
       // Prevent dropdown options vanish before animation end
     }, 200);
   }, []);
@@ -97,7 +108,19 @@ export const useDropdown = (
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>, dropUp: boolean = false) => {
-      if (!isOpen || filteredOptions.length === 0) return;
+      if (!isOpen) return;
+
+      // Must run even when no option matches, so unmatched text reverts.
+      if (
+        (e.key === "Tab" || e.key === "Escape") &&
+        filteredOptions.length === 0
+      ) {
+        handleSelect();
+        handleClose();
+        return;
+      }
+
+      if (filteredOptions.length === 0) return;
 
       if (["ArrowDown", "ArrowUp", "Enter", "Escape"].includes(e.key)) {
         e.preventDefault();

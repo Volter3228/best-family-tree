@@ -33,8 +33,12 @@ export const useFocusNodeAnimation = () => {
 
       // Determine view center offset (accounting for sidebar)
       const sidebarElement = document.getElementById("member-sidebar");
-      const sidebarWidth = sidebarElement ? sidebarElement.offsetWidth : 0;
       const windowWidth = window.innerWidth;
+      // On a phone the sidebar is a full-width bottom sheet, not a side panel.
+      const sidebarWidth =
+        sidebarElement && sidebarElement.offsetWidth < windowWidth * 0.9
+          ? sidebarElement.offsetWidth
+          : 0;
       const windowHeight = window.innerHeight;
 
       // The center point of the visible area (left of sidebar)
