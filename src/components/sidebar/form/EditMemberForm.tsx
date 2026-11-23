@@ -24,6 +24,7 @@ import { SubmitButton, ClearButton } from "./buttons";
 import { buildEditPayload, getInitialFormData } from "./editMemberFormData";
 import validateMemberForm from "./validations/memberFormValidation";
 import FormFooter from "./FormFooter";
+import { useSessionStore } from "@/store/sessionStore";
 import ConfirmDeleteControl from "./ConfirmDeleteControl";
 
 interface Props {
@@ -104,6 +105,9 @@ const EditMemberForm = ({
       const updatedMember = await apiEditMember(member.id, formData);
       if (updatedMember) {
         updateMember(updatedMember);
+        // The account panel reads the session copy of the member.
+        if (useSessionStore.getState().session?.memberId === member.id)
+          void useSessionStore.getState().load();
         // Saving may have created new roles/teams/team types server-side.
         reloadRoles();
         reloadTeams();

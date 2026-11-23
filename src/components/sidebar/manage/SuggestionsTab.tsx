@@ -15,6 +15,7 @@ import ManageScrollArea from "./ManageScrollArea";
 import SuggestionBatchCard, { type ReviewKind } from "./SuggestionBatchCard";
 import { groupByBatch, omit, type SuggestionBatch } from "./suggestionFormat";
 import type { ManageTabProps } from "./types";
+import { useSessionStore } from "@/store/sessionStore";
 
 const LEAVE_MS = 300;
 
@@ -119,6 +120,8 @@ const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
             [...memberIds].map((id) => fetchMemberById(id).catch(() => null)),
           );
           for (const member of fetched) if (member) updateMember(member);
+          const own = useSessionStore.getState().session?.memberId;
+          if (own && memberIds.has(own)) void useSessionStore.getState().load();
         }
         if (mentors) getMentorsList();
       }, LEAVE_MS + 50);
