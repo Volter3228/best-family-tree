@@ -42,7 +42,7 @@ const toForm = (team: Team): SuggestTeamForm => ({
   startYear: team.startYear ?? undefined,
   endYear: team.endYear ?? undefined,
   isOngoing: team.isOngoing,
-  teamTypeId: team.teamTypeId ?? undefined,
+  teamTypeId: team.teamType?.id,
 });
 
 const TeamSuggestForm = ({
@@ -175,7 +175,7 @@ const TeamSuggestForm = ({
         setForm={setForm}
         errors={errors}
         teamTypeOptions={teamTypeOptions}
-        typeRequired={!!team.teamTypeId}
+        typeRequired={!!team.teamType}
         color={color}
       />
       <FormError message={error} color={color} />

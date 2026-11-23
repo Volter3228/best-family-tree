@@ -15,6 +15,7 @@ import { pendingPhotoUrls } from "./suggestion/suggestionPhoto.js";
 import { sendRouteError, errorBody } from "../utils/httpErrors.js";
 import {
   TEAM_INCLUDE,
+  TEAM_OMIT,
   createTeam,
   deleteTeam,
   getTeamDetails,
@@ -34,6 +35,7 @@ router.get("/teams", async (req, res) => {
     const teams = await prisma.team.findMany({
       where: teamTypeId ? { teamTypeId: String(teamTypeId) } : {},
       include: TEAM_INCLUDE,
+      omit: TEAM_OMIT,
       orderBy: { name: "asc" },
     });
     res.status(200).json(teams);

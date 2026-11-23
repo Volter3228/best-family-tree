@@ -20,7 +20,7 @@ const loadFamilyTree = createVersionedCache(async () => {
       positions: {
         include: {
           role: true,
-          team: { include: { teamType: true } },
+          team: { omit: { teamTypeId: true }, include: { teamType: true } },
         },
       },
     },

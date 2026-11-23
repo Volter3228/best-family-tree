@@ -9,8 +9,7 @@ import { useEditorTitle } from "./useEditorTitle";
 import { useJustCreated } from "./useJustCreated";
 import { LIST_VIEW, type ManageTabProps } from "./types";
 
-const resolveType = (team: Team, teamTypes: TeamType[]) =>
-  team.teamType ?? teamTypes.find(({ id }) => id === team.teamTypeId) ?? null;
+const resolveType = (team: Team) => team.teamType ?? null;
 
 // Running event teams first, then other running teams, then the rest.
 const groupRank = (team: Team, type: TeamType | null) =>
@@ -41,21 +40,20 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   const t = useT().manage;
   const locale = useLocale();
   const [teams] = useTeams();
-  const [teamTypes] = useTeamTypes();
   // The team just created: its editor opens with a "Created" bubble.
   const { markCreated, messageFor } = useJustCreated(view);
 
-  const typeOf = (team: Team) => resolveType(team, teamTypes);
+  const typeOf = (team: Team) => resolveType(team);
 
   const sorted = useMemo(
     () =>
       [...teams].sort(
         (a, b) =>
-          groupRank(a, resolveType(a, teamTypes)) -
-            groupRank(b, resolveType(b, teamTypes)) ||
+          groupRank(a, resolveType(a)) -
+            groupRank(b, resolveType(b)) ||
           byPeriodDesc(a, b, locale),
       ),
-    [teams, teamTypes, locale],
+    [teams, locale],
   );
 
   const editedName =

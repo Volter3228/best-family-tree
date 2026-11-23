@@ -23,6 +23,8 @@ export const TEAM_INCLUDE = {
   _count: { select: { positions: true } },
 } as const;
 
+export const TEAM_OMIT = { teamTypeId: true } as const;
+
 const assertNameFree = async (
   tx: MemberTransaction,
   name: string,
@@ -51,6 +53,7 @@ const assertOngoingHasStart = (
 export const getTeamDetails = async (id: string) => {
   const team = await prisma.team.findUnique({
     where: { id },
+    omit: TEAM_OMIT,
     include: {
       ...TEAM_INCLUDE,
       positions: {
@@ -86,6 +89,7 @@ export const createTeam = (body: TeamBody, photoUrl: string | null) =>
         isOngoing: Boolean(body.isOngoing),
       },
       include: TEAM_INCLUDE,
+      omit: TEAM_OMIT,
     });
   });
 
@@ -149,6 +153,7 @@ export const updateTeamIn = async (
       ...(icon !== undefined && { photoUrl: icon }),
     },
     include: TEAM_INCLUDE,
+    omit: TEAM_OMIT,
   });
 
   return {

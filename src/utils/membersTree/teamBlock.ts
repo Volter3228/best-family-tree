@@ -187,7 +187,7 @@ export const buildTeamBlock = (
       color: teamType?.color ?? null,
       // The badge always shows the team type's logo, never the team's own photo.
       iconUrl: getIconUrl(teamType?.iconUrl),
-      teamTypeId: position?.team?.teamTypeId ?? null,
+      teamTypeId: teamType?.id ?? null,
       nodeIds: nodes.map((node) => node.id),
       edges,
     },

@@ -26,7 +26,6 @@ export type Team = {
   name: string;
   description?: string | null;
   photoUrl?: string | null;
-  teamTypeId?: string | null;
   // The team's period in whole years; either end may be unknown, and the
   // isOngoing flag says the team still runs (no end is planned yet).
   startYear?: number | null;

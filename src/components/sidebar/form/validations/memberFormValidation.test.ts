@@ -179,7 +179,7 @@ describe("validateMemberForm positions", () => {
   const eventType = { id: "t-event", name: "Курс", isEvent: true };
   const types = [workType, eventType] as TeamType[];
   const teams = [
-    { id: "team-1", name: "Існуюча група", teamTypeId: "t-work" },
+    { id: "team-1", name: "Існуюча група", teamType: workType },
   ] as Team[];
   const check = (position: Partial<typeof row>, list = teams) =>
     validateMemberForm(

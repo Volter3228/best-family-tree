@@ -37,7 +37,7 @@ export const getTeamOptions = (
   teamTypeId: string | undefined,
 ): DropdownOption[] =>
   teams
-    .filter((team) => !teamTypeId || team.teamTypeId === teamTypeId)
+    .filter((team) => !teamTypeId || team.teamType?.id === teamTypeId)
     .map((team) => ({ value: team.name, text: team.name }));
 
 export const getPositionRowSummary = (
@@ -115,7 +115,7 @@ export const getTeamSelectionPatch = (
 
   return {
     teamName: team.name,
-    teamTypeId: team.teamTypeId ?? row.teamTypeId,
+    teamTypeId: team.teamType?.id ?? row.teamTypeId,
     teamStartYear: undefined,
     teamEndYear: undefined,
   };
@@ -136,7 +136,7 @@ export const getTeamTypeSelectionPatch = (
   const currentTeam = findTeamByName(teams, row.teamName);
   const isEvent = teamTypes.find(({ id }) => id === teamTypeId)?.isEvent;
   const dropsTeam = currentTeam
-    ? (currentTeam.teamTypeId ?? "") !== teamTypeId
+    ? (currentTeam.teamType?.id ?? "") !== teamTypeId
     : !!row.teamName?.trim() && !isEvent;
 
   return {

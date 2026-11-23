@@ -11,7 +11,7 @@ export const MEMBER_INCLUDE = {
   positions: {
     include: {
       role: true,
-      team: { include: { teamType: true } },
+      team: { omit: { teamTypeId: true }, include: { teamType: true } },
     },
   },
 };

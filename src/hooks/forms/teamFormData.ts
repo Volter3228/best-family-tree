@@ -18,7 +18,7 @@ export const EMPTY_TEAM_FORM: TeamFormData = {
 
 export const toTeamFormData = (team: TeamDetails): TeamFormData => ({
   name: team.name,
-  teamTypeId: team.teamTypeId ?? undefined,
+  teamTypeId: team.teamType?.id,
   description: team.description ?? "",
   startYear: team.startYear ?? undefined,
   endYear: team.endYear ?? undefined,

@@ -27,7 +27,7 @@ export const getInitialFormData = (member: Member): MemberFormData => {
       id: crypto.randomUUID(),
       roleId: p.roleId,
       roleName: p.role?.name || "",
-      teamTypeId: p.team?.teamTypeId || undefined,
+      teamTypeId: p.team?.teamType?.id,
       teamName: p.team?.name || undefined,
       organization: p.organization || undefined,
       startYear: p.startYear || undefined,
