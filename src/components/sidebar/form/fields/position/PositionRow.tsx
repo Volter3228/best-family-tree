@@ -55,7 +55,6 @@ const PositionRow = ({
     <div
       className={twMerge(
         "relative flex flex-col gap-3 rounded-2xl p-3",
-        error && "mb-4",
         colorClasses.softBg,
       )}
     >
@@ -94,7 +93,7 @@ const PositionRow = ({
           />
         </>
       )}
-      <FieldError message={error} color={color} />
+      <FieldError message={error} color={color} inline />
     </div>
   );
 };

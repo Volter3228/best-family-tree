@@ -81,7 +81,7 @@ const PositionFormFields = ({
           onTeamTypeSelect={(value) => handleTeamTypeSelect(row.id, value)}
         />
       ))}
-      <FieldError message={error} color={color} />
+      <FieldError message={error} color={color} inline />
       <button
         type="button"
         onClick={addRow}
