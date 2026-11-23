@@ -11,7 +11,7 @@ import apiEditMember from "@/api/editMember";
 import apiDeleteMember from "@/api/deleteMember";
 import { getMemberAvatar } from "@/utils";
 import { Member } from "@/models";
-import type { MemberFormData, AccentColor } from "@/types";
+import type { MemberFormData, MemberFormErrors, AccentColor } from "@/types";
 import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
 import { MemberFormFields } from "./fields";
 import FormError from "./FormError";
@@ -44,9 +44,7 @@ const EditMemberForm = ({
   const initialFormData = useMemo(() => getInitialFormData(member), [member]);
 
   const [form, setForm] = useState<MemberFormData>(initialFormData);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof MemberFormData, string>>
-  >({});
+  const [errors, setErrors] = useState<MemberFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [success, showSuccess, hideSuccess] = useTransientMessage();

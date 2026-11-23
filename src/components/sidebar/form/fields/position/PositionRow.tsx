@@ -9,6 +9,7 @@ import type {
   PositionFormRow as PositionFormData,
 } from "@/types";
 import { getPositionRowSummary } from "./positionFormUtils";
+import FieldError from "../FieldError";
 import PositionAssignmentFields from "./PositionAssignmentFields";
 import PositionPeriodFields from "./PositionPeriodFields";
 import PositionRowHeader from "./PositionRowHeader";
@@ -22,6 +23,7 @@ interface Props {
   roleOptions: DropdownOption[];
   roles: { id: string; name: string }[];
   isExpanded: boolean;
+  error?: string;
   color?: AccentColor;
   onToggle: () => void;
   onRemove: () => void;
@@ -39,6 +41,7 @@ const PositionRow = ({
   roleOptions,
   roles,
   isExpanded,
+  error,
   color = "blue",
   onToggle,
   onRemove,
@@ -51,7 +54,8 @@ const PositionRow = ({
   return (
     <div
       className={twMerge(
-        "flex flex-col gap-3 rounded-2xl p-3",
+        "relative flex flex-col gap-3 rounded-2xl p-3",
+        error && "mb-4",
         colorClasses.softBg,
       )}
     >
@@ -90,6 +94,7 @@ const PositionRow = ({
           />
         </>
       )}
+      <FieldError message={error} color={color} />
     </div>
   );
 };

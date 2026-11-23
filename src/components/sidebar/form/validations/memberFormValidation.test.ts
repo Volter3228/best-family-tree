@@ -90,7 +90,9 @@ describe("validateMemberForm", () => {
   ])("refuses to empty %s once it has a value", (field, overrides) => {
     const form = formFor(complete, overrides);
 
-    expect(validateMemberForm(form, mentors, [], complete)).toHaveProperty(field);
+    expect(validateMemberForm(form, mentors, [], complete)).toHaveProperty(
+      field,
+    );
   });
 
   it("still checks the format of a value that is being added", () => {
@@ -107,7 +109,9 @@ describe("validateMemberForm", () => {
       birthday: new Date(1975, 0, 1),
     };
 
-    expect(validateMemberForm(formFor(legacy), mentors, [], legacy)).toEqual({});
+    expect(validateMemberForm(formFor(legacy), mentors, [], legacy)).toEqual(
+      {},
+    );
   });
 
   it("handles stored dates that arrive from the API as ISO strings", () => {
@@ -191,7 +195,7 @@ describe("validateMemberForm positions", () => {
     );
 
   it("rejects a new team name for a non-event type", () => {
-    expect(check({})).toHaveProperty("positions");
+    expect(check({})).toHaveProperty("positionErrors.row-1");
   });
 
   it("accepts an existing team of a non-event type", () => {
@@ -199,12 +203,10 @@ describe("validateMemberForm positions", () => {
   });
 
   it("rejects a non-event type with no team of its own", () => {
-    expect(check({ teamName: "" })).toHaveProperty("positions");
+    expect(check({ teamName: "" })).toHaveProperty("positionErrors.row-1");
   });
 
   it("allows a new team name for an event type", () => {
-    expect(
-      check({ teamTypeId: "t-event", teamName: "Курс 2025" }),
-    ).toEqual({});
+    expect(check({ teamTypeId: "t-event", teamName: "Курс 2025" })).toEqual({});
   });
 });

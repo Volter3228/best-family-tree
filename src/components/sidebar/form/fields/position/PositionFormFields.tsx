@@ -21,6 +21,7 @@ interface Props {
   positions: PositionFormRow[];
   onChange: (positions: PositionFormRow[]) => void;
   error?: string;
+  rowErrors?: Record<string, string>;
   color?: AccentColor;
 }
 
@@ -28,6 +29,7 @@ const PositionFormFields = ({
   positions,
   onChange,
   error,
+  rowErrors,
   color = "blue",
 }: Props) => {
   const [teamTypes] = useTeamTypes();
@@ -63,6 +65,7 @@ const PositionFormFields = ({
         <PositionRow
           key={row.id}
           row={row}
+          error={rowErrors?.[row.id]}
           teams={teams}
           teamTypes={teamTypes}
           teamTypeOptions={teamTypeOptions}

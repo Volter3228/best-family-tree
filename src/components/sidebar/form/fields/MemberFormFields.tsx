@@ -1,4 +1,9 @@
-import type { MemberFormData, MemberFormMode, AccentColor } from "@/types";
+import type {
+  MemberFormData,
+  MemberFormErrors,
+  MemberFormMode,
+  AccentColor,
+} from "@/types";
 import { useT } from "@/i18n/useT";
 import InfoBubble from "@/components/ui/InfoBubble";
 import { AvatarFileInput, FormCheckbox } from "../inputs";
@@ -11,7 +16,7 @@ import PositionFormFields from "./position/PositionFormFields";
 interface Props {
   form: MemberFormData;
   setForm: React.Dispatch<React.SetStateAction<MemberFormData>>;
-  errors: Partial<Record<keyof MemberFormData, string>>;
+  errors: MemberFormErrors;
   mode?: MemberFormMode;
   initialAvatar?: string | null;
   color?: AccentColor;
@@ -85,6 +90,7 @@ const MemberFormFields = ({
       />
       <PositionFormFields
         error={errors.positions}
+        rowErrors={errors.positionErrors}
         positions={form.positions}
         onChange={(positions) => setForm({ ...form, positions })}
         color={color}

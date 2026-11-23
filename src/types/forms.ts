@@ -56,6 +56,11 @@ export type MemberFormData = {
   positions: PositionFormRow[];
 };
 
+// Position errors are keyed by row id so each shows under its own position.
+export type MemberFormErrors = Partial<Record<keyof MemberFormData, string>> & {
+  positionErrors?: Record<string, string>;
+};
+
 export type TeamTypeFormData = {
   name: string;
   isEvent: boolean;

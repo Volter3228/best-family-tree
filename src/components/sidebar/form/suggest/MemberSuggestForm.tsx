@@ -79,8 +79,7 @@ const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
   const showPicker = savesDirectly || !isOwn;
 
   const changes = useMemo(
-    () =>
-      withoutPending(buildMemberChanges(member, form), pending),
+    () => withoutPending(buildMemberChanges(member, form), pending),
     [member, form, pending],
   );
 
@@ -134,6 +133,7 @@ const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
     );
     const result: Errors = {};
     for (const [key, message] of Object.entries(all)) {
+      if (typeof message !== "string") continue;
       const name = key as keyof MemberFormData;
       if (!form[name]) result[name] = t.cannotEmpty;
       else if (changed.has(name)) result[name] = message;

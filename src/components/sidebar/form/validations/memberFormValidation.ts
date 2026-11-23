@@ -10,6 +10,7 @@ import { normalizePhone } from "@/utils/phone";
 import { getRowPeriod } from "../fields/position/positionFormUtils";
 import type {
   MemberFormData,
+  MemberFormErrors,
   MentorsListItem,
   PositionFormRow,
   Team,
@@ -61,21 +62,24 @@ const validatePositions = (
   teamTypes: TeamType[],
   teams: Team[],
   t: ValidationMessages,
-): string | undefined => {
+): Record<string, string> => {
+  const errors: Record<string, string> = {};
   for (const position of positions) {
     if (!position.roleName.trim()) continue;
 
     if (getRowPeriod(teams, position, teamTypes).kind === "unavailable") {
-      return t.noSuchTeam;
+      errors[position.id] = t.noSuchTeam;
+      continue;
     }
     if (position.teamName?.trim()) continue;
 
     const teamType = teamTypes.find(({ id }) => id === position.teamTypeId);
 
     if (teamType?.isEvent && !position.teamStartYear) {
-      return t.startYearRequired(teamType.name);
+      errors[position.id] = t.startYearRequired(teamType.name);
     }
   }
+  return errors;
 };
 
 // What the stored member already has (edit mode). A stored value can be
@@ -128,9 +132,9 @@ const validateMemberForm = (
     teams?: Team[];
     t?: ValidationMessages;
   } = {},
-): Partial<Record<keyof MemberFormData, string>> => {
+): MemberFormErrors => {
   const REQUIRED_MESSAGE = t.required;
-  let errors: Partial<Record<keyof MemberFormData, string>> = {};
+  let errors: MemberFormErrors = {};
   const {
     firstName,
     lastName,
@@ -215,8 +219,10 @@ const validateMemberForm = (
     errors.phoneNumber = t.phoneInvalid;
   }
 
-  const positionsError = validatePositions(form.positions, teamTypes, teams, t);
-  if (positionsError) errors.positions = positionsError;
+  const positionErrors = validatePositions(form.positions, teamTypes, teams, t);
+  if (Object.keys(positionErrors).length > 0) {
+    errors.positionErrors = positionErrors;
+  }
 
   errors = {
     ...errors,

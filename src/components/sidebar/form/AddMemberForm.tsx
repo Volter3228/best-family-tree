@@ -12,6 +12,7 @@ import apiAddMember from "@/api/addMember";
 import type {
   AccentColor,
   MemberFormData,
+  MemberFormErrors,
   Member as MemberType,
 } from "@/types";
 import { MemberFormFields } from "./fields";
@@ -29,9 +30,7 @@ interface Props {
 
 export default function AddMemberForm({ onSuccess, color = "blue" }: Props) {
   const [form, setForm] = useState<MemberFormData>({ ...MEMBER_FORM_DEFAULTS });
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof MemberFormData, string>>
-  >({});
+  const [errors, setErrors] = useState<MemberFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [isMinimal, setIsMinimal] = useState(false);
