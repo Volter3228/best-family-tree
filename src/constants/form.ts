@@ -1,10 +1,12 @@
-import { endOfYear, subYears } from "date-fns";
+import { endOfDay, endOfYear, subYears } from "date-fns";
 import { ActivityState, type MemberFormData } from "@/types";
 
 /* Date Input */
 export const MAX_DATE_BIRTHDAY = endOfYear(subYears(new Date(), 16));
 export const MIN_DATE_BIRTHDAY = new Date(1980, 0, 1);
 export const MIN_DATE_JOIN = new Date(2002, 0, 1);
+// A function, not a constant: the tab can stay open past midnight.
+export const getMaxDateJoin = () => endOfDay(new Date());
 
 export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   firstName: "",

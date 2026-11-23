@@ -1,5 +1,6 @@
 import {
   MAX_DATE_BIRTHDAY,
+  getMaxDateJoin,
   MIN_DATE_BIRTHDAY,
   MIN_DATE_JOIN,
 } from "@/constants/form";
@@ -182,7 +183,10 @@ const validateMemberForm = (
 
   if (!joinedAt) {
     if (isRequired("joinedAt")) errors.joinedAt = REQUIRED_MESSAGE;
-  } else if (!isUnchanged("joinedAt", joinedAt) && joinedAt < MIN_DATE_JOIN) {
+  } else if (
+    !isUnchanged("joinedAt", joinedAt) &&
+    (joinedAt < MIN_DATE_JOIN || joinedAt > getMaxDateJoin())
+  ) {
     errors.joinedAt = t.joinedAtInvalid;
   }
 

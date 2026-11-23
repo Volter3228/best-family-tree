@@ -4,7 +4,7 @@ import { useLocale, useT } from "@/i18n/useT";
 import { useDisplayName } from "@/utils/displayName";
 import { useMembersStore } from "@/store/membersStore";
 import { collectDescendantIds } from "@/utils/membersTree";
-import { MIN_DATE_JOIN } from "@/constants/form";
+import { MIN_DATE_JOIN, getMaxDateJoin } from "@/constants/form";
 import { getActivityOptions, getStatusOptions } from "@/constants/filters";
 import type {
   AccentColor,
@@ -74,7 +74,7 @@ const MemberBestSection = ({
   return (
     <section className="flex flex-col gap-3">
       <SectionHeading title="BEST" color={color} />
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <FormField error={errors.joinedAt} color={color}>
           <DateInput
             name="joinedAt"
@@ -83,6 +83,7 @@ const MemberBestSection = ({
             onChange={(date) => date && setForm({ ...form, joinedAt: date })}
             placeholder="22.10.2017"
             minDate={MIN_DATE_JOIN}
+            maxDate={getMaxDateJoin()}
             required
             color={color}
           />

@@ -6,7 +6,11 @@ import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useTreeStore } from "@/store/treeStore";
 
 interface Options {
-  openInMode: (memberId: string, mode: SidebarMode) => void;
+  openInMode: (
+    memberId: string,
+    mode: SidebarMode,
+    minimized?: boolean,
+  ) => void;
   openTeam: (teamId: string) => void;
   closeTeam: () => void;
   focusNode: (memberId: string) => void;
@@ -33,7 +37,7 @@ export const useProfileOpenRequest = ({
   useEffect(() => {
     if (!request) return;
     useProfileStore.getState().clear();
-    const { memberId, mode } = request;
+    const { memberId, mode, minimized } = request;
     if (!getMemberById(memberId)) return;
 
     const session = useSessionStore.getState().session;
@@ -47,7 +51,8 @@ export const useProfileOpenRequest = ({
     }
 
     closeTeam();
-    openInMode(memberId, nextMode);
+    // Only the info card can collapse.
+    openInMode(memberId, nextMode, minimized && nextMode === "info");
     rememberTeamFor(memberId);
     focusNode(memberId);
   }, [request, openInMode, closeTeam, focusNode, rememberTeamFor]);

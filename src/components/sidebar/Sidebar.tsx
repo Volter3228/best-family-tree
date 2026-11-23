@@ -136,6 +136,8 @@ const Sidebar = ({
     <div
       id={id}
       ref={setRootElement}
+      // Lets toolbar panels lift above the collapsed bar (see ToolbarPanel).
+      data-sidebar-minimized={isOpen && isMinimized ? "" : undefined}
       className={twMerge(
         "fixed inset-y-0 right-0 flex w-dvw justify-end p-2 pb-24 items-end pointer-events-none md:items-center md:min-w-[35rem] md:w-2/3 md:p-4 md:pb-4 lg:w-1/3 xl:w-1/4 transform transition-transform duration-300 z-50",
         !isOpen
@@ -226,7 +228,7 @@ const Sidebar = ({
                 }}
               >
                 <SidebarFooterContext.Provider value={footerSlotElement}>
-                  <div ref={contentInnerRef} className="px-6 pb-6 pt-0">
+                  <div ref={contentInnerRef} className="px-4 pb-6 pt-0 md:px-6">
                     {children}
                   </div>
                 </SidebarFooterContext.Provider>

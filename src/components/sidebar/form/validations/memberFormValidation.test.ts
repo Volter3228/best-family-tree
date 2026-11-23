@@ -47,6 +47,17 @@ const formFor = (
 };
 
 describe("validateMemberForm", () => {
+  it("rejects a join date later than today", () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const check = (joinedAt: Date) =>
+      validateMemberForm(formFor(complete, { joinedAt }), mentors, [], null)
+        .joinedAt;
+
+    expect(check(tomorrow)).toBeTruthy();
+    expect(check(new Date())).toBeUndefined();
+  });
+
   it("requires every field when adding a member", () => {
     const errors = validateMemberForm(MEMBER_FORM_DEFAULTS, mentors);
 

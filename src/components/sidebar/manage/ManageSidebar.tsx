@@ -126,6 +126,7 @@ const ManageSidebar = ({
           color={color}
           isAdmin={isAdmin}
           pendingCount={pendingCount}
+          hideOnMobile={inEditor}
         />
         <ManagePane screen={`${tab}:${view.kind}`} direction={direction}>
           <div className="@container pt-1">

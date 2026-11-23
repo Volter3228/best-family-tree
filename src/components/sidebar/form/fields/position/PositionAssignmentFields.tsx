@@ -34,7 +34,7 @@ const PositionAssignmentFields = ({
   const t = useT().memberForm.positions;
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <div className="flex min-w-0 flex-col">
           <ComboboxInput
             name={`position-teamType-${rowId}`}

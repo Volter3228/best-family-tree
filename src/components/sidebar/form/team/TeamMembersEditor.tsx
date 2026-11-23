@@ -94,7 +94,7 @@ const TeamMembersEditor = ({
             color={color}
           />
           {expanded.has(row.id) && (
-            <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
               <DropdownSelectInput
                 name={`team-member-${row.id}`}
                 label={t.member}

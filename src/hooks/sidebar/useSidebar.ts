@@ -16,6 +16,7 @@ export const useSidebar = (
   const [isMinimized, setIsMinimized] = useState(false);
   // Mode requested together with a selection; the selection effect applies it.
   const pendingModeRef = useRef<SidebarMode | null>(null);
+  const pendingMinimizedRef = useRef(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // A pending close must not wipe a selection made while the card slides out.
@@ -37,7 +38,8 @@ export const useSidebar = (
       setIsOpen(true);
       setMode(pendingModeRef.current ?? "info");
       pendingModeRef.current = null;
-      setIsMinimized(false);
+      setIsMinimized(pendingMinimizedRef.current);
+      pendingMinimizedRef.current = false;
     }
   }, [selectedId, cancelPendingClose]);
 
@@ -58,10 +60,15 @@ export const useSidebar = (
 
   // Selects a member and opens the sidebar straight in the given mode.
   const openInMode = useCallback(
-    (id: string, nextMode: SidebarMode) => {
-      if (selectedMember?.id === id) setMode(nextMode);
-      else pendingModeRef.current = nextMode;
+    (id: string, nextMode: SidebarMode, minimized = false) => {
+      const same = selectedMember?.id === id;
+      if (same) setMode(nextMode);
+      else {
+        pendingModeRef.current = nextMode;
+        pendingMinimizedRef.current = minimized;
+      }
       selectMember(id);
+      if (same) setIsMinimized(minimized);
     },
     [selectedMember, selectMember],
   );

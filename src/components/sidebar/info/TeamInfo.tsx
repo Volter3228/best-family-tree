@@ -46,7 +46,7 @@ const TeamInfo = ({
       {/* Room for the floating header and its tint (painted by the Sidebar). */}
       <div
         aria-hidden
-        className="-mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0"
+        className="-mx-4 md:-mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0"
       />
       <div className="-mt-16 flex flex-col items-center gap-3">
         <TeamLogo

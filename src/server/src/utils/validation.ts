@@ -3,6 +3,10 @@ import { formatZodErrors } from "./catalogValidation.js";
 
 const isValidDate = (val: string) => !isNaN(Date.parse(val));
 
+// Empty is left to the "required" / isValidDate checks.
+export const isNotFuture = (val: string) =>
+  val === "" || Date.parse(val) <= Date.now();
+
 const isJsonArrayOfStrings = (val: string) => {
   try {
     const parsed = JSON.parse(val);
@@ -19,7 +23,10 @@ export const memberBodySchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   birthday: z.string().refine(isValidDate, "Invalid birthday date"),
-  joinedAt: z.string().refine(isValidDate, "Invalid join date"),
+  joinedAt: z
+    .string()
+    .refine(isValidDate, "Invalid join date")
+    .refine(isNotFuture, "Join date cannot be in the future"),
   mentorId: z.string().min(1, "Mentor ID is required"),
   // Optional: "" means "not sent", so the stored gender is left unchanged.
   gender: z

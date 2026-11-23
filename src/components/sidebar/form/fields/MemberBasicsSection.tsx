@@ -25,7 +25,7 @@ const MemberBasicsSection = ({
   return (
     <section className="flex flex-col gap-3">
       <SectionHeading title={t.basics} color={color} />
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <FormField error={errors.firstName} color={color}>
           <TextInput
             name="firstName"
@@ -49,7 +49,7 @@ const MemberBasicsSection = ({
           />
         </FormField>
       </div>
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <FormField error={errors.birthday} color={color}>
           <DateInput
             name="birthday"

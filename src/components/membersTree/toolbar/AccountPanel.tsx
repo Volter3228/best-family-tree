@@ -14,6 +14,7 @@ import { getInitials, getStatusLabel } from "@/utils";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useProfileStore } from "@/store/profileStore";
 import { useMemberById } from "@/hooks";
+import { useIsMobileScreen } from "@/hooks/membersTree/useTreeDirection";
 import InfoBubble from "@/components/ui/InfoBubble";
 import PhotoOpenButton from "@/components/photoViewer/PhotoOpenButton";
 import {
@@ -45,6 +46,7 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
   const session = useSessionStore((s) => s.session);
   const requestOpen = useProfileStore((s) => s.requestOpen);
   const [confirming, setConfirming] = useState(false);
+  const isMobile = useIsMobileScreen();
   const person = session?.member ?? null;
   const treeMember = useMemberById(person?.id);
 
@@ -58,7 +60,10 @@ const AccountPanel = ({ isOpen, isClosing, onClose }: Props) => {
 
   const open = (mode: "info" | "edit" | "suggest") => {
     if (!person) return;
-    requestOpen(person.id, mode);
+    // On a phone the panel would cover the sidebar: keep it open and collapse
+    // the card for "show me" (the member stays visible), close it for forms.
+    if (isMobile && mode !== "info") onClose();
+    requestOpen(person.id, mode, isMobile && mode === "info");
   };
   const editable = canEdit(session, person?.id);
   const isQuestions = session.method === "QUESTIONS";

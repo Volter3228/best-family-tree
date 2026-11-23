@@ -14,7 +14,7 @@ const SidebarFooter = ({ wrapperRef, slotRef }: Props) => (
     <div className="min-h-0 overflow-hidden transition-[overflow] duration-0 transition-discrete has-[.sidebar-footer-slot:not(:empty)]:overflow-visible has-[.sidebar-footer-slot:not(:empty)]:delay-[400ms]">
       <div
         ref={slotRef}
-        className="sidebar-footer-slot relative flex flex-col items-center gap-3 px-6 py-4"
+        className="sidebar-footer-slot relative flex flex-col items-center gap-3 px-4 py-4 md:px-6"
       />
     </div>
   </div>

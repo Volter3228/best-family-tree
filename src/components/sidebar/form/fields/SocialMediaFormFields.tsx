@@ -27,7 +27,7 @@ const SocialMediaFormFields = ({
   return (
     <section className="flex flex-col gap-3">
       <SocialsHeading color={color} />
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <FormField error={errors.telegramLink} color={color}>
           <TextInput
             name="telegramLink"

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { formatZodErrors } from "./catalogValidation.js";
-import { memberBodySchema } from "./validation.js";
+import { isNotFuture, memberBodySchema } from "./validation.js";
 
 // Updates are lenient about fields the stored record never had (old records
 // miss data), but a value that already exists can only be replaced, never
@@ -11,7 +11,11 @@ export const memberUpdateBodySchema = memberBodySchema.extend({
   firstName: z.string(),
   lastName: z.string().default(""),
   birthday: z.string().refine(isValidDate, "Invalid birthday date").default(""),
-  joinedAt: z.string().refine(isValidDate, "Invalid join date").default(""),
+  joinedAt: z
+    .string()
+    .refine(isValidDate, "Invalid join date")
+    .refine(isNotFuture, "Join date cannot be in the future")
+    .default(""),
   mentorId: z.string().default(""),
 });
 
@@ -24,7 +28,8 @@ export const sparseMemberBodySchema = memberUpdateBodySchema.extend({
   joinedAt: z
     .string()
     .min(1, "Join date is required")
-    .refine(isValidDate, "Invalid join date"),
+    .refine(isValidDate, "Invalid join date")
+    .refine(isNotFuture, "Join date cannot be in the future"),
 });
 
 export const validateSparseMemberBody = (

@@ -6,6 +6,7 @@ import {
   UserGroupIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { twMerge } from "tailwind-merge";
 import CategoryRail from "@/components/ui/CategoryRail";
 import { useT } from "@/i18n/useT";
 import type { AccentColor } from "@/types";
@@ -28,6 +29,8 @@ interface Props {
   color: AccentColor;
   isAdmin: boolean;
   pendingCount: number;
+  // Phones: the editor needs the full width (the header's back arrow leaves).
+  hideOnMobile?: boolean;
 }
 
 const ManageRail = ({
@@ -36,6 +39,7 @@ const ManageRail = ({
   color,
   isAdmin,
   pendingCount,
+  hideOnMobile = false,
 }: Props) => {
   const t = useT().manage;
   return (
@@ -43,7 +47,10 @@ const ManageRail = ({
       color={color}
       active={active}
       onSelect={onSelect}
-      className="sticky top-0 self-start"
+      className={twMerge(
+        "sticky top-0 self-start",
+        hideOnMobile && "max-md:hidden",
+      )}
       items={ITEMS.filter((item) => isAdmin || item.key !== "access").map(
         (item) => ({
           ...item,

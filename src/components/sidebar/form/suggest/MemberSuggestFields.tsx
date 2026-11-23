@@ -10,6 +10,7 @@ import {
   MAX_DATE_BIRTHDAY,
   MIN_DATE_BIRTHDAY,
   MIN_DATE_JOIN,
+  getMaxDateJoin,
 } from "@/constants/form";
 import { getStatusOptions } from "@/constants/filters";
 import { useMentorsList } from "@/hooks";
@@ -106,7 +107,7 @@ const MemberSuggestFields = ({
   return (
     <div className="@container flex w-full flex-col gap-3">
       <div className="flex flex-col">
-        <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
           <FormField error={errors.firstName} color={color}>
             <TextInput
               name="firstName"
@@ -144,7 +145,7 @@ const MemberSuggestFields = ({
           color={color}
         />
       </FormField>
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         <FormField error={errors.joinedAt} color={color}>
           <DateInput
             name="joinedAt"
@@ -153,6 +154,7 @@ const MemberSuggestFields = ({
             onChange={(date) => date && set("joinedAt")(date)}
             placeholder="22.10.2017"
             minDate={MIN_DATE_JOIN}
+            maxDate={getMaxDateJoin()}
             required
             color={color}
           />
@@ -206,7 +208,7 @@ const MemberSuggestFields = ({
         />
       </FormField>
       <SocialsHeading color={color} />
-      <div className="grid grid-cols-1 gap-3 @[22rem]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 @[26rem]:grid-cols-2">
         {SOCIALS.map(({ key, label, placeholder, icon }) => (
           <FormField key={key} error={errors[key]} color={color}>
             <TextInput

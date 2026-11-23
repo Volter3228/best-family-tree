@@ -24,7 +24,7 @@ const MemberInfoCover = ({
 }: Props) => (
   <div
     className={twMerge(
-      "relative -mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]",
+      "relative -mx-4 md:-mx-6 h-[calc(var(--sidebar-header-height,3.5rem)+4.5rem)] shrink-0 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]",
       COLOR_CLASSES[color].text,
     )}
   >
