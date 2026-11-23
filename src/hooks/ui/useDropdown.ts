@@ -60,9 +60,15 @@ export const useDropdown = (
         const { value, text } = filteredOptions[0];
         onSelect(value);
         setInputValue(text);
+      } else if (!inputValue.trim()) {
+        if (initialValue) onSelect("");
+      } else {
+        // Typed text matching no option must not linger next to a stale value.
+        setInputValue(getInitialText());
       }
     },
-    [onSelect, filteredOptions, inputValue],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onSelect, filteredOptions, inputValue, initialValue, options],
   );
 
   const handleClose = useCallback(() => {
