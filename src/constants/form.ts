@@ -24,3 +24,6 @@ export const MEMBER_FORM_DEFAULTS: MemberFormData = {
   linkedinLink: "",
   positions: [],
 };
+
+export const TEAM_DESCRIPTION_MAX_LENGTH = 500;
+export const ROLE_DESCRIPTION_MAX_LENGTH = 300;

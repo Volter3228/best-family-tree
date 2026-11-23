@@ -1,3 +1,4 @@
+import { TEAM_DESCRIPTION_MAX_LENGTH } from "@/constants/form";
 import { FOUNDER_JOIN_YEAR } from "@/constants/member";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { useMembersList, useRoles } from "@/hooks";
@@ -140,6 +141,7 @@ const TeamFormContent = ({
         />
         <TextAreaInput
           name="teamDescription"
+          maxLength={TEAM_DESCRIPTION_MAX_LENGTH}
           label={tCommon.description}
           value={form.description}
           onChange={(description) =>

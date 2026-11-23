@@ -1,3 +1,4 @@
+import { ROLE_DESCRIPTION_MAX_LENGTH } from "@/constants/form";
 import type { Dispatch, SetStateAction } from "react";
 import type { RoleFormData } from "@/hooks/forms/useRoleForm";
 import type { AccentColor } from "@/types";
@@ -61,6 +62,7 @@ const RoleFormContent = ({
         />
         <TextAreaInput
           name="roleDescription"
+          maxLength={ROLE_DESCRIPTION_MAX_LENGTH}
           label={t.description}
           value={form.description}
           onChange={(description) => setForm({ ...form, description })}
