@@ -59,7 +59,19 @@ const ComboboxInput = ({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+    setShowActive(true);
     setIsOpen(true);
+  };
+
+  const focusNextField = () => {
+    const input = inputRef.current;
+    if (!input) return;
+    const fields = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        "input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])",
+      ),
+    ).filter((el) => el.tabIndex >= 0 && el.offsetParent !== null);
+    fields[fields.indexOf(input) + 1]?.focus();
   };
 
   useEffect(() => {
@@ -102,7 +114,10 @@ const ComboboxInput = ({
           if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             setShowActive(true);
           }
+          const picksOption =
+            event.key === "Enter" && isOpen && allOptions.length > 0;
           handleKeyDown(event, dropUp);
+          if (picksOption) focusNextField();
         }}
       />
       {(isOpen || isClosing) && (
