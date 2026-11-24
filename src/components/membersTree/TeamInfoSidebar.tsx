@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/16/solid";
 import { canEdit, useSessionStore } from "@/store/sessionStore";
 import { useManageStore } from "@/store/manageStore";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMembersList, useTeams, useSidebarSwitchAnimation } from "@/hooks";
 import type { useTeamInfoSidebar } from "@/hooks";
 import { formatYearRange, getTeamRoster } from "@/utils";
@@ -72,6 +72,12 @@ const TeamInfoSidebar = ({
   const sendManageBack = useManageStore((s) => s.sendBack);
   const containerRef = useRef<HTMLDivElement>(null);
   useSidebarSwitchAnimation(containerRef, teamId ?? "", mode);
+  // Info view height, so the edit form's loading state doesn't shrink the card.
+  const [infoHeight, setInfoHeight] = useState(0);
+  const startEdit = () => {
+    setInfoHeight(containerRef.current?.offsetHeight ?? 0);
+    state.startEdit();
+  };
 
   return (
     <Sidebar
@@ -98,7 +104,7 @@ const TeamInfoSidebar = ({
       mode={isSuggest ? "edit" : mode}
       isOpen={isOpen}
       onClose={state.close}
-      onEditClick={editable ? state.startEdit : undefined}
+      onEditClick={editable ? startEdit : undefined}
       onSuggestClick={canSuggest ? state.startSuggest : undefined}
       // Suggesting keeps the card as tall as the info view was.
       fillHeight={isSuggest}
@@ -152,6 +158,7 @@ const TeamInfoSidebar = ({
           ) : (
             <TeamForm
               teamId={teamId}
+              loadingHeight={infoHeight}
               onSaved={state.backToInfo}
               onCancel={state.backToInfo}
               onDeleted={state.close}

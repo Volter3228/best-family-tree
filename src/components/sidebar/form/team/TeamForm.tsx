@@ -7,6 +7,8 @@ import TeamFormContent from "./TeamFormContent";
 interface Props {
   // Edit this team; without it the form creates a new one.
   teamId?: string;
+  // Height kept while the team loads, so the sidebar doesn't jump.
+  loadingHeight?: number;
   onCreated?: (teamId: string) => void;
   onSaved?: () => void;
   onDeleted?: () => void;
@@ -19,6 +21,7 @@ interface Props {
 
 const TeamForm = ({
   teamId,
+  loadingHeight,
   onCreated,
   onSaved,
   onDeleted,
@@ -55,7 +58,12 @@ const TeamForm = ({
       noValidate
     >
       {isLoading ? (
-        <p className="text-sm text-foreground/60">{t.loading}</p>
+        <p
+          className="text-sm text-foreground/60"
+          style={{ minHeight: loadingHeight }}
+        >
+          {t.loading}
+        </p>
       ) : (
         <TeamFormContent
           mode={mode}
