@@ -42,6 +42,10 @@ _Avoid_: Child, newbie
 A member for whom some data is missing (old or migrated records). Sparse records are shown like any other member and can be completed gradually. A sparse record can be added on purpose in the Add form's minimal mode (name, status and join date only); normal adds still require everything.
 _Avoid_: Broken record, incomplete member
 
+**Year-only join date**:
+A join date on 1 January means only the year is known. Such a member has no recruitment season: they show as just the year, with a blue card, a question-mark motif in the card cover, and never match the spring or autumn filter. Editors pick 1 January in the Join date field when the exact date is unknown.
+_Avoid_: Unknown date, fake date
+
 **Completeness rule**:
 Editing a member may add data and may change data, but may never empty a field that already has a value; fields that were never filled stay optional. One exception: members may remove their own photo.
 _Avoid_: Required fields (adding a new member still requires them)

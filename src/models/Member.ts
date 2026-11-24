@@ -10,7 +10,39 @@ import {
   MemberStatus,
 } from "@/types";
 
+// A join date on 1 January means only the year is known. Stored values are UTC
+// midnight; a date picked in the form is local midnight (UTC the day before in
+// zones ahead of UTC), so either reading counts, but only at its own midnight:
+// otherwise 2 January picked in Kyiv (1 January 22:00 UTC) would match.
+const getYearOnlyJoinYear = (value: Date | string): number | null => {
+  // The API hands dates over as ISO strings.
+  const date = new Date(value);
+  if (
+    date.getMonth() === 0 &&
+    date.getDate() === 1 &&
+    date.getHours() === 0 &&
+    date.getMinutes() === 0
+  ) {
+    return date.getFullYear();
+  }
+  if (
+    date.getUTCMonth() === 0 &&
+    date.getUTCDate() === 1 &&
+    date.getUTCHours() === 0 &&
+    date.getUTCMinutes() === 0
+  ) {
+    return date.getUTCFullYear();
+  }
+  return null;
+};
+
+export const isJoinYearOnly = (date: Date | string): boolean =>
+  getYearOnlyJoinYear(date) !== null;
+
 const getRecruitmentTerm = (joinedAt: Date): RecruitmentTerm => {
+  const yearOnly = getYearOnlyJoinYear(joinedAt);
+  if (yearOnly !== null) return { season: null, year: yearOnly };
+
   const month = getMonth(joinedAt);
   const year = getYear(joinedAt);
 
@@ -28,7 +60,8 @@ const isBirthdayToday = (name: string, birthday: Date | null): boolean => {
 
   const today = new Date();
   return (
-    getMonth(birthday) === getMonth(today) && birthday.getDate() === today.getDate()
+    getMonth(birthday) === getMonth(today) &&
+    birthday.getDate() === today.getDate()
   );
 };
 
@@ -115,6 +148,10 @@ export default class Member {
 
   getRecruitmentTerm(): RecruitmentTerm {
     return this.recruitmentTerm;
+  }
+
+  isJoinYearOnly(): boolean {
+    return this.recruitmentTerm.season === null;
   }
 
   isMentor(): boolean {

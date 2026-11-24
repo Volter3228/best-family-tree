@@ -19,6 +19,8 @@ export const memberForm = {
   birthday: "Birthday",
   gender: "Gender",
   joinedAt: "Join date",
+  joinedAtHint:
+    "Don't know the exact date? Pick 1\u00A0January of the year. The member will be shown with the year only and no season.",
   status: "Status",
   activityState: "Activity state",
   mentor: "Mentor",

@@ -11,17 +11,16 @@ interface Props {
 }
 
 // Header chip of the member card: the recruitment season with its motif.
+const SEASON_ICONS = {
+  spring: FlowerIcon,
+  autumn: MapleLeafIcon,
+};
+
 const SeasonChip = ({ member, color }: Props) => {
   const locale = useLocale();
+  const { season } = member.getRecruitmentTerm();
   return (
-    <HeaderChip
-      icon={
-        member.getRecruitmentTerm().season === "spring"
-          ? FlowerIcon
-          : MapleLeafIcon
-      }
-      color={color}
-    >
+    <HeaderChip icon={season ? SEASON_ICONS[season] : undefined} color={color}>
       {formatMemberRecruitmentSeason(member, false, locale)}
     </HeaderChip>
   );

@@ -2,9 +2,10 @@ import { twMerge } from "tailwind-merge";
 import type { RecruitmentSeason } from "@/types";
 import MapleLeafIcon from "./MapleLeafIcon";
 import FlowerIcon from "./FlowerIcon";
+import QuestionMarkIcon from "./QuestionMarkIcon";
 
 interface Props {
-  season: RecruitmentSeason;
+  season: RecruitmentSeason | null;
   className?: string;
 }
 
@@ -30,10 +31,15 @@ const PLACEMENTS: Placement[] = [
   { left: "67%", top: "74%", size: 14, rotate: -8, opacity: 0.16 },
 ];
 
-// Scattered blossoms (spring) or maple leaves (autumn) in the inherited
+// Scattered blossoms (spring), maple leaves (autumn) or question marks (year only) in the inherited
 // (member's) colour: the shape tells the season, the colour the member.
 const SeasonMotif = ({ season, className }: Props) => {
-  const Icon = season === "spring" ? FlowerIcon : MapleLeafIcon;
+  const Icon =
+    season === null
+      ? QuestionMarkIcon
+      : season === "spring"
+        ? FlowerIcon
+        : MapleLeafIcon;
 
   return (
     <div

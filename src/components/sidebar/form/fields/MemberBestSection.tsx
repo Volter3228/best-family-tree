@@ -13,6 +13,7 @@ import type {
   MemberFormData,
   MemberStatus,
 } from "@/types";
+import InfoBubble from "@/components/ui/InfoBubble";
 import { DateInput, DropdownSelectInput } from "../inputs";
 import FormField from "./FormField";
 import SectionHeading from "./SectionHeading";
@@ -86,6 +87,11 @@ const MemberBestSection = ({
             maxDate={getMaxDateJoin()}
             required
             color={color}
+            hint={
+              <InfoBubble className="[&_svg]:h-4 [&_svg]:w-4">
+                {t.joinedAtHint}
+              </InfoBubble>
+            }
           />
         </FormField>
         <FormField error={errors.mentorId} color={color}>

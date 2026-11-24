@@ -19,14 +19,17 @@ const RECRUITMENT_SEASON_EMOJI: Record<RecruitmentSeason, string> = {
 
 // The member card takes its colour from the recruitment season (spring reads
 // green, autumn orange), not from the node's colour in the tree, which only
-// rotates between siblings. Blue stays for utilities: forms, search, account.
+// rotates between siblings. Year-only members (unknown season) are blue.
 const RECRUITMENT_SEASON_ACCENT: Record<RecruitmentSeason, AccentColor> = {
   spring: "green",
   autumn: "orange",
 };
 
+export const getTermAccent = (term: RecruitmentTerm): AccentColor =>
+  term.season ? RECRUITMENT_SEASON_ACCENT[term.season] : "blue";
+
 export const getMemberSeasonAccent = (member: Member): AccentColor =>
-  RECRUITMENT_SEASON_ACCENT[member.getRecruitmentTerm().season];
+  getTermAccent(member.getRecruitmentTerm());
 
 export const getMemberAvatar = (
   member: Pick<Member, "photo">,
@@ -47,8 +50,10 @@ export const formatRecruitmentTerm = (
   withEmoji: boolean,
   locale: Locale,
 ): string => {
-  const label = `${messages[locale].filters.seasons[term.season]} ${term.year}`;
-  if (!withEmoji) return label;
+  const label = term.season
+    ? `${messages[locale].filters.seasons[term.season]} ${term.year}`
+    : `${term.year}`;
+  if (!withEmoji || !term.season) return label;
 
   const emoji = RECRUITMENT_SEASON_EMOJI[term.season];
   return `${emoji}${label}${emoji}`;

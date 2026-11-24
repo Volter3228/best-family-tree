@@ -30,7 +30,8 @@ const matchesJoinSeason = (
   seasons: RecruitmentSeason[],
 ): boolean => {
   if (seasons.length === 0) return true;
-  return seasons.includes(member.getRecruitmentTerm().season);
+  const { season } = member.getRecruitmentTerm();
+  return season !== null && seasons.includes(season);
 };
 
 const parseDateStr = (

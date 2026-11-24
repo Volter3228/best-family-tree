@@ -59,7 +59,8 @@ export type MentorsListItem = {
 export type RecruitmentSeason = "spring" | "autumn";
 
 export interface RecruitmentTerm {
-  season: RecruitmentSeason;
+  // null for a year-only join date (1 January): the season is unknown.
+  season: RecruitmentSeason | null;
   year: number;
 }
 

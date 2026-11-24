@@ -21,6 +21,7 @@ interface Props {
   disabled?: boolean;
   onChange: (date: Date | null) => void;
   color?: AccentColor;
+  hint?: React.ReactNode;
 }
 
 // date-fns Ukrainian month names are lowercase; the picker should show them capitalized.
@@ -47,6 +48,7 @@ const DateInput = ({
   disabled = false,
   onChange,
   color = "blue",
+  hint,
 }: Props) => {
   const colorClasses = COLOR_CLASSES[color];
   const locale = useLocale();
@@ -58,6 +60,7 @@ const DateInput = ({
         htmlFor={name}
         required={required}
         color={color}
+        hint={hint}
       />
       <DatePicker
         id={id || name}

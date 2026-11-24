@@ -7,22 +7,32 @@ interface Props {
   htmlFor?: string;
   required: boolean;
   onClick?: () => void;
+  // Shown right after the label text (and its required mark).
+  hint?: React.ReactNode;
   // Kept for call-site compatibility: labels are neutral, not accented.
   color?: AccentColor;
 }
 
-const InputLabel = ({ label, htmlFor, required, onClick }: Props) => {
-  return (
+const InputLabel = ({ label, htmlFor, required, onClick, hint }: Props) => {
+  const text = (
     <label
       htmlFor={htmlFor}
       onClick={onClick}
       className={twMerge(
-        "mb-1.5 block text-sm font-semibold text-foreground",
+        "block text-sm font-semibold text-foreground",
+        !hint && "mb-1.5",
         required && "after:ml-0.5 after:text-foreground/40 after:content-['*']",
       )}
     >
       {label}
     </label>
+  );
+  if (!hint) return text;
+  return (
+    <div className="mb-1.5 flex items-center gap-1">
+      {text}
+      {hint}
+    </div>
   );
 };
 

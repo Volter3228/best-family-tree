@@ -46,14 +46,28 @@ const formatJoinedDate = (date: Date, locale: "en" | "uk") => {
 
 // "12 Mar 2020 · 5 років": the date plus the full years elapsed in the accent.
 // Under one full year the years part is omitted entirely.
-const DateWithYears = ({ date, color }: { date: Date; color: AccentColor }) => {
+// A year-only join date shows just the year, and the years count from it.
+const DateWithYears = ({
+  date,
+  color,
+  yearOnly,
+  year,
+}: {
+  date: Date;
+  color: AccentColor;
+  yearOnly?: boolean;
+  year?: number;
+}) => {
   const t = useT().memberInfo;
   const locale = useLocale();
-  const years = differenceInYears(new Date(), date);
+  const years = differenceInYears(
+    new Date(),
+    yearOnly && year !== undefined ? new Date(year, 0, 1) : date,
+  );
   const mobile = useIsMobileScreen();
   return (
     <span className="whitespace-nowrap text-[15px] sm:text-base">
-      {formatJoinedDate(date, locale)}
+      {yearOnly && year !== undefined ? year : formatJoinedDate(date, locale)}
       {years > 0 && (
         <span
           className={twMerge(
@@ -123,7 +137,12 @@ const MemberInfoFacts = ({
         color={color}
         fullWidth={fullWidth}
       >
-        <DateWithYears date={joinedAt} color={color} />
+        <DateWithYears
+          date={joinedAt}
+          color={color}
+          yearOnly={member.isJoinYearOnly()}
+          year={member.getRecruitmentTerm().year}
+        />
       </MemberFactTile>
     ),
   });
