@@ -15,7 +15,13 @@ const TeamTypesTab = ({ view, go, onTitle, color }: ManageTabProps) => {
   const [teamTypes] = useTeamTypes();
 
   const sorted = useMemo(
-    () => [...teamTypes].sort((a, b) => a.name.localeCompare(b.name, locale)),
+    () =>
+      // Most teams first.
+      [...teamTypes].sort(
+        (a, b) =>
+          (b._count?.teams ?? 0) - (a._count?.teams ?? 0) ||
+          a.name.localeCompare(b.name, locale),
+      ),
     [teamTypes, locale],
   );
 

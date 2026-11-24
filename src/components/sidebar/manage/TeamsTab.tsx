@@ -1,10 +1,11 @@
 import { useMemo } from "react";
-import { useTeams, useTeamTypes } from "@/hooks";
+import { useTeams } from "@/hooks";
 import type { Team, TeamType } from "@/types";
 import { useLocale, useT } from "@/i18n/useT";
 import TeamForm from "../form/team/TeamForm";
 import TeamTile from "../form/team/TeamTile";
 import ManageList from "./ManageList";
+import type { ManageGroup } from "./ManageListGroups";
 import { useEditorTitle } from "./useEditorTitle";
 import { useJustCreated } from "./useJustCreated";
 import { LIST_VIEW, type ManageTabProps } from "./types";
@@ -15,7 +16,7 @@ const resolveType = (team: Team) => team.teamType ?? null;
 const groupRank = (team: Team, type: TeamType | null) =>
   team.isOngoing ? (type?.isEvent ? 0 : 1) : 2;
 
-// Newest period first (start, then end); the type never groups the list.
+// Newest period first (start, then end).
 const byPeriodDesc = (a: Team, b: Team, locale: string) =>
   (b.startYear ?? 0) - (a.startYear ?? 0) ||
   (b.endYear ?? 0) - (a.endYear ?? 0) ||
@@ -45,12 +46,30 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
 
   const typeOf = (team: Team) => resolveType(team);
 
+  // One group per team type; teams without a type go to "Other", last.
+  const groupOf = (team: Team): ManageGroup => {
+    const type = typeOf(team);
+    return {
+      key: type?.id ?? "",
+      title: type?.name ?? t.other,
+      rank: type ? 0 : 1,
+      leading: (
+        <TeamTile
+          name={type?.name ?? t.other}
+          iconUrl={type?.iconUrl}
+          typeColor={type?.color}
+          color={color}
+          className="h-8 w-8 rounded-lg text-xs"
+        />
+      ),
+    };
+  };
+
   const sorted = useMemo(
     () =>
       [...teams].sort(
         (a, b) =>
-          groupRank(a, resolveType(a)) -
-            groupRank(b, resolveType(b)) ||
+          groupRank(a, resolveType(a)) - groupRank(b, resolveType(b)) ||
           byPeriodDesc(a, b, locale),
       ),
     [teams, locale],
@@ -104,17 +123,13 @@ const TeamsTab = ({ view, go, onTitle, color }: ManageTabProps) => {
       getKey={(team) => team.id}
       getTitle={(team) => team.name}
       getSubtitle={(team) =>
-        [
-          typeOf(team)?.name ?? "",
-          formatTeamYears({
-            start: team.startYear,
-            end: team.endYear,
-            ongoing: team.isOngoing,
-          }),
-        ]
-          .filter(Boolean)
-          .join(" · ") || undefined
+        formatTeamYears({
+          start: team.startYear,
+          end: team.endYear,
+          ongoing: team.isOngoing,
+        }) || undefined
       }
+      groupBy={groupOf}
       getSearchable={(team) => [team.name, typeOf(team)?.name ?? ""]}
       renderLeading={(team) => (
         <TeamTile

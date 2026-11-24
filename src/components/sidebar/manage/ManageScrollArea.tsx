@@ -9,7 +9,7 @@ interface Props {
 const ManageScrollArea = ({ color, children }: Props) => (
   <div
     data-manage-content
-    className="-mr-5 h-[calc(var(--sidebar-content-max)-1.75rem)] overflow-y-auto overscroll-contain pr-5"
+    className="-mr-5 h-[calc(var(--sidebar-content-max)-1.75rem)] overflow-y-auto overscroll-contain pr-5 [scrollbar-gutter:stable]"
     style={
       { "--scroll-color": `var(--accent-${color})` } as React.CSSProperties
     }

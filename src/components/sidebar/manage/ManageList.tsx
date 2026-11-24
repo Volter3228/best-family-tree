@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
-import { ChevronRightIcon, PlusIcon } from "@heroicons/react/16/solid";
+import { PlusIcon } from "@heroicons/react/16/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { COLOR_CLASSES } from "@/constants/colorClasses";
 import { matchesQuery } from "@/hooks/data/useSearchSuggestions";
 import type { AccentColor } from "@/types";
-import { useT } from "@/i18n/useT";
+import { useLocale, useT } from "@/i18n/useT";
 import { formInputClasses } from "../form/inputs/inputClasses";
+import ManageListGroups, { type ManageGroup } from "./ManageListGroups";
+import ManageListRow from "./ManageListRow";
 
 interface Props<T> {
   items: readonly T[];
@@ -25,6 +27,8 @@ interface Props<T> {
   emptyText: string;
   // Rendered rows are capped; the rest is reached through the search.
   limit?: number;
+  // Splits the list into collapsible groups (no row cap then).
+  groupBy?: (item: T) => ManageGroup;
   color: AccentColor;
 }
 
@@ -42,9 +46,11 @@ const ManageList = <T,>({
   searchPlaceholder,
   emptyText,
   limit = 50,
+  groupBy,
   color,
 }: Props<T>) => {
   const t = useT().manage;
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const colorClasses = COLOR_CLASSES[color];
 
@@ -56,7 +62,18 @@ const ManageList = <T,>({
     });
   }, [items, query, getSearchable, getTitle]);
 
-  const shown = matches.slice(0, limit);
+  const shown = groupBy ? matches : matches.slice(0, limit);
+
+  const renderRow = (item: T) => (
+    <ManageListRow
+      title={getTitle(item)}
+      subtitle={getSubtitle?.(item)}
+      leading={renderLeading?.(item)}
+      titleSuffix={renderTitleSuffix?.(item)}
+      onOpen={() => onOpen(item)}
+      color={color}
+    />
+  );
 
   return (
     <div className="flex h-[calc(var(--sidebar-content-max)-1.75rem)] flex-col gap-2">
@@ -90,7 +107,7 @@ const ManageList = <T,>({
 
       <div
         data-manage-content
-        className="-mr-5 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-5"
+        className="-mr-5 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-5 [scrollbar-gutter:stable]"
         style={
           { "--scroll-color": `var(--accent-${color})` } as React.CSSProperties
         }
@@ -103,40 +120,21 @@ const ManageList = <T,>({
           <p className="px-2 py-6 text-center text-sm text-foreground/60">
             {t.nothingFound(query.trim())}
           </p>
+        ) : groupBy ? (
+          <ManageListGroups
+            items={matches}
+            groupOf={groupBy}
+            renderItem={renderRow}
+            getKey={getKey}
+            searching={query.trim() !== ""}
+            locale={locale}
+            color={color}
+          />
         ) : (
           <ul className="flex flex-col">
-            {shown.map((item) => {
-              const subtitle = getSubtitle?.(item);
-              return (
-                <li key={getKey(item)}>
-                  <button
-                    type="button"
-                    onClick={() => onOpen(item)}
-                    className={twMerge(
-                      "flex w-full touch-manipulation items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-inset",
-                      colorClasses.hoverSurfaceBg,
-                      colorClasses.focusVisibleRing,
-                    )}
-                  >
-                    {renderLeading?.(item)}
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="flex min-w-0 items-center gap-1.5">
-                        <span className="truncate text-sm font-semibold text-foreground">
-                          {getTitle(item)}
-                        </span>
-                        {renderTitleSuffix?.(item)}
-                      </span>
-                      {subtitle && (
-                        <span className="truncate text-xs text-foreground/60">
-                          {subtitle}
-                        </span>
-                      )}
-                    </span>
-                    <ChevronRightIcon className="h-4 w-4 shrink-0 text-foreground/30" />
-                  </button>
-                </li>
-              );
-            })}
+            {shown.map((item) => (
+              <li key={getKey(item)}>{renderRow(item)}</li>
+            ))}
           </ul>
         )}
 
