@@ -12,6 +12,9 @@ const platformLabels: Record<string, string> = {
 
 export const errors = {
   saveFailed: "Couldn't save. Try again",
+  treeLoadFailed: "Couldn't load the tree",
+  treeLoadHint: "Check your connection and try again",
+  retry: "Try again",
   validation: () => "Check the details you entered",
   sign_in_required: () => "Sign in required",
   not_allowed: () => "Not allowed",

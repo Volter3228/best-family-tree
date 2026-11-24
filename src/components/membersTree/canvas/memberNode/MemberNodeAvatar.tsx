@@ -42,6 +42,7 @@ const MemberNodeAvatar = ({
   const lowResImage = useTexture(lowResUrl, { mipmaps: true });
   const highResImage = useTexture(isSharp ? highResUrl : null, {
     mipmaps: true,
+    release: true,
   });
   const avatarImage = highResImage ?? lowResImage;
   const circleTexture = Assets.get(CIRCLE_TEXTURE_SRC);

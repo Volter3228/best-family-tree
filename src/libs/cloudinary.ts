@@ -9,7 +9,7 @@ export const getPhotoUrlAsRoundAvatar = (url: string, size = 480) => {
   const [baseUrl, filePath] = url.split("/upload/");
   // The extension decides the delivered format, so it must be one with alpha.
   const webpPath = filePath.replace(/\.\w+$/, ".webp");
-  return `${baseUrl}/upload/c_fill,w_${size},h_${size},r_max/${webpPath}`;
+  return `${baseUrl}/upload/c_fill,w_${size},h_${size},r_max,q_auto/${webpPath}`;
 };
 
 export const getPhotoUrlAsAvatar = (
@@ -42,5 +42,5 @@ export const getIconUrlAsRounded = (
   if (!url.includes("res.cloudinary.com")) return null;
   const [baseUrl, filePath] = url.split("/upload/");
   const webpPath = filePath.replace(/\.\w+$/, ".webp");
-  return `${baseUrl}/upload/c_fit,w_${size},h_${size},r_${radius}/${webpPath}`;
+  return `${baseUrl}/upload/c_fit,w_${size},h_${size},r_${radius},q_auto/${webpPath}`;
 };

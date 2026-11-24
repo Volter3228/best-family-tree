@@ -22,3 +22,4 @@ export * from "./teamRoster";
 export * from "./teamTrunk";
 export * from "./teamMorph";
 export * from "./tapGesture";
+export * from "./renderDemand";

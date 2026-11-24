@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import type { Container } from "pixi.js";
 import { cardsHiddenSignal } from "@/store/treeSignals";
+import { requestCanvasRender } from "@/utils/membersTree/renderDemand";
 
 // Member cards are built only when first needed: cards are shown and the node
 // is on screen. Mounting every card in one task made a tree-mode switch freeze,
@@ -47,6 +48,7 @@ function tick() {
     entry.mount(animate);
     if (++mounted >= MOUNTS_PER_TICK) break;
   }
+  if (mounted > 0) requestCanvasRender();
   sync();
 }
 

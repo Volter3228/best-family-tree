@@ -10,6 +10,9 @@ const platformLabels: Record<string, string> = {
 
 export const errors = {
   saveFailed: "Не вдалося зберегти. Спробуй ще раз",
+  treeLoadFailed: "Не вдалося завантажити дерево",
+  treeLoadHint: "Перевір з'єднання та спробуй ще раз",
+  retry: "Спробувати ще раз",
   validation: () => "Перевір введені дані",
   sign_in_required: () => "Потрібно увійти",
   not_allowed: () => "Недостатньо прав",

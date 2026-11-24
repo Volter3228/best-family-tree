@@ -9,5 +9,5 @@ export * from "./useTapWithoutDrag";
 export * from "./useTeamSelection";
 export * from "./useSceneTransition";
 export * from "./useTreeDirection";
-export * from "./useViewportCulling";
+export * from "./useRenderOnDemand";
 export * from "./useProgressiveIds";

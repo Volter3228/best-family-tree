@@ -25,7 +25,7 @@ import type { Member as MemberType } from "@/types";
 import { getRenderResolution } from "@/utils";
 import { Viewport, SharpAvatarTracker } from "./canvas";
 import MembersTreeScene from "./MembersTreeScene";
-import ViewportCulling from "./ViewportCulling";
+import RenderOnDemand from "./RenderOnDemand";
 import MemberSidebar from "./MemberSidebar";
 import TeamInfoSidebar from "./TeamInfoSidebar";
 import Toolbar from "./toolbar";
@@ -188,7 +188,7 @@ const MembersTreeContent = ({ members, showToolbar }: Props) => {
           height={window.innerHeight}
           onScaleChange={setScale}
         >
-          <ViewportCulling />
+          <RenderOnDemand />
           <SharpAvatarTracker />
           {/* A render group of its own: panning the viewport then moves one
               transform instead of recomputing every node's world transform. */}

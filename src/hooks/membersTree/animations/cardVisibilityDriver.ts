@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 import type { Container } from "pixi.js";
+import { requestCanvasRender } from "@/utils/membersTree/renderDemand";
 
 // One shared gsap ticker callback drives every card appearance/disappearance.
 // A zoom threshold crossing used to create a timeline with several tweens per
@@ -37,6 +38,7 @@ export const deferCardHidden = (card: Container): void => {
 };
 
 function tick() {
+  requestCanvasRender();
   const now = gsap.ticker.time;
   for (const [card, entry] of entries) {
     const local = now - entry.startAt;

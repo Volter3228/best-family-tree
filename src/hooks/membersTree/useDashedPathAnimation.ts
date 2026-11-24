@@ -3,11 +3,10 @@ import { useApplication } from "@pixi/react";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
 import {
-  findCommonLen,
-  animDuration,
   drawDashes,
   alignSegments,
   lerpSegment,
+  requestCanvasRender,
 } from "@/utils";
 import { buildDashStyles } from "@/utils/membersTree/dashedBezier";
 import { isPathOffScreen } from "@/utils/membersTree/pathVisibility";
@@ -16,11 +15,10 @@ import {
   GAP_LEN,
   SPEED,
   EMPTY_PATH,
-  RETRACT_BASE,
-  DRAW_IN_BASE,
 } from "@/constants/canvas/lineageEdgePath";
 import type { SegmentMorph } from "@/utils/membersTree/dashedBezier";
 import type { PathData } from "@/types";
+import { buildPathTransition } from "./dashedPathTransition";
 
 // Smallest dash movement (world units) that is worth a redraw.
 const MIN_REDRAW_OFFSET = 1.2;
@@ -73,64 +71,18 @@ export const useDashedPathAnimation = ({
 
     if (prevId === newId) return;
 
-    const tl = gsap.timeline();
-    timelineRef.current = tl;
-
-    const oldPath = pathRef.current;
     const newPath = newId ? buildPath(newId) : EMPTY_PATH;
-
-    const hasOld = prevId !== null && animRef.current.visibleLen > 0;
-    const hasNew = newId !== null;
-
-    if (hasOld && hasNew) {
-      // A -> B: retract to common prefix, swap path, draw in
-      const commonLen = findCommonLen(oldPath, newPath);
-      const retractDist = animRef.current.visibleLen - commonLen;
-
-      if (retractDist > 0) {
-        tl.to(animRef.current, {
-          visibleLen: commonLen,
-          duration: animDuration(retractDist, oldPath.totalLen, RETRACT_BASE),
-          ease: "power2.inOut",
-          onComplete: () => {
-            pathRef.current = newPath;
-            prevIdRef.current = newId;
-          },
-        });
-      } else {
-        pathRef.current = newPath;
-        prevIdRef.current = newId;
-      }
-
-      const drawInDist = newPath.totalLen - commonLen;
-      if (drawInDist > 0) {
-        tl.to(animRef.current, {
-          visibleLen: newPath.totalLen,
-          duration: animDuration(drawInDist, newPath.totalLen, DRAW_IN_BASE),
-          ease: "power2.out",
-        });
-      }
-    } else if (hasOld && !hasNew) {
-      // Target -> null: retract fully
-      tl.to(animRef.current, {
-        visibleLen: 0,
-        duration: RETRACT_BASE,
-        ease: "power2.inOut",
-        onComplete: () => {
-          pathRef.current = EMPTY_PATH;
-          prevIdRef.current = null;
-        },
-      });
-    } else if (!hasOld && hasNew) {
-      // null -> Target: draw in fully
-      pathRef.current = newPath;
-      prevIdRef.current = newId;
-      tl.to(animRef.current, {
-        visibleLen: newPath.totalLen,
-        duration: DRAW_IN_BASE,
-        ease: "power2.out",
-      });
-    }
+    timelineRef.current = buildPathTransition({
+      anim: animRef.current,
+      prevId,
+      newId,
+      oldPath: pathRef.current,
+      newPath,
+      onSwap: (path, id) => {
+        pathRef.current = path;
+        prevIdRef.current = id;
+      },
+    });
 
     return () => {
       timelineRef.current?.kill();
@@ -235,6 +187,8 @@ export const useDashedPathAnimation = ({
       // gap makes the first on-screen tick redraw.
       if (!morph && isPathOffScreen(pathRef.current)) return;
       lastOffsetRef.current = offsetRef.current;
+      // The marching dashes move on their own: keep the canvas drawing.
+      requestCanvasRender();
 
       isCleared = false;
       g.clear();
