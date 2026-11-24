@@ -14,6 +14,7 @@ export const buildSessionInfo = async (session: Session) => {
           status: true,
           featuredPositionId: true,
           nameBadgeTeamId: true,
+          nameBadgeIcon: true,
           positions: {
             select: {
               id: true,
@@ -59,6 +60,7 @@ export const buildSessionInfo = async (session: Session) => {
       status: member.status,
       featuredPositionId: member.featuredPositionId,
       nameBadgeTeamId: member.nameBadgeTeamId,
+      nameBadgeIcon: member.nameBadgeIcon,
       positions: member.positions.map((p) => ({
         id: p.id,
         roleName: p.role.name,

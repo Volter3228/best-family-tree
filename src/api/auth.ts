@@ -34,6 +34,7 @@ export interface SessionInfo {
     status: "OBSERVER" | "BABY" | "FULL" | "ALUMNI";
     featuredPositionId: string | null;
     nameBadgeTeamId: string | null;
+    nameBadgeIcon: "LION" | "BEST" | null;
     positions: SessionPosition[];
   } | null;
 }

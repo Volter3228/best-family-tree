@@ -15,8 +15,9 @@ const put = async (endpoint: string, body: unknown) => {
 export const setFeaturedPosition = (positionId: string | null) =>
   put("/me/featured-position", { positionId });
 
-export const setNameBadge = (teamId: string | null) =>
-  put("/me/name-badge", { teamId });
+export const setNameBadge = (
+  badge: { teamId: string } | { icon: "LION" | "BEST" } | null,
+) => put("/me/name-badge", badge ?? {});
 
 /** Reloads the session and the member, so the sidebar shows the change at once. */
 export const refreshProfile = async (memberId: string) => {

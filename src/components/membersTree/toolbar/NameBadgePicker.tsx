@@ -5,6 +5,7 @@ import type { SessionInfo } from "@/api/auth";
 import { refreshProfile, setNameBadge } from "@/api/profile";
 import { useT } from "@/i18n/useT";
 import TypeIconTile from "@/components/sidebar/info/TypeIconTile";
+import { DefaultBadgeIcon } from "@/components/sidebar/info/NameBadge";
 
 type SessionMember = NonNullable<SessionInfo["member"]>;
 
@@ -16,9 +17,13 @@ const SIZE = "h-8 w-8 shrink-0 rounded-full";
 
 const NameBadgePicker = ({ member }: Props) => {
   const t = useT().account;
+  // A team id, "LION" / "BEST" for the default icons, or null for none.
   const [pending, setPending] = useState<string | null | undefined>();
   const [failed, setFailed] = useState(false);
-  const selected = pending !== undefined ? pending : member.nameBadgeTeamId;
+  const selected =
+    pending !== undefined
+      ? pending
+      : (member.nameBadgeIcon ?? member.nameBadgeTeamId);
 
   // One option per team type; its value is the first team of that type.
   const types = new Map<
@@ -39,14 +44,19 @@ const NameBadgePicker = ({ member }: Props) => {
       });
     }
   }
-  if (types.size === 0) return null;
 
-  const choose = async (teamId: string | null) => {
-    if (teamId === selected) return;
-    setPending(teamId);
+  const choose = async (value: string | null) => {
+    if (value === selected) return;
+    setPending(value);
     setFailed(false);
     try {
-      await setNameBadge(teamId);
+      await setNameBadge(
+        value === null
+          ? null
+          : value === "LION" || value === "BEST"
+            ? { icon: value }
+            : { teamId: value },
+      );
       await refreshProfile(member.id);
     } catch {
       setFailed(true);
@@ -81,6 +91,22 @@ const NameBadgePicker = ({ member }: Props) => {
         >
           <NoSymbolIcon className="h-4 w-4" />
         </button>
+        {(["LION", "BEST"] as const).map((icon) => (
+          <button
+            key={icon}
+            type="button"
+            title={icon === "LION" ? t.badgeLion : t.badgeBest}
+            aria-label={icon === "LION" ? t.badgeLion : t.badgeBest}
+            aria-pressed={selected === icon}
+            onClick={() => void choose(icon)}
+            className={twMerge(
+              ring(selected === icon),
+              "flex items-center justify-center bg-foreground/5",
+            )}
+          >
+            <DefaultBadgeIcon icon={icon} className="h-[70%] w-[70%]" />
+          </button>
+        ))}
         {[...types].map(([icon, type]) => {
           const on = !!selected && type.teamIds.includes(selected);
           return (

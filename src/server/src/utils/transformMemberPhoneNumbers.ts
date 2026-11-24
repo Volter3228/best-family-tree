@@ -18,7 +18,9 @@ export type MemberWithPhoneNumberRecords = PrismaMember & {
 };
 
 export type NameBadge = {
-  teamId: string;
+  // A team badge has a teamId; a default badge has an icon instead.
+  teamId: string | null;
+  icon: "LION" | "BEST" | null;
   name: string;
   iconUrl: string | null;
   color: string | null;
@@ -34,6 +36,15 @@ export type MemberWithPhoneNumberStrings = PrismaMember & {
 const buildNameBadge = (
   member: MemberWithPhoneNumberRecords,
 ): NameBadge | null => {
+  if (member.nameBadgeIcon) {
+    return {
+      teamId: null,
+      icon: member.nameBadgeIcon,
+      name: member.nameBadgeIcon === "LION" ? "Lion" : "BEST",
+      iconUrl: null,
+      color: null,
+    };
+  }
   if (!member.nameBadgeTeamId) return null;
   const team = member.positions?.find(
     (p) => p.teamId === member.nameBadgeTeamId,
@@ -42,6 +53,7 @@ const buildNameBadge = (
   if (!team || !iconUrl) return null;
   return {
     teamId: team.id,
+    icon: null,
     name: team.name,
     iconUrl,
     color: team.teamType?.color ?? null,

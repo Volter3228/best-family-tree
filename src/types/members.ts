@@ -19,8 +19,11 @@ export enum Gender {
   Female = "FEMALE",
 }
 
+export type NameBadgeIcon = "LION" | "BEST";
+
 export type NameBadge = {
-  teamId: string;
+  teamId: string | null;
+  icon: NameBadgeIcon | null;
   name: string;
   iconUrl: string | null;
   color: string | null;

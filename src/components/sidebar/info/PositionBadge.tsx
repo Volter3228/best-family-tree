@@ -5,6 +5,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useStackOnOverflow } from "@/hooks";
 import type { MemberPosition } from "@/types";
 import { useT } from "@/i18n/useT";
+import MaskIcon from "@/components/ui/MaskIcon";
 
 interface Props {
   position: MemberPosition;
@@ -119,7 +120,7 @@ const PositionBadge = ({ position, onClick, featured = false }: Props) => {
         {lastTeamWord && (
           <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap">
             {lastTeamWord}
-            {logoUrl && (
+            {logoUrl ? (
               <Image
                 src={logoUrl}
                 alt={team ? team.name : ""}
@@ -127,6 +128,15 @@ const PositionBadge = ({ position, onClick, featured = false }: Props) => {
                 height={featured ? 16 : 14}
                 className="shrink-0 rounded-full"
               />
+            ) : (
+              team && (
+                // Fallback mark: the BEST logo as a silhouette in the badge's
+                // text colour (theme foreground when the type has no colour).
+                <MaskIcon
+                  src="/images/best-logo.png"
+                  className={featured ? "h-4 w-4" : "h-3.5 w-3.5"}
+                />
+              )
             )}
           </span>
         )}

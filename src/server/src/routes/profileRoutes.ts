@@ -140,13 +140,18 @@ router.put("/me/featured-position", selfServeGuard, async (req, res) => {
 
 router.put("/me/name-badge", selfServeGuard, async (req, res) => {
   const body = parseWith(
-    z.object({ teamId: z.string().min(1).nullable() }),
+    z.object({
+      teamId: z.string().min(1).nullable().optional(),
+      icon: z.enum(["LION", "BEST"]).nullable().optional(),
+    }),
     req.body,
   );
   try {
     if (!body.success) throw new ValidationError(body.errors);
     const memberId = req.session!.memberId!;
-    const { teamId } = body.data;
+    // At most one of the two is stored; neither clears the badge.
+    const teamId = body.data.icon ? null : (body.data.teamId ?? null);
+    const nameBadgeIcon = body.data.icon ?? null;
     if (teamId && !(await holdsPositionIn(memberId, teamId))) {
       throw new ValidationError("You are not a member of this team", {
         code: "not_team_member",
@@ -154,7 +159,7 @@ router.put("/me/name-badge", selfServeGuard, async (req, res) => {
     }
     await prisma.member.update({
       where: { id: memberId },
-      data: { nameBadgeTeamId: teamId },
+      data: { nameBadgeTeamId: teamId, nameBadgeIcon },
     });
     res.status(204).send();
   } catch (error) {

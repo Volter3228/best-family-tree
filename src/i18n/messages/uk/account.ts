@@ -12,8 +12,10 @@ export const account = {
     "Роль із зіркою показується першою та виділяється в твоєму профілі.",
   featureRole: "Закріпити роль",
   unfeatureRole: "Відкріпити роль",
-  badge: "Значок біля імені",
+  badge: "Іконка біля імені",
   badgeNone: "Без значка",
+  badgeLion: "Лев",
+  badgeBest: "BEST",
   showInTree: "Показати мене в дереві",
   editProfile: "Редагувати мій профіль",
   editProfileInfo:

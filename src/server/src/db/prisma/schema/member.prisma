@@ -28,6 +28,7 @@ model Member {
   featuredPositionId String?         @unique
   featuredPosition   MemberPosition? @relation("FeaturedPosition", fields: [featuredPositionId], references: [id], onDelete: SetNull)
   nameBadgeTeamId    String?
+  nameBadgeIcon      NameBadgeIcon?
   nameBadgeTeam      Team?           @relation("NameBadgeTeam", fields: [nameBadgeTeamId], references: [id], onDelete: SetNull)
   phoneNumbers       PhoneNumber[]
 
@@ -37,6 +38,11 @@ model Member {
   @@unique([name, status, joinedAt])
   @@index([mentorId])
   @@map("members")
+}
+
+enum NameBadgeIcon {
+  LION
+  BEST
 }
 
 enum ActivityState {
