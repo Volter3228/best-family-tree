@@ -68,7 +68,6 @@ export const useComboboxState = (
 
   const selectOption = useCallback(
     (option: DropdownOption) => {
-      setHasTyped(false);
       if (option.value === NEW_OPTION_VALUE) {
         onSelect("", inputValue);
       } else {
