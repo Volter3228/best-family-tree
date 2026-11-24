@@ -168,21 +168,21 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTree.tsx": {
-    "mtime": 1791905785.6346376,
-    "seen": 1792609757.1323063,
-    "ast_hash": "05d13fe807eb7a18992290ab808bcc0a",
-    "semantic_hash": "05d13fe807eb7a18992290ab808bcc0a"
+    "mtime": 1795467355.6535506,
+    "seen": 1795513645.205512,
+    "ast_hash": "f8ad9335ad866003de23c5cdb9b2b959",
+    "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeContent.tsx": {
-    "mtime": 1795173406.9812036,
-    "seen": 1795173416.043818,
-    "ast_hash": "0793192d82357d0ec038af34c94b313a",
+    "mtime": 1795467355.6556787,
+    "seen": 1795513645.205513,
+    "ast_hash": "4c421df461e989b767c57f489736e20b",
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeDynamic.tsx": {
-    "mtime": 1794693918.2251024,
-    "seen": 1794694914.9590273,
-    "ast_hash": "318ad8391ea845f2c1b10fa4cdbf3e19",
+    "mtime": 1795467356.8052456,
+    "seen": 1795513645.2055137,
+    "ast_hash": "ad96113f78a47b0d5e95ad93e063447b",
     "semantic_hash": ""
   },
   "src/components/membersTree/MembersTreeScene.tsx": {
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/Sidebar.tsx": {
-    "mtime": 1795466365.4198036,
-    "seen": 1795466375.1698341,
-    "ast_hash": "dddc5064e3ab32699f532efa4e8b2e81",
+    "mtime": 1795472153.1200442,
+    "seen": 1795513645.2092998,
+    "ast_hash": "1aafaf972cfe45d5e67497aa2832df96",
     "semantic_hash": ""
   },
   "src/components/sidebar/SidebarFooterContext.ts": {
@@ -942,9 +942,9 @@
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useFocusNodeAnimation.ts": {
-    "mtime": 1794845474.7764928,
-    "seen": 1794847683.2441745,
-    "ast_hash": "a6e9c912f3041009e0739f2ce8ddf48e",
+    "mtime": 1795471815.3120842,
+    "seen": 1795513645.216456,
+    "ast_hash": "47d2fd9910d502f45bc5351fe9e5bd2e",
     "semantic_hash": ""
   },
   "src/hooks/membersTree/animations/useHoverNodeAnimation.ts": {
@@ -1026,9 +1026,9 @@
     "semantic_hash": ""
   },
   "src/hooks/sidebar/useSidebar.ts": {
-    "mtime": 1795466365.4214997,
-    "seen": 1795466375.1764355,
-    "ast_hash": "fc1cfcee739a9e2762857ca7ff584978",
+    "mtime": 1795472153.1185036,
+    "seen": 1795513645.217276,
+    "ast_hash": "180e15e018d50da9b1b7c4e07cbe1011",
     "semantic_hash": ""
   },
   "src/hooks/sidebar/useSidebarHeightAnimation.ts": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": ""
   },
   "src/hooks/ui/useDropdown.ts": {
-    "mtime": 1795103026.7033277,
-    "seen": 1795117228.5816128,
-    "ast_hash": "10c1b18dbb12fe98d645ba465ffbf210",
+    "mtime": 1795472536.7992518,
+    "seen": 1795513645.2177076,
+    "ast_hash": "9695e318d8547db66e992b145e4822b2",
     "semantic_hash": ""
   },
   "src/hooks/ui/useDropdownPosition.ts": {
@@ -1518,9 +1518,9 @@
     "semantic_hash": "f043077661311a848d3857ed11837065"
   },
   "src/utils/membersTree/teamEdges.ts": {
-    "mtime": 1793880621.8537006,
-    "seen": 1793881288.1133263,
-    "ast_hash": "78741cbce0070b263d7770db533746e3",
+    "mtime": 1795513620.8912053,
+    "seen": 1795513645.229265,
+    "ast_hash": "547ba614cf6062442c5842bfce55e4f3",
     "semantic_hash": ""
   },
   "src/utils/membersTree/teamGroups.ts": {
@@ -2046,15 +2046,15 @@
     "semantic_hash": ""
   },
   "src/utils/membersTree/teamEdgePath.ts": {
-    "mtime": 1793880663.9712176,
-    "seen": 1793881288.1133249,
-    "ast_hash": "c63957f8ef7d354f5038fe47e6ff7cf0",
+    "mtime": 1795513620.8305387,
+    "seen": 1795513645.229263,
+    "ast_hash": "72bd7f7a564fc038d661363e4f8f3dc6",
     "semantic_hash": ""
   },
   "src/utils/membersTree/teamEdges.test.ts": {
-    "mtime": 1793881185.2472637,
-    "seen": 1793881288.1133256,
-    "ast_hash": "c1e15c98789e760efe003366411603a1",
+    "mtime": 1795513620.8652055,
+    "seen": 1795513645.229264,
+    "ast_hash": "6378905ecc63d635bee412c5f4f51bcf",
     "semantic_hash": ""
   },
   "src/utils/membersTree/teamTrunk.ts": {
@@ -2130,9 +2130,9 @@
     "semantic_hash": ""
   },
   "src/components/membersTree/MemberSidebar.tsx": {
-    "mtime": 1795173406.9810615,
-    "seen": 1795173416.0437846,
-    "ast_hash": "264419270caf7b78bce7399b1d9fae0c",
+    "mtime": 1795472153.1193118,
+    "seen": 1795513645.2055104,
+    "ast_hash": "f924c0db7513fd963f7c0c5ec0cb751c",
     "semantic_hash": ""
   },
   "src/components/sidebar/SidebarHandle.tsx": {
@@ -4056,15 +4056,15 @@
     "semantic_hash": ""
   },
   "src/components/sidebar/manage/AccessRow.tsx": {
-    "mtime": 1795100422.2333453,
-    "seen": 1795101343.4116695,
-    "ast_hash": "f7f22ca4a9d1c48a3df1b8e483ec71bc",
+    "mtime": 1795471543.3107634,
+    "seen": 1795513645.213509,
+    "ast_hash": "6c1e429417b98fab0d96e12c8cc5e40f",
     "semantic_hash": ""
   },
   "src/components/sidebar/manage/AccessTab.tsx": {
-    "mtime": 1795100422.2334352,
-    "seen": 1795101343.4116702,
-    "ast_hash": "e65124997ede9fac52e68a06571d9265",
+    "mtime": 1795471543.3106651,
+    "seen": 1795513645.2135105,
+    "ast_hash": "7d817e103eda8b3cea7abc5594565830",
     "semantic_hash": ""
   },
   "src/components/sidebar/manage/CollapseOut.tsx": {
@@ -4413,6 +4413,18 @@
     "mtime": 1795173383.3227453,
     "seen": 1795173416.0542145,
     "ast_hash": "13792e4e6b0d40779edc6653aafa7f74",
+    "semantic_hash": ""
+  },
+  "src/utils/membersTree/teamEdgeAnchors.ts": {
+    "mtime": 1795513620.795872,
+    "seen": 1795513645.2292616,
+    "ast_hash": "67923926ecabd1931ece9ab11c7122ca",
+    "semantic_hash": ""
+  },
+  "src/utils/membersTree/teamEdgesLR.ts": {
+    "mtime": 1795513596.5576594,
+    "seen": 1795513645.229266,
+    "ast_hash": "bf1d9a65e56e0af2a2108f181c1f15a2",
     "semantic_hash": ""
   }
 }

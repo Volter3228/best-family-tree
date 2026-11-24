@@ -68,7 +68,7 @@ describe("buildTeamEdges orthogonal routes", () => {
     expect(Math.min(...ys)).toBeLessThanOrEqual(96);
   });
 
-  it("LR: multi-leader hub edges are fan-only, so they never draw in orthogonal", () => {
+  it("LR: orthogonal routes reach every leader and the member spine", () => {
     const { edges } = buildTeamEdges({
       axisX: 0,
       direction: "LR",
@@ -77,12 +77,41 @@ describe("buildTeamEdges orthogonal routes", () => {
         { x: 0, y: 0 },
         { x: 0, y: 400 },
       ],
-      members: [{ point: { x: 500, y: 200 }, row: 0 }],
+      members: [
+        { point: { x: 500, y: 0 }, row: 0 },
+        { point: { x: 500, y: 400 }, row: 0 },
+      ],
     });
-    const hubs = edges.filter((e) => e.morphKey?.startsWith("l"));
-    expect(hubs.length).toBeGreaterThan(0);
-    for (const hub of hubs) {
-      expect(hub.styles).toEqual(["bezier", "straight"]);
+    const routes = orthogonal(edges);
+    const leaderEnds = routes
+      .filter((e) => e.morphKey?.startsWith("l"))
+      .map((e) => e.start);
+    expect(leaderEnds.map((p) => p.y).sort((a, b) => a - b)).toEqual([96, 496]);
+    // Vertical spans of each spine tile it without overlapping.
+    const verticals = routes.flatMap(({ points = [] }) =>
+      points.flatMap((p, i) =>
+        i > 0 && p.x === points[i - 1].x && p.y !== points[i - 1].y
+          ? [
+              {
+                x: p.x,
+                from: Math.min(p.y, points[i - 1].y),
+                to: Math.max(p.y, points[i - 1].y),
+              },
+            ]
+          : [],
+      ),
+    );
+    const spines = [...new Set(verticals.map((v) => v.x))];
+    expect(spines).toHaveLength(2);
+    for (const x of spines) {
+      const spans = verticals
+        .filter((v) => v.x === x)
+        .sort((a, b) => a.from - b.from);
+      expect(spans[0].from).toBeLessThanOrEqual(96);
+      expect(spans[spans.length - 1].to).toBeGreaterThanOrEqual(496);
+      for (let i = 1; i < spans.length; i++) {
+        expect(spans[i].from).toBeGreaterThanOrEqual(spans[i - 1].to - 1e-6);
+      }
     }
   });
 
