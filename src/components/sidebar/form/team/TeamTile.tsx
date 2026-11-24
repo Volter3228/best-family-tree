@@ -31,7 +31,16 @@ const TeamTile = ({ name, photoUrl, iconUrl, typeColor, color = "blue", classNam
         !tint && [COLOR_CLASSES[color].softBg, COLOR_CLASSES[color].text],
         className,
       )}
-      style={tint ? { backgroundColor: `${tint}26`, color: tint } : undefined}
+      // Initials pulled toward the theme foreground, as in TeamTypeMark, so
+      // near-black and near-white type colours stay readable in both themes.
+      style={
+        tint
+          ? {
+              backgroundColor: `${tint}26`,
+              color: `color-mix(in srgb, ${tint} 30%, var(--foreground))`,
+            }
+          : undefined
+      }
     >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
