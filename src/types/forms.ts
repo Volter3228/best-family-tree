@@ -2,6 +2,8 @@ import { ActivityState, Gender, MemberStatus } from "@/types";
 
 export type PositionFormRow = {
   id: string;
+  // The stored position this row shows (edit and suggest forms).
+  positionId?: string;
   teamTypeId?: string;
   teamName?: string;
   // Period of the team this row creates (an existing team keeps its own).

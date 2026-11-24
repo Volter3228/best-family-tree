@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildMemberChanges,
+  buildPositionsChange,
   buildTeamChanges,
   findEmptiedTeamFields,
   type SuggestableMember,
@@ -108,5 +109,48 @@ describe("team changes", () => {
       startYear: undefined,
     });
     expect([...emptied].sort()).toEqual(["description", "startYear"]);
+  });
+});
+
+describe("buildPositionsChange", () => {
+  const stored = [
+    {
+      id: "a",
+      positionId: "p1",
+      roleId: "r1",
+      roleName: "Leader",
+      teamName: "HR",
+    },
+  ];
+
+  it("sends nothing when the list is unchanged, whatever the key order", () => {
+    const reordered = [
+      {
+        teamName: "HR",
+        roleName: "Leader ",
+        roleId: "r1",
+        positionId: "p1",
+        id: "b",
+      },
+    ];
+    expect(buildPositionsChange(stored, reordered)).toBeNull();
+  });
+
+  it("ignores rows without a role", () => {
+    expect(
+      buildPositionsChange(stored, [...stored, { id: "c", roleName: " " }]),
+    ).toBeNull();
+  });
+
+  it("sends the whole list without row ids when it changed", () => {
+    const change = buildPositionsChange(stored, [
+      ...stored,
+      { id: "c", roleName: "Mascot", teamName: "BTW 2026", teamTypeId: "" },
+    ]);
+    expect(change?.field).toBe("positions");
+    expect(JSON.parse(change!.value!)).toEqual([
+      { positionId: "p1", roleId: "r1", roleName: "Leader", teamName: "HR" },
+      { roleName: "Mascot", teamName: "BTW 2026" },
+    ]);
   });
 });

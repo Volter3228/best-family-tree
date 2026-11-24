@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import type { SuggestionChange } from "@/api/selfService";
+import type { PositionFormRow } from "@/types";
 import { normalizePhone } from "@/utils/phone";
 
 // A suggestion may change or add a value, never empty one: a field the form
@@ -85,6 +86,44 @@ export const buildMemberChanges = (
     );
   }
   return changes;
+};
+
+type PositionRow = PositionFormRow;
+
+const POSITION_KEYS = [
+  "positionId",
+  "roleId",
+  "roleName",
+  "isLeaderPosition",
+  "teamTypeId",
+  "teamName",
+  "teamStartYear",
+  "teamEndYear",
+  "organization",
+  "startYear",
+  "endYear",
+] as const;
+
+// Fixed key order and no empty values, so equal rows give equal JSON.
+const sentPosition = (row: PositionRow) =>
+  Object.fromEntries(
+    POSITION_KEYS.map((key) => {
+      const value = row[key];
+      return [key, typeof value === "string" ? value.trim() : value];
+    }).filter(([, value]) => value !== undefined && value !== ""),
+  );
+
+// The whole position list, sent only when it differs from the stored one; the
+// server turns it into one suggestion per added, edited or removed position.
+export const buildPositionsChange = (
+  stored: PositionRow[],
+  rows: PositionRow[],
+): SuggestionChange | null => {
+  const list = (items: PositionRow[]) =>
+    items.filter((row) => row.roleName.trim()).map(sentPosition);
+  const next = list(rows);
+  if (JSON.stringify(next) === JSON.stringify(list(stored))) return null;
+  return { field: "positions", value: JSON.stringify(next) };
 };
 
 export interface SuggestableTeam {

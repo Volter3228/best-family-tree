@@ -1,6 +1,11 @@
 import { FormEvent, useEffect, useId, useMemo, useState } from "react";
 import { useTransientMessage } from "@/hooks/forms/useTransientMessage";
-import { useMembersActions, useMentorsList } from "@/hooks";
+import {
+  useMembersActions,
+  useMentorsList,
+  useTeams,
+  useTeamTypes,
+} from "@/hooks";
 import {
   fetchMyMemberSuggestions,
   removeMyPhoto,
@@ -9,24 +14,26 @@ import {
   uploadMyPhoto,
 } from "@/api/selfService";
 import { getMemberAvatar } from "@/utils";
-import { buildMemberChanges, toDay } from "@/utils/suggestChanges";
-import { getStatusOptions } from "@/constants/filters";
-import { useLocale, useT } from "@/i18n/useT";
-import { formatDay } from "../../manage/suggestionFormat";
-import { useDisplayName } from "@/utils/displayName";
+import {
+  buildMemberChanges,
+  buildPositionsChange,
+  toDay,
+} from "@/utils/suggestChanges";
+import { useT } from "@/i18n/useT";
 import { useSessionStore } from "@/store/sessionStore";
 import InfoBubble from "@/components/ui/InfoBubble";
 import { Member } from "@/models";
-import type { AccentColor, MemberFormData } from "@/types";
+import type { AccentColor, MemberFormData, MemberFormErrors } from "@/types";
 import { ClearButton, SubmitButton } from "../buttons";
 import { AvatarFileInput } from "../inputs";
 import { getInitialFormData } from "../editMemberFormData";
-import validateMemberForm from "../validations/memberFormValidation";
+import PositionFormFields from "../fields/position/PositionFormFields";
 import FormError from "../FormError";
 import FormFooter from "../FormFooter";
 import MemberSuggestFields from "./MemberSuggestFields";
 import PendingBlock from "./PendingBlock";
-import { buildPendingRows } from "./pendingRows";
+import { collectSuggestErrors } from "./memberSuggestErrors";
+import { useMemberPendingRows } from "./useMemberPendingRows";
 import { useSuggestions, withoutPending } from "./useSuggestions";
 
 interface Props {
@@ -35,29 +42,21 @@ interface Props {
   color?: AccentColor;
 }
 
-type Errors = Partial<Record<keyof MemberFormData, string>>;
-
-// Suggest field -> the form fields it covers.
-const FORM_KEYS: Record<string, (keyof MemberFormData)[]> = {
-  name: ["firstName", "lastName"],
-  phoneNumbers: ["phoneNumber"],
-};
-
 const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
   const t = useT().suggest;
   const tMember = useT().memberForm;
   const tCommon = useT().formCommon;
-  const locale = useLocale();
-  const dn = useDisplayName();
   const formId = useId();
   const session = useSessionStore((s) => s.session);
   const mentorsList = useMentorsList();
+  const [teams] = useTeams();
+  const [teamTypes] = useTeamTypes();
   const { updateMember, getMentorsList } = useMembersActions();
 
   const [form, setForm] = useState<MemberFormData>(() =>
     getInitialFormData(member),
   );
-  const [errors, setErrors] = useState<Errors>({});
+  const [errors, setErrors] = useState<MemberFormErrors>({});
   const [success, showSuccess] = useTransientMessage();
   // A newly picked photo, saved together with the suggestions on submit.
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -78,68 +77,27 @@ const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
   const savesDirectly = isOwn && !session.demo;
   const showPicker = savesDirectly || !isOwn;
 
-  const changes = useMemo(
-    () => withoutPending(buildMemberChanges(member, form), pending),
-    [member, form, pending],
-  );
-
-  const pendingRows = useMemo(() => {
-    const statuses = getStatusOptions(locale);
-    const labels: Record<string, string> = {
-      name: t.name,
-      photo: t.photo,
-      birthday: tMember.birthday,
-      joinedAt: tMember.joinedAt,
-      status: tMember.status,
-      mentorId: tMember.mentor,
-      email: "Email",
-      phoneNumbers: tMember.phoneNumber,
-      telegramLink: "Telegram",
-      instagramLink: "Instagram",
-      facebookLink: "Facebook",
-      linkedinLink: "LinkedIn",
-    };
-    return buildPendingRows(
-      pending,
-      t,
-      (field) => labels[field] ?? field,
-      (field, value) => {
-        if (field === "birthday" || field === "joinedAt")
-          return formatDay(value, locale);
-        if (field === "status") {
-          return statuses.find((item) => item.value === value)?.label ?? value;
-        }
-        if (field === "mentorId") {
-          const mentor = mentorsList.find(({ id }) => id === value);
-          return mentor ? dn(mentor.name) : value;
-        }
-        return value;
-      },
+  const changes = useMemo(() => {
+    const fields = withoutPending(buildMemberChanges(member, form), pending);
+    const positions = buildPositionsChange(
+      getInitialFormData(member).positions,
+      form.positions,
     );
-  }, [pending, t, tMember, locale, mentorsList, dn]);
+    return positions ? [...fields, positions] : fields;
+  }, [member, form, pending]);
 
-  // Emptying a stored field is refused; a format error counts only for a
-  // field the suggestion actually changes.
-  const collectErrors = (): Errors => {
-    const changed = new Set(
-      changes.flatMap(({ field }) => FORM_KEYS[field] ?? [field]),
-    );
-    const all = validateMemberForm(
-      { ...form, positions: [] },
-      mentorsList,
-      [],
+  const pendingRows = useMemberPendingRows(pending);
+
+  const collectErrors = () =>
+    collectSuggestErrors(form, {
       member,
-      { t: tMember.validation },
-    );
-    const result: Errors = {};
-    for (const [key, message] of Object.entries(all)) {
-      if (typeof message !== "string") continue;
-      const name = key as keyof MemberFormData;
-      if (!form[name]) result[name] = t.cannotEmpty;
-      else if (changed.has(name)) result[name] = message;
-    }
-    return result;
-  };
+      changes,
+      mentorsList,
+      teams,
+      teamTypes,
+      t: tMember.validation,
+      cannotEmpty: t.cannotEmpty,
+    });
   const hasErrors = Object.keys(collectErrors()).length > 0;
   const photoChanged = !!photoFile || removePhoto;
   const hasChanges = changes.length > 0 || photoChanged;
@@ -214,6 +172,13 @@ const MemberSuggestForm = ({ member, onExit, color = "blue" }: Props) => {
           birthday: !!toDay(member.birthday),
           mentor: !!member.mentorId,
         }}
+        color={color}
+      />
+      <PositionFormFields
+        error={errors.positions}
+        rowErrors={errors.positionErrors}
+        positions={form.positions}
+        onChange={(positions) => setForm((prev) => ({ ...prev, positions }))}
         color={color}
       />
       <FormError message={error} color={color} />

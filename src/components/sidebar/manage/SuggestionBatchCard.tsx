@@ -60,7 +60,7 @@ const SuggestionBatchCard = ({
             <button
               type="button"
               onClick={onOpen}
-              className="touch-manipulation self-start truncate text-left text-sm font-semibold text-foreground hover:underline focus:outline-none focus-visible:underline"
+              className="max-w-full touch-manipulation self-start truncate text-left text-sm font-semibold text-foreground hover:underline focus:outline-none focus-visible:underline"
             >
               {name}
             </button>

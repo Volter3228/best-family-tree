@@ -13,6 +13,7 @@ import {
   PHONE_ADD,
   PHONE_REPLACE,
   diffMemberSuggestion,
+  isPositionField,
   diffTeamSuggestion,
   revertedFields,
   type SuggestionChange,
@@ -30,6 +31,10 @@ import {
   assertNoMentorCycle,
   assertUniqueContacts,
 } from "../member/memberService.js";
+import {
+  buildPositionRows,
+  supersedePendingPositions,
+} from "./suggestionPositions.js";
 
 export type { SuggestionTarget };
 
@@ -101,14 +106,18 @@ const buildRows = async (
     });
     if (!member)
       throw new NotFoundError("Member not found", { code: "member_not_found" });
+    const positions = changes.findLast((c) => c.field === "positions");
     const rows = diffMemberSuggestion(
       {
         ...member,
         phoneNumbers: member.phoneNumbers.map((p) => p.phoneNumber),
       },
-      changes,
+      changes.filter((c) => c.field !== "positions"),
     );
     if (rows.length > 0) await checkMemberRows(target.id, rows);
+    if (positions) {
+      rows.push(...(await buildPositionRows(target.id, positions.value)));
+    }
     return rows;
   }
 
@@ -128,7 +137,11 @@ export const createSuggestionBatch = async (
   if (!canSuggest(session) || (!session.memberId && !session.email)) {
     throw new ForbiddenError();
   }
-  const rows = await buildRows(target, changes);
+  const { rows, replacedIds } = await supersedePendingPositions(
+    session,
+    target.id,
+    await buildRows(target, changes),
+  );
   const own = {
     status: "PENDING" as const,
     ...authorWhere(session),
@@ -152,13 +165,16 @@ export const createSuggestionBatch = async (
   await assertUnderPendingCap(session, target);
 
   const batchId = randomUUID();
-  // One pending suggestion per field: the new rows replace the author's old ones.
+  // One pending suggestion per field: the new rows replace the author's old
+  // ones. Positions are matched per position (see supersedePendingPositions).
+  const fields = rows.map((r) => r.field).filter((f) => !isPositionField(f));
   await prisma.$transaction([
     prisma.editSuggestion.deleteMany({
       where: {
         ...own,
         OR: [
-          { field: { in: [...new Set(rows.map((r) => r.field))] } },
+          { field: { in: [...new Set(fields)] } },
+          { id: { in: replacedIds } },
           ...(reverted.length > 0 ? [{ field: { in: reverted } }] : []),
         ],
       },

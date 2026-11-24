@@ -25,7 +25,7 @@ const createBodySchema = z.object({
     .array(
       z.object({
         field: z.string().min(1).max(40),
-        value: z.string().max(2000).nullable(),
+        value: z.string().max(20000).nullable(),
       }),
     )
     .min(1)

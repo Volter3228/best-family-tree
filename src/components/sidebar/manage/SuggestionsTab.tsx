@@ -7,7 +7,7 @@ import {
 } from "@/api/suggestionReview";
 import { ApiError } from "@/api/ApiError";
 import fetchMemberById from "@/api/fetchMemberById";
-import { useMembersActions, useTeams } from "@/hooks";
+import { useMembersActions, useRoles, useTeams } from "@/hooks";
 import Spinner from "@/components/ui/Spinner";
 import { useProfileStore } from "@/store/profileStore";
 import { useT } from "@/i18n/useT";
@@ -23,6 +23,7 @@ const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
   const t = useT().review;
   const { updateMember, getMentorsList, reloadMembers } = useMembersActions();
   const [, , reloadTeams] = useTeams();
+  const [, , reloadRoles] = useRoles();
   const [items, setItems] = useState<SuggestionDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
@@ -105,7 +106,11 @@ const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
       const memberIds = new Set<string>();
       let teams = false;
       let mentors = false;
+      // An approved position may have created a role or an event team.
+      let catalog = false;
       for (const item of approved) {
+        if (item.field === "position:add" || item.field === "position:replace")
+          catalog = true;
         if (item.target.kind === "team") teams = true;
         else memberIds.add(item.target.id);
         if (item.field === "name" || item.field === "status") mentors = true;
@@ -124,9 +129,11 @@ const SuggestionsTab = ({ refreshCount, color }: ManageTabProps) => {
           if (own && memberIds.has(own)) void useSessionStore.getState().load();
         }
         if (mentors) getMentorsList();
+        if (catalog && !teams) reloadTeams();
+        if (catalog) reloadRoles();
       }, LEAVE_MS + 50);
     },
-    [updateMember, getMentorsList, reloadTeams, reloadMembers],
+    [updateMember, getMentorsList, reloadTeams, reloadRoles, reloadMembers],
   );
 
   const act = async (id: string, kind: ReviewKind, force = false) => {

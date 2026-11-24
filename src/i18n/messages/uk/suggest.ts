@@ -18,6 +18,9 @@ export const suggest = {
   yes: "так",
   no: "ні",
   name: "Ім'я та прізвище",
+  positionAdd: "Нова посада",
+  positionReplace: "Посада",
+  positionRemove: "Видалити посаду",
   cannotEmpty: "Заповнене поле не можна очистити.",
   errors: {
     too_many_pending: "Дочекайся перевірки попередніх пропозицій",
@@ -25,5 +28,12 @@ export const suggest = {
     cannot_empty: "Заповнене поле не можна очистити",
     no_changes: "Немає змін",
     field_not_suggestable: "Це поле не можна змінити через пропозицію",
+    role_unknown: "Цієї посади вже немає. Обери іншу",
+    team_type_unknown: "Цього типу команди вже немає",
+    team_in_other_type: "Команда з такою назвою вже є в іншому типі",
+    team_create_event_only:
+      "Нову команду можна створити лише як випуск події. Обери наявну команду",
+    team_start_year_required: "Для події без назви команди потрібен рік",
+    positions_invalid: "Перевір посади: деякі дані некоректні",
   },
 };

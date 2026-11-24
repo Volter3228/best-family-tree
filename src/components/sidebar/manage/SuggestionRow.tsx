@@ -10,6 +10,8 @@ import { getStatusLabel } from "@/utils";
 import { useDisplayName } from "@/utils/displayName";
 import CollapseOut from "./CollapseOut";
 import SuggestionPhotos from "./SuggestionPhotos";
+import SuggestionPositions, { PositionTypeLabel } from "./SuggestionPositions";
+import { isPositionField } from "./positionSuggestion";
 import { fieldLabelKey, formatDay } from "./suggestionFormat";
 
 interface Props {
@@ -54,6 +56,12 @@ const SuggestionRow = ({
       case "phone:add":
       case "phone:replace":
         return tMember.phoneNumber;
+      case "position:add":
+        return t.fields.positionAdd;
+      case "position:replace":
+        return t.fields.positionReplace;
+      case "position:remove":
+        return t.fields.positionRemove;
       default:
         return (
           (t.fields as Record<string, string>)[
@@ -101,13 +109,28 @@ const SuggestionRow = ({
     <CollapseOut leaving={leaving}>
       <div className="flex items-start gap-2 py-2">
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-foreground/60">{label}</p>
+          <p className="text-xs text-foreground/60">
+            {label}
+            {isPositionField(s.field) && (
+              <PositionTypeLabel
+                field={s.field}
+                current={s.fromValue}
+                next={s.toValue}
+              />
+            )}
+          </p>
           {s.field === "photo" ? (
             <SuggestionPhotos
               suggestionId={s.id}
               kind={s.target.kind}
               name={s.target.name}
               current={s.currentValue ?? s.fromValue}
+              next={s.toValue}
+            />
+          ) : isPositionField(s.field) ? (
+            <SuggestionPositions
+              field={s.field}
+              current={s.fromValue}
               next={s.toValue}
             />
           ) : (

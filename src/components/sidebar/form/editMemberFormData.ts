@@ -25,6 +25,7 @@ export const getInitialFormData = (member: Member): MemberFormData => {
     linkedinLink: member.linkedinLink || "",
     positions: (member.positions || []).map((p) => ({
       id: crypto.randomUUID(),
+      positionId: p.id,
       roleId: p.roleId,
       roleName: p.role?.name || "",
       teamTypeId: p.team?.teamType?.id,

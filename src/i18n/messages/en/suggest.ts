@@ -21,6 +21,9 @@ export const suggest = {
   yes: "yes",
   no: "no",
   name: "First and last name",
+  positionAdd: "New position",
+  positionReplace: "Position",
+  positionRemove: "Remove position",
   cannotEmpty: "A filled field cannot be cleared.",
   errors: {
     too_many_pending: "Wait until your earlier suggestions are reviewed",
@@ -28,5 +31,12 @@ export const suggest = {
     cannot_empty: "A filled field cannot be cleared",
     no_changes: "No changes",
     field_not_suggestable: "This field cannot be changed by a suggestion",
+    role_unknown: "This role no longer exists. Pick another one",
+    team_type_unknown: "This team type no longer exists",
+    team_in_other_type: "A team with this name already exists in another type",
+    team_create_event_only:
+      "A new team can only be an edition of an event. Pick an existing team",
+    team_start_year_required: "An event without a team name needs a year",
+    positions_invalid: "Check the positions: some values are invalid",
   },
 } satisfies Messages["suggest"];

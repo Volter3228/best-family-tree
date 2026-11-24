@@ -16,7 +16,8 @@ const parseDay = (value: string) => {
 
 export { parseDay };
 
-// One line per pending suggestion: "Field: value" (phones: "old -> new").
+// One line per pending suggestion: "Field: value" (phones and positions:
+// "old -> new").
 export const buildPendingRows = (
   pending: PendingSuggestion[],
   t: Messages["suggest"],
@@ -42,6 +43,13 @@ export const buildPendingRows = (
       return value
         ? [{ key, label: label("phoneNumbers"), text: t.removeValue(value) }]
         : [];
+    }
+    if (field === "position:replace" && fromValue && toValue) {
+      const text = `${show(field, fromValue)} → ${show(field, toValue)}`;
+      return [{ key, label: label(field), text }];
+    }
+    if (field === "position:remove" && fromValue) {
+      return [{ key, label: label(field), text: show(field, fromValue) }];
     }
     if (field === "phone:add" && toValue) {
       return [{ key, label: label("phoneNumbers"), text: toValue }];

@@ -9,6 +9,10 @@ import {
   teamCurrentValues,
   type FieldValues,
 } from "../../utils/suggestions.js";
+import {
+  isPositionField,
+  isPositionStale,
+} from "../../utils/suggestionPositions.js";
 
 export const countPending = () =>
   prisma.editSuggestion.count({ where: { status: "PENDING" } });
@@ -17,7 +21,10 @@ export const listPending = async (session: Session) => {
   const rows = await prisma.editSuggestion.findMany({
     where: { status: "PENDING" },
     orderBy: [{ createdAt: "asc" }, { batchId: "asc" }, { id: "asc" }],
-    include: { member: { include: { phoneNumbers: true } }, team: true },
+    include: {
+      member: { include: { phoneNumbers: true, positions: true } },
+      team: true,
+    },
   });
 
   const memberIds = rows.flatMap((r) => (r.memberId ? [r.memberId] : []));
@@ -68,13 +75,16 @@ export const listPending = async (session: Session) => {
 
   return rows.map((row) => {
     const phone = isPhoneField(row.field);
+    const position = isPositionField(row.field);
     const current = currentOf(row);
     const phones = row.member?.phoneNumbers.map((p) => p.phoneNumber) ?? [];
-    const currentValue = phone
-      ? row.field === PHONE_REPLACE && phones.includes(row.fromValue!)
-        ? row.fromValue
-        : null
-      : (current[row.field] ?? null);
+    const currentValue = position
+      ? row.fromValue
+      : phone
+        ? row.field === PHONE_REPLACE && phones.includes(row.fromValue!)
+          ? row.fromValue
+          : null
+        : (current[row.field] ?? null);
     const labels =
       row.field === "mentorId"
         ? memberNames
@@ -109,12 +119,14 @@ export const listPending = async (session: Session) => {
         toLabel: label(row.toValue),
         currentLabel: label(currentValue),
       }),
-      stale: isStale(
-        row,
-        phone
-          ? (row.member?.phoneNumbers.map((p) => p.phoneNumber) ?? [])
-          : currentValue,
-      ),
+      stale: position
+        ? isPositionStale(row, row.member?.positions ?? [])
+        : isStale(
+            row,
+            phone
+              ? (row.member?.phoneNumbers.map((p) => p.phoneNumber) ?? [])
+              : currentValue,
+          ),
       locked:
         !!row.member &&
         !canEditMember(session, {

@@ -1,6 +1,7 @@
 import { ValidationError } from "./httpErrors.js";
 import { diffPhones, isPhoneField, isPhoneStale } from "./suggestionPhones.js";
 export * from "./suggestionPhones.js";
+export { isPositionField } from "./suggestionPositions.js";
 import {
   MEMBER_NORMALIZERS,
   TEAM_NORMALIZERS,

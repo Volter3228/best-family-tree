@@ -14,7 +14,7 @@ interface ResolvedPosition {
   endYear: number | null;
 }
 
-const getPositionKey = (position: ResolvedPosition) =>
+export const getPositionKey = (position: ResolvedPosition) =>
   [
     position.roleId,
     position.teamId ?? "",
@@ -23,7 +23,7 @@ const getPositionKey = (position: ResolvedPosition) =>
     position.endYear ?? "",
   ].join("|");
 
-const resolvePosition = async (
+export const resolvePosition = async (
   tx: MemberTransaction,
   position: PositionInput,
 ): Promise<ResolvedPosition> => {

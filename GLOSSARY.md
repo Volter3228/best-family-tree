@@ -132,7 +132,7 @@ _Avoid_: Sandbox (edits are refused, not kept in the browser), test mode
 ## Contributions
 
 **Suggestion**:
-A proposed change to one field of a member or a team, sent by anyone with a Personal sign-in and applied only when an Editor or Admin approves it. Fields sent together form one batch, but each is approved or rejected on its own. A suggestion may add or change a value, never empty it. Photos are never suggested.
+A proposed change to one field of a member or a team, sent by anyone with a Personal sign-in and applied only when an Editor or Admin approves it. Fields sent together form one batch, but each is approved or rejected on its own. A suggestion may add or change a value, never empty it; only a phone number or a position may be suggested for removal. A suggested position may name a role or an event team that does not exist yet: it is created only when the suggestion is approved.
 _Avoid_: Request, proposal, edit request
 
 **Featured role**:

@@ -11,6 +11,7 @@ import { teamBodySchema, parseWith } from "../../utils/catalogValidation.js";
 import { CONTACT_FIELDS } from "../../utils/suggestionFields.js";
 import {
   isPhoneField,
+  isPositionField,
   isStale,
   memberCurrentValues,
   teamCurrentValues,
@@ -29,7 +30,9 @@ import {
   PHOTO_FIELD,
   photoAssetsToDiscard,
 } from "../../utils/suggestionPhoto.js";
+import { isPositionStale } from "../../utils/suggestionPositions.js";
 import { applyPhone } from "./suggestionApplyPhone.js";
+import { applyPosition } from "./suggestionApplyPosition.js";
 import { updateTeamIn } from "../team/teamService.js";
 
 const alreadyReviewed = () =>
@@ -50,6 +53,9 @@ const applyMemberField = async (
 ) => {
   if (isPhoneField(row.field)) {
     return applyPhone(tx, memberId, row);
+  }
+  if (isPositionField(row.field)) {
+    return applyPosition(tx, memberId, row);
   }
   const value = row.toValue;
   if (row.field === "mentorId") {
@@ -106,7 +112,7 @@ const applyApproval = (session: Session, id: string, force: boolean) =>
     if (row.memberId) {
       const member = await tx.member.findUnique({
         where: { id: row.memberId },
-        include: { phoneNumbers: true },
+        include: { phoneNumbers: true, positions: true },
       });
       if (!member)
         throw new NotFoundError("Member not found", {
@@ -125,7 +131,10 @@ const applyApproval = (session: Session, id: string, force: boolean) =>
         : (memberCurrentValues({ ...member, phoneNumbers: phones })[
             row.field
           ] ?? null);
-      if (!force && isStale(row, current)) {
+      const stale = isPositionField(row.field)
+        ? isPositionStale(row, member.positions)
+        : isStale(row, current);
+      if (!force && stale) {
         throw new ConflictError(
           "The value changed since this was suggested",
           undefined,
